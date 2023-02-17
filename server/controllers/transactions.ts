@@ -1,5 +1,5 @@
 import { PrismaClient, Transaction } from "@prisma/client";
-import { CreateTransactionDto, TagTransactionDto, TransactionIdDto } from "../validators/transactions.dto";
+import { CreateTransactionDto, TagTransactionDto, TransactionIdDto, TransactionMonthDto } from "../validators/transactions.dto";
 
 
 class Transactions {
@@ -14,21 +14,30 @@ class Transactions {
 
     public async findSingle(transactionData: TransactionIdDto): Promise<Transaction> {
         console.info(`Querying transaction id=${transactionData.id}`)
-        const transaction = await this.transactions.findUnique({ where: { id: transactionData.id } });
+        const transaction = await this.transactions.findUnique({
+            where: { id: transactionData.id },
+            include: { source: true, tags: true },
+        });
         if (!transaction) {
             throw createError({ statusCode: 400, statusMessage: `No such transaction id=${transactionData.id}` });
         }
         return transaction
     }
 
-    public async findRecent({ month = undefined, year = undefined }: { month?: number; year?: number; } = {}): Promise<Transaction[]> {
+    public async findRecent(data: TransactionMonthDto): Promise<any> {
         const now = new Date();
-        if (!month) {
-          month = now.getMonth() + 1;
+        console.info(data);
+        let month = data.month;
+        let year = data.year;
+        
+        if (month) {
+            month--;
+        } else {
+            month = now.getMonth();
         }
-        if (!year) {
-          year = now.getUTCFullYear();
-        }
+        year ??= now.getUTCFullYear();
+        console.info(`${year}, ${month}`);
+        
         let monthNext = month + 1;
         let yearNext = year;
         if (monthNext > 12) {
@@ -36,8 +45,10 @@ class Transactions {
             yearNext++;
         }
     
-        const queryDate = new Date(`${year}-${month}-${1}`);
-        const queryDateNext = new Date(`${yearNext}-${monthNext}-${1}`);
+        // const queryDate = new Date(`${year}-${month}-${1}`);
+        const queryDate = new Date(year=year,month=month)
+        // const queryDateNext = new Date(`${yearNext}-${monthNext}-${1}`);
+        const queryDateNext = new Date(year=yearNext, month=monthNext);
         console.log(`Querying transactions from='${queryDate}' to='${queryDateNext}'`);
         const allTrans: Transaction[] = await this.transactions.findMany({
           where: {
@@ -49,7 +60,11 @@ class Transactions {
           include: { source: true, tags: true },
         });
         allTrans.sort((a, b) => b.created.getTime() - a.created.getTime());
-        return allTrans;
+        return {
+            month: `${year}-${month}`,
+            count: allTrans.length,
+            data: allTrans
+        };
     }
     
       public async createTransaction(transactionData: CreateTransactionDto): Promise<Transaction> {
@@ -57,7 +72,7 @@ class Transactions {
         if (transactionData.created) {
             parsed_date = new Date(transactionData.created);
         }
-        const tags = transactionData.tags.split(',').map(tagName => ({ name: tagName }));
+        const tags = transactionData.tags.map(tagName => ({ name: tagName }));
         console.info(tags);
     
         transactionData.currency ??= 'CZK';
@@ -85,7 +100,7 @@ class Transactions {
     }
 
     public async tagTransaction(tagsData: TagTransactionDto): Promise<Transaction> {
-        const tags = tagsData.tags.split(',').map(t => t.trim()).map(tagName => ({ name: tagName }));
+        const tags = tagsData.tags.map(tagName => ({ name: tagName }));
         const trans = await this.transactions.update({
           where: {
             id: tagsData.transactionId,
@@ -95,15 +110,13 @@ class Transactions {
               connect: tags,
             },
           },
-          include: {
-            tags: true,
-          },
+          include: { tags: true, source: true },
         });
         return trans;
     }
     
     public async untagTransaction(tagsData: TagTransactionDto): Promise<Transaction> {
-        const tags = tagsData.tags.split(',').map(t => t.trim()).map(tagName => ({ name: tagName }));
+        const tags = tagsData.tags.map(tagName => ({ name: tagName }));
         const trans = await this.transactions.update({
           where: {
             id: tagsData.transactionId,
@@ -113,9 +126,7 @@ class Transactions {
               disconnect: tags,
             },
           },
-          include: {
-            tags: true,
-          },
+          include: { tags: true, source: true },
         });
         return trans;
     }
