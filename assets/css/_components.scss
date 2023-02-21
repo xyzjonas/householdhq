@@ -33,6 +33,13 @@
         text-align: end;
     }
 
+    &::before {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border: solid;
+    }
+
     .item:nth-child(1) {
         text-align: start;
         flex: 1;
@@ -54,8 +61,6 @@
 $tag-radius: 32px;
 
 .tag {
-    // padding: 0.5em;
-    // font-size: 80%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,7 +70,27 @@ $tag-radius: 32px;
     border-radius: $tag-radius;
     background-color: var(--color-grey-dark-2);
      i {
-        transform: scale(0.7);
+        transform: scale(0.8);
      }
+}
+
+.app-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    height: auto;
+
+    @media only screen and (max-width: $bp-large) {
+        display: block;
+    }
+}
+
+.floating {
+    display: block;
+    position: absolute;
+    top: 90%; right: 1em;
+    @media only screen and (max-width: $bp-large) {
+        position: relative;
+    }
 }
   

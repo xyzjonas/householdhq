@@ -1,16 +1,10 @@
 <template>
-    <div class="tag">
-        <i v-if="icon" :class="icon"></i>
-        <p v-else>
-            {{ alt }}
-        </p>
-
-    </div>
+    <i v-if="icon" :class="icon" style="color: white; margin-left: 0.4em;"></i>
 </template>
 
 <script>
 export default {
-    props: [ "iconName", "alt" ],
+    props: [ "iconName" ],
     
     computed: {
         icon() {
