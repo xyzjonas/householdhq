@@ -34,15 +34,8 @@ const doValidate = async (
     whitelist = true,
     forbidNonWhitelisted = true,
 ): Promise<any> => {
-    // console.debug(`Validating data:`)
-    console.debug(body);
     const data = plainToInstance(type, body);
     const errors = await validate(data, { skipMissingProperties, whitelist, forbidNonWhitelisted })
-    console.info('--------------------');
-    console.info(errors);
-    console.info('--------------------');
-    console.info(data);
-    console.info('--------------------');
     
     if (errors.length > 0) {
         const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
@@ -51,8 +44,6 @@ const doValidate = async (
             statusMessage: message
         })
     }
-
-    console.debug(`Data OK: ${plainToInstance(type, body)}`)
     return data;
 };
 

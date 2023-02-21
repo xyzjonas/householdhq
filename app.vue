@@ -3,7 +3,7 @@
   const { pending, data: transactions } = useLazyFetch('/api/transactions')
 </script> -->
 
-<script>
+<!-- <script>
 import { TransactionRow } from '#components';
 
 export default {
@@ -21,6 +21,10 @@ export default {
     transactions() {
       const now = new Date();
       return this.allTransactions.filter(trans => new Date(trans.created) <= now);
+    },
+    upcommingTransactions() {
+      const now = new Date();
+      return this.allTransactions.filter(trans => new Date(trans.created) > now);
     }
   },
 
@@ -28,27 +32,19 @@ export default {
 
   },
 
-  created() {
-    this.loading = true;
-    $fetch('/api/transactions', {method: 'GET'})
-      .then(res => this.allTransactions = res.data)
-      .finally(() => this.loading = false)
-  }
+  // created() {
+  //   console.info(`On create: app.vue`)
+  //   this.loading = true;
+  //   $fetch('/api/transactions', {method: 'GET'})
+  //     .then(res => this.allTransactions = res.data)
+  //     .finally(() => this.loading = false)
+  // }
 }
-</script>
+</script> -->
 
 
 <template>
   <NuxtLayout>
-    <div v-if="loading">LOADING</div>
-    <table v-else>
-      <tr>
-        <th>Datum</th>
-        <th>Castka</th>
-        <th>Popis</th>
-      </tr>
-      <TransactionRow v-for="transaction in transactions" :transaction="transaction" />
-    </table>
-
+    <NuxtPage />
   </NuxtLayout>
 </template>

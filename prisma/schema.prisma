@@ -22,6 +22,7 @@ model Tag {
   id            Int     @id @default(autoincrement())
   name          String  @unique
   description   String?
+  icon          String?
 
   parentId      Int?
   parentTag     Tag?    @relation("TagHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)

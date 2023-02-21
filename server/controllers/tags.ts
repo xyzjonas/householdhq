@@ -1,5 +1,6 @@
 import { PrismaClient, Tag, Prisma } from '@prisma/client';
 import { CreateTagDto, TagIdDto } from '../validators/tags.dto';
+import { IdDto } from '../validators/transactions.dto';
 
 
 class Tags {
@@ -9,6 +10,17 @@ class Tags {
   public async findAllTags(): Promise<Tag[]> {
     const tags: Tag[] = await this.tags.findMany({ include: { childTags: true } });
     return tags;
+  }
+
+  public async findSingle(data: IdDto): Promise<Tag> {
+    const tag = await this.tags.findUnique({
+      where: { id: data.id },
+      include: { childTags: true }
+    });
+    if (!tag) {
+      throw createError({ statusCode: 404, statusMessage: `Tag '${data.id}' nof found.` });
+    }
+    return tag;
   }
 
   public async deleteTag(tagData: TagIdDto): Promise<Tag> {
@@ -43,4 +55,4 @@ class Tags {
   }
 }
 
-export default Tags;
+export default new Tags();

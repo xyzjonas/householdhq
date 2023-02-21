@@ -3,7 +3,7 @@ import { IsInt, IsNumber, IsOptional, IsString, IsDate, Validate } from 'class-v
 import { ValidArray, ValidDate } from './validator';
 
 
-export class TransactionIdDto {
+export class IdDto {
   @IsInt()
   @Transform(({value}) => parseInt(value))
   public id?: number

@@ -1,0 +1,71 @@
+@import "icons";
+
+.box {
+    border-bottom: solid;
+    border-width: 1px;
+    border-color: var(--color-grey-dark-2);
+
+    margin: 0.5em;
+    padding: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .item {
+        min-width: 3em;
+        width: fit-content;
+        height: fit-content;
+        flex: 1;
+        
+    }
+
+    // .item .parent {
+    //     display: flex;
+    //     flex-direction: row;
+    //     align-items: center;
+    //     justify-content: center;
+    //     @media only screen and (max-width: $bp-small) {
+    //         flex-direction: column;
+    //     }
+    // }
+
+    .item:nth-last-child(1) {
+        text-align: end;
+    }
+
+    .item:nth-child(1) {
+        text-align: start;
+        flex: 1;
+    }
+
+    .item:nth-child(2) {
+        flex: none;
+    }
+
+    .item:nth-child(3) {
+        margin-left: 2em;
+        flex: 3;
+    }
+
+   
+    
+}
+
+$tag-radius: 32px;
+
+.tag {
+    // padding: 0.5em;
+    // font-size: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: $tag-radius;
+    height: $tag-radius;
+    border-radius: $tag-radius;
+    background-color: var(--color-grey-dark-2);
+     i {
+        transform: scale(0.7);
+     }
+}
+  

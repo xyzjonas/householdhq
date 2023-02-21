@@ -1,5 +1,5 @@
 import { PrismaClient, Transaction } from "@prisma/client";
-import { CreateTransactionDto, TagTransactionDto, TransactionIdDto, TransactionMonthDto } from "../validators/transactions.dto";
+import { CreateTransactionDto, TagTransactionDto, IdDto, TransactionMonthDto } from "../validators/transactions.dto";
 
 
 class Transactions {
@@ -12,7 +12,7 @@ class Transactions {
         return allTrans;
     }
 
-    public async findSingle(transactionData: TransactionIdDto): Promise<Transaction> {
+    public async findSingle(transactionData: IdDto): Promise<Transaction> {
         console.info(`Querying transaction id=${transactionData.id}`)
         const transaction = await this.transactions.findUnique({
             where: { id: transactionData.id },
@@ -95,7 +95,7 @@ class Transactions {
         return trans;
     }
 
-      public async deleteTransaction(transactionData: TransactionIdDto): Promise<Transaction> {
+      public async deleteTransaction(transactionData: IdDto): Promise<Transaction> {
         return await this.transactions.delete({ where: { id: transactionData.id } });
     }
 
