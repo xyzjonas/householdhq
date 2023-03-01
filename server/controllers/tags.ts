@@ -29,17 +29,16 @@ class Tags {
 
   public async createTag(tagData: TagDto): Promise<Tag> {
     try {
-      const tag = await this.tags.create({
-        data: {
-          name: tagData.name,
-          description: tagData.description,
-          parentTag: {
-            connect: {
-              id: tagData.parentId ? tagData.parentId : undefined,
-            },
-          },
-        },
-      });
+      const data = {
+        name: tagData.name,
+        description: tagData.description,
+        icon: tagData.icon,
+        // color: tagData.color,
+      }
+      if (tagData.parentId) {
+        data['parentTag'] = { connect: { id: tagData.parentId }, }
+      }
+      const tag = await this.tags.create({ data: data });
       return tag;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -67,6 +66,7 @@ class Tags {
           name: tagData.name,
           description: tagData.description,
           icon: tagData.icon,
+          color: tagData.color,
           parentTag: parentId ? {
             connect: {
               id: parentId ? tagData.parentId : undefined,

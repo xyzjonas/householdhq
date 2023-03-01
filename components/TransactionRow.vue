@@ -1,5 +1,5 @@
 <template>
-    <div class="box">
+    <div class="transaction">
         <div class="item">
             <NuxtLink v-if="firstTag" :to="`/tags/${firstTag.id}`">
                 <CategoryBadge :category="firstTag" />
@@ -31,7 +31,6 @@ export default {
         },
         firstTag() {
             if (this.transaction.tags.length > 0) {
-                console.info(this.transaction.tags)
                 return this.transaction.tags[0];
             }
             return undefined;

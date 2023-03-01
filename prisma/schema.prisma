@@ -23,6 +23,7 @@ model Tag {
   name          String  @unique
   description   String?
   icon          String?
+  color         String?
 
   parentId      Int?
   parentTag     Tag?    @relation("TagHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)

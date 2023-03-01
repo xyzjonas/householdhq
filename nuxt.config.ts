@@ -1,15 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     css: [
-        '@/assets/css/main.scss'
+        '@/assets/css/main.scss',
+        '@/assets/iconicss/iconicss.min.css'
     ],
-    // vite: {
-    //     css: {
-    //         preprocessorOptions: {
-    //             scss: {
-    //                 additionalData: '@use "@/assets/css/_colors.scss" as *;'
-    //             }
-    //         }
-    //     }
-    // }
+    vite: {
+        css: {
+            preprocessorOptions: {
+                sass: {
+                    additionalData: '@import "@/assets/css/main.scss";'
+                }
+            }
+        }
+    }
 })

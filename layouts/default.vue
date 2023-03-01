@@ -1,9 +1,13 @@
 <template>
-    <div class="container">
-        <div class="app-wrapper" style="max-height: 50%;">
-            <slot />
-            <button class="floating">BUTTON</button>
+    <div>
+        <!-- <header class="header"></header> -->
+        <div class="space"></div>
+        <div>
+            <div class="app-wrapper" style="max-height: 50%;">
+                <slot />
+                <button class="floating">BUTTON</button>
 
+            </div>
         </div>
     </div>
 </template>

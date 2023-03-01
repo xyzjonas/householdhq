@@ -1,8 +1,8 @@
-<template lang="">
-    <div>
+<template>
+    <div :style="`color: ${category.color}`">
         <Icon v-if="category && category.icon" :iconName="category.icon" />
         <div v-else-if="category && category.name" class="tag">
-            <p style="font-size: 80%; color: white; text-decoration: none;">
+            <p style="font-size: 60%; color: white; text-decoration: none;">
                 {{ alt }}
             </p>
         </div>
@@ -26,6 +26,3 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
-</style>

@@ -1,16 +1,71 @@
+@mixin left-center-right {
+    .item:nth-last-child(1) {
+        text-align: end;
+    }
+
+    &::before {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border: solid;
+    }
+
+    .item:nth-child(1) {
+        text-align: start;
+        flex: 1;
+    }
+
+    .item:nth-child(2) {
+        flex: none;
+    }
+
+    .item:nth-child(3) {
+        margin-left: 2em;
+        flex: 3;
+    }
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .container {
     max-width: 80%;
     margin: 4rem auto;
-    // box-shadow: var(--shadow-dark);
-    // min-width: 60%;
+    min-width: 60%;
 
-    min-height: 50rem;
+    // min-height: 50rem;
+
+    @media only screen and (max-width: $bp-small) {
+        min-width: 72%;
+    }
 
     @media only screen and (max-width: $bp-small) {
         margin: 0;
         max-width: 100%;
         width: 100%;
     }
+}
+
+@mixin box {
+    box-shadow: var(--shadow-dark);
+    border-radius: 0.3em;
+}
+
+.section {
+    @include box();
+
+    min-width: 100%;
+    padding: 1em;
+}
+
+.card {
+    @include box();
+    width: auto;
+    padding: 1em;
+    margin: 0.2em;
 }
 
 .content {
@@ -20,4 +75,52 @@
     // @media only screen and (max-width: $bp-medium) {
     //     flex-direction: column;
     // }
+}
+
+.space {
+    margin-top: 1em;
+}
+
+
+.row {
+    @include left-center-right();
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.columns {
+    display: flex;
+    flex-direction: row;
+    flex: auto;
+
+    * {
+        flex: 1;
+    }
+
+    @media only screen and (max-width: $bp-small) {
+        flex-direction: column;
+    }
+}
+
+.grid {
+    display: grid;
+    // grid: repeat(1, 120px) / auto-flow 80px;
+    grid: auto-flow dense / 1fr 1fr 1fr;
+    grid-auto-flow: column;
+
+    @media only screen and (max-width: $bp-medium) {
+        grid: auto-flow dense / 1fr 1fr;
+    }
+
+    @media only screen and (max-width: $bp-small) {
+        grid: auto-flow dense / 1fr;
+    }
+}
+
+
+header {
+    width: 100%;
+    height: 5em;
+    background-color: var(--color-background-dark);
 }

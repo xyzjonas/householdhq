@@ -1,9 +1,12 @@
-@import "icons";
+@import "layout";
 
-.box {
-    border-bottom: solid;
+
+.transaction {
+    @include left-center-right();
+
+    border: solid;
     border-width: 1px;
-    border-color: var(--color-grey-dark-2);
+    border-color: #aaaaaa22;
 
     margin: 0.5em;
     padding: 1em;
@@ -17,45 +20,11 @@
         height: fit-content;
         flex: 1;
         
-    }
+    }    
+}
 
-    // .item .parent {
-    //     display: flex;
-    //     flex-direction: row;
-    //     align-items: center;
-    //     justify-content: center;
-    //     @media only screen and (max-width: $bp-small) {
-    //         flex-direction: column;
-    //     }
-    // }
-
-    .item:nth-last-child(1) {
-        text-align: end;
-    }
-
-    &::before {
-        display: block;
-        width: 20px;
-        height: 20px;
-        border: solid;
-    }
-
-    .item:nth-child(1) {
-        text-align: start;
-        flex: 1;
-    }
-
-    .item:nth-child(2) {
-        flex: none;
-    }
-
-    .item:nth-child(3) {
-        margin-left: 2em;
-        flex: 3;
-    }
-
-   
-    
+.transaction:hover {
+    border-color: #aaaaaa33;
 }
 
 $tag-radius: 32px;

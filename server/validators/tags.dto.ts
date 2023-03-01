@@ -9,6 +9,9 @@ export class TagDto {
   @IsString()
   @IsOptional()
   public icon: string;
+  @IsString()
+  @IsOptional()
+  public color: string;
   @IsOptional()
   @IsInt()
   public parentId: number;
@@ -26,6 +29,9 @@ export class EditTagDto {
   @IsString()
   @IsOptional()
   public icon?: string;
+  @IsString()
+  @IsOptional()
+  public color?: string;
   @IsOptional()
   @IsInt()
   public parentId?: number;
