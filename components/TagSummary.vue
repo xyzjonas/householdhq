@@ -1,39 +1,48 @@
 <template>
-    <NuxtLink :to="`/tags/${tagInfo.tag.id}`" class="card">
-        <div class="row">
+    <NuxtLink :to="`/tags/${tagInfo.tag.id}`" class="card center" :style="colorStyle">
+        <div>
+            <!-- <CategoryBadge :category="tagInfo.tag" /> -->
             <div>{{ tagInfo.tag.name.toUpperCase() }}</div>
-            <div class="amount">{{ sum || 0 }}<span style="font-size: medium;">{{ getCurrency() }}</span></div>
+            <Price :amount="sum" :currency="tagInfo.transactions[0].currency" />
         </div>
     </NuxtLink>
 </template>
+
 <script>
+import { CategoryBadge, Price } from '#components';
+
 export default {
+
+    components: { CategoryBadge, Price },
+
     props: ["tagInfo"],
 
     computed: {
+
         sum() {
             let total = 0;
             this.tagInfo.transactions.forEach(t => total += t.amount)
             return total;
         },
         tagColor() {
-            return `${this.tagInfo.tag.color}52` || null;
+            if (this.tagInfo && this.tagInfo.tag && this.tagInfo.tag.color) {
+                return `${this.tagInfo.tag.color}52`
+            }
+            return null;
         },
         tagBorderColor() {
-            return `${this.tagInfo.tag.color}99` || "#333";
+            if (this.tagColor) {
+                return `${this.tagInfo.tag.color}55`
+            }
+            return "#555"
+        },
+        colorStyle() {
+            if (this.tagColor) {
+                return `background-color: ${this.tagColor};`
+            }
         }
     },
-    methods: {
 
-        getCurrency() {
-            const curr = this.tagInfo.transactions[0].currency
-            if (curr === "CZK") {
-                return 'Kč'
-            }
-            return 
-        }
-
-    }
 }
 </script>
 <style scoped lang="scss">
@@ -41,18 +50,10 @@ export default {
     text-decoration: none;
     color: var(--color-grey-light-1);
     border: 1px solid transparent;
-    background-color: v-bind('tagColor');
 }
 
 .card:hover {
     border: solid 1px;
     border-color: v-bind('tagBorderColor');
-}
-
-.amount {
-    margin-left: auto;
-    padding-left: 1em;
-    font-size: xx-large;
-    font-family: monospace;
 }
 </style>

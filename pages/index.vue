@@ -86,6 +86,9 @@ export default {
 
     <div class="space"></div>
 
+    <button class="button">{{ $t('message') }}</button>
+    
+
     <div v-if="loading" class="center">
       <span><i class="icss-spinner icss-pulse x5" style="color: #cccccc55;"></i></span>
     </div>
@@ -103,6 +106,5 @@ export default {
 <style scoped lang="scss">
 .upcomming {
   filter: opacity(0.3);
-  max-height: 1em;
 }
 </style>

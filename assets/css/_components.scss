@@ -6,21 +6,24 @@
 
     border: solid;
     border-width: 1px;
-    border-color: #aaaaaa22;
+    border-color: #aaaaaa00;
+    border-radius: 5px;
+    background-color: #2b2b2b;
 
     margin: 0.5em;
-    padding: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-start;
 
-    .item {
-        min-width: 3em;
-        width: fit-content;
-        height: fit-content;
-        flex: 1;
-        
-    }    
+    overflow: hidden;
+
+    .item:first-child {
+        min-width: 5.5em;
+    }
+
 }
 
 .transaction:hover {
@@ -54,12 +57,26 @@ $tag-radius: 32px;
     }
 }
 
-.floating {
-    display: block;
-    position: absolute;
-    top: 90%; right: 1em;
-    @media only screen and (max-width: $bp-large) {
-        position: relative;
-    }
+/* CSS */
+.button {
+  background-color: var(--color-grey-dark-2);
+  border-radius: 8px;
+  border-width: 0;
+  color: #333333;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  text-align: center;
+  transition: all 200ms;
+  vertical-align: baseline;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
-  

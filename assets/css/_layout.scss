@@ -1,28 +1,23 @@
 @mixin left-center-right {
-    .item:nth-last-child(1) {
-        text-align: end;
+
+    .item > * {
+        text-align: start;
+        margin-right: 1.3em;
+        flex: 1 2 50%;
     }
 
-    &::before {
-        display: block;
-        width: 20px;
-        height: 20px;
-        border: solid;
+    .item:last-child {
+        text-align: end;
+        margin-left: auto;
+        padding-left: 1em;
     }
 
     .item:nth-child(1) {
         text-align: start;
-        flex: 1;
+        margin-right: 0px;
+        margin-left: 1em;
     }
 
-    .item:nth-child(2) {
-        flex: none;
-    }
-
-    .item:nth-child(3) {
-        margin-left: 2em;
-        flex: 3;
-    }
 }
 
 .center {
@@ -62,10 +57,12 @@
 }
 
 .card {
-    @include box();
+    // @include box();
     width: auto;
     padding: 1em;
     margin: 0.2em;
+    border-radius: 3px;
+    background-color: var(--color-grey-dark-1);
 }
 
 .content {
@@ -105,16 +102,15 @@
 
 .grid {
     display: grid;
-    // grid: repeat(1, 120px) / auto-flow 80px;
-    grid: auto-flow dense / 1fr 1fr 1fr;
-    grid-auto-flow: column;
+    grid: auto-flow dense / 1fr 1fr 1fr 1fr;
+    padding: 4px;
 
     @media only screen and (max-width: $bp-medium) {
-        grid: auto-flow dense / 1fr 1fr;
+        grid: auto-flow dense / 1fr 1fr 1fr;
     }
 
     @media only screen and (max-width: $bp-small) {
-        grid: auto-flow dense / 1fr;
+        grid: auto-flow dense / 1fr 1fr;
     }
 }
 

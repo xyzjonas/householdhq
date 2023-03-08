@@ -1,8 +1,8 @@
 <template>
-    <div :style="`color: ${category.color}`">
+    <div style="color: #ccccccff">
         <Icon v-if="category && category.icon" :iconName="category.icon" />
         <div v-else-if="category && category.name" class="tag">
-            <p style="font-size: 60%; color: white; text-decoration: none;">
+            <p style="color: white; text-decoration: none;">
                 {{ alt }}
             </p>
         </div>
