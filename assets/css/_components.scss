@@ -8,7 +8,7 @@
     border-width: 1px;
     border-color: #aaaaaa00;
     border-radius: 5px;
-    background-color: #2b2b2b;
+    background-color: var(--color-grey-dark-1);
 
     margin-top: 0.25em;
     margin-bottom: 0.25em;
@@ -36,7 +36,8 @@
 
 .tag {
     border-radius: 4px;
-    padding: 0.3em 0.8em 0.3em 0.8em
+    padding: 0.3em 0.8em 0.3em 0.8em;
+    background-color: var(--color-grey-dark-1);
 }
 
 .title {
@@ -75,43 +76,35 @@ button {
     filter: opacity(0.5);
   }
 
-  &.success {
-    background-color: var(--color-success);
-  }
-
-  &.danger {
-    background-color: var(--color-danger);
+  &.outlined {
+    background-color: #00000000;
+    border-color: var(--color-primary);
   }
 }
 
-button .success {
-    background-color: var(--color-success);
-}
-  
-.input {
+@mixin input-mixin {
     background-color: var(--color-grey-dark-1);
     border-radius: 5px;
     border: 1px solid;
     border-color: var(--color-grey-dark-1);
+
+    width: 100%;
     
     outline: 0;
     padding: 4px;
     color: var(--color-grey-dark-3);
+}
+
+input {
+    @include input-mixin();
 }
 
 textarea {
-    background-color: var(--color-grey-dark-1);
-    border-radius: 5px;
-    border: 1px solid;
-    border-color: var(--color-grey-dark-1);
-    
-    outline: 0;
-    padding: 4px;
-    color: var(--color-grey-dark-3);
+    @include input-mixin();
 }
 
-.input:focus {
-    color: var(--color-grey-light-1);
+select {
+    @include input-mixin();
 }
 
 

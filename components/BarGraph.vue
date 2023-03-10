@@ -1,13 +1,17 @@
 <template lang="">
     <div class="graph">
-        <NuxtLink v-for="tag in tags" :to="`/tags/${tag.tag.id}`" class="row-wrapper">
-            <p class="label">{{ tag.tag.name }}</p>
+        <NuxtLink
+            v-for="tag in tags" :to="`/tags/${tag.tag.id}`"
+            class="row-wrapper"
+            :style="`color: ${light_or_dark(tag.tag.color) ? '#2b2b2b': '#faf9f9'};`"
+        >
+            <p class="label" :style="`background-color: ${tag.tag.color}`">{{ tag.tag.name }}</p>
             <div class="bar-wrapper">
                 <p class="bar" :style="`width: ${(tag.sum / max * loaded)}%; background-color: ${tag.tag.color}`">
                     <Price
                         :amount="tag.sum"
                         :currency="tag.transactions[0].currency"
-                        style="margin-left: 0.3em"
+                        style="margin-left: 0.5em;"
                     />
                 </p>
             </div>
@@ -41,6 +45,16 @@ export default {
         },
     },
 
+    methods: {
+        light_or_dark(color) {
+            if (color) {
+                console.info(`${color} -> ${parseInt(color.replace('#', ''), 16)}`)
+                return color && parseInt(color.replace('#', ''), 16) > 15000000;
+            }
+            return false
+        }
+    },
+
     created() {
         setTimeout(() => {
             console.info(this.loaded);
@@ -49,48 +63,3 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
-
-
-
-
-// .col-wrapper {
-//     position: relative;
-//     padding-left: 5px;
-//     padding-right: 5px;
-//     flex: 1 5;
-
-//     .label {
-//         top: 140%;
-//         position: absolute;
-//         transform: rotate(-90deg);
-//         text-align: end;
-//     }
-
-//     .price-label {
-//         position: absolute;
-//         min-width: 100%;
-//         right: 0%;
-//         text-align: center;
-//         transform: rotate(-90deg);
-//     }
-
-//     .col {
-//         height: 100%;
-//         margin-left: auto;
-//         display: flex;
-//         flex-direction: column;
-
-//         * {
-//             flex: auto;
-//             transition: linear;
-//             transition-duration: 0.5s;
-//         }
-//     }
-// }
-
-// .actual-column {
-//     background-color: var(--color-grey-dark-2);
-// }
-    
-</style>

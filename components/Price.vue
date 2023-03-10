@@ -10,6 +10,7 @@ export default {
 
     methods: {
         getCurrency() {
+            // num = new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(number);
             if (this.currency === "CZK") {
                 return 'Kč'
             }

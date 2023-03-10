@@ -6,5 +6,8 @@
   "t_date": "Datum",
   "t_desc": "Popis",
   "t_amount": "Částka",
-  "t_tag": "Kategorie"
+  "t_tag": "Kategorie",
+  "t_add": "Účtujem!",
+  "t_placeholder": "Nespecifikovaná útrata",
+  "remaining_bills": "Do konce měsíce zbývá"
 }

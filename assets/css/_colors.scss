@@ -1,1 +1,9 @@
-$primary: #404258
+@import 'base';
+
+.success {
+    background-color: var(--color-success);
+}
+
+.danger {
+    background-color: var(--color-danger);
+}

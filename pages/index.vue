@@ -1,12 +1,12 @@
 <script lang="ts">
-import { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader } from '#components';
+import { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm } from '#components';
 import tags from '~~/server/controllers/tags';
 
 
 export default {
 
 
-  components: { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader },
+  components: { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm },
 
   data() {
     return {
@@ -14,6 +14,13 @@ export default {
       allTransactions: [],
       date: new Date(),
       cells: 4,
+      addTransaction: false,
+    }
+  },
+
+  provide() {
+    return {
+      currency: computed(() => this.currency)
     }
   },
 
@@ -33,19 +40,26 @@ export default {
       })
       return sum;
     },
+    currency() {
+      if (this.allTransactions && this.allTransactions.length > 0) {
+        return this.allTransactions[0].currency;
+      }
+    },
     tags() {
       const tagsTmp: any = {}
       this.transactions.forEach(trans => {
-        trans.tags.forEach(tag => {
-          if (!tagsTmp[tag.id]) {
-            tagsTmp[tag.id] = {
-              tag: tag,
-              transactions: [trans]
-            }
-        } else {
-          tagsTmp[tag.id].transactions.push(trans)
-        }  
+        if (trans.tags && trans.tags.length > 0) {
+          trans.tags.forEach(tag => {
+            if (!tagsTmp[tag.id]) {
+              tagsTmp[tag.id] = {
+                tag: tag,
+                transactions: [trans]
+              }
+          } else {
+            tagsTmp[tag.id].transactions.push(trans)
+          }
         })
+      }
       });
 
       const tags = Object.values(tagsTmp)
@@ -69,7 +83,14 @@ export default {
   },
 
   methods: {
-
+    putTransaction(transactionData) {
+      const url = "/api/transactions";
+      $fetch(url, {method: 'PUT', body: transactionData})
+        .then(res =>
+          this.allTransactions.unshift(res.data)
+        )
+        .finally(() => this.addTransaction = false)
+    }
   },
   setup() {
     const route = useRoute();
@@ -112,12 +133,17 @@ export default {
         <BarGraph :tags="tags"/>
       </section>
 
-      <!-- <section class="row-simple">
-        <button class="item button">{{ $t('message') }}: {{ remainingBills }}</button>
-        <button class="item button">{{ $t('message') }}: {{ remainingBills }}</button>
-      </section> -->
+      <section v-if="!addTransaction" class="row-simple">
+        <button @click="addTransaction = !addTransaction" class="item button">{{ $t('t_add') }}</button>
+      </section>
+      <section v-else>
+        <TransactionForm :tags="tags" @cancel="addTransaction = false" @send="putTransaction"/>
+      </section>
 
       <section>
+          <h4 class="title row-simple">
+            {{ $t('remaining_bills') }}: <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
+          </h4>
           <div class="icon" alt="Discover Nuxt 3"></div>
           <TransactionRow v-for="transaction in upcommingTransactions" :transaction="transaction" class="upcomming" />
           <div class="space"></div>
@@ -134,6 +160,5 @@ export default {
 }
 .button {
   min-height: 60px;
-  margin: 0.6em;
 }
 </style>
