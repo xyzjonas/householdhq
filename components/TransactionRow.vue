@@ -1,5 +1,6 @@
 <template>
-    <div class="transaction">
+    <NuxtLink :to="`/transactions/${transaction.id}`" class="transaction">
+    <!-- <div class="transaction"> -->
         <!-- <NuxtLink v-if="firstTag" :to="`/tags/${firstTag.id}`"></NuxtLink> -->
         <div class="item">
             <!-- <span><CategoryBadge :category="firstTag" /></span> -->
@@ -11,7 +12,7 @@
             <Price :amount="transaction.amount" :currency="transaction.currency" />
             <!-- <span>{{ transaction.amount }}&nbsp;{{ transaction.currency }}</span> -->
         </p>
-    </div>
+    </NuxtLink>
 </template>
 <script>
 import { CategoryBadge, Price, DateTile } from '#components';

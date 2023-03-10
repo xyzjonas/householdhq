@@ -1,13 +1,13 @@
 <template>
-    <h1 class="card center" style="font-size: 1.5em;">
-        <a :href="previousMonth">
+    <section class="title center">
+        <a :href="previousMonth" class="left">
             <i class="icss-caret-l"></i>
         </a>
-        <span style="margin-left: 0.5em; margin-right: 0.5em;">{{ formatMMYYYY() }}</span>
-        <a :href="nextMonth">
+        <h1>{{ formatMMYYYY() }}</h1>
+        <a :href="nextMonth" class="right">
             <i class="icss-caret-r"></i>
         </a>
-    </h1>
+    </section>
 </template>
 <script>
 export default {
@@ -55,6 +55,32 @@ export default {
 a {
     display: flex;
     align-items: center;
+    font-size: large;
     color: var(--color-grey-light-1);
+    transition-duration: 0.3s;
+}
+
+a:hover {
+    transition-duration: 0.3s;
+    transition: linear;
+}
+
+.left:hover {
+    transform: translate(-2px)
+}
+
+.right:hover {
+    transform: translate(2px)
+}
+
+h1 {
+    font-size: x-large;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    text-align: center;
+}
+section {
+    padding-top: 2em;
+    padding-bottom: 2em;
 }
 </style>

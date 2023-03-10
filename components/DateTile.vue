@@ -21,8 +21,6 @@ export default {
     methods: {
         getWeekDays() {
             const locale = this.$i18n.locale;
-            console.info(this.$i18n)
-            console.info(this.$t('message'))
             var baseDate = new Date(Date.UTC(2017, 0, 2)); // just a Monday
             var weekDays = [];
             for(let i = 0; i < 7; i++)
@@ -39,7 +37,6 @@ export default {
 <style lang="scss" scoped>
 .date-card{
     display:flex;
-    padding-right: 1em;
     border-right: 1px solid gray;
     flex-direction: column;
     align-items:center;

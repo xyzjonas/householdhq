@@ -50,6 +50,7 @@ export default {
     text-decoration: none;
     color: var(--color-grey-light-1);
     border: 1px solid transparent;
+    max-height: 4em;
 }
 
 .card:hover {

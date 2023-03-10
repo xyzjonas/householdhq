@@ -1,3 +1,5 @@
 {
-    "message": "Hello!"
+    "message": "Hello!",
+    "t_date": "Date",
+    "t_desc": "Description"
 }

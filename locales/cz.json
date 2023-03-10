@@ -1,3 +1,10 @@
 {
-    "message": "Ahoj!"
-  }
+  "message": "Ahoj!",
+  "loading": "Načítám...",
+  "ok": "ok",
+  "cancel": "zrušit",
+  "t_date": "Datum",
+  "t_desc": "Popis",
+  "t_amount": "Částka",
+  "t_tag": "Kategorie"
+}

@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 :root {
-    --color-primary: #eb2f64;
+    --color-primary: #FFB84C;
+    --color-success: #68B984;
+    --color-danger: #D23369;
     --color-primary-light: #000000;
     --color-primary-dark: #393c4d;
 
@@ -16,6 +18,7 @@
     --color-grey-dark-1: #2b2b2b;
     --color-grey-dark-2: #777;
     --color-grey-dark-3: #999;
+    --color-grey-dark-4: #1b1b1b;
 
     --shadow-dark: 0 2rem 6rem rgba(0,0,0,.3);
     --shadow-light: 0 2rem 5rem rgba(0,0,0,.06);
@@ -23,6 +26,11 @@
     --line: 1px solid var(--color-grey-light-2);
 
     --ggs: 1;
+
+    --input-border: var(--color-grey-dark-1);
+    --input-focus-h: 245;
+    --input-focus-s: 100%;
+    --input-focus-l: 42%;
 }
 
 $bp-largest: 75em;     // 1200px
@@ -56,4 +64,16 @@ body {
     background-repeat: no-repeat;
 
     min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:link {
+    color: var(--color-grey-light-1);
+}
+
+a:visited {
+    color: var(--color-grey-light-1);
 }
