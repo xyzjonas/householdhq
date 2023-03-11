@@ -1,21 +1,22 @@
 <template lang="">
     <div class="frame">
         <div class="row-simple">
-            <button @click="$emit('cancel')" style="margin-left: auto">{{ $t('cancel') }}</button>
+            <button @click="$emit('cancel')" style="margin-left: auto; margin-bottom: 2em">
+                <Icon iconName="x"/>
+            </button>
         </div>
         <div v-if="stage === 1">
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_amount') }}</p>
                 <input v-model.number="transaction.amount"/>
             </div>
-            {{transaction.created}}
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_date') }}</p>
                 <input v-model="transaction.created" type="date"/>
             </div>
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_desc') }}</p>
-                <textarea v-model="transaction.description" type="date"/>
+                <textarea v-model="transaction.description" type="date" :placeholder="$t('t_placeholder')"></textarea>
             </div>
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_from') }}</p>
@@ -38,7 +39,6 @@
             <div class="space"></div>
 
             <div class="row">
-                <button @click="$emit('cancel')">{{ $t('cancel') }}</button>
                 <button @click="stage -= 1" style="margin-left: auto">{{ $t('back') }}</button>
                 <button @click="send" class="success" style="margin: 5px">{{ $t('t_send') }}</button>
             </div>
@@ -61,11 +61,11 @@
     </div>
 </template>
 <script>
-import { Price } from "#components";
+import { Price, Icon } from "#components";
 
 export default {
 
-    components: { Price },
+    components: { Price, Icon },
 
     props: ['tags'],
 
@@ -75,7 +75,7 @@ export default {
             transaction: {
                 created: `${new Date().getUTCFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
                 amount: 0,
-                description: this.$t('t_placeholder'),
+                description: undefined,
                 sourceId: 1
             }
         }
@@ -90,6 +90,9 @@ export default {
             this.transaction.amount = parseInt(amountStr.substring(0, amountStr.length - 1)) || 0
         },
         send() {
+            if (!this.transaction.description) {
+                this.transaction.description = this.$t('t_placeholder')
+            }
             this.$emit('send', this.transaction)
         }
     }
@@ -98,7 +101,7 @@ export default {
 <style lang="scss" scoped>
 .frame {
     border: 1px solid;
-    padding: 2em 1em 2em 1em;
+    padding: 1em 1em 2em 1em;
     border-color: var(--color-grey-dark-3);
     border-radius: 3px;
 }

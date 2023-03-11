@@ -1,16 +1,17 @@
 <script lang="ts">
-import { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm } from '#components';
+import { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner } from '#components';
 import tags from '~~/server/controllers/tags';
 
 
 export default {
 
 
-  components: { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm },
+  components: { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner },
 
   data() {
     return {
       loading: false,
+      putLoading: false,
       allTransactions: [],
       date: new Date(),
       cells: 4,
@@ -83,13 +84,36 @@ export default {
   },
 
   methods: {
+    getTransactions(loading=false) {
+      if (loading) {
+        this.loading = true;
+      }
+      let url;
+      if (this.year && this.month) {
+        this.date = new Date(`${this.year}-${this.month}`);
+        url = `/api/transactions/?year=${this.year}&month=${this.month}`
+      } else {
+        url = '/api/transactions'
+      }
+      $fetch(url, {method: 'GET'})
+        .then(res => this.allTransactions = res.data)
+        .finally(() => this.loading = false)
+    },
     putTransaction(transactionData) {
+      this.putLoading = true;
       const url = "/api/transactions";
       $fetch(url, {method: 'PUT', body: transactionData})
         .then(res =>
           this.allTransactions.unshift(res.data)
         )
-        .finally(() => this.addTransaction = false)
+        .finally(() => { this.addTransaction = false; this.putLoading = false })
+    },
+    deleteTransaction(transactionData) {
+      const url = "/api/transactions";
+      $fetch(url, {method: 'DELETE', body: transactionData})
+        .then(res => {
+          this.allTransactions = this.allTransactions.filter(t => t.id != transactionData.id);
+        })
     }
   },
   setup() {
@@ -113,7 +137,6 @@ export default {
     $fetch(url, {method: 'GET'})
       .then(res => this.allTransactions = res.data)
       .finally(() => this.loading = false)
-
   }
 }
 </script>
@@ -133,11 +156,15 @@ export default {
         <BarGraph :tags="tags"/>
       </section>
 
+      <button @click="addTransaction = !addTransaction">reset</button>
       <section v-if="!addTransaction" class="row-simple">
         <button @click="addTransaction = !addTransaction" class="item button">{{ $t('t_add') }}</button>
       </section>
       <section v-else>
-        <TransactionForm :tags="tags" @cancel="addTransaction = false" @send="putTransaction"/>
+        <div v-if="putLoading" class="center">
+          <Spinner />
+        </div>
+        <TransactionForm v-else :tags="tags" @cancel="addTransaction = false" @send="putTransaction"/>
       </section>
 
       <section>
@@ -145,9 +172,8 @@ export default {
             {{ $t('remaining_bills') }}: <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
           </h4>
           <div class="icon" alt="Discover Nuxt 3"></div>
-          <TransactionRow v-for="transaction in upcommingTransactions" :transaction="transaction" class="upcomming" />
-          <div class="space"></div>
-          <TransactionRow v-for="transaction in transactions" :transaction="transaction" />
+          <TransactionRow v-for="transaction in upcommingTransactions" :key="transaction.id" :transaction="transaction" class="upcomming" @delete="deleteTransaction" />
+          <TransactionRow v-for="transaction in transactions" :key="transaction.id" :transaction="transaction" @delete="deleteTransaction" />
       </section>
 
     </div>

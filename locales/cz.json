@@ -3,11 +3,16 @@
   "loading": "Načítám...",
   "ok": "ok",
   "cancel": "zrušit",
+  "back": "zpět",
+  "delete": "smazat",
   "t_date": "Datum",
   "t_desc": "Popis",
   "t_amount": "Částka",
   "t_tag": "Kategorie",
   "t_add": "Účtujem!",
   "t_placeholder": "Nespecifikovaná útrata",
+  "t_send": "Zaúčtovat",
+  "t_from": "Odkud",
+  "t_to": "Kam",
   "remaining_bills": "Do konce měsíce zbývá"
 }

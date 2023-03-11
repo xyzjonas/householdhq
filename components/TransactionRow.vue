@@ -1,27 +1,38 @@
 <template>
-    <NuxtLink :to="`/transactions/${transaction.id}`" class="transaction">
-    <!-- <div class="transaction"> -->
-        <!-- <NuxtLink v-if="firstTag" :to="`/tags/${firstTag.id}`"></NuxtLink> -->
+    <div class="wrapper">
+    <div 
+        class="transaction"
+        :style="`width: ${details ? 50 : 100}%`"
+        @click="details = !details"
+    >
         <div class="item">
-            <!-- <span><CategoryBadge :category="firstTag" /></span> -->
             <DateTile :date="date"/>
-            <!-- <span>{{ day }}.{{ month }}.</span> -->
         </div>
         <div class="item">{{ transaction.description }}</div>
         <p class="item">
             <Price :amount="transaction.amount" :currency="transaction.currency" />
-            <!-- <span>{{ transaction.amount }}&nbsp;{{ transaction.currency }}</span> -->
         </p>
-    </NuxtLink>
+    </div>
+    <div class="panel" :style="`width: ${details ? 50 : 0}%`">
+        <button class="danger" @click="$emit('delete', { id: transaction.id })">{{ $t('delete') }}</button>
+        <button>BAR</button>
+    </div>
+    </div>
 </template>
 <script>
-import { CategoryBadge, Price, DateTile } from '#components';
+import { CategoryBadge, Price, DateTile, Icon } from '#components';
 
 export default {
 
-  components: { CategoryBadge, Price, DateTile },
+  components: { CategoryBadge, Price, DateTile, Icon },
     
     props: ['transaction'],
+
+    data() {
+        return {
+            details: false
+        }
+    },
 
     computed: {
         date() {
@@ -35,7 +46,7 @@ export default {
         },
         tagColor() {
             if (this.firstTag && this.firstTag.color) {
-                return `${this.firstTag.color}52`;
+                return `${this.firstTag.color}aa`;
             }
             return '#00000000';
         },
@@ -46,10 +57,36 @@ export default {
 .transaction {
     border-right: solid 10px;
     border-right-color: v-bind('tagColor');
+    
+    transition: 250ms;
 
     &:hover {
-    border-right-color: v-bind('tagColor');
+        border-right-color: v-bind('tagColor');
+    }
+
+
 }
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    
+
+    .panel {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        transition: 250ms;
+        padding-top: 0.25em;
+        padding-bottom: 0.25em;
+
+        button {
+            height: 100%;
+            width: 4em;
+            margin-left: 5px;
+            flex: auto;
+        }
+    }
 }
 
 </style>

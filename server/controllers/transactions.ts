@@ -91,6 +91,7 @@ class Transactions {
               },
             },
           },
+          include: { source: true, tags: true }
         });
         return trans;
     }
