@@ -1,5 +1,5 @@
 import { PrismaClient, Transaction } from "@prisma/client";
-import { CreateTransactionDto, TagTransactionDto, IdDto, TransactionMonthDto } from "../validators/transactions.dto";
+import { CreateTransactionDto, TagTransactionDto, IdDto, TransactionMonthDto, EditTransactionDto } from "../validators/transactions.dto";
 
 
 class Transactions {
@@ -73,7 +73,6 @@ class Transactions {
             parsed_date = new Date(transactionData.created);
         }
         const tags = transactionData.tags.map(tagName => ({ name: tagName }));
-        console.info(tags);
     
         transactionData.currency ??= 'CZK';
         const trans: Transaction = await this.transactions.create({
@@ -95,6 +94,38 @@ class Transactions {
         });
         return trans;
     }
+
+    public async editTransaction(transactionData: EditTransactionDto): Promise<Transaction> {
+      let parsed_date = undefined;
+      if (transactionData.created) {
+          parsed_date = new Date(transactionData.created);
+      }
+      let tags = undefined;
+      if (transactionData.tags) {
+        tags = { connect: transactionData.tags.map(tagName => ({ name: tagName })) };
+      }
+      let source = undefined;
+      if (transactionData.sourceId) {
+        source = { connect: { id: transactionData.sourceId } };
+      }
+  
+      transactionData.currency ??= 'CZK';
+      const trans: Transaction = await this.transactions.update({
+        where: {
+          id: transactionData.id
+        },
+        data: {
+          created: parsed_date,
+          currency: transactionData.currency,
+          description: transactionData.description,
+          amount: transactionData.amount,
+          tags: tags,
+          source: source,
+        },
+        include: { source: true, tags: true }
+      });
+      return trans;
+  }
 
       public async deleteTransaction(transactionData: IdDto): Promise<Transaction> {
         return await this.transactions.delete({ where: { id: transactionData.id } });

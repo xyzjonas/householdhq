@@ -21,7 +21,6 @@ export class TransactionMonthDto {
   public year?: number
 }
 
-
 export class CreateTransactionDto {
   @IsOptional()
   @Validate(ValidDate)
@@ -41,6 +40,47 @@ export class CreateTransactionDto {
   @IsOptional()
   public currency?: string;
 
+  @Validate(ValidArray)
+  @Transform(({value}) => value.split(','))
+  public tags?: string[];
+}
+
+export class EditTransactionDto {
+  @IsNumber()
+  public id?: number;
+
+  @IsOptional()
+  @Validate(ValidDate)
+  @Transform(({value}) => new Date(value))
+  public created?: Date;
+  
+  @IsOptional()
+  @Validate(ValidDate)
+  @Transform(({value}) => new Date(value))
+  public cancelled?: Date;
+
+  @IsOptional()
+  @Validate(ValidDate)
+  @Transform(({value}) => new Date(value))
+  public confirmed?: Date;
+
+  @IsOptional()
+  @IsString()
+  public description?: string;
+  
+  @IsOptional()
+  @IsNumber()
+  public amount?: number;
+  
+  @IsOptional()
+  @IsNumber()
+  public sourceId?: number;
+  
+  @IsString()
+  @IsOptional()
+  public currency?: string;
+
+  @IsOptional()
   @Validate(ValidArray)
   @Transform(({value}) => value.split(','))
   public tags?: string[];

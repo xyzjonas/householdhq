@@ -50,6 +50,7 @@ model Transaction {
   amount          Float
   currency        String
   cancelled       Boolean     @default(false)
+  confirmed       Boolean     @default(true)
 
   sourceId        Int
   source          Source      @relation(fields: [sourceId], references: [id])

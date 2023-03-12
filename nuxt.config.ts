@@ -4,7 +4,9 @@ import en from './locales/en.json';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-
+    appConfig: {
+        unwrapInjectedRef: true,
+    },
     css: [ 
         '@/assets/css/main.scss',
         '@/assets/iconicss/iconicss.min.css'

@@ -12,16 +12,19 @@ export default {
     return {
       loading: false,
       putLoading: false,
+      deleteLoading: false,
       allTransactions: [],
       date: new Date(),
       cells: 4,
       addTransaction: false,
+      allTags: [],
     }
   },
 
   provide() {
     return {
-      currency: computed(() => this.currency)
+      currency: computed(() => this.currency),
+      allTags: computed(() => this.allTags),
     }
   },
 
@@ -64,21 +67,14 @@ export default {
       });
 
       const tags = Object.values(tagsTmp)
-
       tags.forEach(tag => {
         let sum = 0;
-        tag.transactions.forEach(trans => {
-          sum += trans.amount;
-        })
-        console.info(sum)
+        tag.transactions.forEach(trans => { sum += trans.amount; })
         tag.sum = sum;
       });
-
       tags.sort((a, b) => {
         return b.sum - a.sum;
       });
-
-
       return tags;
     }
   },
@@ -108,12 +104,26 @@ export default {
         )
         .finally(() => { this.addTransaction = false; this.putLoading = false })
     },
+    
     deleteTransaction(transactionData) {
       const url = "/api/transactions";
       $fetch(url, {method: 'DELETE', body: transactionData})
         .then(res => {
           this.allTransactions = this.allTransactions.filter(t => t.id != transactionData.id);
         })
+    },
+    getTags() {
+      const url = '/api/tags'
+      $fetch(url, {method: 'GET'})
+        .then(res => this.allTags = res.data)
+    },
+    updateTransaction(transaction) {
+      for (let index = 0; index < this.allTransactions.length; index++) {
+        const element = this.allTransactions[index];if (element.id === transaction.id)
+        if (element.id === transaction.id) {
+          this.allTransactions[index] = transaction;
+        }
+      }
     }
   },
   setup() {
@@ -126,17 +136,8 @@ export default {
     }
   },
   created() {
-    this.loading = true;
-    let url
-    if (this.year && this.month) {
-      this.date = new Date(`${this.year}-${this.month}`);
-      url = `/api/transactions/?year=${this.year}&month=${this.month}`
-    } else {
-      url = '/api/transactions'
-    }
-    $fetch(url, {method: 'GET'})
-      .then(res => this.allTransactions = res.data)
-      .finally(() => this.loading = false)
+    this.getTransactions(true);
+    this.getTags();
   }
 }
 </script>
@@ -156,15 +157,18 @@ export default {
         <BarGraph :tags="tags"/>
       </section>
 
-      <button @click="addTransaction = !addTransaction">reset</button>
-      <section v-if="!addTransaction" class="row-simple">
-        <button @click="addTransaction = !addTransaction" class="item button">{{ $t('t_add') }}</button>
+      <section class="row-simple">
+        <button @click="addTransaction = !addTransaction" class="item button">
+          {{ addTransaction ? $t('cancel') : $t('t_add') }}
+        </button>
       </section>
-      <section v-else>
-        <div v-if="putLoading" class="center">
-          <Spinner />
-        </div>
-        <TransactionForm v-else :tags="tags" @cancel="addTransaction = false" @send="putTransaction"/>
+      <section style="padding-top: 0;">
+        <TransactionForm
+          :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`"
+          @cancel="addTransaction = false"
+          @send="putTransaction"
+          :processing="putLoading"
+        />
       </section>
 
       <section>
@@ -172,8 +176,21 @@ export default {
             {{ $t('remaining_bills') }}: <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
           </h4>
           <div class="icon" alt="Discover Nuxt 3"></div>
-          <TransactionRow v-for="transaction in upcommingTransactions" :key="transaction.id" :transaction="transaction" class="upcomming" @delete="deleteTransaction" />
-          <TransactionRow v-for="transaction in transactions" :key="transaction.id" :transaction="transaction" @delete="deleteTransaction" />
+          <TransactionRow
+            v-for="transaction in upcommingTransactions"
+            :key="transaction.id"
+            :transaction="transaction"
+            :transparent="true"
+            class="upcomming"
+            @patched="updateTransaction"
+            @delete="deleteTransaction"
+          />
+          <TransactionRow
+            v-for="transaction in transactions"
+            :key="transaction.id"
+            :transaction="transaction"
+            @patched="updateTransaction"
+            @delete="deleteTransaction" />
       </section>
 
     </div>
@@ -181,9 +198,6 @@ export default {
   </div>
 </template>
 <style scoped lang="scss">
-.upcomming {
-  filter: opacity(0.3);
-}
 .button {
   min-height: 60px;
 }

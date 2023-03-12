@@ -1,10 +1,5 @@
 <template lang="">
-    <div class="frame">
-        <div class="row-simple">
-            <button @click="$emit('cancel')" style="margin-left: auto; margin-bottom: 2em">
-                <Icon iconName="x"/>
-            </button>
-        </div>
+    <div :class="`frame ${noFrame ? 'background': ''}`">
         <div v-if="stage === 1">
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_amount') }}</p>
@@ -33,14 +28,17 @@
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_tag') }}</p>
                 <select v-model="transaction.tags">
-                    <option v-for="tag in tags" :value="tag.tag.name">{{ tag.tag.name }}</option>
+                    <option v-for="tag in allTags.value" :key="tag.id + '-event'" :value="tag.name">{{ tag.name }}</option>
                 </select>
             </div>
             <div class="space"></div>
 
             <div class="row">
-                <button @click="stage -= 1" style="margin-left: auto">{{ $t('back') }}</button>
-                <button @click="send" class="success" style="margin: 5px">{{ $t('t_send') }}</button>
+                <button @click="stage -= 1" style="margin-left: auto" class="button-sm ">{{ $t('back') }}</button>
+                <button @click="send" class="success button-sm">
+                    <span v-if="!processing">{{ $t('t_send') }}</span>
+                    <Spinner v-else />
+                </button>
             </div>
         </div>
         <div v-else-if="stage === 2"></div>
@@ -61,23 +59,43 @@
     </div>
 </template>
 <script>
-import { Price, Icon } from "#components";
+import { Price, Icon, Spinner } from "#components";
 
 export default {
 
-    components: { Price, Icon },
+    components: { Price, Icon, Spinner },
 
-    props: ['tags'],
+    props: ['processing', 'transactionIn', 'startStage', 'noFrame'],
+
+    inject: ['allTags'],
 
     data() {
         return {
             stage: 0,
             transaction: {
-                created: `${new Date().getUTCFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
+                created: this.formatDate(new Date()),
                 amount: 0,
                 description: undefined,
-                sourceId: 1
-            }
+                sourceId: 1,
+            },
+            boxColor: 'var(--color-grey-dark-1)',
+            borderColor: 'var(--color-grey-dark-3)',
+        }
+    },
+
+    created() {
+        if (this.transactionIn) {
+            this.transaction = { ...this.transactionIn };
+            this.transaction.created = this.formatDate(new Date(this.transactionIn.created));
+            this.transaction.tags = this.transactionIn.tags.map(t => t.name).join(",");
+            delete this.transaction.source;
+        }
+        if (this.startStage) {
+            this.stage = this.startStage;
+        }
+        if (this.noFrame) {
+            this.boxColor = 'var(--color-background-dark)';
+            this.borderColor = "#00000000";
         }
     },
 
@@ -93,17 +111,28 @@ export default {
             if (!this.transaction.description) {
                 this.transaction.description = this.$t('t_placeholder')
             }
-            this.$emit('send', this.transaction)
-        }
-    }
+            this.$emit('send', this.transaction);
+        },
+        formatDate(date) {
+            console.info(date)
+            return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        },
+    },
 }
 </script>
 <style lang="scss" scoped>
 .frame {
     border: 1px solid;
     padding: 1em 1em 2em 1em;
-    border-color: var(--color-grey-dark-3);
+    border-color: v-bind('borderColor');
     border-radius: 3px;
+}
+
+.collapsed {
+    transition: 250ms;
+    border-color: #00000000;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .button {
@@ -112,9 +141,29 @@ export default {
 
     button {
         font-size: xx-large;
+        background-color: v-bind('boxColor');
         height: 100%;
         width: 100%;
     }
+}
+
+input {
+    background-color: v-bind('boxColor');
+}
+
+textarea {
+    background-color: v-bind('boxColor');
+}
+
+select {
+    background-color: v-bind('boxColor');
+}
+
+.button-sm {
+    min-height: 3em;
+    margin-left: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .row {
