@@ -16,7 +16,11 @@
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_from') }}</p>
                 <select v-model.number="transaction.sourceId">
-                    <option :value="1">Účet u ČS</option>
+                    <option
+                        v-for="source in allSources.value"
+                        :key="'option-source-' + source.id"
+                        :value="source.id"
+                    >{{ source.name }}</option>
                 </select>
             </div>
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
@@ -67,7 +71,7 @@ export default {
 
     props: ['processing', 'transactionIn', 'startStage', 'noFrame'],
 
-    inject: ['allTags'],
+    inject: ['allTags', 'allSources'],
 
     data() {
         return {
@@ -114,7 +118,6 @@ export default {
             this.$emit('send', this.transaction);
         },
         formatDate(date) {
-            console.info(date)
             return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         },
     },

@@ -1,6 +1,5 @@
 import { PrismaClient, Source } from "@prisma/client";
-import { CreateSourceDto } from "../validators/sources.dto";
-import { CreateTransactionDto, TagTransactionDto, IdDto, TransactionMonthDto, EditTransactionDto } from "../validators/transactions.dto";
+import { CreateSourceDto, EditSourceDto, IdDto } from "../validators/sources.dto";
 
 
 class Sources {
@@ -12,20 +11,24 @@ class Sources {
         return allSources;
     }
 
-    public async findSingle(transactionData: IdDto): Promise<Transaction> {
-        console.info(`Querying transaction id=${transactionData.id}`)
-        const transaction = await this.transactions.findUnique({
-            where: { id: transactionData.id },
-            include: { source: true, tags: true },
-        });
-        if (!transaction) {
-            throw createError({ statusCode: 400, statusMessage: `No such transaction id=${transactionData.id}` });
+    public async findSingle(sourceData: IdDto): Promise<Source> {
+        const source = await this.sources.findUnique({ where: { id: sourceData.id } });
+        if (!source) {
+            throw createError({ statusCode: 400, statusMessage: `No such transaction id=${sourceData.id}` });
         }
-        return transaction
+        return source
     }
     
     public async createSource(sourceData: CreateSourceDto): Promise<Source> {
       const source: Source = await this.sources.create({ data: { name: sourceData.name } });
+      return source;
+    }
+
+    public async editSource(sourceData: EditSourceDto) {
+      const source: Source = await this.sources.update({ 
+        where: { id: sourceData.id },
+        data: { name: sourceData.name }
+      });
       return source;
     }
 }

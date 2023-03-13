@@ -48,7 +48,6 @@ export default {
     methods: {
         light_or_dark(color) {
             if (color) {
-                console.info(`${color} -> ${parseInt(color.replace('#', ''), 16)}`)
                 return color && parseInt(color.replace('#', ''), 16) > 15000000;
             }
             return false
@@ -57,7 +56,6 @@ export default {
 
     created() {
         setTimeout(() => {
-            console.info(this.loaded);
             this.loaded = 100;
         }, 100)
     }

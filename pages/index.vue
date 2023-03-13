@@ -18,6 +18,7 @@ export default {
       cells: 4,
       addTransaction: false,
       allTags: [],
+      allSources: [],
     }
   },
 
@@ -25,6 +26,7 @@ export default {
     return {
       currency: computed(() => this.currency),
       allTags: computed(() => this.allTags),
+      allSources: computed(() => this.allSources),
     }
   },
 
@@ -117,6 +119,11 @@ export default {
       $fetch(url, {method: 'GET'})
         .then(res => this.allTags = res.data)
     },
+    getSources() {
+      const url = '/api/sources'
+      $fetch(url, {method: 'GET'})
+        .then(res => this.allSources = res.data)
+    },
     updateTransaction(transaction) {
       for (let index = 0; index < this.allTransactions.length; index++) {
         const element = this.allTransactions[index];if (element.id === transaction.id)
@@ -130,7 +137,7 @@ export default {
     const route = useRoute();
     const year = route.query.year
     const month = route.query.month
-
+    console.info(`y: ${year}, m: ${month}`);
     return {
       year, month
     }
@@ -138,6 +145,7 @@ export default {
   created() {
     this.getTransactions(true);
     this.getTags();
+    this.getSources();
   }
 }
 </script>
@@ -152,7 +160,6 @@ export default {
     </section>
     
     <div v-else>
-
       <section v-if="Object.keys(tags).length > 0">
         <BarGraph :tags="tags"/>
       </section>

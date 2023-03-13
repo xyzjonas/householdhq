@@ -13,7 +13,6 @@ class Transactions {
     }
 
     public async findSingle(transactionData: IdDto): Promise<Transaction> {
-        console.info(`Querying transaction id=${transactionData.id}`)
         const transaction = await this.transactions.findUnique({
             where: { id: transactionData.id },
             include: { source: true, tags: true },
@@ -26,7 +25,6 @@ class Transactions {
 
     public async findRecent(data: TransactionMonthDto): Promise<any> {
         const now = new Date();
-        console.info(data);
         let month = data.month;
         let year = data.year;
         
@@ -36,7 +34,6 @@ class Transactions {
             month = now.getMonth();
         }
         year ??= now.getUTCFullYear();
-        console.info(`${year}, ${month}`);
         
         let monthNext = month + 1;
         let yearNext = year;

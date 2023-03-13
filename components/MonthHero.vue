@@ -4,9 +4,7 @@
             <i class="icss-caret-l"></i>
         </a>
         <h1>{{ formatMMYYYY() }}</h1>
-        <a :href="nextMonth" class="right">
-            <i class="icss-caret-r"></i>
-        </a>
+        <a :href="nextMonth" class="right"><i class="icss-caret-r"></i></a>
     </section>
 </template>
 <script>
@@ -16,7 +14,6 @@ export default {
     computed: {
         previousMonth() {
             const [year, month] = this.getMonth(this.date, -1);
-            console.info(year)
             return `/?year=${year}&month=${month}`
         },
         nextMonth() {
@@ -30,20 +27,23 @@ export default {
         formatMMYYYY() {
             const locale = this.$i18n.locale;
             const month = this.date.toLocaleDateString(locale, {month: "long"}).toUpperCase();
-            return `${month} ${this.date.getUTCFullYear()}`;
+            return `${month} ${this.date.getFullYear()}`;
         },
 
         getMonth(date, plusOrMinus) {
-            let year = date.getUTCFullYear();
+            let year = date.getFullYear();
             const currMonth = date.getMonth();  // ...0-11
-            let nextMonth = currMonth + plusOrMinus;
-            if (nextMonth > 11) {
-                nextMonth = (nextMonth % 11)
+            let nextMonth = currMonth;
+            if (plusOrMinus > 0 && currMonth === 11) {
+                nextMonth = 0;
                 year++;
-            } else if (nextMonth < 0) {
-                nextMonth = (nextMonth % 11) + 12
+            } else if (plusOrMinus < 0 && currMonth === 0) {
+                nextMonth = 11;
                 year--;
+            } else {
+                nextMonth += plusOrMinus;
             }
+
             // and back to 12 digit format
             nextMonth++;
             return [year, nextMonth];
