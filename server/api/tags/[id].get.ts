@@ -5,7 +5,9 @@ import doValidate from "~~/server/validators/validator";
 
 
 export default defineEventHandler(async (event) => {
-    console.info(event.context.params);
     const data = await doValidate(IdDto, event.context.params);
-    return tags.findSingle(data);
+    const tag = await tags.findSingle(data);
+    return {
+        data: tag
+    };
 })

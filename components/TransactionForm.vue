@@ -32,7 +32,12 @@
             <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                 <p>{{ $t('t_tag') }}</p>
                 <select v-model="transaction.tags">
-                    <option v-for="tag in allTags.value" :key="tag.id + '-event'" :value="tag.name">{{ tag.name }}</option>
+                    <option 
+                        v-for="tag in allTags.value"
+                        :key="tag.id + '-event'"
+                        :value="tag.name"
+                        :style="`background-color: ${tag.color}`"
+                    >{{ tag.name }}</option>
                 </select>
             </div>
             <div class="space"></div>

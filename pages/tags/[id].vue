@@ -1,42 +1,66 @@
-<script setup>
-    const route = useRoute()
-    const { data: tag } = await useFetch(`/api/tags/${route.params.id}`)
-</script>
 <template>
-    <div class="container">
-        <h1 class="title">{{ tag.name }}</h1>
-        <div class="row">
-            <div class="item">Description</div>
-            <EditableField class="item" :value="tag.description"/>
-            <!-- <div class="item">{{ tag.description }}</div> -->
-        </div>
-        <div class="row">
-            <div class="item">Icon</div>
-            <div class="item">{{ tag.icon }}</div>
-        </div>
-        <div class="row">
-            <div class="item">Parent</div>
-            <div class="item">{{ tag.parentId }}</div>
-        </div>
-        <div class="row">
-            <div class="item">Child</div>
-            <div class="item">{{ childTag }}</div>
-        </div>
-        <div class="row">
-            <div class="item">Color</div>
-            <div class="item">
-                <p class="color-circle" :style="`background-color: ${tag.color}`"></p>
+    <div class="container more-p">
+        <div v-if="loading" class="center"><MosaicLoader /></div>
+        <div v-else-if="tag.id">
+            <h1 class="title">{{ tag.name }}</h1>
+            <div class="row">
+                <div class="item">{{ $t('name') }}</div>
+                <EditableField
+                    :value="tag.name"
+                    keyName="name"
+                    @send="patchTag"
+                    class="item"
+                />
             </div>
-            <!-- <div class="item">{{ tag.color }}</div> -->
+            <div class="row">
+                <div class="item">{{ $t('description') }}</div>
+                <EditableField
+                    keyName="description"
+                    :value="tag.description"
+                    @send="patchTag"
+                    class="item"
+                />
+            </div>
+            <div class="row">
+                <div class="item">{{ $t('icon') }}</div>
+                <EditableField
+                    keyName="icon"
+                    :value="tag.icon"
+                    @send="patchTag"
+                    class="item"
+                />
+            </div>
+            <div class="row">
+                <div class="item">{{ $t('tag_parent') }}</div>
+                <div class="item">{{ tag.parentId || $t('tag_no_parent') }}</div>
+            </div>
+            <div class="row">
+                <div class="item">{{ $t('tag_child') }}</div>
+                <div class="item">{{ childTag || $t('tag_no_child')}}</div>
+            </div>
+
+            <div class="row">
+                <div class="item">{{ $t('color') }}</div>
+                <div class="item">
+                    <EditableColor
+                        keyName="color"
+                        :value="tag.color || '#ffffffff'"
+                        @send="patchTag"
+                    />
+                    </div>
+            </div>
+        </div>
+        <div v-else class="center">
+            NOT FOUND
         </div>
     </div>
 </template>
 <script>
-import { EditableField } from '#components';
+import { EditableField, EditableColor, MosaicLoader } from '#components';
 
 export default {
 
-    components: { EditableField },
+    components: { EditableField, EditableColor, MosaicLoader },
 
     computed: {
         childTag() {
@@ -45,20 +69,62 @@ export default {
                 return this.childTags[0];
             }
         }
+    },
+
+    data() {
+        return {
+            loading: false,
+            tag: {}
+        }
+    },
+    
+    methods: {
+        getTag() {
+            this.loading = true;
+            const url = `/api/tags/${this.tagId}`;
+            $fetch(url, {method: 'GET'})
+            .then(res => this.tag = res.data)
+            .finally(() => this.loading = false)
+        },
+        patchTag(tagData) {
+            const url = "/api/tags";
+            console.info(tagData)
+            tagData.id = this.tag.id;
+            $fetch(url, {method: 'PATCH', body: tagData})
+                .then(res => this.tag = res.data)
+                .finally(() => { this.patching = false; this.edit = false; this.details = false })
+        }
+    },
+
+    setup() {
+        const route = useRoute();
+        const tagId = route.params.id
+        return { tagId }
+    },
+
+    created() {
+        this.getTag();
     }
 }
 </script>
 <style lang="scss" scoped>
-.color-circle {
-    width: 30px;
-    height: 30px;
-    border-radius: 15px;
-    border: 1px solid;
-    border-color: var(--color-grey-dark-3);
-    margin-right: 0;
+
+.title {
+    border-color: v-bind('tag.color');
+    color: v-bind('tag.color');
+}
+
+.title {
+    text-transform: uppercase;
 }
 .row {
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+    min-height: 1.8em;
+
+    .item:first-child {
+        text-transform: capitalize;
+        filter: contrast(0.2);
+    }
 }
 </style>

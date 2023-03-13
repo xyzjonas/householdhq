@@ -4,8 +4,8 @@ import en from './locales/en.json';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    appConfig: {
-        unwrapInjectedRef: true,
+    head: {
+        title: 'household HQ'
     },
     css: [ 
         '@/assets/css/main.scss',

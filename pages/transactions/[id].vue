@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container more-p">
         <h1 class="title">
             <Price :amount="transaction.amount" :currency="transaction.currency" />
         </h1>

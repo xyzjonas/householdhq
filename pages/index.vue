@@ -1,6 +1,5 @@
 <script lang="ts">
 import { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner } from '#components';
-import tags from '~~/server/controllers/tags';
 
 
 export default {
@@ -137,7 +136,6 @@ export default {
     const route = useRoute();
     const year = route.query.year
     const month = route.query.month
-    console.info(`y: ${year}, m: ${month}`);
     return {
       year, month
     }

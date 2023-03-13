@@ -1,28 +1,52 @@
 <template>
-    <div>
-        <div v-if="editting" class="input">
-            <textarea v-model="valueCopy" cols="20" :rows="Math.round(valueCopy.length/20) || 1"></textarea>
-            <button @click="editting = false" class="success">{{ $t('ok') }}</button>
+    <div class="row-simple">
+        <div v-if="editting" class="input row-simple">
+            <textarea
+                v-model="valueCopy"
+                cols="20"
+                :rows="rowCount"
+                :placeholder="$t('undefined')"
+            ></textarea>
+            <button @click="send" class="success">{{ $t('ok') }}</button>
             <button @click="editting = false">{{ $t('cancel') }}</button>
         </div>
-        <p v-else @click="editting = true" style="text-align: end;">{{ value }}</p>
+        <p v-else @click="editting = true" style="text-align: end;">{{ value || $t('undefined')}}</p>
     </div>
 </template>
 <script>
 export default {
 
-    props: ['value'],
+    props: ['value', 'keyName'],
 
     data() {
         return {
             editting: false,
-            valueCopy: null
+            valueCopy: undefined,
+            columns: 15,
+        }
+    },
+
+    computed: {
+        rowCount() {
+            if (this.valueCopy) {
+                return Math.round(this.valueCopy.length / this.columns) || 1;
+            }
+            return 1;
         }
     },
 
     created() {
         this.valueCopy = this.value;
-    }
+    },
+
+    methods: {
+        send() {
+            const data = {};
+            data[this.keyName] = this.valueCopy;
+            this.$emit('send', data);
+            this.editting = false;
+        }
+    },
     
 }
 </script>

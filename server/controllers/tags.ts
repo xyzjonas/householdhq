@@ -53,7 +53,7 @@ class Tags {
     }
   }
 
-  public async updateTag(tagData: EditTagDto): Promise<Tag> {
+  public async editTag(tagData: EditTagDto): Promise<Tag> {
     let data = {...tagData}
     const parentId = data.parentId;
     delete data.parentId;

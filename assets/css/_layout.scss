@@ -52,6 +52,12 @@
     }
 }
 
+.container.more-p {
+    @media only screen and (max-width: $bp-small) {
+        padding: 1em;
+    }
+}
+
 @mixin box {
     box-shadow: var(--shadow-dark);
     border-radius: 0.3em;
