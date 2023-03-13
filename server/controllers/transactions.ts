@@ -108,7 +108,13 @@ class Transactions {
       if (transactionData.sourceId) {
         source = { connect: { id: transactionData.sourceId } };
       }
-  
+
+      // disconnect all other tags...
+      await this.transactions.update({
+        where: { id: transactionData.id },
+        data: { tags: { set: [] } }
+      });
+
       transactionData.currency ??= 'CZK';
       const trans: Transaction = await this.transactions.update({
         where: {
