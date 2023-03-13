@@ -1,23 +1,32 @@
 <template>
-    <div :style="transparent && !details ? transparentStyle : ''">
+<div :style="transparent && !details ? transparentStyle : ''">
     <div class="wrapper">
-    <div 
-        class="transaction"
-        :style="`width: ${details ? 60 : 100}%`"
-        @click="details = !details"
-    >
-        <div class="item">
-            <DateTile :date="date"/>
+        <div 
+            class="transaction"
+            :style="`width: ${details ? 60 : 100}%`"
+            @click="details = !details"
+        >
+            <div class="item">
+                <DateTile :date="date"/>
+            </div>
+            <div class="item">{{ transaction.description }}</div>
+            <p class="item">
+                <Price :amount="transaction.amount" :currency="transaction.currency" />
+            </p>
         </div>
-        <div class="item">{{ transaction.description }}</div>
-        <p class="item">
-            <Price :amount="transaction.amount" :currency="transaction.currency" />
-        </p>
-    </div>
-    <div class="panel" :style="`width: ${details ? 40 : 0}%`">
-        <button class="danger" @click="$emit('delete', { id: transaction.id })">{{ $t('delete') }}</button>
-        <button @click="edit = !edit">{{ edit ? $t('cancel') : $t('edit') }}</button>
-    </div>
+        <div class="panel" :style="`width: ${details ? 40 : 0}%`">
+            <button class="danger" @click="$emit('delete', { id: transaction.id })">{{ $t('delete') }}</button>
+            <button @click="edit = !edit">{{ edit ? $t('cancel') : $t('edit') }}</button>
+        </div>
+        <div class="panel y" :style="`width: ${confirmable ? 20 : 0}%`">
+            <button class="success" @click="patchTransaction({ id: transaction.id, confirmed: true, created: transaction.created })">
+                {{ $t('confirm') }}
+                <span v-if="transaction.recurring > 0">
+                    <br>
+                    <small>{{ $t('t_new_recurring') }} {{ transaction.recurring }} {{ $t('months') }}</small>
+                </span>
+            </button>
+        </div>
     </div>
     <div :class="`collapsible-y ${edit && details ? '': 'collapsed'}`">
         <TransactionForm
@@ -81,6 +90,9 @@ export default {
             }
             return '#00000000';
         },
+        confirmable() {
+            return !this.transaction.confirmed && this.date <= new Date();
+        },
     },
 }
 </script>
@@ -110,6 +122,10 @@ export default {
         transition: 250ms;
         padding-top: 0.25em;
         padding-bottom: 0.25em;
+        
+        .y {
+            flex-direction: column;
+        }
 
         button {
             height: 100%;

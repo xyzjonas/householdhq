@@ -40,6 +40,15 @@
                     >{{ tag.name }}</option>
                 </select>
             </div>
+            <div class="row" style="padding-top: 3px; padding-bottom: 3px">
+                <p>{{ $t('recurring') }}</p>
+                <input
+                    v-model="isRecurring"
+                    type="checkbox"
+                    style="max-width: fit-content; margin-right: 1em;"
+                >
+                <input v-if="isRecurring" v-model="transaction.recurring" type="number">
+            </div>
             <div class="space"></div>
 
             <div class="row">
@@ -86,9 +95,11 @@ export default {
                 amount: 0,
                 description: undefined,
                 sourceId: 1,
+                recurring: 0,
             },
             boxColor: 'var(--color-grey-dark-1)',
             borderColor: 'var(--color-grey-dark-3)',
+            isRecurring: false,
         }
     },
 
@@ -97,7 +108,8 @@ export default {
             this.transaction = { ...this.transactionIn };
             this.transaction.created = this.formatDate(new Date(this.transactionIn.created));
             this.transaction.tags = this.transactionIn.tags.map(t => t.name).join(",");
-            delete this.transaction.source;
+            delete this.transaction.source; // discard prisma-included properties
+            delete this.transaction.confirmed; // discard explicit confirmed property - only for confirm action
         }
         if (this.startStage) {
             this.stage = this.startStage;
@@ -106,6 +118,7 @@ export default {
             this.boxColor = 'var(--color-background-dark)';
             this.borderColor = "#00000000";
         }
+        this.isRecurring = this.transaction.recurring !== 0
     },
 
     methods: {
@@ -175,6 +188,9 @@ select {
 }
 
 .row {
+
+    min-height: 2.5em;
+
     p {
         margin-right: 1em;
         min-width: 4em;

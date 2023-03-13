@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsNumber, IsOptional, IsString, IsDate, Validate } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, IsDate, Validate, IsBoolean } from 'class-validator';
 import { ValidArray, ValidDate } from './validator';
 
 
@@ -32,6 +32,10 @@ export class CreateTransactionDto {
   
   @IsNumber()
   public amount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  public recurring?: number;
   
   @IsNumber()
   public sourceId?: number;
@@ -55,14 +59,12 @@ export class EditTransactionDto {
   public created?: Date;
   
   @IsOptional()
-  @Validate(ValidDate)
-  @Transform(({value}) => new Date(value))
-  public cancelled?: Date;
+  @IsBoolean()
+  public cancelled?: boolean;
 
   @IsOptional()
-  @Validate(ValidDate)
-  @Transform(({value}) => new Date(value))
-  public confirmed?: Date;
+  @IsBoolean()
+  public confirmed?: boolean;
 
   @IsOptional()
   @IsString()
@@ -71,6 +73,10 @@ export class EditTransactionDto {
   @IsOptional()
   @IsNumber()
   public amount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  public recurring?: number;
   
   @IsOptional()
   @IsNumber()

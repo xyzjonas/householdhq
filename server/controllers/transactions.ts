@@ -41,10 +41,7 @@ class Transactions {
             monthNext = monthNext % 12;
             yearNext++;
         }
-    
-        // const queryDate = new Date(`${year}-${month}-${1}`);
         const queryDate = new Date(year=year,month=month)
-        // const queryDateNext = new Date(`${yearNext}-${monthNext}-${1}`);
         const queryDateNext = new Date(year=yearNext, month=monthNext);
         console.log(`Querying transactions from='${queryDate}' to='${queryDateNext}'`);
         const allTrans: Transaction[] = await this.transactions.findMany({
@@ -72,12 +69,15 @@ class Transactions {
         const tags = transactionData.tags.map(tagName => ({ name: tagName }));
     
         transactionData.currency ??= 'CZK';
+        const now = new Date();
         const trans: Transaction = await this.transactions.create({
           data: {
+            confirmed: parsed_date > now ? false : true,
             created: parsed_date,
             currency: transactionData.currency,
             description: transactionData.description,
             amount: transactionData.amount,
+            recurring: transactionData.recurring,
             tags: {
               connect: tags,
             },
@@ -107,18 +107,23 @@ class Transactions {
       }
 
       // disconnect all other tags...
-      await this.transactions.update({
-        where: { id: transactionData.id },
-        data: { tags: { set: [] } }
-      });
+      if (tags) {
+        await this.transactions.update({
+          where: { id: transactionData.id },
+          data: { tags: { set: [] } }
+        });
+      }
 
       transactionData.currency ??= 'CZK';
+      const now = new Date();
       const trans: Transaction = await this.transactions.update({
         where: {
           id: transactionData.id
         },
         data: {
           created: parsed_date,
+          confirmed: parsed_date <= now ? transactionData.confirmed : false,
+          recurring: transactionData.recurring,
           currency: transactionData.currency,
           description: transactionData.description,
           amount: transactionData.amount,

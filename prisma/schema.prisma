@@ -51,6 +51,7 @@ model Transaction {
   currency        String
   cancelled       Boolean     @default(false)
   confirmed       Boolean     @default(true)
+  recurring       Int         @default(0)  // recurring each n months
 
   sourceId        Int
   source          Source      @relation(fields: [sourceId], references: [id])

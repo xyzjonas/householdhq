@@ -53,18 +53,20 @@ export default {
     tags() {
       const tagsTmp: any = {}
       this.transactions.forEach(trans => {
-        if (trans.tags && trans.tags.length > 0) {
-          trans.tags.forEach(tag => {
-            if (!tagsTmp[tag.id]) {
-              tagsTmp[tag.id] = {
-                tag: tag,
-                transactions: [trans]
-              }
-          } else {
-            tagsTmp[tag.id].transactions.push(trans)
+        if(trans.confirmed) {
+          if (trans.tags && trans.tags.length > 0) {
+            trans.tags.forEach(tag => {
+              if (!tagsTmp[tag.id]) {
+                tagsTmp[tag.id] = {
+                  tag: tag,
+                  transactions: [trans]
+                }
+            } else {
+              tagsTmp[tag.id].transactions.push(trans)
+            }
+          })
           }
-        })
-      }
+        }
       });
 
       const tags = Object.values(tagsTmp)
