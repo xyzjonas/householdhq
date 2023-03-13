@@ -64,9 +64,8 @@ export default {
 
     computed: {
         childTag() {
-            console.info(this.tag)
             if (this.tag && this.tag.childTags && this.tag.childTags.length > 0) {
-                return this.childTags[0];
+                return this.tag.childTags[0].id;
             }
         }
     },
