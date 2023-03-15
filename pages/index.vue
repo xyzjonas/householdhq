@@ -18,6 +18,7 @@ export default {
       cells: 4,
       addTransaction: false,
       allTags: [],
+      filterTag: -1,
       allSources: [],
     }
   },
@@ -33,11 +34,15 @@ export default {
   computed: {
     transactions() {
       const now = new Date();
-      return this.allTransactions.filter(trans => new Date(trans.created) <= now);
+      return this.allTransactions
+        .filter(trans => new Date(trans.created) <= now)
+        .filter(trans => this.isTransactionTagged(trans, this.filterTag));
     },
     upcommingTransactions() {
       const now = new Date();
-      return this.allTransactions.filter(trans => new Date(trans.created) > now);
+      return this.allTransactions
+        .filter(trans => new Date(trans.created) > now)
+        .filter(trans => this.isTransactionTagged(trans, this.filterTag));
     },
     remainingBills() {
       let sum = 0;
@@ -142,6 +147,13 @@ export default {
       } else {
         return this.$t('t_upcomming_5')
       }
+    },
+    isTransactionTagged(transaction, tagId) {
+      if (tagId < 0) {
+        // dont filter
+        return true;
+      }
+      return transaction.tags.filter(t => t.id === tagId).length > 0;
     }
   },
   setup() {
@@ -164,41 +176,43 @@ export default {
 <template>
   <div class="container">
     <MonthHero :date="date"/>
-
     <section v-if="loading" class="center">
       <MosaicLoader />
     </section>
     
     <div v-else>
       <section v-if="Object.keys(tags).length > 0">
-        <BarGraph :tags="tags"/>
+        <BarGraph :tags="tags" @filter="tagId => filterTag = tagId"/>
       </section>
+      
+      <div :class="`collapsible-y ${filterTag < 0 ? '' : 'collapsed'}`">
+        <section class="row-simple">
+          <button @click="addTransaction = !addTransaction" class="item button">
+            {{ addTransaction ? $t('cancel') : $t('t_add') }}
+          </button>
+        </section>
+        <section style="padding-top: 0;">
+          <TransactionForm
+            :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`"
+            @cancel="addTransaction = false"
+            @send="putTransaction"
+            :processing="putLoading"
+          />
+        </section>
 
-      <section class="row-simple">
-        <button @click="addTransaction = !addTransaction" class="item button">
-          {{ addTransaction ? $t('cancel') : $t('t_add') }}
-        </button>
-      </section>
-      <section style="padding-top: 0;">
-        <TransactionForm
-          :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`"
-          @cancel="addTransaction = false"
-          @send="putTransaction"
-          :processing="putLoading"
-        />
-      </section>
+        <h4 class="title row-simple">
+          <span>{{ $t('remaining_bills') }}: </span>
+          <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
+          <button 
+            @click="showUpcomming = !showUpcomming"
+            class="tag"
+            style="height: 2.8em; margin-left: 0.5em;"
+          >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</button>
+        </h4>
+      </div>
 
       <section>
-          <h4 class="title row-simple">
-            <span>{{ $t('remaining_bills') }}: </span>
-            <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
-            <button 
-              @click="showUpcomming = !showUpcomming"
-              class="tag"
-              style="height: 2.8em; margin-left: 0.5em;"
-            >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</button>
-          </h4>
-          <div :class="`collapsible-y ${showUpcomming ? '' : 'collapsed'}`">
+          <div :class="`collapsible-y ${showUpcomming || filterTag > 0 ? '' : 'collapsed'}`">
           <TransactionRow
             v-for="transaction in upcommingTransactions"
             :key="transaction.id"
