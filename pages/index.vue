@@ -13,6 +13,7 @@ export default {
       putLoading: false,
       deleteLoading: false,
       allTransactions: [],
+      showUpcomming: false,
       date: new Date(),
       cells: 4,
       addTransaction: false,
@@ -132,6 +133,15 @@ export default {
           this.allTransactions[index] = transaction;
         }
       }
+    },
+    mapTransactionDeclention(count) {
+      if (count === 1) {
+        return this.$t('t_upcomming_1')
+      } else if (count > 1 && count < 5) {
+        return this.$t('t_upcomming_2')
+      } else {
+        return this.$t('t_upcomming_5')
+      }
     }
   },
   setup() {
@@ -180,9 +190,15 @@ export default {
 
       <section>
           <h4 class="title row-simple">
-            {{ $t('remaining_bills') }}: <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
+            <span>{{ $t('remaining_bills') }}: </span>
+            <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
+            <button 
+              @click="showUpcomming = !showUpcomming"
+              class="tag"
+              style="height: 2.8em; margin-left: 0.5em;"
+            >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</button>
           </h4>
-          <div class="icon" alt="Discover Nuxt 3"></div>
+          <div :class="`collapsible-y ${showUpcomming ? '' : 'collapsed'}`">
           <TransactionRow
             v-for="transaction in upcommingTransactions"
             :key="transaction.id"
@@ -192,6 +208,7 @@ export default {
             @patched="updateTransaction"
             @delete="deleteTransaction"
           />
+          </div>
           <TransactionRow
             v-for="transaction in transactions"
             :key="transaction.id"

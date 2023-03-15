@@ -1,9 +1,9 @@
 <template lang="">
     <div class="graph">
         <NuxtLink
-            v-for="tag in tags" :to="`/tags/${tag.tag.id}`"
+            v-for="tag in displayedTags" :to="`/tags/${tag.tag.id}`"
             class="row-wrapper"
-            :style="`color: ${light_or_dark(tag.tag.color) ? '#2b2b2b': '#faf9f9'};`"
+            :style="`color: ${light_or_dark(tag.tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 1px 1px 0px ${tag.tag.color};`"
         >
             <p class="label" :style="`background-color: ${tag.tag.color}`">{{ tag.tag.name }}</p>
             <div class="bar-wrapper">
@@ -34,6 +34,9 @@ export default {
     },
 
     computed: {
+        displayedTags() {
+            return this.tags;
+        },
         max() {
             let max = 0;
             Object.values(this.tags).forEach(t => {
