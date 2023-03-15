@@ -192,8 +192,9 @@ export default {
           </button>
         </section>
         <section style="padding-top: 0;">
+        <!-- :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`" -->
           <TransactionForm
-            :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`"
+            v-if="addTransaction"
             @cancel="addTransaction = false"
             @send="putTransaction"
             :processing="putLoading"

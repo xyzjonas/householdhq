@@ -21,7 +21,7 @@
             </div>
         </div>
         <div v-show="selected > 0">
-            <TagDetails :tagId="selected" />
+            <TagDetails :tagId="selected"  @cancel="toggleSelected(selected)"/>
         </div>
     </div>
 </template>

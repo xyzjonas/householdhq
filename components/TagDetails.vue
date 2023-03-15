@@ -1,6 +1,6 @@
 <template>
     <section>
-        <button>{{ $t('back') }}</button>
+        <button @click="$emit('cancel')">{{ $t('back') }}</button>
         <button style="margin-left: 0.5em;">
             <NuxtLink :to="`/tags/${tagId}`">{{ $t('edit') }}</NuxtLink>
         </button>
