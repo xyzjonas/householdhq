@@ -166,6 +166,6 @@ header {
 }
 
 .collapsible-y.collapsed {
-    transition:max-height 0.3s linear; // note that we're transitioning max-height, not height!
+    // transition:max-height 0.3s linear; // note that we're transitioning max-height, not height!
     max-height:0;
 }

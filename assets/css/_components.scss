@@ -153,12 +153,21 @@ select {
     
     .bar {
         height: 100%;
-        // text-align: end;
         display: flex;
         align-items: center;
         justify-items: flex-en;
-        transition: linear;
-        transition-duration: 0.5s;
+        // transition: width cubic-bezier(.9,.03,.69,.22);
+        // transition-duration: 0.2s;
+        animation: slide-in 0.7s both;
     }
+
+    @keyframes slide-in {
+        0% {
+          transform: translateX(-1000px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
 
 }
