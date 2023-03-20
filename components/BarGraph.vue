@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div class="graph">
+        <transition name="slide" mode="out-in">
+        <div v-if="selected > 0" class="graph">
             <div
                 v-for="tag in displayedTags" :to="`/tags/${tag.tag.id}`"
                 @click="toggleSelected(tag.tag.id)"
@@ -20,6 +21,27 @@
                 </div>
             </div>
         </div>
+        <div v-else class="graph">
+            <div
+                v-for="tag in tags" :to="`/tags/${tag.tag.id}`"
+                @click="toggleSelected(tag.tag.id)"
+                class="row-wrapper"
+                :style="`color: ${light_or_dark(tag.tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.tag.color}, 0px 0px 2px ${tag.tag.color}, 0px 0px 2px ${tag.tag.color};`"
+            >
+                <p class="label" :style="`background-color: ${tag.tag.color}`">{{ tag.tag.name }}</p>
+                <div class="bar-wrapper">
+                    <p class="bar" 
+                        :style="`width: ${tag.tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.tag.color}`">
+                        <Price
+                            :amount="tag.sum"
+                            :currency="tag.transactions[0].currency"
+                            style="margin-left: 0.5em;"
+                        />
+                    </p>
+                </div>
+            </div>
+        </div>
+        </transition>
         <div v-show="selected > 0">
             <TagDetails :tagId="selected"  @cancel="toggleSelected(selected)"/>
         </div>
@@ -81,7 +103,7 @@ export default {
             if (tag.tag.id === this.selected) {
                 return 100;
             }
-            return tag.sum / max * 100
+            return tag.sum / max * this.loaded;
         }
     },
 }

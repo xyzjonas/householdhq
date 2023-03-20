@@ -9,6 +9,7 @@ export default {
 
   data() {
     return {
+      tags: [],
       loading: false,
       putLoading: false,
       deleteLoading: false,
@@ -56,36 +57,7 @@ export default {
         return this.allTransactions[0].currency;
       }
     },
-    tags() {
-      const tagsTmp: any = {}
-      this.transactions.forEach(trans => {
-        if(trans.confirmed) {
-          if (trans.tags && trans.tags.length > 0) {
-            trans.tags.forEach(tag => {
-              if (!tagsTmp[tag.id]) {
-                tagsTmp[tag.id] = {
-                  tag: tag,
-                  transactions: [trans]
-                }
-            } else {
-              tagsTmp[tag.id].transactions.push(trans)
-            }
-          })
-          }
-        }
-      });
-
-      const tags = Object.values(tagsTmp)
-      tags.forEach(tag => {
-        let sum = 0;
-        tag.transactions.forEach(trans => { sum += trans.amount; })
-        tag.sum = sum;
-      });
-      tags.sort((a, b) => {
-        return b.sum - a.sum;
-      });
-      return tags;
-    }
+   
   },
 
   methods: {
@@ -102,7 +74,10 @@ export default {
       }
       $fetch(url, {method: 'GET'})
         .then(res => this.allTransactions = res.data)
-        .finally(() => this.loading = false)
+        .finally(() => {
+          this.tags = this.remapTags();
+          this.loading = false;
+        })
     },
     putTransaction(transactionData) {
       this.putLoading = true;
@@ -154,6 +129,39 @@ export default {
         return true;
       }
       return transaction.tags.filter(t => t.id === tagId).length > 0;
+    },
+    remapTags() {
+      const start = new Date();
+      console.info(`computing tags... ${start}`)
+      const tagsTmp: any = {}
+      this.transactions.forEach(trans => {
+        if(trans.confirmed) {
+          if (trans.tags && trans.tags.length > 0) {
+            trans.tags.forEach(tag => {
+              if (!tagsTmp[tag.id]) {
+                tagsTmp[tag.id] = {
+                  tag: tag,
+                  transactions: [trans]
+                }
+            } else {
+              tagsTmp[tag.id].transactions.push(trans)
+            }
+          })
+          }
+        }
+      });
+
+      const tags = Object.values(tagsTmp)
+      tags.forEach(tag => {
+        let sum = 0;
+        tag.transactions.forEach(trans => { sum += trans.amount; })
+        tag.sum = sum;
+      });
+      tags.sort((a, b) => {
+        return b.sum - a.sum;
+      });
+      console.info(`tags computed in ${new Date().getTime() - start.getTime()}ms`)
+      return tags;
     }
   },
   setup() {
@@ -185,32 +193,34 @@ export default {
         <BarGraph :tags="tags" @filter="tagId => filterTag = tagId"/>
       </section>
       
-      <div :class="`collapsible-y ${filterTag < 0 ? '' : 'collapsed'}`">
-        <section class="row-simple py">
-          <button @click="addTransaction = !addTransaction" class="item button">
-            {{ addTransaction ? $t('cancel') : $t('t_add') }}
-          </button>
-        </section>
-        <section style="padding-top: 0;">
-        <!-- :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`" -->
-          <TransactionForm
-            v-if="addTransaction"
-            @cancel="addTransaction = false"
-            @send="putTransaction"
-            :processing="putLoading"
-          />
-        </section>
+      <!-- <div :class="`collapsible-y ${filterTag < 0 ? '' : 'collapsed'}`"> -->
+      <section class="row-simple py">
+        <button @click="addTransaction = !addTransaction" class="item button">
+          {{ addTransaction ? $t('cancel') : $t('t_add') }}
+        </button>
+      </section>
+      
+      <transition name="page" mode="in-out">
+      <section v-if="addTransaction" style="padding-top: 0;">
+      <!-- :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`" -->
+        <TransactionForm
+          v-if="addTransaction"
+          @cancel="addTransaction = false"
+          @send="putTransaction"
+          :processing="putLoading"
+        />
+      </section>
+      </transition>
 
-        <h4 class="title row-simple">
-          <span>{{ $t('remaining_bills') }}: </span>
-          <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
-          <button 
-            @click="showUpcomming = !showUpcomming"
-            class="tag"
-            style="height: 2.8em; margin-left: 0.5em;"
-          >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</button>
-        </h4>
-      </div>
+      <h4 class="title row-simple">
+        <span>{{ $t('remaining_bills') }}: </span>
+        <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
+        <button 
+          @click="showUpcomming = !showUpcomming"
+          class="tag"
+          style="height: 2.8em; margin-left: 0.5em;"
+        >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</button>
+      </h4>
 
       <section>
           <div :class="`collapsible-y ${showUpcomming || filterTag > 0 ? '' : 'collapsed'}`">

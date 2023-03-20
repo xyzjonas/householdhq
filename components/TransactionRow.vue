@@ -28,7 +28,8 @@
             </button>
         </div>
     </div>
-    <div :class="`collapsible-y ${edit && details ? '': 'collapsed'}`">
+    <transition name="page" mode="in-out">
+    <div v-if="edit && details">
         <TransactionForm
             :transactionIn="transaction"
             :startStage="1"
@@ -38,6 +39,7 @@
             @send="patchTransaction"
         />
     </div>
+    </transition>
 </div>
 </template>
 <script>

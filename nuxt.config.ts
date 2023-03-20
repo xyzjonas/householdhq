@@ -4,6 +4,9 @@ import en from './locales/en.json';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    app: {
+        pageTransition: { name: 'page', mode: 'out-in' }
+    },
     head: {
         title: 'household HQ'
     },
