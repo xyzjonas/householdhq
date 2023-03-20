@@ -181,7 +181,7 @@ export default {
     </section>
     
     <div v-else>
-      <section v-if="Object.keys(tags).length > 0">
+      <section>
         <BarGraph :tags="tags" @filter="tagId => filterTag = tagId"/>
       </section>
       
