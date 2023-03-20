@@ -1,25 +1,39 @@
 <template>
     <div>
         <transition name="slide" mode="out-in">
+        <!-- EXPENSES -->
         <section v-if="item === 0" class="row-simple">
-            <BarGraph class="item" :items="tags" @filter="tagId => $emit('filter', tagId)"/>
+            <div class="item">
+                <h3 class="mb">{{ $t('expenses') }}</h3>
+                <BarGraph class="item" :items="tags" @filter="tagId => $emit('filter', tagId)"/>
+            </div>
             <button @click="item+=1" class="chevron right item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-right"></i></button>
         </section>
+
+        <!-- INCOMES -->
         <section v-else-if="item === 1" class="row-simple">
+            <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="item border-left">
+                <h3 class="mb">{{ $t('incomes') }}</h3>
+                <BarGraph class="item" :items="incomes" @filter="id => $emit('filter', id)"/>
+            </div>            
+            <button @click="item+=1" class="chevron right item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-right"></i></button>
+        </section>
+
+        <!-- SOURCES STATE -->
+        <section v-else-if="item === 2" class="row-simple">
             <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
             <div class="item border-left">
                 <h3>{{ $t('sources') }}</h3>
                 <BarGraph class="item" :items="sources" @filter="id => $emit('filterSource', id)"/>
-                <!-- <button style="min-width: 100%;"><i class="fa-solid fa-plus"></i></button> -->
             </div>            
             <button @click="item+=1" class="chevron right item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-right"></i></button>
         </section>
-        <section v-else-if="item === 2" class="row-simple">
+        <section v-else-if="item === 3" class="row-simple">
             <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
             <div class="item border-left">
                 <h3>{{ $t('targets') }}</h3>
                 <BarGraph :items="targets" @filter="id => $emit('filterTarget', id)" />
-                <!-- <button style="min-width: 100%;"><i class="fa-solid fa-plus"></i></button> -->
             </div>            
         </section>
         </transition>
@@ -35,11 +49,11 @@ export default {
 
     components: { BarGraph, SourceRow },
 
-    props: ['tags', 'sources', 'targets'],
+    props: ['tags', 'incomes', 'sources', 'targets'],
 
     data() {
         return {
-            items: 3,
+            items: 4,
             item: 0
         }
     }

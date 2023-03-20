@@ -23,6 +23,7 @@ export default {
       allSources: [],
       sources: [],
       targets: [],
+      incomes: [],
     }
   },
 
@@ -82,6 +83,7 @@ export default {
           this.tags = this.remapTags();
           this.sources = this.remapSources();
           this.targets = this.remapTargets();
+          this.incomes = this.remapTags(true);
           this.loading = false;
         })
     },
@@ -139,11 +141,11 @@ export default {
       }
       return transaction.tags.filter(t => t.id === tagId).length > 0;
     },
-    remapTags() {
+    remapTags(incomeOnly=false) {
       const tagsTmp: any = {}
       this.transactions.forEach(trans => {
         if(trans.confirmed) {
-          if (trans.tags && trans.tags.length > 0 && trans.target.isOut) {
+          if (trans.tags && trans.tags.length > 0 && ((!incomeOnly && trans.target.isOut) || (incomeOnly && !trans.target.isOut))) {
             trans.tags.forEach(tag => {
               if (!tagsTmp[tag.id]) {
                 tagsTmp[tag.id] = {...tag}
@@ -236,7 +238,13 @@ export default {
     </section>
     
     <div v-else>
-      <HomeCarousel :tags="tags" :sources="sources" :targets="targets" @filter="tagId => filterTag = tagId" />
+      <HomeCarousel
+        :tags="tags"
+        :incomes="incomes"
+        :sources="sources"
+        :targets="targets"
+        @filter="tagId => filterTag = tagId"
+      />
       
       <section class="row-simple py">
         <button @click="addTransaction = !addTransaction" class="item button">
