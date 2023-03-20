@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 
 export class IdDto {
@@ -11,6 +11,11 @@ export class IdDto {
 export class CreateSourceDto {
   @IsString()
   public name?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  public isOut?: boolean
+
 }
 
 export class EditSourceDto {
@@ -18,6 +23,10 @@ export class EditSourceDto {
     @IsInt()
     @Transform(({value}) => parseInt(value))
     public id?: number
+
+    @IsBoolean()
+    @IsOptional()
+    public isOut?: boolean
 
     @IsOptional()
     @IsString()

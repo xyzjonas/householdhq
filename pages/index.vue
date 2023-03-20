@@ -1,11 +1,11 @@
 <script lang="ts">
-import { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner } from '#components';
+import { TransactionRow, HomeCarousel, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner, SourceRow } from '#components';
 
 
 export default {
 
 
-  components: { TransactionRow, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner },
+  components: { TransactionRow, HomeCarousel, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner, SourceRow },
 
   data() {
     return {
@@ -21,6 +21,8 @@ export default {
       allTags: [],
       filterTag: -1,
       allSources: [],
+      sources: [],
+      targets: [],
     }
   },
 
@@ -48,7 +50,9 @@ export default {
     remainingBills() {
       let sum = 0;
       this.upcommingTransactions.forEach(t => {
-        sum += t.amount;
+        if (!t.source.isOut) {
+          sum += t.amount;
+        }
       })
       return sum;
     },
@@ -76,6 +80,8 @@ export default {
         .then(res => this.allTransactions = res.data)
         .finally(() => {
           this.tags = this.remapTags();
+          this.sources = this.remapSources();
+          this.targets = this.remapTargets();
           this.loading = false;
         })
     },
@@ -104,13 +110,16 @@ export default {
     getSources() {
       const url = '/api/sources'
       $fetch(url, {method: 'GET'})
-        .then(res => this.allSources = res.data)
+        .then(res => {
+          this.allSources = res.data;
+    })
     },
     updateTransaction(transaction) {
       for (let index = 0; index < this.allTransactions.length; index++) {
         const element = this.allTransactions[index];if (element.id === transaction.id)
         if (element.id === transaction.id) {
           this.allTransactions[index] = transaction;
+          this.getTransactions();
         }
       }
     },
@@ -131,18 +140,14 @@ export default {
       return transaction.tags.filter(t => t.id === tagId).length > 0;
     },
     remapTags() {
-      const start = new Date();
-      console.info(`computing tags... ${start}`)
       const tagsTmp: any = {}
       this.transactions.forEach(trans => {
         if(trans.confirmed) {
-          if (trans.tags && trans.tags.length > 0) {
+          if (trans.tags && trans.tags.length > 0 && trans.target.isOut) {
             trans.tags.forEach(tag => {
               if (!tagsTmp[tag.id]) {
-                tagsTmp[tag.id] = {
-                  tag: tag,
-                  transactions: [trans]
-                }
+                tagsTmp[tag.id] = {...tag}
+                tagsTmp[tag.id].transactions = [trans];
             } else {
               tagsTmp[tag.id].transactions.push(trans)
             }
@@ -157,13 +162,55 @@ export default {
         tag.transactions.forEach(trans => { sum += trans.amount; })
         tag.sum = sum;
       });
-      tags.sort((a, b) => {
-        return b.sum - a.sum;
-      });
-      console.info(`tags computed in ${new Date().getTime() - start.getTime()}ms`)
+      tags.sort((a, b) => { return b.sum - a.sum; });
       return tags;
-    }
+    },
+    remapSources() {
+      const sourcesTmp: any = {}
+      this.allTransactions.forEach(trans => {
+          if (trans.source) {
+            if (sourcesTmp[trans.sourceId]) {
+              sourcesTmp[trans.sourceId].transactions.push(trans);
+            } else {
+              sourcesTmp[trans.sourceId] = {...trans.source};
+              sourcesTmp[trans.sourceId].transactions = [trans];
+            }
+          }
+      });
+
+      const sources = Object.values(sourcesTmp);
+      sources.forEach(source => {
+        let sum = 0;
+        source.transactions.forEach(trans => { sum += trans.amount; })
+        source.sum = sum;
+      });
+      sources.sort((a, b) => { return b.sum - a.sum; });
+      return sources;
   },
+  remapTargets() {
+      const targetsTmp: any = {}
+      this.allTransactions.forEach(trans => {
+          if (trans.target) {
+            if (targetsTmp[trans.targetId]) {
+              targetsTmp[trans.targetId].transactions.push(trans);
+            } else {
+              targetsTmp[trans.targetId] = {...trans.target};
+              targetsTmp[trans.targetId].transactions = [trans];
+            }
+          }
+      });
+
+      const targets = Object.values(targetsTmp);
+      targets.forEach(target => {
+        let sum = 0;
+        target.transactions.forEach(trans => { sum += trans.amount; })
+        target.sum = sum;
+      });
+      targets.sort((a, b) => { return b.sum - a.sum; });
+      return targets;
+  },
+  },
+  
   setup() {
     const route = useRoute();
     const year = route.query.year
@@ -189,20 +236,16 @@ export default {
     </section>
     
     <div v-else>
-      <section>
-        <BarGraph :tags="tags" @filter="tagId => filterTag = tagId"/>
-      </section>
+      <HomeCarousel :tags="tags" :sources="sources" :targets="targets" @filter="tagId => filterTag = tagId" />
       
-      <!-- <div :class="`collapsible-y ${filterTag < 0 ? '' : 'collapsed'}`"> -->
       <section class="row-simple py">
         <button @click="addTransaction = !addTransaction" class="item button">
           {{ addTransaction ? $t('cancel') : $t('t_add') }}
         </button>
       </section>
-      
+
       <transition name="page" mode="in-out">
       <section v-if="addTransaction" style="padding-top: 0;">
-      <!-- :class="`collapsible-y ${addTransaction ? '': 'collapsed'}`" -->
         <TransactionForm
           v-if="addTransaction"
           @cancel="addTransaction = false"
@@ -213,17 +256,17 @@ export default {
       </transition>
 
       <h4 class="title row-simple">
-        <span>{{ $t('remaining_bills') }}: </span>
-        <Price style="margin-left: 0.3em;" class="tag" :amount="remainingBills" :currency="currency"/>
+        <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
           @click="showUpcomming = !showUpcomming"
-          class="tag"
-          style="height: 2.8em; margin-left: 0.5em;"
-        >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</button>
+          class="tag ml"
+        >
+          <Price class="tag" :amount="remainingBills" :currency="currency"/>
+        </button>
       </h4>
 
-      <section>
-          <div :class="`collapsible-y ${showUpcomming || filterTag > 0 ? '' : 'collapsed'}`">
+      <transition name="page">
+      <section v-if="showUpcomming || filterTag > 0">
           <TransactionRow
             v-for="transaction in upcommingTransactions"
             :key="transaction.id"
@@ -233,13 +276,16 @@ export default {
             @patched="updateTransaction"
             @delete="deleteTransaction"
           />
-          </div>
+      </section>
+      </transition>
+      <section>
           <TransactionRow
             v-for="transaction in transactions"
             :key="transaction.id"
             :transaction="transaction"
             @patched="updateTransaction"
-            @delete="deleteTransaction" />
+            @delete="deleteTransaction"
+          />
       </section>
 
     </div>

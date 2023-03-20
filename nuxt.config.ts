@@ -12,7 +12,8 @@ export default defineNuxtConfig({
     },
     css: [ 
         '@/assets/css/main.scss',
-        '@/assets/iconicss/iconicss.min.css'
+        '@/assets/iconicss/iconicss.min.css',
+        '@/assets/fontawesome/css/all.css'
     ],
     modules: [
         [

@@ -39,6 +39,9 @@ export class CreateTransactionDto {
   
   @IsNumber()
   public sourceId?: number;
+
+  @IsNumber()
+  public targetId?: number;
   
   @IsString()
   @IsOptional()
@@ -81,6 +84,10 @@ export class EditTransactionDto {
   @IsOptional()
   @IsNumber()
   public sourceId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  public targetId?: number;
   
   @IsString()
   @IsOptional()

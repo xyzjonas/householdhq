@@ -25,9 +25,11 @@ class Sources {
     }
 
     public async editSource(sourceData: EditSourceDto) {
+      const data = {...sourceData};
+      delete data.id;
       const source: Source = await this.sources.update({ 
         where: { id: sourceData.id },
-        data: { name: sourceData.name }
+        data: data
       });
       return source;
     }

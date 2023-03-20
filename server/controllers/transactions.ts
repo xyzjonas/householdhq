@@ -1,6 +1,7 @@
 import { PrismaClient, Transaction } from "@prisma/client";
 import { CreateTransactionDto, TagTransactionDto, IdDto, TransactionMonthDto, EditTransactionDto } from "../validators/transactions.dto";
 
+const DEFAULT_INCLUDE = { source: true, target:true, tags: true };
 
 class Transactions {
 
@@ -15,7 +16,7 @@ class Transactions {
     public async findSingle(transactionData: IdDto): Promise<Transaction> {
         const transaction = await this.transactions.findUnique({
             where: { id: transactionData.id },
-            include: { source: true, tags: true },
+            include: DEFAULT_INCLUDE,
         });
         if (!transaction) {
             throw createError({ statusCode: 400, statusMessage: `No such transaction id=${transactionData.id}` });
@@ -51,7 +52,7 @@ class Transactions {
                 lt: queryDateNext,
             }
         },
-          include: { source: true, tags: true },
+          include: DEFAULT_INCLUDE,
         });
         allTrans.sort((a, b) => b.created.getTime() - a.created.getTime());
         return {
@@ -86,8 +87,13 @@ class Transactions {
                 id: transactionData.sourceId,
               },
             },
+            target: {
+              connect: {
+                id: transactionData.targetId,
+              },
+            },
           },
-          include: { source: true, tags: true }
+          include: DEFAULT_INCLUDE
         });
         return trans;
     }
@@ -104,6 +110,10 @@ class Transactions {
       let source = undefined;
       if (transactionData.sourceId) {
         source = { connect: { id: transactionData.sourceId } };
+      }
+      let target = undefined;
+      if (transactionData.targetId) {
+        target = { connect: { id: transactionData.targetId } };
       }
 
       // disconnect all other tags...
@@ -129,8 +139,9 @@ class Transactions {
           amount: transactionData.amount,
           tags: tags,
           source: source,
+          target: target,
         },
-        include: { source: true, tags: true }
+        include: DEFAULT_INCLUDE
       });
       return trans;
   }
@@ -150,7 +161,7 @@ class Transactions {
               connect: tags,
             },
           },
-          include: { tags: true, source: true },
+          include: DEFAULT_INCLUDE,
         });
         return trans;
     }
@@ -166,7 +177,7 @@ class Transactions {
               disconnect: tags,
             },
           },
-          include: { tags: true, source: true },
+          include: DEFAULT_INCLUDE,
         });
         return trans;
     }

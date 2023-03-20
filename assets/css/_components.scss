@@ -158,4 +158,16 @@ select {
         justify-items: flex-en;
     }
 
+    .carousel-circle {
+        display: block;
+        height: 15px;
+        width: 15px;
+        border: 1px solid red;
+        border-color: var(--color-grey-light-1);
+    }
+
+    .carousel-circle.selected {
+        background-color: var(--color-grey-light-1);
+    }
+
 }

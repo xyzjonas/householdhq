@@ -19,7 +19,7 @@
                     <p>{{ $t('t_from') }}</p>
                     <select v-model.number="transaction.sourceId">
                         <option
-                            v-for="source in allSources.value"
+                            v-for="source in allSources"
                             :key="'option-source-' + source.id"
                             :value="source.id"
                         >{{ source.name }}</option>
@@ -27,18 +27,23 @@
                 </div>
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('t_to') }}</p>
-                    <select>
-                        <option :value="1">Pryč</option>
+                    <select v-model.number="transaction.targetId">
+                        <option
+                            v-for="source in allSources"
+                            :key="'option-target-' + source.id"
+                            :value="source.id"
+                        >
+                            {{ source.name }}
+                        </option>
                     </select>
                 </div>
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('t_tag') }}</p>
                     <select v-model="transaction.tags">
                         <option 
-                            v-for="tag in allTags.value"
+                            v-for="tag in allTags"
                             :key="tag.id + '-event'"
                             :value="tag.name"
-                            :style="`background-color: ${tag.color}`"
                         >{{ tag.name }}</option>
                     </select>
                 </div>
@@ -88,8 +93,6 @@ export default {
 
     props: ['processing', 'transactionIn', 'startStage', 'noFrame'],
 
-    // inject: ['allTags', 'allSources'],
-
     data() {
         return {
             stage: 0,
@@ -117,6 +120,7 @@ export default {
             this.transaction.created = this.formatDate(new Date(this.transactionIn.created));
             this.transaction.tags = this.transactionIn.tags.map(t => t.name).join(",");
             delete this.transaction.source; // discard prisma-included properties
+            delete this.transaction.target; // discard prisma-included properties
             delete this.transaction.confirmed; // discard explicit confirmed property - only for confirm action
         }
         if (this.startStage) {
@@ -127,6 +131,12 @@ export default {
             this.borderColor = "#00000000";
         }
         this.isRecurring = this.transaction.recurring !== 0
+    },
+
+    computed: {
+        firstOut() {
+            this.allSources.filter(s => s.isOut).reduce((a, b) => a);
+        }
     },
 
     methods: {

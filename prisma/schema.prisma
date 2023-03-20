@@ -37,27 +37,33 @@ model Tag {
 
 
 model Source {
-  id              Int    @id @default(autoincrement())
-  name            String
-  transactions    Transaction[]
-}
-
-
-model Transaction {
-  id              Int         @id @default(autoincrement())
-  created         DateTime    @updatedAt
-  description     String
-  amount          Float
-  currency        String
-  cancelled       Boolean     @default(false)
-  confirmed       Boolean     @default(true)
-  recurring       Int         @default(0)  // recurring each n months
-
-  sourceId        Int
-  source          Source      @relation(fields: [sourceId], references: [id])
-
-  tags            Tag[]
-
-  @@map("transaction")
-  @@index([sourceId])
-}
+    id                Int           @id @default(autoincrement())
+    name              String
+    transactionsIn    Transaction[] @relation(name: "source")
+    transactionsOut   Transaction[] @relation(name: "target")
+    isOut             Boolean       @default(false)  // mark 'source' as output (not owned)
+  }
+  
+  
+  model Transaction {
+    id              Int         @id @default(autoincrement())
+    created         DateTime    @updatedAt
+    description     String
+    amount          Float
+    currency        String
+    cancelled       Boolean     @default(false)
+    confirmed       Boolean     @default(true)
+    recurring       Int         @default(0)  // recurring each n months
+  
+    sourceId        Int
+    source          Source      @relation(name: "source", fields: [sourceId], references: [id])
+  
+    targetId        Int         @default(2)
+    target          Source      @relation(name: "target", fields: [targetId], references: [id])
+  
+    tags            Tag[]
+  
+    @@map("transaction")
+    @@index([sourceId])
+    @@index([targetId])
+  }

@@ -1,17 +1,20 @@
 <template>
     <div>
+        <section v-if="items.length === 0" class="center">
+            <h1>{{ $t('no_data') }}</h1>
+        </section>
         <transition name="slide" mode="out-in">
         <div v-if="selected > 0" class="graph">
             <div
-                v-for="tag in displayedTags" :to="`/tags/${tag.tag.id}`"
-                @click="toggleSelected(tag.tag.id)"
+                v-for="tag in displayedTags" :to="`/tags/${tag.id}`"
+                @click="toggleSelected(tag.id)"
                 class="row-wrapper"
-                :style="`color: ${light_or_dark(tag.tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.tag.color}, 0px 0px 2px ${tag.tag.color}, 0px 0px 2px ${tag.tag.color};`"
+                :style="`color: ${light_or_dark(tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color};`"
             >
-                <p class="label" :style="`background-color: ${tag.tag.color}`">{{ tag.tag.name }}</p>
+                <p class="label" :style="`background-color: ${tag.color}`">{{ tag.name }}</p>
                 <div class="bar-wrapper">
                     <p class="bar" 
-                        :style="`width: ${tag.tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.tag.color}`">
+                        :style="`width: ${tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.color}`">
                         <Price
                             :amount="tag.sum"
                             :currency="tag.transactions[0].currency"
@@ -23,15 +26,15 @@
         </div>
         <div v-else class="graph">
             <div
-                v-for="tag in tags" :to="`/tags/${tag.tag.id}`"
-                @click="toggleSelected(tag.tag.id)"
+                v-for="tag in items" :to="`/tags/${tag.id}`"
+                @click="toggleSelected(tag.id)"
                 class="row-wrapper"
-                :style="`color: ${light_or_dark(tag.tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.tag.color}, 0px 0px 2px ${tag.tag.color}, 0px 0px 2px ${tag.tag.color};`"
+                :style="`color: ${light_or_dark(tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color};`"
             >
-                <p class="label" :style="`background-color: ${tag.tag.color}`">{{ tag.tag.name }}</p>
+                <p class="label" :style="`background-color: ${tag.color}`">{{ tag.name }}</p>
                 <div class="bar-wrapper">
                     <p class="bar" 
-                        :style="`width: ${tag.tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.tag.color}`">
+                        :style="`width: ${tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.color}`">
                         <Price
                             :amount="tag.sum"
                             :currency="tag.transactions[0].currency"
@@ -54,7 +57,7 @@ export default {
 
     components: { Price, TagDetails },
 
-    props: [ 'tags' ],
+    props: [ 'items' ],
 
     data() {
         return {
@@ -66,15 +69,15 @@ export default {
     computed: {
         displayedTags() {
             if (this.selected < 0) {
-                return this.tags;
+                return this.items;
             }
-            return this.tags.filter(t => t.tag.id === this.selected);
+            return this.items.filter(t => t.id === this.selected);
         },
     },
 
     created() {
         let max = 0;
-        Object.values(this.tags).forEach(t => {
+        Object.values(this.items).forEach(t => {
             if (t.sum > max) { max = t.sum; }
         })
         this.max = max;
@@ -100,7 +103,7 @@ export default {
             this.$emit('filter', this.selected);
         },
         getTagWidth(tag) {
-            if (tag.tag.id === this.selected) {
+            if (tag.id === this.selected) {
                 return 100;
             }
             return tag.sum / max * this.loaded;

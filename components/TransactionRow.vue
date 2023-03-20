@@ -2,14 +2,18 @@
 <div :style="transparent && !details ? transparentStyle : ''">
     <div class="wrapper">
         <div 
-            class="transaction"
+            :class="`transaction ${transaction.target.isOut ? '' : 'income'}`"
             :style="`width: ${details ? 60 : 100}%`"
             @click="details = !details"
         >
             <div class="item">
                 <DateTile :date="date"/>
             </div>
-            <div class="item">{{ transaction.description }}</div>
+            <div class="item">
+                {{ transaction.description }}
+                <br>
+                <small style="font-size: xx-small">{{ transaction.source.name }} <i class="fa-solid fa-arrow-right"></i> {{ transaction.target.name }}</small>
+            </div>
             <p class="item">
                 <Price :amount="transaction.amount" :currency="transaction.currency" />
             </p>
@@ -136,6 +140,10 @@ export default {
             flex: auto;
         }
     }
+}
+
+.income {
+    border-color: var(--color-success);
 }
 
 </style>
