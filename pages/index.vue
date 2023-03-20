@@ -186,7 +186,7 @@ export default {
       </section>
       
       <div :class="`collapsible-y ${filterTag < 0 ? '' : 'collapsed'}`">
-        <section class="row-simple">
+        <section class="row-simple py">
           <button @click="addTransaction = !addTransaction" class="item button">
             {{ addTransaction ? $t('cancel') : $t('t_add') }}
           </button>

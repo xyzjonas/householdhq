@@ -52,6 +52,11 @@
     }
 }
 
+.py {
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+}
+
 .container.more-p {
     @media only screen and (max-width: $bp-small) {
         padding: 1em;
@@ -155,7 +160,7 @@ header {
 
 .collapsible-y {
     overflow:hidden;
-    transition:max-height 0.6s linear; // note that we're transitioning max-height, not height!
+    transition:max-height 0.3s linear; // note that we're transitioning max-height, not height!
     height:auto;
     max-height:600px; // still have to hard-code a value!
 }

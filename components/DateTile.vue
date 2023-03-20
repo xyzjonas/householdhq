@@ -9,9 +9,15 @@ export default {
 
     props: ["date"],
 
+    data() {
+        return {
+            weekDays: this.getWeekDays(),
+        }
+    },  
+
     computed: {
         day() {
-            return this.getWeekDays()[this.date.getDay()];
+            return this.weekDays[this.date.getDay()];
         },
         month() {
             return this.date.getMonth() + 1;
@@ -21,7 +27,7 @@ export default {
     methods: {
         getWeekDays() {
             const locale = this.$i18n.locale;
-            var baseDate = new Date(Date.UTC(2017, 0, 2)); // just a Monday
+            const baseDate = new Date(2023, 2, 19); // just a Sunday
             var weekDays = [];
             for(let i = 0; i < 7; i++)
             {       
