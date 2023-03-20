@@ -101,6 +101,7 @@ export default {
                 amount: 0,
                 description: undefined,
                 sourceId: 1,
+                targetId: 2,
                 recurring: 0,
             },
             boxColor: 'var(--color-grey-dark-1)',
