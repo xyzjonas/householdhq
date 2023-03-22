@@ -13,11 +13,10 @@
         <!-- INCOMES -->
         <section v-else-if="item === 1" class="row-simple">
             <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
-            <div class="item border-left">
+            <div class="item">
                 <h3 class="mb">{{ $t('incomes') }}</h3>
                 <BarGraph class="item" :items="incomes" @filter="id => $emit('filter', id)"/>
             </div>            
-            <button @click="item+=1" class="chevron right item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-right"></i></button>
         </section>
 
         <!-- SOURCES STATE -->

@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Validate } from 'class-validator';
+import { ValidDate } from './validator';
 
 
 export class IdDto {
@@ -19,7 +20,6 @@ export class CreateSourceDto {
 }
 
 export class EditSourceDto {
-
     @IsInt()
     @Transform(({value}) => parseInt(value))
     public id?: number
@@ -31,4 +31,24 @@ export class EditSourceDto {
     @IsOptional()
     @IsString()
     public name?: string;
+
+    @IsOptional()
+    @IsString()
+    public color?: string;
   }
+
+export class UpdateSourceStateDto {
+  @IsInt()
+  @Transform(({value}) => parseInt(value))
+  public sourceId?: number
+
+  @IsNumber()
+  public amount?: number;
+  
+
+  @IsOptional()
+  @Validate(ValidDate)
+  @Transform(({value}) => new Date(value))
+  public created?: Date;
+
+}

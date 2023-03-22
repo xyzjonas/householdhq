@@ -1,11 +1,19 @@
 <script lang="ts">
-import { TransactionRow, HomeCarousel, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner, SourceRow } from '#components';
+import {
+  TransactionRow, HomeCarousel, TagSummary,
+  MonthHero, BarGraph, MosaicLoader, TransactionForm,
+  Spinner, SourceRow, BalanceRow
+} from '#components';
 
 
 export default {
 
 
-  components: { TransactionRow, HomeCarousel, TagSummary, MonthHero, BarGraph, MosaicLoader, TransactionForm, Spinner, SourceRow },
+  components: {
+    TransactionRow, HomeCarousel, TagSummary,
+    MonthHero, BarGraph, MosaicLoader,
+    TransactionForm, Spinner, SourceRow, BalanceRow
+  },
 
   data() {
     return {
@@ -30,8 +38,6 @@ export default {
   provide() {
     return {
       currency: computed(() => this.currency),
-      allTags: computed(() => this.allTags),
-      allSources: computed(() => this.allSources),
     }
   },
 
@@ -62,6 +68,34 @@ export default {
         return this.allTransactions[0].currency;
       }
     },
+    balances() {
+      const sources = this.allSources
+        .filter(s => !s.isOut)
+        .map(s => {
+          const source = { ...s };
+          if (source.states.length === 0) {
+            source.balance = undefined;
+          } else {
+            const last_entry = source.states[source.states.length - 1];
+            let last_balance = last_entry.amount;
+            console.info(`Last bal: ${last_entry}`)
+            console.info(`${this.transactions.length} transactions`);
+            const out_ = this.transactions
+              .filter(t => new Date(t.created) > new Date(last_entry.created))
+              .filter(t => t.sourceId === source.id);
+            const in_ = this.transactions
+              .filter(t => new Date(t.created) > new Date(last_entry.created))
+              .filter(t => t.targetId === source.id);
+            console.info(`states: ${source.states.length}`)
+            
+            in_.forEach(t => last_balance += t.amount);
+            out_.forEach(t => last_balance -= t.amount);
+            source.balance = last_balance;
+          }
+          return source;
+        })
+      return sources;
+    }
    
   },
 
@@ -246,6 +280,11 @@ export default {
         @filter="tagId => filterTag = tagId"
       />
       
+      <section>
+        <h3 class="mb">{{ $t('balance') }}</h3>
+        <BalanceRow :sources="balances" />
+      </section>
+
       <section class="row-simple py">
         <button @click="addTransaction = !addTransaction" class="item button">
           {{ addTransaction ? $t('cancel') : $t('t_add') }}
@@ -301,6 +340,9 @@ export default {
   </div>
 </template>
 <style scoped lang="scss">
+h3 {
+  text-transform: uppercase;
+}
 .button {
   min-height: 60px;
 }

@@ -9,7 +9,11 @@
                 </div>
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('t_date') }}</p>
-                    <input v-model="transaction.created" type="date"/>
+                    <input v-model="date" type="date"/>
+                </div>
+                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
+                    <p>{{ $t('t_time') }}</p>
+                    <input v-model="time" type="time"/>
                 </div>
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('t_desc') }}</p>
@@ -96,8 +100,10 @@ export default {
     data() {
         return {
             stage: 0,
+            date: this.formatDate(new Date()),
+            time: this.formatTime(new Date()),
             transaction: {
-                created: this.formatDate(new Date()),
+                created: null,
                 amount: 0,
                 description: undefined,
                 sourceId: 1,
@@ -118,11 +124,14 @@ export default {
 
         if (this.transactionIn) {
             this.transaction = { ...this.transactionIn };
-            this.transaction.created = this.formatDate(new Date(this.transactionIn.created));
+            this.transaction.created = this.transactionIn.created;
             this.transaction.tags = this.transactionIn.tags.map(t => t.name).join(",");
             delete this.transaction.source; // discard prisma-included properties
             delete this.transaction.target; // discard prisma-included properties
             delete this.transaction.confirmed; // discard explicit confirmed property - only for confirm action
+            this.date = this.formatDate(new Date(this.transaction.created));
+            this.time = this.formatTime(new Date(this.transaction.created));
+            console.info(this.time)
         }
         if (this.startStage) {
             this.stage = this.startStage;
@@ -132,6 +141,7 @@ export default {
             this.borderColor = "#00000000";
         }
         this.isRecurring = this.transaction.recurring !== 0
+        console.info('addassd')
     },
 
     computed: {
@@ -152,11 +162,22 @@ export default {
             if (!this.transaction.description) {
                 this.transaction.description = this.$t('t_placeholder')
             }
+            const datetime = new Date(this.date);
+            if (this.time) {
+                const hour = this.time.split(":")[0];
+                const minute = this.time.split(":")[1];
+                datetime.setHours(hour, minute);
+            }
+            this.transaction.created = datetime.toUTCString();
             this.$emit('send', this.transaction);
         },
         formatDate(date) {
             return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         },
+        formatTime(date) {
+            return `${date.getHours()}:${date.getMinutes()}`
+        },
+
         getTags() {
         const url = '/api/tags'
         $fetch(url, {method: 'GET'})

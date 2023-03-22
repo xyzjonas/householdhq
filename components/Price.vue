@@ -1,20 +1,21 @@
 <template>
     <div class="amount">
         <span>{{ amount || 0 }}</span>
-        <span style="font-size: medium; margin-left: 2px;">{{ getCurrency() }}</span>
+        <span style="font-size: medium; margin-left: 2px;">{{ curr }}</span>
     </div>
 </template>
 <script>
 export default {
+
     props: ['amount', 'currency'],
 
-    methods: {
-        getCurrency() {
+    computed: {
+        curr() {
             // num = new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(number);
-            if (this.currency === "CZK") {
+            if (this.currency === 'CZK') {
                 return 'Kč'
             }
-            return 
+            return this.currency
         }
     }
 }
