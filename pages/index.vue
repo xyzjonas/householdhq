@@ -65,7 +65,8 @@ export default {
     },
     currency() {
       if (this.allTransactions && this.allTransactions.length > 0) {
-        return this.allTransactions[0].currency;
+        const curr = this.allTransactions[0].currency;
+        return curr;
       }
     },
     balances() {

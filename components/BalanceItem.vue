@@ -5,7 +5,7 @@
         <span>{{ source.name }}</span>
         <br>
         <div v-if="lastEntry && lastEntryNotThisMonth"></div>
-        <Price v-else-if="!isNaN(source.balance)" class="item" :amount="source.balance" :currency="currency" />
+        <Price v-else-if="!isNaN(source.balance)" class="item" :amount="source.balance" :currency="currency.value" />
         <span v-else>
             <i class="fa-solid fa-triangle-exclamation"></i>
         </span>
