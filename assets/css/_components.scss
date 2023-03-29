@@ -2,7 +2,7 @@
 
 
 @mixin background {
-    background-color: var(--color-grey-dark-1);
+    background-color: var(--color-primary-dark-2);
     border-radius: 5px;
 }
 
@@ -46,19 +46,19 @@
 .tag {
     border-radius: 4px;
     padding: 0.3em 0.8em 0.3em 0.8em;
-    background-color: var(--color-grey-dark-1);
+    background-color: var(--color-primary-dark-1);
 }
 
 .title {
     border-bottom: 1px solid;
-    border-bottom-color: var(--color-grey-dark-2);
+    border-bottom-color: var(--color-primary-light-1);
     padding-bottom: 0.5em;
     margin-bottom: 1em;
 }
 
 /* CSS */
 button {
-  background-color: var(--color-grey-dark-1);
+  background-color: var(--color-primary-dark-2);
   color: var(--color-grey-light-1);
   border-radius: 3px;
   border-width: 0;
@@ -74,7 +74,7 @@ button {
   touch-action: manipulation;
 
   i {
-    color: var(--color-grey-dark-3);
+    color: var(--color-font-light);
   }
 
   &:hover {
@@ -87,15 +87,15 @@ button {
 
   &.outlined {
     background-color: #00000000;
-    border-color: var(--color-primary);
+    border-color: var(--color-primary-light-1);
   }
 }
 
 @mixin input-mixin {
-    background-color: var(--color-grey-dark-1);
+    background-color: var(--color-primary-dark-2);
     border-radius: 5px;
     border: 1px solid;
-    border-color: var(--color-grey-dark-1);
+    border-color: var(--color-primary-dark-2);
 
     width: 100%;
     
@@ -124,12 +124,11 @@ select {
         flex-direction: row;
         margin-top: 3px;
         margin-bottom: 3px;
-        max-height: 2em;
         border: 1px solid;
         border-color: #aaaaaa00;
 
         &:hover {
-            border-color: #aaaaaa33;
+            border-color: var(--color-primary-light-1);
         }
     
         * {
@@ -141,12 +140,14 @@ select {
             padding-right: 0.3em;
             margin-right: 5px;
             text-align: end;
-            background-color: var(--color-grey-dark-1);
+            background-color: var(--color-primary-dark-2);
             border-radius: 1px;
             text-transform: uppercase;
             overflow: hidden;
             white-space: nowrap;
             max-width: 6em;
+            border-top-left-radius: 2px;
+            border-bottom-left-radius: 2px;
         }
 
     }
@@ -155,7 +156,9 @@ select {
         height: 100%;
         display: flex;
         align-items: center;
-        justify-items: flex-en;
+        justify-items: flex-end;
+        background-color: var(--color-primary-light);
+        background: linear-gradient(to right, var(--color-primary-dark-2) 80%, var(--color-primary-dark-1));
     }
 
     .carousel-circle {
@@ -171,3 +174,34 @@ select {
     }
 
 }
+
+.toggle-bar {
+    --h: 2.5em;
+    height: var(--h);
+    width: fit-content;
+    border: 1px solid var(--color-primary-light-1);
+    display: flex;
+    border-radius: var(--h);
+    padding-left: 3px;
+    padding-right: 3px;  
+
+    .bar-item {
+      cursor: pointer;
+      text-transform: capitalize;
+      display: grid;
+      height: calc(var(--h) - 2* 3px);
+      width: calc(var(--h) * 3);
+      border-radius: calc(0.9 * var(--h));
+      align-self: center;
+      justify-items: center;
+      align-items: center;
+      padding-left: 1em;
+      padding-right: 1em;
+      transition: background-color 0.3s;
+    }
+  }
+  
+  .bar-item.active {
+    background-color: #fff;
+    color: #22272c;
+  }

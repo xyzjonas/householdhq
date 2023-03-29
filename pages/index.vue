@@ -2,7 +2,7 @@
 import {
   TransactionRow, HomeCarousel, TagSummary,
   MonthHero, BarGraph, MosaicLoader, TransactionForm,
-  Spinner, SourceRow, BalanceRow
+  Spinner, SourceRow, BalanceRow, RadialGraph
 } from '#components';
 
 
@@ -12,7 +12,7 @@ export default {
   components: {
     TransactionRow, HomeCarousel, TagSummary,
     MonthHero, BarGraph, MosaicLoader,
-    TransactionForm, Spinner, SourceRow, BalanceRow
+    TransactionForm, Spinner, SourceRow, BalanceRow, RadialGraph
   },
 
   data() {
@@ -281,10 +281,16 @@ export default {
         @filter="tagId => filterTag = tagId"
       />
       
+      <hr>
+
       <section>
         <h3 class="mb">{{ $t('balance') }}</h3>
         <BalanceRow :sources="balances" />
       </section>
+
+      <!-- <section>
+        <RadialGraph />
+      </section> -->
 
       <section class="row-simple py">
         <button @click="addTransaction = !addTransaction" class="item button">

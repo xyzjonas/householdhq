@@ -3,75 +3,51 @@
         <section v-if="items.length === 0" class="center">
             <h1>{{ $t('no_data') }}</h1>
         </section>
+
         <transition name="slide" mode="out-in">
-        <div v-if="selected > 0" class="graph">
-            <div
-                v-for="tag in displayedTags" :to="`/tags/${tag.id}`"
-                @click="toggleSelected(tag.id)"
-                class="row-wrapper"
-                :style="`color: ${light_or_dark(tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color};`"
-            >
-                <p class="label" :style="`background-color: ${tag.color}`">{{ tag.name }}</p>
-                <div class="bar-wrapper">
-                    <p class="bar" 
-                        :style="`width: ${tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.color}`">
-                        <Price
-                            :amount="tag.sum"
-                            :currency="tag.transactions[0].currency"
-                            style="margin-left: 0.5em;"
-                        />
-                    </p>
-                </div>
-            </div>
+        <div v-if="selectedCategory > 0" class="graph">
+            <BarGraphRow v-for="tag in displayedTags"
+                :tag="tag"
+                :selected="tag.id === selectedCategory"
+                @toggle="tagId => toggleSelected(tagId)"
+            />
         </div>
         <div v-else class="graph">
-            <div
-                v-for="tag in items" :to="`/tags/${tag.id}`"
-                @click="toggleSelected(tag.id)"
-                class="row-wrapper"
-                :style="`color: ${light_or_dark(tag.color) ? '#2b2b2b': '#faf9f9'}; text-shadow: 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color}, 0px 0px 2px ${tag.color};`"
-            >
-                <p class="label" :style="`background-color: ${tag.color}`">{{ tag.name }}</p>
-                <div class="bar-wrapper">
-                    <p class="bar" 
-                        :style="`width: ${tag.id === selected ? 100 : (tag.sum / max) * 100}%; background-color: ${tag.color}`">
-                        <Price
-                            :amount="tag.sum"
-                            :currency="tag.transactions[0].currency"
-                            style="margin-left: 0.5em;"
-                        />
-                    </p>
-                </div>
-            </div>
+            <BarGraphRow v-for="tag in displayedTags"
+                :tag="tag"
+                :max="max"
+                @toggle="tagId => toggleSelected(tagId)"
+            />
         </div>
         </transition>
-        <div v-show="selected > 0">
-            <TagDetails :tagId="selected"  @cancel="toggleSelected(selected)"/>
+
+        <div v-show="selectedCategory > 0">
+            <TagDetails :tagId="selectedCategory"  @cancel="toggleSelected(selectedCategory)"/>
         </div>
     </div>
 </template>
 <script>
-import { Price, TagDetails } from '#components';
+import { Price, TagDetails, BarGraphRow } from '#components';
 
 export default {
 
-    components: { Price, TagDetails },
+    components: { Price, TagDetails, BarGraphRow },
 
     props: [ 'items' ],
 
     data() {
         return {
-            selected: -1,
+            selectedCategory: -1,
             max: 0,
         }
     },
 
     computed: {
         displayedTags() {
-            if (this.selected < 0) {
+            if (this.selectedCategory < 0) {
                 return this.items;
             }
-            return this.items.filter(t => t.id === this.selected);
+            return this.items.filter(t => t.id === this.selectedCategory);
         },
     },
 
@@ -95,15 +71,16 @@ export default {
             return false
         },
         toggleSelected(tagId) {
-            if (this.selected === tagId) {
-                this.selected = -1;
+            console.info(`hooo: ${tagId}`)
+            if (this.selectedCategory === tagId) {
+                this.selectedCategory = -1;
             } else {
-                this.selected = tagId;
+                this.selectedCategory = tagId;
             }
-            this.$emit('filter', this.selected);
+            this.$emit('filter', this.selectedCategory);
         },
         getTagWidth(tag) {
-            if (tag.id === this.selected) {
+            if (tag.id === this.selectedCategory) {
                 return 100;
             }
             return tag.sum / max * this.loaded;

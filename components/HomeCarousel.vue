@@ -2,26 +2,17 @@
     <div>
         <transition name="slide" mode="out-in">
         <!-- EXPENSES -->
-        <section v-if="item === 0" class="row-simple">
-            <div class="item">
-                <h3 class="mb">{{ $t('expenses') }}</h3>
-                <BarGraph class="item" :items="tags" @filter="tagId => $emit('filter', tagId)"/>
-            </div>
-            <button @click="item+=1" class="chevron right item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-right"></i></button>
+        <section v-if="item === 0">
+            <BarGraph :items="tags" @filter="tagId => $emit('filter', tagId)"/>
         </section>
 
         <!-- INCOMES -->
-        <section v-else-if="item === 1" class="row-simple">
-            <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
-            <div class="item">
-                <h3 class="mb">{{ $t('incomes') }}</h3>
-                <BarGraph class="item" :items="incomes" @filter="id => $emit('filter', id)"/>
-            </div>            
+        <section v-else-if="item === 1">
+            <BarGraph :items="incomes" @filter="id => $emit('filter', id)"/>
         </section>
 
         <!-- SOURCES STATE -->
         <section v-else-if="item === 2" class="row-simple">
-            <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
             <div class="item border-left">
                 <h3>{{ $t('sources') }}</h3>
                 <BarGraph class="item" :items="sources" @filter="id => $emit('filterSource', id)"/>
@@ -37,8 +28,11 @@
         </section>
         </transition>
     </div>
-    <div class="center">
-        <div v-for="index in items" :class="`circle ${index-1 === item ? 'selected' : ''}`"></div>
+    <div class="center my-2">
+        <div class="toggle-bar m-1">
+        <a @click="item = 0" :class="`bar-item ${item === 0 ? 'active' : ''}`">{{ $t('expenses') }}</a>
+        <a @click="item = 1" :class="`bar-item ${item === 1 ? 'active' : ''}`">{{ $t('incomes') }}</a>
+        </div>
     </div>
 </template>
 <script>
@@ -52,7 +46,6 @@ export default {
 
     data() {
         return {
-            items: 4,
             item: 0
         }
     }
@@ -62,7 +55,8 @@ export default {
 <style lang="scss" scoped>
 
 section {
-    min-height: 12em;
+    height: 10em;
+    overflow: scroll;
 }
 
 h3 {
