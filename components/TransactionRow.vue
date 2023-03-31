@@ -36,8 +36,7 @@
     <div v-if="edit && details">
         <TransactionForm
             :transactionIn="transaction"
-            :startStage="1"
-            :noFrame="true"
+            :startStage="2"
             :processing="patching"
             @cancel="edit = false"
             @send="patchTransaction"

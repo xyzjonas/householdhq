@@ -1,8 +1,9 @@
 <template lang="">
-    <div :class="`frame ${noFrame ? 'background': ''}`">
-        
+    <div ref="focusDiv" :class="`frame ${noFrame ? 'background': ''}`">
+
         <transition name="slide" mode="out-in">
-            <div v-if="stage === 1">
+            <!-- ENTIRE FORM -->
+            <div v-if="stage === 2" class="form">
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('t_amount') }}</p>
                     <input v-model.number="transaction.amount"/>
@@ -53,11 +54,10 @@
                 </div>
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('recurring') }}</p>
-                    <input
-                        v-model="isRecurring"
-                        type="checkbox"
-                        style="max-width: fit-content; margin-right: 1em;"
-                    >
+                    <div class="slideOne" @click="isRecurring = !isRecurring">
+                        <input v-model="isRecurring" type="checkbox" id="slideOne" name="check" disabled/>
+                        <label for="slideOne"></label>
+                    </div>
                     <input v-if="isRecurring" v-model="transaction.recurring" type="number">
                 </div>
                 <div class="space"></div>
@@ -70,7 +70,11 @@
                     </button>
                 </div>
             </div>
-            <div v-else-if="stage === 2"></div>
+            <!-- CATEGORY SELECTION -->
+            <div v-else-if="stage === 1" class="categories">
+                <CategoryBadge v-for="tag in allTags" :category="tag" @selected="categorySelected"/>
+            </div>
+            <!-- NUMPAD  -->
             <div v-else>
                 <Price :amount="transaction.amount"  style="font-size: xx-large; padding: 0.5em" />
                 <div class="numpad">
@@ -79,21 +83,20 @@
                     </div>
                 </div>
                 <div class="numpad">
-                    <div class="button"><button class="danger" @click="remove">DEL</button></div>
+                    <div class="button"><button @click="remove">DEL</button></div>
                     <div class="button"><button @click="add(0)">0</button></div>
-                    <div class="button"><button class="success" @click="stage+=1">OK</button></div>
+                    <div class="button"><button @click="stage+=1">OK</button></div>
                 </div>
             </div>
         </transition>
-
     </div>
 </template>
 <script>
-import { Price, Icon, Spinner } from "#components";
+import { Price, Icon, Spinner, CategoryBadge } from "#components";
 
 export default {
 
-    components: { Price, Icon, Spinner },
+    components: { Price, Icon, Spinner, CategoryBadge },
 
     props: ['processing', 'transactionIn', 'startStage', 'noFrame'],
 
@@ -110,8 +113,6 @@ export default {
                 targetId: 2,
                 recurring: 0,
             },
-            boxColor: 'var(--color-grey-dark-1)',
-            borderColor: 'var(--color-grey-dark-3)',
             isRecurring: false,
             allTags: [],
             allSources: [],
@@ -131,7 +132,6 @@ export default {
             delete this.transaction.confirmed; // discard explicit confirmed property - only for confirm action
             this.date = this.formatDate(new Date(this.transaction.created));
             this.time = this.formatTime(new Date(this.transaction.created));
-            console.info(this.time)
         }
         if (this.startStage) {
             this.stage = this.startStage;
@@ -141,7 +141,10 @@ export default {
             this.borderColor = "#00000000";
         }
         this.isRecurring = this.transaction.recurring !== 0
-        console.info('addassd')
+    },
+
+    mounted() {
+        this.$refs.focusDiv.scrollIntoView({ block: "nearest", behavior: "smooth" });
     },
 
     computed: {
@@ -188,6 +191,10 @@ export default {
         $fetch(url, {method: 'GET'})
             .then(res => this.allSources = res.data)
         },
+        categorySelected(categoryName) {
+            this.transaction.tags = categoryName;
+            this.stage++;
+        }
     },
 }
 </script>
@@ -195,7 +202,7 @@ export default {
 .frame {
     border: 1px solid;
     padding: 1em 1em 2em 1em;
-    border-color: v-bind('borderColor');
+    border-color: var(--color-primary-dark-3);
     border-radius: 3px;
 }
 
@@ -212,22 +219,10 @@ export default {
 
     button {
         font-size: xx-large;
-        background-color: v-bind('boxColor');
+        background-color: z;
         height: 100%;
         width: 100%;
     }
-}
-
-input {
-    background-color: v-bind('boxColor');
-}
-
-textarea {
-    background-color: v-bind('boxColor');
-}
-
-select {
-    background-color: v-bind('boxColor');
 }
 
 .button-sm {
@@ -239,15 +234,29 @@ select {
 
 .row {
 
+    display: flex;
     min-height: 2.5em;
 
     p {
-        margin-right: 1em;
-        min-width: 4em;
+        // margin-right: 1em;
+        width: 30%;
+        padding-right: 1em;
+        text-align: right;
     }
 
-    textarea {
-        width: 100%;
+    textarea, input, select {
+        width: 70%;
+        margin-left: auto;
     }
+}
+
+input[type=number] {
+    width: 5em;
+}
+
+.categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 5px;
 }
 </style>

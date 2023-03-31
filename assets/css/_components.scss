@@ -58,11 +58,10 @@
 
 /* CSS */
 button {
-  background-color: var(--color-primary-dark-2);
-  color: var(--color-grey-light-1);
-  border-radius: 3px;
-  border-width: 0;
-
+  background-color: var(--color-primary-dark-1);
+  border: 1px solid var(--color-primary-dark-3);
+  color: var(--color-font-light);
+  border-radius: 5px;
   width: fit-content;
 
   cursor: pointer;
@@ -78,7 +77,7 @@ button {
   }
 
   &:hover {
-    filter: opacity(0.8);
+    filter: brightness(0.9)
   }
 
   &:active {
@@ -115,6 +114,41 @@ textarea {
 select {
     @include input-mixin();
 }
+
+/* .slideOne */
+.slideOne {
+    --h: 1.5em;
+    width: calc(2* var(--h));
+    height: var(--h);
+    background: var(--color-primary-dark-3);
+    position: relative;
+    border-radius: calc(var(--h) / 2);
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px var(--color-primary-dark-3);
+    label {
+        --gap: 5%;
+        display: block;
+        cursor: pointer;
+        width: calc(var(--h) - 2* var(--gap));
+        // height: calc(var(--h) - 2* var(--gap));
+        aspect-ratio: 1;
+        position: absolute;
+        top: calc(var(--h) / 2);
+        left: 5%;
+        transform: translateY(-50%);
+        background: var(--color-danger);
+        border-radius: 50%;
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+    }
+    input[type=checkbox] {
+      visibility: hidden;
+      &:checked + label {
+        left: calc(2 * var(--h) - (var(--h) - 10%) - 5%);
+        background: var(--color-success);
+      }  
+    }
+  }
+  /* end .slideOne */
 
 
 .graph {
@@ -205,3 +239,14 @@ select {
     background-color: #fff;
     color: #22272c;
   }
+
+
+.balance-row {
+    display: grid;
+    gap: 0.3em;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    @media only screen and (max-width: $bp-small) {
+        grid-template-columns: 1fr 1fr;
+    }
+}

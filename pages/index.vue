@@ -288,17 +288,14 @@ export default {
         <BalanceRow :sources="balances" />
       </section>
 
-      <!-- <section>
-        <RadialGraph />
-      </section> -->
-
-      <section class="row-simple py">
+      <section id="add-t-button" class="row-simple py">
         <button @click="addTransaction = !addTransaction" class="item button">
-          {{ addTransaction ? $t('cancel') : $t('t_add') }}
+          <i v-if="!addTransaction" class="fa-solid fa-coins" style="margin-right: 0.8em;"></i>
+          <span>{{ addTransaction ? $t('cancel') : $t('t_add') }}</span>
         </button>
       </section>
 
-      <transition name="page" mode="in-out">
+      <transition name="page">
       <section v-if="addTransaction" style="padding-top: 0;">
         <TransactionForm
           v-if="addTransaction"
@@ -309,7 +306,7 @@ export default {
       </section>
       </transition>
 
-      <h4 class="title row-simple">
+      <h4 id="remaining-bills" class="title row-simple">
         <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
           @click="showUpcomming = !showUpcomming"
@@ -347,6 +344,10 @@ export default {
   </div>
 </template>
 <style scoped lang="scss">
+#add-t-button, #remaining-bills {
+  margin-top: 2em;
+}
+
 h3 {
   text-transform: uppercase;
 }

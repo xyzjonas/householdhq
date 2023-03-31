@@ -1,10 +1,8 @@
 <template>
-    <section class="title center">
-        <a :href="previousMonth" class="left">
-            <i class="icss-caret-l"></i>
-        </a>
+    <section class="title">
         <h1>{{ formatMMYYYY() }}</h1>
-        <a :href="nextMonth" class="right"><i class="icss-caret-r"></i></a>
+        <a :href="previousMonth" class="left"><i class="fa-solid fa-chevron-left"></i></a>
+        <a :href="nextMonth" class="right"><i class="fa-solid fa-chevron-right"></i></a>
     </section>
 </template>
 <script>
@@ -52,6 +50,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.title {
+    display: flex;
+    flex-direction: row;
+}
+
 a {
     display: flex;
     align-items: center;
@@ -65,12 +68,27 @@ a:hover {
     transition: linear;
 }
 
+.left, .right {
+    font-size: small;
+    color: var(--color-primary-light-1);
+}
+
+.left {
+    margin-left: auto;
+    margin-right: 1.5em
+    // margin-left: 2em;
+}
+
+.right {
+    margin-right: 2em;
+}
+
 .left:hover {
-    transform: translate(-2px)
+    color: var(--color-font-light);
 }
 
 .right:hover {
-    transform: translate(2px)
+    color: var(--color-font-light);
 }
 
 h1 {

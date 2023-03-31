@@ -33,6 +33,9 @@ export default {
 }
 </script>
 <style lang="scss">
+.row-wrapper {
+    flex-direction: column;
+}
 .label {
     border-left: 0.5em solid;
     border-color: v-bind('tag.color');

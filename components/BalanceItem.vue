@@ -1,22 +1,19 @@
 <template>
-    <div class="bal=wrapper">
-    <NuxtLink :to="`/sources/${source.id}`">
-        <div class="bal-item">
-        <span>{{ source.name }}</span>
-        <br>
-        <div v-if="lastEntry && lastEntryNotThisMonth"></div>
-        <Price v-else-if="!isNaN(source.balance)" class="item" :amount="source.balance" :currency="currency.value" />
-        <span v-else>
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </span>
+    <div class="bal-wrapper">
+        <div class="icon">
+            <i v-if="lastEntry && lastEntryNotThisMonth" class="fa-solid fa-rotate"></i>
+            <i v-else-if="!isNaN(source.balance)" class="fa-regular fa-circle-check"></i>
+            <i v-else class="fa-solid fa-warning"></i>
         </div>
-    </NuxtLink>
-    <div v-if="lastEntry && lastEntryNotThisMonth" class="center">
-        <button @click="updating = !updating">
-            {{ $t("balance_auto_update") }}
-            <i :class="`fa-solid fa-rotate ${ updating ? 'rotating' : ''}`"></i>
-        </button>
-    </div>
+        <div class="text">
+            <Price v-if="lastEntry && lastEntryNotThisMonth" class="item" amount="???" />
+            <Price v-else-if="!isNaN(source.balance)" class="item" :amount="source.balance" :currency="currency.value" />
+            <Price v-else="lastEntry && lastEntryNotThisMonth" class="item" amount="???" />
+            <span class="label">{{ source.name }}</span>
+        </div>
+        <NuxtLink :to="`/sources/${source.id}`" class="action">
+            <i class="fa-solid fa-arrow-right"></i>
+        </NuxtLink>
     </div>
 </template>
 <script>
@@ -71,24 +68,50 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.bal-item {
-    padding-top: 0.3em;
-    padding-bottom: 0.3em;
-    text-align: center;
-    background-color: v-bind('source.color');
-    margin-left: 2px;
-    margin-right: 2px;
-    min-width: 5em;
-    white-space: nowrap;
-    overflow: hidden;
-    // max-width: v-bind('maxWidth');
-}
 .bal-wrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    min-height: 5em;
+    border: 1px solid var(--color-primary-light-1);;
+    border-radius: 8px;
+
+    * {
+        height: fit-content;
+        align-self: center;
+    }
+
+    .icon {
+        color: var(--color-primary-light-1);
+        font-size: x-large;
+        justify-self: flex-start;
+        margin-left: 1em;
+    }
+
+    .text {
+        margin-left: 2em;
+    }
+
+    .action {
+        margin-left: auto;
+        margin-right: 1em;
+        color: var(--color-font-gray);
+
+        &:hover {
+            color: var(--color-font-light)
+        }
+    }
+
 }
 button {
     margin: 5px;
+}
+
+.label {
+    border: 0;
+    color: var(--color-font-light);
+    filter: contrast(0.1);
+    font-size: small;
+    text-transform: uppercase;
 }
 
 .rotating {
