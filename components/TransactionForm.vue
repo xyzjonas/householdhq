@@ -253,10 +253,4 @@ export default {
 input[type=number] {
     width: 5em;
 }
-
-.categories {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 5px;
-}
 </style>

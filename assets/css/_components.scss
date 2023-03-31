@@ -250,3 +250,14 @@ select {
         grid-template-columns: 1fr 1fr;
     }
 }
+
+
+.categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 5px;
+
+    @media only screen and (max-width: $bp-small) {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}

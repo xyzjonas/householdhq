@@ -1,5 +1,5 @@
 <template>
-    <i v-if="icon" :class="icon" style="font-size: 1.5em;"></i>
+    <i v-if="icon" :class="icon"></i>
 </template>
 
 <script>
@@ -9,7 +9,7 @@ export default {
     computed: {
         icon() {
             if (this.iconName) {
-                return `icss-${this.iconName}`
+                return `fa-solid fa-${this.iconName}`
             }
         }
     }

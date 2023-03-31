@@ -29,6 +29,12 @@ export default {
         border-color: v-bind('category.color');
     }
 
+    i {
+        // font-size: small;
+        margin-right: 0.5em;
+        color: v-bind('category.color');
+    }
+
     p {
         text-align: center;
     }
