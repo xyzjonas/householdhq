@@ -1,16 +1,10 @@
 <template>
     <div class="bal-wrapper">
-        <div class="icon">
-            <i v-if="lastEntry && lastEntryNotThisMonth" class="fa-solid fa-rotate"></i>
-            <i v-else-if="!isNaN(source.balance)" class="fa-regular fa-circle-check"></i>
-            <i v-else class="fa-solid fa-warning"></i>
-        </div>
         <div class="text">
-            <Price v-if="lastEntry && lastEntryNotThisMonth" class="item" amount="???" />
-            <Price v-else-if="!isNaN(source.balance)" class="item" :amount="source.balance" :currency="currency.value" />
+            <Price v-if="!isNaN(source.balance)"  :amount="source.balance" :currency="currency.value" />
             <Price v-else="lastEntry && lastEntryNotThisMonth" class="item" amount="???" />
-            <span class="label">{{ source.name }}</span>
         </div>
+        <div class="label">{{ source.name }}</div>
         <NuxtLink :to="`/sources/${source.id}`" class="action">
             <i class="fa-solid fa-arrow-right"></i>
         </NuxtLink>
@@ -54,7 +48,14 @@ export default {
             }
             
             return `${percentage}%`;
+        },
+        opacity() {
+            if (this.lastEntry && this.lastEntryNotThisMonth) {
+                return 'opacity(1)'
+            }
+            return 'opacity(0)'
         }
+
     },
     methods: {
         autoUpdate() {
@@ -71,25 +72,31 @@ export default {
 .bal-wrapper {
     display: flex;
     flex-direction: row;
-    min-height: 5em;
-    border: 1px solid var(--color-primary-light-1);;
-    border-radius: 8px;
-
-    * {
-        height: fit-content;
-        align-self: center;
-    }
-
-    .icon {
-        color: var(--color-primary-light-1);
-        font-size: x-large;
-        justify-self: flex-start;
-        margin-left: 1em;
-    }
+    overflow: hidden;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
 
     .text {
-        margin-left: 1em;
+        flex-grow: 2;
+        display: inline-flex;
     }
+
+    .text::after {
+        content: "*";
+        margin-left: 0.3em;
+        color: var(--color-danger);
+        filter: v-bind('opacity');
+    }
+
+    .label {
+        border: 0;
+        color: var(--color-font-light);
+        color: v-bind('source.color');
+        font-size: small;
+        text-transform: uppercase;
+        margin-right: 0.7em;
+    }
+    
 
     .action {
         margin-left: auto;
@@ -100,18 +107,10 @@ export default {
             color: var(--color-font-light)
         }
     }
-
 }
+
 button {
     margin: 5px;
-}
-
-.label {
-    border: 0;
-    color: var(--color-font-light);
-    filter: contrast(0.1);
-    font-size: small;
-    text-transform: uppercase;
 }
 
 .rotating {

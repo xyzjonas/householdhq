@@ -241,17 +241,6 @@ select {
   }
 
 
-.balance-row {
-    display: grid;
-    gap: 0.3em;
-    grid-template-columns: 1fr 1fr 1fr;
-
-    @media only screen and (max-width: $bp-small) {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-
 .categories {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
