@@ -5,14 +5,20 @@ import {
   Spinner, SourceRow, BalanceRow, RadialGraph
 } from '#components';
 
+import { useAuth0 } from '@auth0/auth0-vue'
+
+// Composition API
+const auth0 = process.client ? useAuth0() : undefined
+
 
 export default {
+  
 
 
   components: {
     TransactionRow, HomeCarousel, TagSummary,
     MonthHero, BarGraph, MosaicLoader,
-    TransactionForm, Spinner, SourceRow, BalanceRow, RadialGraph
+    TransactionForm, Spinner, SourceRow, BalanceRow, RadialGraph,
   },
 
   data() {
@@ -246,17 +252,42 @@ export default {
       targets.sort((a, b) => { return b.sum - a.sum; });
       return targets;
   },
+    login() {
+      // this.$auth0.loginWithRedirect();
+      this.$auth0?.checkSession()
+      if (!this.$auth0?.isAuthenticated.value) {
+        this.$auth0?.loginWithRedirect({
+          appState: {
+            target: useRoute().path,
+          },
+        })
+      }
+    }
   },
   
   setup() {
     const route = useRoute();
     const year = route.query.year
     const month = route.query.month
+    // definePageMeta({
+    //   middleware: ["auth"]
+    //   // or middleware: 'auth'
+    // })
     return {
       year, month
     }
   },
-  created() {
+  async created() {
+    // const x = await this.$auth0?.checkSession()\
+    try {
+      const x = await this.$auth0.getAccessTokenSilently();
+      console.info("TOKEN OK");
+      console.info(x);
+    } catch (error) {
+      console.error("TOKEN FETCH FAILED");
+      console.error(error);
+    }
+      // const token = this.$auth0.getAccessTokenSilently();
     this.getTransactions(true);
     this.getTags();
     this.getSources();
@@ -271,7 +302,6 @@ export default {
     <section v-if="loading" class="center">
       <MosaicLoader />
     </section>
-    
     <div v-else>
       <HomeCarousel
         :tags="tags"
@@ -280,9 +310,9 @@ export default {
         :targets="targets"
         @filter="tagId => filterTag = tagId"
       />
-      
       <hr>
-
+      <button @click="login">LOG IN</button>
+      USER: {{ $auth0.user }}
       <section>
         <h3 class="mb">{{ $t('balance') }}</h3>
         <BalanceRow :sources="balances" />
