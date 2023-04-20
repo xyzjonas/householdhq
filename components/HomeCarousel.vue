@@ -36,11 +36,11 @@
     </div>
 </template>
 <script>
-import { BarGraph, SourceRow } from "#components";
+import { BarGraph } from "#components";
 
 export default {
 
-    components: { BarGraph, SourceRow },
+    components: { BarGraph },
 
     props: ['tags', 'incomes', 'sources', 'targets'],
 

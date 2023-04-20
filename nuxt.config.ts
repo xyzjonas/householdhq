@@ -9,6 +9,8 @@ export default defineNuxtConfig({
         public: {
             auth0_domain: process.env.AUTH0_DOMAIN,
             auth0_clientId: process.env.AUTH0_CLIENT_ID,
+            auth0_redirectUri: process.env.AUTH0_REDIRECT_URI,
+            auth0_audience: process.env.AUTH0_AUDIENCE,
         }
         // auth0_domain: "",
         // auth0_clientId: ""
@@ -20,11 +22,8 @@ export default defineNuxtConfig({
             meta: [
                 { charset: 'utf-8' },
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-                { hid: 'description', name: 'description', content: 'Nuxt.js project' }
+                { hid: 'description', name: 'description', content: 'Personal finance helper.' }
               ],
-              link: [
-                { rel: 'icon', type: 'image/x-icon', href: 'https://nuxtjs.org/favicon.ico' }
-              ]
         },
     },
     css: [ 

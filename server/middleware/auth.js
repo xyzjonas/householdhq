@@ -1,65 +1,34 @@
-// import { ManagementClient } from 'auth0';
+import * as jwt from 'jsonwebtoken';
 
-// const auth0 = new ManagementClient({
-//   domain: process.env.AUTH0_DOMAIN,
-//   clientId: process.env.AUTH0_CLIENT_ID,
-//   clientSecret: process.env.AUTH0_CLIENT_SECRET,
-//   scope: 'read:users',
-// });
+
+const pubKey = process.env.AUTH0_PUBKEY
+
 
 export default defineEventHandler((event) => {
-  // console.info('New request: ' + event.node.req.url)
-  if (String(event.node.req.url).startsWith("/api")) {
-    console.info('THIS is an API call...')
-    // try {
-    //   const accessToken = event.context.auth
-    //   throw new Error();
-    //   console.info('THIS is an API call...')
-    // } catch (error) {
-    //   console.error(error)
-    //   event.node.res.writeHead(307, { Location: '/login' });
-    // }
-
-  }
+  const token = event.node.req.headers.authorization;
+  if (!String(event.node.req.url).startsWith("/api")) {
+    console.debug(`${String(event.node.req.url)}: this is an unprotected endpoint!`)
+  } else if (token) {
+    try {
+      let authorization = token.split(' ');
+      if (authorization[0] !== 'Bearer') {
+        throw createError({ statusCode: 401, statusMessage: 'Invalid auth type.' })
+      } else if (!authorization[1]) {
+        throw createError({ statusCode: 401, statusMessage: 'Empty token' })
+      } else {
+        console.info(authorization);
+        console.info(`secret: ${pubKey}`)
+        const decoded = jwt.verify(authorization[1], pubKey, {
+          algorithms: ['RS256'],
+        })
+        console.info("!!!!!!!")
+        console.info(decoded)
+      }
+    } catch (err) {
+      console.error(err);
+      throw createError({ statusCode: 403, statusMessage: String(err) });
+    }
+  } else {
+    throw createError({ statusCode: 401, statusMessage: 'Authorization is missing.' })
+  } 
 })
-
-// import auth0 from './auth0';
-
-// export default defineEventHandler(async (event) => {
-//   console.log('New request: ' + event.node.req.url)
-//   if (event.node.req.url === '/login') {
-//     console.info('/login registered')
-//   } else {
-//     console.info('/login NOT registered') 
-//     console.info(event.node.req.url);
-//   }
-  // console.info(event);
-  // try {
-  //   const accessToken = event.context.auth
-  //   // const accessToken = from.query.headers.authorization.split(' ')[1];
-    
-  //   return navigateTo('/login')
-  // } catch (error) {
-  //   console.error(error);
-  //   event.node.res.writeHead(301, { Location: '/login' });
-  //   event.node.res.end();
-  // }
-// })
-
-// export default async function authMiddleware({ req, redirect }) {
-//   try {
-//     // Get the access token from the request headers
-//     const accessToken = req.headers.authorization.split(' ')[1];
-
-//     // Verify the access token and get user information
-//     const user = await auth0.getUser({ id: accessToken });
-//     if (!user) {
-//         return redirect('/login')
-//     }
-//     req.session.user = user;
-
-//   } catch (error) {
-//     console.error(error);
-//     return redirect('/login')
-//   }
-// }

@@ -1,12 +1,17 @@
 <template>
     <section class="title">
+        <UserBadge />
         <h1>{{ formatMMYYYY() }}</h1>
         <a :href="previousMonth" class="left"><i class="fa-solid fa-chevron-left"></i></a>
         <a :href="nextMonth" class="right"><i class="fa-solid fa-chevron-right"></i></a>
     </section>
 </template>
 <script>
+import { UserBadge } from '#components';
+
 export default {
+
+    components: { UserBadge },
     props: ["date"],
 
     computed: {
@@ -53,6 +58,10 @@ export default {
 .title {
     display: flex;
     flex-direction: row;
+}
+
+h1 {
+    vertical-align:  middle;
 }
 
 a {
