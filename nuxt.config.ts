@@ -1,18 +1,33 @@
 import cz from './locales/cz.json';
 import en from './locales/en.json';
+import 'dotenv/config';
 
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    app: {
-        pageTransition: { name: 'page', mode: 'out-in' }
+    runtimeConfig: {
+        public: {
+            auth0_domain: process.env.AUTH0_DOMAIN,
+            auth0_clientId: process.env.AUTH0_CLIENT_ID,
+            auth0_redirectUri: process.env.AUTH0_REDIRECT_URI,
+            auth0_audience: process.env.AUTH0_AUDIENCE,
+        }
+        // auth0_domain: "",
+        // auth0_clientId: ""
     },
-    head: {
-        title: 'household HQ'
+    app: {
+        pageTransition: { name: 'page', mode: 'out-in' },
+        head: {
+            title: 'Home',
+            meta: [
+                { charset: 'utf-8' },
+                { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+                { hid: 'description', name: 'description', content: 'Personal finance helper.' }
+              ],
+        },
     },
     css: [ 
         '@/assets/css/main.scss',
-        '@/assets/iconicss/iconicss.min.css',
         '@/assets/fontawesome/css/all.css'
     ],
     modules: [
@@ -39,7 +54,7 @@ export default defineNuxtConfig({
                         en: en,
                     }
                 }
-            }
+            },
         ]
     ],
     vite: {

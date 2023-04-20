@@ -1,11 +1,10 @@
-<template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-</template>
-<script>
-
+<script lang="ts">
 </script>
+<template>
+<NuxtLayout>
+    <NuxtPage />
+</NuxtLayout>
+</template>
 <style>
 .page-enter-active,
 .page-leave-active {

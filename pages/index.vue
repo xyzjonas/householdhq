@@ -2,17 +2,16 @@
 import {
   TransactionRow, HomeCarousel, TagSummary,
   MonthHero, BarGraph, MosaicLoader, TransactionForm,
-  Spinner, SourceRow, BalanceRow, RadialGraph
+  Spinner, BalanceRow, RadialGraph
 } from '#components';
 
 
 export default {
 
-
   components: {
     TransactionRow, HomeCarousel, TagSummary,
     MonthHero, BarGraph, MosaicLoader,
-    TransactionForm, Spinner, SourceRow, BalanceRow, RadialGraph
+    TransactionForm, Spinner, BalanceRow, RadialGraph,
   },
 
   data() {
@@ -24,7 +23,7 @@ export default {
       allTransactions: [],
       showUpcomming: false,
       date: new Date(),
-      cells: 4,
+
       addTransaction: false,
       allTags: [],
       filterTag: -1,
@@ -32,7 +31,29 @@ export default {
       sources: [],
       targets: [],
       incomes: [],
+      
+      token: "",
     }
+  },
+
+  async setup() {
+    const route = useRoute();
+    const year = route.query.year
+    const month = route.query.month
+    
+    // definePageMeta({
+    //   middleware: ["auth"]
+    // })
+
+    return { year, month }
+  },
+
+  // created() {
+  //   // useAuth0().getAccessTokenSilently()
+    
+  // },
+  mounted() {
+    this.$auth0.getAccessTokenSilently().then(tok => this.token = tok)
   },
 
   provide() {
@@ -96,11 +117,45 @@ export default {
           return source;
         })
       return sources;
+    },
+    auth() {
+      if (this.$auth0) {
+        console.info("hey!")
+        this.$auth0.getAccessTokenSilently()
+        .then(tok => {
+          console.info(`got token: ${tok}`)
+          this.token = tok
+        }).catch(err => {
+          console.error(err)
+        })
+        return this.$auth0;
+      }
     }
    
   },
 
+  watch: {
+    token(newValue) {
+      console.info("watched token")
+      if (newValue) {
+        this.initialFetch();
+      }
+    }
+  },
+
   methods: {
+
+    login() {
+      this.$auth0.loginWithRedirect();
+    },
+
+    initialFetch() {
+      // Fetch all the required data on startup - only after session validation
+      this.getTransactions(true);
+      this.getTags();
+      this.getSources();
+    },
+
     getTransactions(loading=false) {
       if (loading) {
         this.loading = true;
@@ -112,7 +167,15 @@ export default {
       } else {
         url = '/api/transactions'
       }
-      $fetch(url, {method: 'GET'})
+      
+      $fetch(
+        url,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer ' + this.token
+          }
+        })
         .then(res => this.allTransactions = res.data)
         .finally(() => {
           this.tags = this.remapTags();
@@ -125,7 +188,12 @@ export default {
     putTransaction(transactionData) {
       this.putLoading = true;
       const url = "/api/transactions";
-      $fetch(url, {method: 'PUT', body: transactionData})
+      $fetch(url, {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + this.token
+        },
+        body: transactionData})
         .then(res =>
           this.allTransactions.unshift(res.data)
         )
@@ -134,19 +202,34 @@ export default {
     
     deleteTransaction(transactionData) {
       const url = "/api/transactions";
-      $fetch(url, {method: 'DELETE', body: transactionData})
+      $fetch(url, {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer ' + this.token
+        },
+        body: transactionData})
         .then(res => {
           this.allTransactions = this.allTransactions.filter(t => t.id != transactionData.id);
         })
     },
     getTags() {
       const url = '/api/tags'
-      $fetch(url, {method: 'GET'})
+      $fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + this.token
+        }
+      })
         .then(res => this.allTags = res.data)
     },
     getSources() {
       const url = '/api/sources'
-      $fetch(url, {method: 'GET'})
+      $fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + this.token
+        }
+      })
         .then(res => {
           this.allSources = res.data;
     })
@@ -247,20 +330,6 @@ export default {
       return targets;
   },
   },
-  
-  setup() {
-    const route = useRoute();
-    const year = route.query.year
-    const month = route.query.month
-    return {
-      year, month
-    }
-  },
-  created() {
-    this.getTransactions(true);
-    this.getTags();
-    this.getSources();
-  }
 }
 </script>
 
@@ -271,7 +340,6 @@ export default {
     <section v-if="loading" class="center">
       <MosaicLoader />
     </section>
-    
     <div v-else>
       <HomeCarousel
         :tags="tags"
@@ -280,9 +348,8 @@ export default {
         :targets="targets"
         @filter="tagId => filterTag = tagId"
       />
-      
       <hr>
-
+      <button @click="login">LOG IN</button>
       <section>
         <h3 class="mb">{{ $t('balance') }}</h3>
         <BalanceRow :sources="balances" />
@@ -294,7 +361,6 @@ export default {
           <span>{{ addTransaction ? $t('cancel') : $t('t_add') }}</span>
         </button>
       </section>
-
       <transition name="page">
       <section v-if="addTransaction" style="padding-top: 0;">
         <TransactionForm
