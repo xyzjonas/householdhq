@@ -44,6 +44,7 @@
   "balance": "zůstatek",
   "balance_auto_update": "dopočítat",
   "s_isout": "výdaje",
+  "s_isdisp": "zahrnout do zůstatku",
   "s_state": "záznam",
   "s_states": "záznamy",
   "log_in": "Přihlásit",

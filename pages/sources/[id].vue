@@ -24,6 +24,16 @@
             </div>
 
             <div class="row">
+                <p class="item">{{ $t('s_isdisp') }}</p>
+                <EditableBoolean
+                    keyName="isDisponible"
+                    :value="source.isDisponible"
+                    @send="patchSource"
+                    class="item"
+                />
+            </div>
+
+            <div class="row">
                 <p class="item">{{ $t('color') }}</p>
                 <div class="item">
                     <EditableColor

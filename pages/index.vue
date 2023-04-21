@@ -95,6 +95,7 @@ export default {
     balances() {
       const sources = this.allSources
         .filter(s => !s.isOut)
+        .filter(s => s.isDisponible)
         .map(s => {
           const source = { ...s };
           if (source.states.length === 0) {
@@ -169,7 +170,11 @@ export default {
             Authorization: 'Bearer ' + this.token
           }
         })
-        .then(res => this.allTransactions = res.data)
+        .then(res => {
+          this.allTransactions = res.data.filter(trans => {
+            return trans.target.isDisponible
+          })
+        })
         .finally(() => {
           this.tags = this.remapTags();
           this.sources = this.remapSources();

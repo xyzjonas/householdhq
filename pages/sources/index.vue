@@ -23,11 +23,6 @@ useFetch(
             Authorization: 'Bearer ' + token
         },
 }).then(res => sources.value = res.data)
-
-const addSource = () => {
-    
-}
-
 </script>
 <style lang="">
     

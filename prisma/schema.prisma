@@ -52,6 +52,7 @@ model Source {
   transactionsIn    Transaction[] @relation(name: "source")
   transactionsOut   Transaction[] @relation(name: "target")
   isOut             Boolean       @default(false)  // mark 'source' as output (not owned)
+  isDisponible      Boolean       @default(false)  // mark 'source' as traceable in the monthly budget
   states            SourceState[]
   color             String?
 }

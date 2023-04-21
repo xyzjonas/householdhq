@@ -26,7 +26,8 @@ class Sources {
     }
     
     public async createSource(sourceData: CreateSourceDto): Promise<Source> {
-      const source: Source = await this.sources.create({ data: { name: sourceData.name } });
+      const data = { ...sourceData };
+      const source: Source = await this.sources.create(data);
       return source;
     }
 
@@ -35,12 +36,11 @@ class Sources {
       delete data.id;
       const source: Source = await this.sources.update({ 
         where: { id: sourceData.id },
-        data: data
+        data: data,
+        include: { states: true }
       });
       return source;
     }
-
-    public async 
 
     public async insertState(sourceData: UpdateSourceStateDto) {
       const data = {... sourceData};
