@@ -2,7 +2,7 @@
 import {
   TransactionRow, HomeCarousel, TagSummary,
   MonthHero, BarGraph, MosaicLoader, TransactionForm,
-  Spinner, BalanceRow, RadialGraph
+  Spinner, BalanceRow, RadialGraph, AccessDenied
 } from '#components';
 
 
@@ -12,12 +12,14 @@ export default {
     TransactionRow, HomeCarousel, TagSummary,
     MonthHero, BarGraph, MosaicLoader,
     TransactionForm, Spinner, BalanceRow, RadialGraph,
+    AccessDenied
   },
 
   data() {
     return {
       tags: [],
-      loading: false,
+      loading: true,
+      authError: null,
       putLoading: false,
       deleteLoading: false,
       allTransactions: [],
@@ -44,9 +46,14 @@ export default {
   },
 
   mounted() {
-    this.$auth0.getAccessTokenSilently().then(tok => {
+    this.$auth0.getAccessTokenSilently()
+    .then(tok => {
       this.token = tok;
       this.initialFetch();
+    })
+    .catch(err => {
+      this.loading = false;
+      this.authError = err;
     })
   },
 
@@ -331,6 +338,9 @@ export default {
     <section v-if="loading" class="center">
       <MosaicLoader />
     </section>
+    <section v-else-if="authError" class="center">
+      <AccessDenied @login="$auth0.loginWithRedirect()" />
+    </section>
     <div v-else>
       <HomeCarousel
         :tags="tags"
@@ -347,6 +357,7 @@ export default {
         <BalanceRow :sources="balances" />
       </section>
 
+      <!-- ADD NEW TRANSACTION -->
       <section id="add-t-button" class="row-simple py">
         <button @click="addTransaction = !addTransaction" class="item button">
           <i v-if="!addTransaction" class="fa-solid fa-coins" style="margin-right: 0.8em;"></i>
@@ -364,6 +375,7 @@ export default {
       </section>
       </transition>
 
+      <!-- SHOW UPCOMMING -->
       <h4 id="remaining-bills" class="title row-simple">
         <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 

@@ -45,5 +45,7 @@
   "balance_auto_update": "dopočítat",
   "s_isout": "výdaje",
   "s_state": "záznam",
-  "s_states": "záznamy"
+  "s_states": "záznamy",
+  "log_in": "Přihlásit",
+  "access_denied": "Nepovolaným vstup zakázán!"
 }
