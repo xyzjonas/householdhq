@@ -8,7 +8,10 @@
 </template>
 <script setup lang="ts">
 const route = useRoute()
-const pathSegments = route.fullPath.split("/").filter(s => s);
+const pathSegments = computed(() => {
+    const path = route.fullPath.split("?")[0];
+    return path.split("/").filter(s => s)
+});
 </script>
 <style scoped lang="scss">
 .crumbs {
