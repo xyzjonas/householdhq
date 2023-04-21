@@ -41,7 +41,7 @@ export default {
     }
 }
 </script>
-<style lang="scss">
+<style scoped lang="scss">
 .wrapper {
     padding-right: 1em;
     border-right: 1px solid var(--color-primary-light-1);
