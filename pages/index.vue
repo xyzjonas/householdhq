@@ -40,25 +40,20 @@ export default {
     const route = useRoute();
     const year = route.query.year
     const month = route.query.month
-    
-    // definePageMeta({
-    //   middleware: ["auth"]
-    // })
-
     return { year, month }
   },
 
-  // created() {
-  //   // useAuth0().getAccessTokenSilently()
-    
-  // },
   mounted() {
-    this.$auth0.getAccessTokenSilently().then(tok => this.token = tok)
+    this.$auth0.getAccessTokenSilently().then(tok => {
+      this.token = tok;
+      this.initialFetch();
+    })
   },
 
   provide() {
     return {
       currency: computed(() => this.currency),
+      token: computed(() => this.token)
     }
   },
 
@@ -132,15 +127,6 @@ export default {
       }
     }
    
-  },
-
-  watch: {
-    token(newValue) {
-      console.info("watched token")
-      if (newValue) {
-        this.initialFetch();
-      }
-    }
   },
 
   methods: {
@@ -348,8 +334,9 @@ export default {
         :targets="targets"
         @filter="tagId => filterTag = tagId"
       />
+
       <hr>
-      <button @click="login">LOG IN</button>
+
       <section>
         <h3 class="mb">{{ $t('balance') }}</h3>
         <BalanceRow :sources="balances" />

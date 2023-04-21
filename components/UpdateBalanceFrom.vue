@@ -12,10 +12,12 @@
             <p>{{ $t('t_amount') }}</p>
             <input v-model.number="state.amount"/>
         </div>
-
+        <div v-if="error">
+            <small class="error">{{ $t(error.statusMessage) }}</small>
+        </div>
         <div class="row mt">
             <button @click="$emit('close')" style="margin-left: auto" class="button-sm ">{{ $t('close') }}</button>
-            <button @click="send" class="success button-sm">
+            <button @click="send" :class="`button-sm ${ error ? 'danger' : 'success'}`">
                 <span v-if="!processing">{{ $t('t_send') }}</span>
                 <Spinner v-else />
             </button>
@@ -40,7 +42,13 @@ export default {
                 sourceId: this.sourceId,
             },
             processing: false,
+            error: undefined,
         }
+    },
+
+    async created() {
+        const tok = await this.$auth0.getAccessTokenSilently();
+        this.token = tok;
     },
 
     methods: {
@@ -61,8 +69,15 @@ export default {
             this.state.created = datetime.toUTCString();
             this.processing = true;
             const url = "/api/sources/update";
-            $fetch(url, {method: 'PUT', body: this.state})
+            $fetch(url, {
+                method: 'PUT',
+                body: this.state,
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                }
+            })
                 .then(res => this.$emit('created', res.data))
+                .catch(err => this.error = err.data)
                 .finally(() => { this.processing = false; })
         }
     }

@@ -78,7 +78,12 @@ export default {
         getSource() {
             this.loading = true;
             const url = `/api/sources/${this.sourceId}`;
-            $fetch(url, {method: 'GET'})
+            $fetch(url, {
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                }
+            })
             .then(res => this.source = res.data)
             .finally(() => this.loading = false)
         },
@@ -86,13 +91,25 @@ export default {
             const url = "/api/sources";
             console.info(sourceData)
             sourceData.id = this.source.id;
-            $fetch(url, {method: 'PATCH', body: sourceData})
+            $fetch(url, {
+                method: 'PATCH',
+                body: sourceData,
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                }
+            })
                 .then(res => this.source = res.data)
                 .finally(() => { this.patching = false; this.edit = false; this.details = false })
         },
         deleteEntry(entryId) {
             const url = "/api/sources/update";
-            $fetch(url, {method: 'DELETE', body: { id: entryId }})
+            $fetch(url, {
+                method: 'DELETE',
+                body: { id: entryId },
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                }
+            })
                 .then(res => this.source.states = this.source.states.filter(s => s.id !== res.data.id))
                 .finally(() => { this.patching = false; this.edit = false; this.details = false })
         },
@@ -108,7 +125,9 @@ export default {
         return { sourceId: sourceId }
     },
 
-    created() {
+    async created() {
+        const tok = await this.$auth0.getAccessTokenSilently();
+        this.token = tok;
         this.getSource();
     }
 }
