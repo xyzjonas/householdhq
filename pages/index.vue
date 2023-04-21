@@ -315,6 +315,11 @@ export default {
       targets.sort((a, b) => { return b.sum - a.sum; });
       return targets;
   },
+  monthReloaded(options) {
+    this.year = options.year;
+    this.month = options.month;
+    this.initialFetch();
+  }
   },
 }
 </script>
@@ -322,7 +327,7 @@ export default {
 
 <template>
   <div class="container">
-    <MonthHero :date="date"/>
+    <MonthHero :date="date" @reload="monthReloaded"/>
     <section v-if="loading" class="center">
       <MosaicLoader />
     </section>

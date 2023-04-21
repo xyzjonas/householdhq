@@ -1,9 +1,14 @@
 <template>
     <section class="title">
         <UserBadge />
-        <h1>{{ formatMMYYYY() }}</h1>
-        <a :href="previousMonth" class="left"><i class="fa-solid fa-chevron-left"></i></a>
-        <a :href="nextMonth" class="right"><i class="fa-solid fa-chevron-right"></i></a>
+        <p>{{ formatMMYYYY() }}</p>
+        <!-- <a><i class="fa-solid fa-calendar"></i></a> -->
+        <NuxtLink :to="previousMonth" @click="$emit('reload', prev)" class="left">
+            <i class="fa-solid fa-chevron-left"></i>
+        </NuxtLink>
+        <NuxtLink :to="previousMonth" @click="$emit('reload', next)" class="right">
+            <i class="fa-solid fa-chevron-right"></i>
+        </NuxtLink>
     </section>
 </template>
 <script>
@@ -15,6 +20,14 @@ export default {
     props: ["date"],
 
     computed: {
+        prev() {
+            const [year, month] = this.getMonth(this.date, -1);
+            return { year: year, month: month }
+        },
+        next() {
+            const [year, month] = this.getMonth(this.date, +1);
+            return { year: year, month: month }
+        },
         previousMonth() {
             const [year, month] = this.getMonth(this.date, -1);
             return `/?year=${year}&month=${month}`
@@ -58,11 +71,17 @@ export default {
 .title {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 1.5em;
+
+    p {
+        font-size: x-large;
+        font-weight: 600;
+    }
+
 }
 
-h1 {
-    vertical-align:  middle;
-}
+
 
 a {
     display: flex;
@@ -84,8 +103,6 @@ a:hover {
 
 .left {
     margin-left: auto;
-    margin-right: 1.5em
-    // margin-left: 2em;
 }
 
 .right {
