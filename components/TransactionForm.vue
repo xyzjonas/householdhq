@@ -100,6 +100,8 @@ export default {
 
     props: ['processing', 'transactionIn', 'startStage', 'noFrame'],
 
+    // inject: ['token'],
+
     data() {
         return {
             stage: 0,
@@ -119,7 +121,9 @@ export default {
         }
     },
 
-    created() {
+    async created() {
+        const tok = await this.$auth0.getAccessTokenSilently();
+        this.token = tok;
         this.getTags();
         this.getSources();
 
@@ -183,12 +187,23 @@ export default {
 
         getTags() {
         const url = '/api/tags'
-        $fetch(url, {method: 'GET'})
+        console.info(`tok: ${this.token}`)
+        $fetch(url, {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + this.token
+            },
+        })
             .then(res => this.allTags = res.data)
         },
         getSources() {
         const url = '/api/sources'
-        $fetch(url, {method: 'GET'})
+        $fetch(url, {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + this.token
+            },
+        })
             .then(res => this.allSources = res.data)
         },
         categorySelected(categoryName) {

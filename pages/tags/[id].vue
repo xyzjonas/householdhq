@@ -2,7 +2,10 @@
     <div class="container more-p">
         <div v-if="loading" class="center"><MosaicLoader /></div>
         <div v-else-if="tag.id">
-            <h1 class="title">{{ tag.name }}</h1>
+            <h1 class="title">
+                <Icon :iconName="tag.icon" />
+                {{ tag.name }}
+            </h1>
             <div class="row">
                 <div class="item">{{ $t('name') }}</div>
                 <EditableField
@@ -56,11 +59,11 @@
     </div>
 </template>
 <script>
-import { EditableField, EditableColor, MosaicLoader } from '#components';
+import { EditableField, EditableColor, MosaicLoader, Icon } from '#components';
 
 export default {
 
-    components: { EditableField, EditableColor, MosaicLoader },
+    components: { EditableField, EditableColor, MosaicLoader, Icon },
 
     computed: {
         childTag() {
@@ -81,7 +84,12 @@ export default {
         getTag() {
             this.loading = true;
             const url = `/api/tags/${this.tagId}`;
-            $fetch(url, {method: 'GET'})
+            $fetch(url, {
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                }
+            })
             .then(res => this.tag = res.data)
             .finally(() => this.loading = false)
         },
@@ -89,7 +97,13 @@ export default {
             const url = "/api/tags";
             console.info(tagData)
             tagData.id = this.tag.id;
-            $fetch(url, {method: 'PATCH', body: tagData})
+            $fetch(url, {
+                method: 'PATCH',
+                body: tagData,
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                }
+            })
                 .then(res => this.tag = res.data)
                 .finally(() => { this.patching = false; this.edit = false; this.details = false })
         }
@@ -101,7 +115,9 @@ export default {
         return { tagId }
     },
 
-    created() {
+    async created() {
+        const tok = await this.$auth0.getAccessTokenSilently();
+        this.token = tok;
         this.getTag();
     }
 }

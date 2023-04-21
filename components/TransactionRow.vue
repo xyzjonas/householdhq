@@ -63,7 +63,9 @@ export default {
         }
     },
 
-    created() {
+    async created() {
+        const tok = await this.$auth0.getAccessTokenSilently();
+        this.token = tok;
         if(this.transparent) {
             this.transparentStyle = 'filter: opacity(0.3);'
         }
@@ -73,7 +75,13 @@ export default {
         patchTransaction(transactionData) {
             this.patching = true;
             const url = "/api/transactions";
-            $fetch(url, {method: 'PATCH', body: transactionData})
+            $fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: 'Bearer ' + this.token
+                },
+                body: transactionData
+            })
                 .then(res => this.$emit('patched', res.data))
                 .finally(() => { this.patching = false; this.edit = false; this.details = false })
         },
