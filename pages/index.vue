@@ -172,7 +172,7 @@ export default {
         })
         .then(res => {
           this.allTransactions = res.data.filter(trans => {
-            return trans.target.isDisponible
+            return trans.target.isDisponible || trans.source.isDisponible
           })
         })
         .finally(() => {
