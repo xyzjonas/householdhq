@@ -3,6 +3,7 @@
         <Price :amount="total" :currency="currency.value" class="sum" />
         <div>
             <BalanceItem v-for="bal in sources" :source="bal" :max="max"/>
+            <NuxtLink to="/sources">. . .</NuxtLink>
         </div>
     </div>
 </template>
