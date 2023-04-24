@@ -1,6 +1,6 @@
 import { PrismaClient, Tag, Prisma } from '@prisma/client';
-import { TagDto, EditTagDto, TagIdDto } from '../validators/tags.dto';
-import { IdDto } from '../validators/transactions.dto';
+import { TagDto, EditTagDto } from '../validators/tags.dto';
+import { IdDto } from '../validators/common.dto';
 
 
 class Tags {
@@ -23,7 +23,7 @@ class Tags {
     return tag;
   }
 
-  public async deleteTag(tagData: TagIdDto): Promise<Tag> {
+  public async deleteTag(tagData: IdDto): Promise<Tag> {
     return await this.tags.delete({ where: { id: tagData.id } });
   }
 

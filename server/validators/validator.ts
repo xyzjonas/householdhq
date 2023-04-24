@@ -1,4 +1,3 @@
-import { isString } from "@vue/shared";
 import { plainToInstance } from "class-transformer";
 import { validate, ValidationArguments, ValidationError, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
 
@@ -24,8 +23,6 @@ export class ValidArray implements ValidatorConstraintInterface {
     return '\'$value\' is not a valid array or is empty.';
   }
 }
-
-
 
 const doValidate = async (
     type: any,

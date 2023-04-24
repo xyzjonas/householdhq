@@ -1,5 +1,5 @@
 import transactions from "../controllers/transactions";
-import { IdDto } from "../validators/transactions.dto";
+import { IdDto } from "../validators/common.dto";
 import doValidate from "../validators/validator";
 
 

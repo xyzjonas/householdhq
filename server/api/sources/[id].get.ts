@@ -1,6 +1,6 @@
 import { plainToClass, plainToInstance } from "class-transformer";
 import sources from "~~/server/controllers/sources";
-import { IdDto } from "~~/server/validators/transactions.dto";
+import { IdDto } from "~~/server/validators/common.dto";
 import doValidate from "~~/server/validators/validator";
 
 

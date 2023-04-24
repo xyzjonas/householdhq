@@ -1,5 +1,6 @@
 import { PrismaClient, Source, SourceState } from "@prisma/client";
-import { CreateSourceDto, EditSourceDto, IdDto, UpdateSourceStateDto } from "../validators/sources.dto";
+import { CreateSourceDto, EditSourceDto, UpdateSourceStateDto } from "../validators/sources.dto";
+import { IdDto } from "../validators/common.dto";
 
 
 class Sources {

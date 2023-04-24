@@ -3,13 +3,6 @@ import { IsInt, IsNumber, IsOptional, IsString, IsDate, Validate, IsBoolean } fr
 import { ValidArray, ValidDate } from './validator';
 
 
-export class IdDto {
-  @IsInt()
-  @Transform(({value}) => parseInt(value))
-  public id?: number
-}
-
-
 export class TransactionMonthDto {
   @IsInt()
   @IsOptional()
@@ -37,6 +30,9 @@ export class CreateTransactionDto {
   @IsNumber()
   public recurring?: number;
   
+  @IsNumber()
+  public categoryId?: number;
+
   @IsNumber()
   public sourceId?: number;
 
@@ -81,6 +77,10 @@ export class EditTransactionDto {
   @IsNumber()
   public recurring?: number;
   
+  @IsOptional()
+  @IsNumber()
+  public categoryId?: number;
+
   @IsOptional()
   @IsNumber()
   public sourceId?: number;

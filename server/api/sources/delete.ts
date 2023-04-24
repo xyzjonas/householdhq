@@ -1,5 +1,5 @@
+import { IdDto } from "~~/server/validators/common.dto";
 import sources from "../../controllers/sources";
-import { IdDto } from "../../validators/sources.dto";
 import doValidate from "../../validators/validator";
 
 

@@ -1,8 +1,4 @@
-import { plainToClass, plainToInstance } from "class-transformer";
 import sources from "../controllers/sources";
-import transactions from "../controllers/transactions";
-import { IdDto } from "../validators/sources.dto";
-import doValidate from "~~/server/validators/validator";
 
 
 export default defineEventHandler(async (event) => {

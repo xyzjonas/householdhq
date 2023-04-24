@@ -1,14 +1,15 @@
 import { PrismaClient, Transaction } from "@prisma/client";
-import { CreateTransactionDto, TagTransactionDto, IdDto, TransactionMonthDto, EditTransactionDto } from "../validators/transactions.dto";
+import { CreateTransactionDto, TagTransactionDto, TransactionMonthDto, EditTransactionDto } from "../validators/transactions.dto";
+import { IdDto } from "../validators/common.dto"
 
-const DEFAULT_INCLUDE = { source: true, target:true, tags: true };
+const DEFAULT_INCLUDE = { category: true, source: true, target:true, tags: true };
 
 class Transactions {
 
     private transactions = new PrismaClient().transaction;
 
     public async findAll(): Promise<Transaction[]> {
-        const allTrans: Transaction[] = await this.transactions.findMany({ include: { source: true, tags: true } });
+        const allTrans: Transaction[] = await this.transactions.findMany({ include: DEFAULT_INCLUDE });
         allTrans.sort((a, b) => b.created.getTime() - a.created.getTime());
         return allTrans;
     }
@@ -82,6 +83,11 @@ class Transactions {
             tags: {
               connect: tags,
             },
+            category: {
+              connect: {
+                id: transactionData.categoryId,
+              },
+            },
             source: {
               connect: {
                 id: transactionData.sourceId,
@@ -106,6 +112,10 @@ class Transactions {
       let tags = undefined;
       if (transactionData.tags) {
         tags = { connect: transactionData.tags.map(tagName => ({ name: tagName })) };
+      }
+      let category = undefined;
+      if (transactionData.categoryId) {
+        category = { connect: { id: transactionData.categoryId } };
       }
       let source = undefined;
       if (transactionData.sourceId) {
@@ -138,6 +148,7 @@ class Transactions {
           description: transactionData.description,
           amount: transactionData.amount,
           tags: tags,
+          category: category,
           source: source,
           target: target,
         },

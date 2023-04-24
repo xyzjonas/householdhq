@@ -36,14 +36,3 @@ export class EditTagDto {
   @IsInt()
   public parentId?: number;
 }
-
-
-export class TagIdDto {
-  @IsInt()
-  public id: number;
-}
-
-export class TagNameDto {
-  @IsString()
-  public name: string;
-}

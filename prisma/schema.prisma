@@ -18,6 +18,19 @@ model User {
 }
 
 
+model Category {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  description   String?
+  icon          String?
+  color         String?
+
+  transactions  Transaction[]
+
+  @@map("category")
+}
+
+
 model Tag {
   id            Int     @id @default(autoincrement())
   name          String  @unique
@@ -67,6 +80,9 @@ model Transaction {
   cancelled       Boolean     @default(false)
   confirmed       Boolean     @default(true)
   recurring       Int         @default(0)  // recurring each n months
+  
+  categoryId      Int?
+  category        Category?   @relation(fields: [categoryId], references: [id])
 
   sourceId        Int
   source          Source      @relation(name: "source", fields: [sourceId], references: [id])
@@ -79,4 +95,5 @@ model Transaction {
   @@map("transaction")
   @@index([sourceId])
   @@index([targetId])
+  @@index([categoryId])
 }

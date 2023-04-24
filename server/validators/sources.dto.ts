@@ -3,12 +3,6 @@ import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Validate } from 'clas
 import { ValidDate } from './validator';
 
 
-export class IdDto {
-    @IsInt()
-    @Transform(({value}) => parseInt(value))
-    public id?: number
-  }
-
 export class CreateSourceDto {
   @IsString()
   public name?: string;
