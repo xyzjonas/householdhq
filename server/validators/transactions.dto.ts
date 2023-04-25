@@ -30,6 +30,7 @@ export class CreateTransactionDto {
   @IsNumber()
   public recurring?: number;
   
+  @IsOptional()
   @IsNumber()
   public categoryId?: number;
 

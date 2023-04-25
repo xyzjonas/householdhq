@@ -69,7 +69,12 @@ class Transactions {
             parsed_date = new Date(transactionData.created);
         }
         const tags = transactionData.tags.map(tagName => ({ name: tagName }));
-    
+        
+        let category = undefined;
+        if (transactionData.categoryId) {
+          category = { connect: { id: transactionData.categoryId } }
+        }
+
         transactionData.currency ??= 'CZK';
         const now = new Date();
         const trans: Transaction = await this.transactions.create({
@@ -83,11 +88,7 @@ class Transactions {
             tags: {
               connect: tags,
             },
-            category: {
-              connect: {
-                id: transactionData.categoryId,
-              },
-            },
+            category: category,
             source: {
               connect: {
                 id: transactionData.sourceId,
