@@ -27,8 +27,8 @@ class Sources {
     }
     
     public async createSource(sourceData: CreateSourceDto): Promise<Source> {
-      const data = { ...sourceData };
-      const source: Source = await this.sources.create(data);
+      // const data = { ...sourceData };
+      const source: Source = await this.sources.create( { data: { ...sourceData } });
       return source;
     }
 
