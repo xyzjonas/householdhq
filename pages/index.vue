@@ -2,7 +2,7 @@
 import {
   TransactionRow, HomeCarousel, TagSummary,
   MonthHero, BarGraph, MosaicLoader, TransactionForm,
-  Spinner, BalanceRow, RadialGraph, AccessDenied
+  Spinner, BalanceRow, RadialGraph
 } from '#components';
 
 
@@ -11,8 +11,7 @@ export default {
   components: {
     TransactionRow, HomeCarousel, TagSummary,
     MonthHero, BarGraph, MosaicLoader,
-    TransactionForm, Spinner, BalanceRow, RadialGraph,
-    AccessDenied
+    TransactionForm, Spinner, BalanceRow, RadialGraph
   },
 
   data() {
@@ -52,8 +51,8 @@ export default {
       this.initialFetch();
     })
     .catch(err => {
-      this.loading = false;
-      this.authError = err;
+      console.error(err);
+      this.$router.push("/login");
     })
   },
 
@@ -342,9 +341,6 @@ export default {
     <MonthHero :date="date" @reload="monthReloaded"/>
     <section v-if="loading" class="center">
       <MosaicLoader />
-    </section>
-    <section v-else-if="authError" class="center">
-      <AccessDenied @login="$auth0.loginWithRedirect()" />
     </section>
     <div v-else>
       <HomeCarousel

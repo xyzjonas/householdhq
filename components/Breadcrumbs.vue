@@ -6,6 +6,7 @@
         </span>
     </div>
 </template>
+
 <script setup lang="ts">
 const route = useRoute()
 const pathSegments = computed(() => {
@@ -13,6 +14,7 @@ const pathSegments = computed(() => {
     return path.split("/").filter(s => s)
 });
 </script>
+
 <style scoped lang="scss">
 .crumbs {
     margin-top: 1em;
