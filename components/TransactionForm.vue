@@ -134,6 +134,7 @@ export default {
             this.transaction.tags = this.transactionIn.tags.map(t => t.name).join(",");
             delete this.transaction.source; // discard prisma-included properties
             delete this.transaction.target; // discard prisma-included properties
+            delete this.transaction.category; // discard prisma-included properties
             delete this.transaction.confirmed; // discard explicit confirmed property - only for confirm action
             this.date = this.formatDate(new Date(this.transaction.created));
             this.time = this.formatTime(new Date(this.transaction.created));
