@@ -38,6 +38,7 @@
             :transactionIn="transaction"
             :startStage="2"
             :processing="patching"
+            :error="patchingError"
             @cancel="edit = false"
             @send="patchTransaction"
         />
@@ -60,6 +61,7 @@ export default {
             edit: false,
             transparentStyle: '',
             patching: false,
+            patchingError: undefined,
         }
     },
 
@@ -82,8 +84,15 @@ export default {
                 },
                 body: transactionData
             })
-                .then(res => this.$emit('patched', res.data))
-                .finally(() => { this.patching = false; this.edit = false; this.details = false })
+                .then(res => {
+                    this.$emit('patched', res.data);
+                    this.edit = false;
+                    this.details = false;
+                })
+                .catch(err => {
+                    this.patchingError = err.data.statusMessage;
+                })
+                .finally(() => { this.patching = false;  })
         },
     },  
 

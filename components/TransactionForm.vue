@@ -64,7 +64,7 @@
 
                 <div class="row">
                     <button @click="stage -= 1" style="margin-left: auto" class="button-sm ">{{ $t('back') }}</button>
-                    <button @click="send" class="success button-sm">
+                    <button @click="send" :class="`${error ? 'danger' : 'success'} button-sm`">
                         <span v-if="!processing">{{ $t('t_send') }}</span>
                         <Spinner v-else />
                     </button>
@@ -89,6 +89,7 @@
                 </div>
             </div>
         </transition>
+        <p class="error" style="text-align: right">{{ error }}</p>
     </div>
 </template>
 <script>
@@ -98,7 +99,7 @@ export default {
 
     components: { Price, Icon, Spinner, CategoryBadge },
 
-    props: ['processing', 'transactionIn', 'startStage', 'noFrame'],
+    props: ['processing', 'transactionIn', 'startStage', 'noFrame', 'error'],
 
     // inject: ['token'],
 
