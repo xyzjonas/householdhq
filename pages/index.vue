@@ -23,6 +23,7 @@ export default {
       deleteLoading: false,
       allTransactions: [],
       showUpcomming: false,
+      showHidden: false,
       date: new Date(),
 
       addTransaction: false,
@@ -66,15 +67,25 @@ export default {
   computed: {
     transactions() {
       const now = new Date();
-      return this.allTransactions
+      const tmp = this.allTransactions
         .filter(trans => new Date(trans.created) <= now)
-        .filter(trans => this.isTransactionTagged(trans, this.filterTag));
+      if (this.showHidden) {
+        return tmp;
+      }
+      return tmp
+        .filter(trans => this.isTransactionTagged(trans, this.filterTag))
+        .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
     },
     upcommingTransactions() {
       const now = new Date();
-      return this.allTransactions
+      const tmp = this.allTransactions
         .filter(trans => new Date(trans.created) > now)
-        .filter(trans => this.isTransactionTagged(trans, this.filterTag));
+      if (this.showHidden) {
+        return tmp;
+      }
+      return tmp
+        .filter(trans => this.isTransactionTagged(trans, this.filterTag))
+        .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
     },
     remainingBills() {
       let sum = 0;
@@ -97,24 +108,22 @@ export default {
         .filter(s => s.isDisponible)
         .map(s => {
           const source = { ...s };
-          if (source.states.length === 0) {
-            source.balance = undefined;
+          if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
+            source.balance = undefined;  // can't calculate actual balance without the user's correction
           } else {
             const last_entry = source.states[source.states.length - 1];
-            let last_balance = last_entry.amount;
-            console.info(`Last bal: ${last_entry}`)
-            console.info(`${this.transactions.length} transactions`);
-            const out_ = this.transactions
-              .filter(t => new Date(t.created) > new Date(last_entry.created))
-              .filter(t => t.sourceId === source.id);
-            const in_ = this.transactions
+            let current_balance = last_entry.amount;
+            
+            const out_ = this.allTransactions
+              .filter(trans => new Date(trans.created) > new Date(last_entry.created))
+              .filter(trans => trans.sourceId === source.id);
+            const in_ = this.allTransactions
               .filter(t => new Date(t.created) > new Date(last_entry.created))
               .filter(t => t.targetId === source.id);
-            console.info(`states: ${source.states.length}`)
             
-            in_.forEach(t => last_balance += t.amount);
-            out_.forEach(t => last_balance -= t.amount);
-            source.balance = last_balance;
+            in_.forEach(trans => current_balance += trans.amount);
+            out_.forEach(trans => current_balance -= trans.amount);
+            source.balance = current_balance;
           }
           return source;
         })
@@ -175,10 +184,10 @@ export default {
           })
         })
         .finally(() => {
-          this.tags = this.remapTags();
+          this.tags = this.remapCategories();
           this.sources = this.remapSources();
           this.targets = this.remapTargets();
-          this.incomes = this.remapTags(true);
+          this.incomes = this.remapCategories(true);
           this.loading = false;
         })
     },
@@ -251,12 +260,11 @@ export default {
     },
     isTransactionTagged(transaction, tagId) {
       if (tagId < 0) {
-        // dont filter
         return true;
       }
       return transaction.tags.filter(t => t.id === tagId).length > 0;
     },
-    remapTags(incomeOnly=false) {
+    remapCategories(incomeOnly=false) {
       const tagsTmp: any = {}
       this.transactions.forEach(trans => {
         if(trans.confirmed) {
@@ -385,6 +393,7 @@ export default {
         >
           <Price class="tag" :amount="remainingBills" :currency="currency"/>
         </button>
+        <button @click="showHidden = !showHidden" style="margin-left: auto;"><i class="fa-solid fa-eye-slash"></i></button>
       </h4>
 
       <transition name="page">
