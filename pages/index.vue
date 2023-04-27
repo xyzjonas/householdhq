@@ -66,9 +66,8 @@ export default {
 
   computed: {
     transactions() {
-      const now = new Date();
       const tmp = this.allTransactions
-        .filter(trans => new Date(trans.created) <= now)
+        .filter(trans => new Date(trans.created) <= new Date())
       if (this.showHidden) {
         return tmp;
       }
@@ -77,15 +76,13 @@ export default {
         .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
     },
     upcommingTransactions() {
-      const now = new Date();
       const tmp = this.allTransactions
-        .filter(trans => new Date(trans.created) > now)
+        .filter(trans => new Date(trans.created) > new Date())
       if (this.showHidden) {
         return tmp;
       }
       return tmp
-        .filter(trans => this.isTransactionTagged(trans, this.filterTag))
-        .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
+        .filter(trans => this.isTransactionTagged(trans, this.filterTag));
     },
     remainingBills() {
       let sum = 0;
@@ -114,10 +111,11 @@ export default {
             const last_entry = source.states[source.states.length - 1];
             let current_balance = last_entry.amount;
             
-            const out_ = this.allTransactions
+            const applicableTransactions = this.allTransactions.filter(trans => new Date(trans.created) <= new Date());
+            const out_ = applicableTransactions
               .filter(trans => new Date(trans.created) > new Date(last_entry.created))
               .filter(trans => trans.sourceId === source.id);
-            const in_ = this.allTransactions
+            const in_ = applicableTransactions
               .filter(t => new Date(t.created) > new Date(last_entry.created))
               .filter(t => t.targetId === source.id);
             
