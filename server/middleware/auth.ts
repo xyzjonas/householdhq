@@ -1,10 +1,9 @@
-import * as jwt from 'jsonwebtoken';
-
+import jwt from 'jsonwebtoken';
 
 const pubKey = process.env.AUTH0_PUBKEY
 
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const token = event.node.req.headers.authorization;
   if (!String(event.node.req.url).startsWith("/api")) {
     console.debug(`${String(event.node.req.url)}: this is an unprotected endpoint!`)
@@ -18,7 +17,7 @@ export default defineEventHandler((event) => {
       } else {
         console.info(authorization);
         console.info(`secret: ${pubKey}`)
-        const decoded = jwt.verify(authorization[1], pubKey, {
+        const decoded = await jwt.verify(authorization[1], pubKey, {
           algorithms: ['RS256'],
         })
         console.info("!!!!!!!")

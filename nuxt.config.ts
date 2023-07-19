@@ -5,6 +5,17 @@ import 'dotenv/config';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    nitro: {
+        esbuild: {
+            options: {
+                tsconfigRaw: {
+                    compilerOptions: {
+                        experimentalDecorators: true
+                    }
+                }
+            }
+        },
+    },
     runtimeConfig: {
         public: {
             auth0_domain: process.env.AUTH0_DOMAIN,
@@ -12,8 +23,6 @@ export default defineNuxtConfig({
             auth0_redirectUri: process.env.AUTH0_REDIRECT_URI,
             auth0_audience: process.env.AUTH0_AUDIENCE,
         }
-        // auth0_domain: "",
-        // auth0_clientId: ""
     },
     app: {
         pageTransition: { name: 'page', mode: 'out-in' },
@@ -48,12 +57,7 @@ export default defineNuxtConfig({
                         name: 'Česky'
                     }
                 ],
-                vueI18n: {
-                    messages: {
-                        cs: cz,
-                        en: en,
-                    }
-                }
+                vueI18n: './i18n.config.ts'
             },
         ]
     ],
