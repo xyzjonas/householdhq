@@ -1,6 +1,5 @@
-import cz from './locales/cz.json';
-import en from './locales/en.json';
 import 'dotenv/config';
+// import { cs } from 'locales/cz';
 
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -40,27 +39,13 @@ export default defineNuxtConfig({
         '@/assets/fontawesome/css/all.css'
     ],
     modules: [
-        [
-            '@nuxtjs/i18n',
-            {
-                vueI18nLoader: true,
-                defaultLocale: 'cs',
-                locales: [
-                    {
-                        code: 'en',
-                        iso: 'en-US',
-                        name: "English"
-                    },
-                    {
-                        code: 'cs',
-                        iso: 'cs',
-                        name: 'Česky'
-                    }
-                ],
-                vueI18n: './i18n.config.ts'
-            },
-        ]
+        '@nuxtjs/i18n',
     ],
+    i18n: {
+        locales: ['en', 'fr', 'es'],
+        defaultLocale: 'en',
+        vueI18n: './i18n.config.ts',
+    },
     vite: {
         css: {
             preprocessorOptions: {

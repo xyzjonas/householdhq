@@ -97,6 +97,8 @@ export default {
       if (this.allTransactions && this.allTransactions.length > 0) {
         const curr = this.allTransactions[0].currency;
         return curr;
+      } else {
+        return "NaN"
       }
     },
     balances() {

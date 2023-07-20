@@ -1,12 +1,11 @@
-import cz from './locales/cz.json';
-import en from './locales/en.json';
-
+import { cs } from './locales/cs';
+import { en } from './locales/en';
 
 export default defineI18nConfig(() => ({
     legacy: false,
     locale: 'en',
     messages: {
       en: en,
-      cz: cz,
+      cz: cs,
     }
   }))
