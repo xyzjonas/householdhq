@@ -1,346 +1,342 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   TransactionRow, HomeCarousel, TagSummary,
   MonthHero, BarGraph, MosaicLoader, TransactionForm,
   Spinner, BalanceRow, RadialGraph
 } from '#components';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 
-export default {
+const tags = ref([]);
+const loading = ref(true);
+const authError = ref(null);
+const putLoading = ref(false);
+const deleteLoading = ref(false);
+const allTransactions = ref([]);
+const showUpcomming = ref(false);
+const showHidden = ref(false);
+const date = ref(new Date());
 
-  components: {
-    TransactionRow, HomeCarousel, TagSummary,
-    MonthHero, BarGraph, MosaicLoader,
-    TransactionForm, Spinner, BalanceRow, RadialGraph
-  },
+const addTransaction = ref(false);
+const allTags = ref([]);
+const filterTag = ref(-1);
+const allSources = ref([]);
+const sources = ref([]);
+const targets = ref([]);
+const incomes =ref([]);
+  
+const token = ref<string>();
 
-  data() {
-    return {
-      tags: [],
-      loading: true,
-      authError: null,
-      putLoading: false,
-      deleteLoading: false,
-      allTransactions: [],
-      showUpcomming: false,
-      showHidden: false,
-      date: new Date(),
 
-      addTransaction: false,
-      allTags: [],
-      filterTag: -1,
-      allSources: [],
-      sources: [],
-      targets: [],
-      incomes: [],
-      
-      token: "",
-    }
-  },
+const router = useRouter();
+const { yearPath, monthPath } = useRoute().query
 
-  async setup() {
-    const route = useRoute();
-    const year = route.query.year
-    const month = route.query.month
-    return { year, month }
-  },
+const year = ref(yearPath);
+const month = ref(monthPath);
 
-  mounted() {
-    this.$auth0.getAccessTokenSilently()
-    .then(tok => {
-      this.token = tok;
-      this.initialFetch();
-    })
-    .catch(err => {
-      console.error(err);
-      this.$router.push("/login");
-    })
-  },
 
-  provide() {
-    return {
-      currency: computed(() => this.currency),
-      token: computed(() => this.token)
-    }
-  },
+const auth0 = useAuth0();
+onMounted(() => {
+  auth0.getAccessTokenSilently()
+  .then(tok => {
+    token.value = tok;
+    initialFetch();
+  })
+  .catch(err => {
+    console.error(err);
+    router.push("/login");
+  })
+})
 
-  computed: {
-    transactions() {
-      const tmp = this.allTransactions
-        .filter(trans => new Date(trans.created) <= new Date())
-      if (this.showHidden) {
-        return tmp;
-      }
-      return tmp
-        .filter(trans => this.isTransactionTagged(trans, this.filterTag))
-        .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
-    },
-    upcommingTransactions() {
-      const tmp = this.allTransactions
-        .filter(trans => new Date(trans.created) > new Date())
-      if (this.showHidden) {
-        return tmp;
-      }
-      return tmp
-        .filter(trans => this.isTransactionTagged(trans, this.filterTag));
-    },
-    remainingBills() {
-      let sum = 0;
-      this.upcommingTransactions.forEach(t => {
-        if (!t.source.isOut) {
-          sum += t.amount;
-        }
-      })
-      return sum;
-    },
-    currency() {
-      if (this.allTransactions && this.allTransactions.length > 0) {
-        const curr = this.allTransactions[0].currency;
-        return curr;
-      } else {
-        return "NaN"
-      }
-    },
-    balances() {
-      const sources = this.allSources
-        .filter(s => !s.isOut)
-        .filter(s => s.isDisponible)
-        .map(s => {
-          const source = { ...s };
-          if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
-            source.balance = undefined;  // can't calculate actual balance without the user's correction
-          } else {
-            const last_entry = source.states[source.states.length - 1];
-            let current_balance = last_entry.amount;
-            
-            const applicableTransactions = this.allTransactions.filter(trans => new Date(trans.created) <= new Date());
-            const out_ = applicableTransactions
-              .filter(trans => new Date(trans.created) > new Date(last_entry.created))
-              .filter(trans => trans.sourceId === source.id);
-            const in_ = applicableTransactions
-              .filter(t => new Date(t.created) > new Date(last_entry.created))
-              .filter(t => t.targetId === source.id);
-            
-            in_.forEach(trans => current_balance += trans.amount);
-            out_.forEach(trans => current_balance -= trans.amount);
-            source.balance = current_balance;
-          }
-          return source;
-        })
-      return sources;
-    },
-    auth() {
-      if (this.$auth0) {
-        console.info("hey!")
-        this.$auth0.getAccessTokenSilently()
-        .then(tok => {
-          console.info(`got token: ${tok}`)
-          this.token = tok
-        }).catch(err => {
-          console.error(err)
-        })
-        return this.$auth0;
-      }
-    }
-   
-  },
 
-  methods: {
-
-    login() {
-      this.$auth0.loginWithRedirect();
-    },
-
-    initialFetch() {
-      // Fetch all the required data on startup - only after session validation
-      this.getTransactions(true);
-      this.getTags();
-      this.getSources();
-    },
-
-    getTransactions(loading=false) {
-      if (loading) {
-        this.loading = true;
-      }
-      let url;
-      if (this.year && this.month) {
-        this.date = new Date(`${this.year}-${this.month}`);
-        url = `/api/transactions/?year=${this.year}&month=${this.month}`
-      } else {
-        url = '/api/transactions'
-      }
-      
-      $fetch(
-        url,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: 'Bearer ' + this.token
-          }
-        })
-        .then(res => {
-          this.allTransactions = res.data.filter(trans => {
-            return trans.target.isDisponible || trans.source.isDisponible
-          })
-        })
-        .finally(() => {
-          this.tags = this.remapCategories();
-          this.sources = this.remapSources();
-          this.targets = this.remapTargets();
-          this.incomes = this.remapCategories(true);
-          this.loading = false;
-        })
-    },
-    putTransaction(transactionData) {
-      this.putLoading = true;
-      const url = "/api/transactions";
-      $fetch(url, {
-        method: 'PUT',
-        headers: {
-          Authorization: 'Bearer ' + this.token
-        },
-        body: transactionData})
-        .then(res =>
-          this.allTransactions.unshift(res.data)
-        )
-        .finally(() => { this.addTransaction = false; this.putLoading = false })
-    },
-    
-    deleteTransaction(transactionData) {
-      const url = "/api/transactions";
-      $fetch(url, {
-        method: 'DELETE',
-        headers: {
-          Authorization: 'Bearer ' + this.token
-        },
-        body: transactionData})
-        .then(res => {
-          this.allTransactions = this.allTransactions.filter(t => t.id != transactionData.id);
-        })
-    },
-    getTags() {
-      const url = '/api/tags'
-      $fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer ' + this.token
-        }
-      })
-        .then(res => this.allTags = res.data)
-    },
-    getSources() {
-      const url = '/api/sources'
-      $fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer ' + this.token
-        }
-      })
-        .then(res => {
-          this.allSources = res.data;
-    })
-    },
-    updateTransaction(transaction) {
-      for (let index = 0; index < this.allTransactions.length; index++) {
-        const element = this.allTransactions[index];if (element.id === transaction.id)
-        if (element.id === transaction.id) {
-          this.allTransactions[index] = transaction;
-          this.getTransactions();
-        }
-      }
-    },
-    mapTransactionDeclention(count) {
-      if (count === 1) {
-        return this.$t('t_upcomming_1')
-      } else if (count > 1 && count < 5) {
-        return this.$t('t_upcomming_2')
-      } else {
-        return this.$t('t_upcomming_5')
-      }
-    },
-    isTransactionTagged(transaction, tagId) {
-      if (tagId < 0) {
-        return true;
-      }
-      return transaction.tags.filter(t => t.id === tagId).length > 0;
-    },
-    remapCategories(incomeOnly=false) {
-      const tagsTmp: any = {}
-      this.transactions.forEach(trans => {
-        if(trans.confirmed) {
-          if (trans.tags && trans.tags.length > 0 && ((!incomeOnly && trans.target.isOut) || (incomeOnly && !trans.target.isOut))) {
-            trans.tags.forEach(tag => {
-              if (!tagsTmp[tag.id]) {
-                tagsTmp[tag.id] = {...tag}
-                tagsTmp[tag.id].transactions = [trans];
-            } else {
-              tagsTmp[tag.id].transactions.push(trans)
-            }
-          })
-          }
-        }
-      });
-
-      const tags = Object.values(tagsTmp)
-      tags.forEach(tag => {
-        let sum = 0;
-        tag.transactions.forEach(trans => { sum += trans.amount; })
-        tag.sum = sum;
-      });
-      tags.sort((a, b) => { return b.sum - a.sum; });
-      return tags;
-    },
-    remapSources() {
-      const sourcesTmp: any = {}
-      this.allTransactions.forEach(trans => {
-          if (trans.source) {
-            if (sourcesTmp[trans.sourceId]) {
-              sourcesTmp[trans.sourceId].transactions.push(trans);
-            } else {
-              sourcesTmp[trans.sourceId] = {...trans.source};
-              sourcesTmp[trans.sourceId].transactions = [trans];
-            }
-          }
-      });
-
-      const sources = Object.values(sourcesTmp);
-      sources.forEach(source => {
-        let sum = 0;
-        source.transactions.forEach(trans => { sum += trans.amount; })
-        source.sum = sum;
-      });
-      sources.sort((a, b) => { return b.sum - a.sum; });
-      return sources;
-  },
-  remapTargets() {
-      const targetsTmp: any = {}
-      this.allTransactions.forEach(trans => {
-          if (trans.target) {
-            if (targetsTmp[trans.targetId]) {
-              targetsTmp[trans.targetId].transactions.push(trans);
-            } else {
-              targetsTmp[trans.targetId] = {...trans.target};
-              targetsTmp[trans.targetId].transactions = [trans];
-            }
-          }
-      });
-
-      const targets = Object.values(targetsTmp);
-      targets.forEach(target => {
-        let sum = 0;
-        target.transactions.forEach(trans => { sum += trans.amount; })
-        target.sum = sum;
-      });
-      targets.sort((a, b) => { return b.sum - a.sum; });
-      return targets;
-  },
-  monthReloaded(options) {
-    this.year = options.year;
-    this.month = options.month;
-    this.initialFetch();
+const currency = computed(() => {
+  if (allTransactions.value && allTransactions.value.length > 0) {
+    const curr = allTransactions.value[0].currency;
+    return curr;
+  } else {
+    return "NaN"
   }
-  },
+})
+provide("currency", currency);
+provide("token", token);
+
+
+const transactions = computed(() => {
+  const tmp = allTransactions.value.filter(trans => new Date(trans.created) <= new Date())
+  if (showHidden.value) {
+    return tmp;
+  }
+  return tmp
+    .filter(trans => isTransactionTagged(trans, filterTag.value))
+    .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
+});
+
+const upcommingTransactions = computed(() => {
+      const tmp = allTransactions.value
+        .filter(trans => new Date(trans.created) > new Date())
+      if (showHidden.value) {
+        return tmp;
+      }
+      return tmp
+        .filter(trans => isTransactionTagged(trans, filterTag.value));
+});
+
+const remainingBills = computed(() => {
+  let sum = 0;
+  upcommingTransactions.value.forEach(t => {
+    if (!t.source.isOut) {
+      sum += t.amount;
+    }
+  })
+  return sum;
+});
+
+const balances = computed(() => {
+    const sources = allSources.value
+      .filter(s => !s.isOut)
+      .filter(s => s.isDisponible)
+      .map(s => {
+        const source = { ...s };
+        if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
+          source.balance = undefined;  // can't calculate actual balance without the user's correction
+        } else {
+          const last_entry = source.states[source.states.length - 1];
+          let current_balance = last_entry.amount;
+          
+          const applicableTransactions = allTransactions.value.filter(trans => new Date(trans.created) <= new Date());
+          const out_ = applicableTransactions
+            .filter(trans => new Date(trans.created) > new Date(last_entry.created))
+            .filter(trans => trans.sourceId === source.id);
+          const in_ = applicableTransactions
+            .filter(t => new Date(t.created) > new Date(last_entry.created))
+            .filter(t => t.targetId === source.id);
+          
+          in_.forEach(trans => current_balance += trans.amount);
+          out_.forEach(trans => current_balance -= trans.amount);
+          source.balance = current_balance;
+        }
+        return source;
+      })
+    return sources;
+});
+
+const auth = computed(() => {
+  if (auth0) {
+    console.info("hey!")
+    auth0.getAccessTokenSilently()
+    .then(tok => {
+      console.info(`got token: ${tok}`)
+      token.value = tok
+    }).catch(err => {
+      console.error(err)
+    })
+    return auth0;
+  }
+})
+
+
+const login = () => {
+  auth0.loginWithRedirect();
+};
+
+const initialFetch = () => {
+  // Fetch all the required data on startup - only after session validation
+  getTransactions();
+  getTags();
+  getSources();
+};
+
+const getTransactions = () => {
+  loading.value = true;
+  let url;
+  if (year.value && month.value) {
+    date.value = new Date(`${year.value}-${month.value}`);
+    url = `/api/transactions/?year=${year.value}&month=${month.value}`
+  } else {
+    url = '/api/transactions'
+  }
+  
+  $fetch(
+    url,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + token.value
+      }
+    })
+    .then(res => {
+      allTransactions.value = res.data.filter(trans => {
+        return trans.target.isDisponible || trans.source.isDisponible
+      })
+    })
+    .finally(() => {
+      tags.value = remapCategories();
+      sources.value = remapSources();
+      targets.value = remapTargets();
+      incomes.value = remapCategories(true);
+      loading.value = false;
+    })
+};
+
+const putTransaction = (transactionData) => {
+  putLoading.value = true;
+  const url = "/api/transactions";
+  $fetch(url, {
+    method: 'PUT',
+    headers: {
+      Authorization: 'Bearer ' + token.value
+    },
+    body: transactionData}
+  )
+    .then(res =>
+      allTransactions.value.unshift(res.data)
+    )
+    .finally(() => { addTransaction.value = false; putLoading.value = false })
+};
+    
+const deleteTransaction = (transactionData) => {
+  const url = "/api/transactions";
+  $fetch(url, {
+    method: 'DELETE',
+    headers: {
+      Authorization: 'Bearer ' + token.value
+    },
+    body: transactionData})
+    .then(res => {
+      allTransactions.value = allTransactions.value.filter(t => t.id != transactionData.id);
+    })
 }
+
+const getTags = () => {
+  const url = '/api/tags'
+  $fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + token.value
+    }
+  })
+    .then(res => allTags.value = res.data)
+};
+
+const getSources = () => {
+  const url = '/api/sources'
+  $fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + token.value
+    }
+  })
+    .then(res => {
+      allSources.value = res.data;
+  })
+};
+
+const updateTransaction = (transaction) => {
+  for (let index = 0; index < allTransactions.value.length; index++) {
+    const element = allTransactions.value[index]; if (element.id === transaction.id)
+    if (element.id === transaction.id) {
+      allTransactions.value[index] = transaction;
+      getTransactions();
+    }
+  }
+};
+
+const { t } = useI18n();
+const mapTransactionDeclention = (count: number) => {
+  if (count === 1) {
+    return t('t_upcomming_1')
+  } else if (count > 1 && count < 5) {
+    return t('t_upcomming_2')
+  } else {
+    return t('t_upcomming_5')
+  }
+};
+
+const isTransactionTagged = (transaction: any, tagId: number) => {
+  if (tagId < 0) {
+    return true;
+  }
+  return transaction.tags.filter(t => t.id === tagId).length > 0;
+};
+
+const remapCategories = (incomeOnly=false) => {
+  const tagsTmp: any = {}
+  transactions.value.forEach(trans => {
+    if(trans.confirmed) {
+      if (trans.tags && trans.tags.length > 0 && ((!incomeOnly && trans.target.isOut) || (incomeOnly && !trans.target.isOut))) {
+        trans.tags.forEach(tag => {
+          if (!tagsTmp[tag.id]) {
+            tagsTmp[tag.id] = {...tag}
+            tagsTmp[tag.id].transactions = [trans];
+        } else {
+          tagsTmp[tag.id].transactions.push(trans)
+        }
+      })
+      }
+    }
+  });
+
+  const tags = Object.values(tagsTmp)
+  tags.forEach(tag => {
+    let sum = 0;
+    tag.transactions.forEach(trans => { sum += trans.amount; })
+    tag.sum = sum;
+  });
+  tags.sort((a, b) => { return b.sum - a.sum; });
+  return tags;
+};
+
+const remapSources = () => {
+  const sourcesTmp = {}
+  allTransactions.value.forEach(trans => {
+      if (trans.source) {
+        if (sourcesTmp[trans.sourceId]) {
+          sourcesTmp[trans.sourceId].transactions.push(trans);
+        } else {
+          sourcesTmp[trans.sourceId] = {...trans.source};
+          sourcesTmp[trans.sourceId].transactions = [trans];
+        }
+      }
+  });
+
+  const sources = Object.values(sourcesTmp);
+  sources.forEach(source => {
+    let sum = 0;
+    source.transactions.forEach(trans => { sum += trans.amount; })
+    source.sum = sum;
+  });
+  sources.sort((a, b) => { return b.sum - a.sum; });
+  return sources;
+};
+const remapTargets = () => {
+    const targetsTmp: any = {}
+    allTransactions.value.forEach(trans => {
+        if (trans.target) {
+          if (targetsTmp[trans.targetId]) {
+            targetsTmp[trans.targetId].transactions.push(trans);
+          } else {
+            targetsTmp[trans.targetId] = {...trans.target};
+            targetsTmp[trans.targetId].transactions = [trans];
+          }
+        }
+    });
+
+    const targets = Object.values(targetsTmp);
+    targets.forEach(target => {
+      let sum = 0;
+      target.transactions.forEach(trans => { sum += trans.amount; })
+      target.sum = sum;
+    });
+    targets.sort((a, b) => { return b.sum - a.sum; });
+    return targets
+};
+
+const monthReloaded = (options) => {
+  year.value = options.year;
+  month.value = options.month;
+  initialFetch();
+}
+
 </script>
 
 
