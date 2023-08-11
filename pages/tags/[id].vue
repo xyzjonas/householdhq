@@ -8,7 +8,7 @@
             </h1>
             <div class="row">
                 <div class="item">{{ $t('name') }}</div>
-                <EditableField
+                <form-editable-field
                     :value="tag.name"
                     keyName="name"
                     @send="patchTag"
@@ -17,7 +17,7 @@
             </div>
             <div class="row">
                 <div class="item">{{ $t('description') }}</div>
-                <EditableField
+                <form-editable-field
                     keyName="description"
                     :value="tag.description"
                     @send="patchTag"
@@ -26,7 +26,7 @@
             </div>
             <div class="row">
                 <div class="item">{{ $t('icon') }}</div>
-                <EditableField
+                <form-editable-field
                     keyName="icon"
                     :value="tag.icon"
                     @send="patchTag"
@@ -45,7 +45,7 @@
             <div class="row">
                 <div class="item">{{ $t('color') }}</div>
                 <div class="item">
-                    <EditableColor
+                    <form-editable-color
                         keyName="color"
                         :value="tag.color || '#ffffffff'"
                         @send="patchTag"
@@ -59,11 +59,11 @@
     </div>
 </template>
 <script>
-import { EditableField, EditableColor, MosaicLoader, Icon } from '#components';
+import { FormEditableField, FormEditableColor, MosaicLoader, Icon } from '#components';
 
 export default {
 
-    components: { EditableField, EditableColor, MosaicLoader, Icon },
+    components: { FormEditableField, FormEditableColor, MosaicLoader, Icon },
 
     computed: {
         childTag() {

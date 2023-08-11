@@ -8,13 +8,3 @@
         </div>
     </div>
 </template>
-<script>
-import { Breadcrumbs } from '#components';
-
-export default {
-    component: { Breadcrumbs }
-}
-</script>
-<style lang="">
-    
-</style>

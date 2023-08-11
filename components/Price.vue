@@ -1,28 +1,38 @@
 <template>
     <div class="amount">
-        <span>{{ amount || 0 }}</span>
+        <span>{{ new Intl.NumberFormat().format(amount) }}</span>
         <span style="font-size: medium; margin-left: 2px;">{{ curr }}</span>
     </div>
 </template>
-<script>
-export default {
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useTransactionStore } from '@/stores/transactions';
 
-    props: ['amount', 'currency'],
-
-    computed: {
-        curr() {
-            // num = new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(number);
-            if (this.currency === 'CZK') {
-                return 'Kč'
-            }
-            return this.currency
-        }
+const props = defineProps({
+    amount: {
+        type: Number,
+        default: 0,
+    },
+    size: {
+        type: String,
+        default: 'x-large'
     }
-}
+});
+
+const { currency } = storeToRefs(useTransactionStore());
+
+// num = new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(number);
+const curr = computed(() => {
+    if (currency.value === 'CZK') {
+        return 'Kč';
+    }
+    return currency.value;
+})
+
 </script>
 <style lang="scss" scoped>
 .amount {
-    font-size: x-large;
-    font-family: monospace;
+    font-size: v-bind('size');
+    font-family: sans-serif;
 }
 </style>

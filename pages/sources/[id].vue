@@ -6,7 +6,7 @@
             <h1 class="title">{{ source.name }}</h1>
             <div class="row">
                 <p class="item">{{ $t('name') }}</p>
-                <EditableField
+                <form-editable-field
                     :value="source.name"
                     keyName="name"
                     @send="patchSource"
@@ -15,7 +15,7 @@
             </div>
             <div class="row">
                 <p class="item">{{ $t('s_isout') }}</p>
-                <EditableBoolean
+                <form-editable-boolean
                     keyName="isOut"
                     :value="source.isOut"
                     @send="patchSource"
@@ -25,7 +25,7 @@
 
             <div class="row">
                 <p class="item">{{ $t('s_isdisp') }}</p>
-                <EditableBoolean
+                <form-editable-boolean
                     keyName="isDisponible"
                     :value="source.isDisponible"
                     @send="patchSource"
@@ -36,7 +36,7 @@
             <div class="row">
                 <p class="item">{{ $t('color') }}</p>
                 <div class="item">
-                    <EditableColor
+                    <form-editable-color
                         keyName="color"
                         :value="source.color || '#ffffffff'"
                         @send="patchSource"
@@ -68,11 +68,11 @@
     </div>
 </template>
 <script>
-import { EditableBoolean, EditableField, EditableColor, MosaicLoader, UpdateBalanceFrom } from '#components';
+import { FormEditableBoolean, FormEditableField, FormEditableColor, MosaicLoader, UpdateBalanceFrom } from '#components';
 
 export default {
 
-    components: { EditableBoolean, EditableField, EditableColor, MosaicLoader, UpdateBalanceFrom },
+    components: { FormEditableBoolean, FormEditableField, FormEditableColor, MosaicLoader, UpdateBalanceFrom },
 
     inject: ['currency'],
 

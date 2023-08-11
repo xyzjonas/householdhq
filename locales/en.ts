@@ -19,6 +19,7 @@ const en = {
   edit: "edit",
   delete: "delete",
   no_data: "no data",
+  no_data_will_appear: "Summary will appear once transactions are added",
   t_date: "date",
   t_time: "time",
   t_desc: "description",
@@ -48,7 +49,7 @@ const en = {
   s_state: "entry",
   s_states: "entries",
   log_in: "Log in",
-  access_denied: "Access Denied"
+  access_denied: "Access not granted"
 }
 
 export { en }

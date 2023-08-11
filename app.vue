@@ -27,4 +27,13 @@
   opacity: 0;
 }
 
+body {
+    background-image: url('@/assets/blurry-gradient-haikei.svg');
+    backdrop-filter: blur(7px);
+    background-repeat: repeat;
+    background-position: center;
+    background-position-x: center;
+    overflow: scroll;
+}
+
 </style>

@@ -5,21 +5,21 @@
         </h1>
         <div class="row">
             <p class="item">{{ $t('t_date') }}</p>
-            <EditableDate class="item" :date="transaction.created"/>
+            <form-editable-date class="item" :date="transaction.created"/>
         </div>
         <div class="row">
             <div class="item">{{ $t('t_desc') }}</div>
-            <EditableField class="item" :value="transaction.description"/>
+            <form-editable-field class="item" :value="transaction.description"/>
         </div>
         <div class="row">
             <div class="item">{{ $t('t_amount') }}</div>
-            <EditableField class="item" :value="transaction.amount"/>
+            <form-editable-field class="item" :value="transaction.amount"/>
         </div>
         <div class="row">
             <div class="item">{{ $t('t_tag') }}</div>
             <div class="item">
                 <div v-for="tag in transaction.tags">
-                    <EditableTag class="item" :tag="tag"/>
+                    <form-editable-tag class="item" :tag="tag"/>
                 </div>
             </div>
         </div>
@@ -30,10 +30,10 @@ const route = useRoute()
 const { data: transaction } = await useFetch(`/api/transactions/${route.params.id}`)
 </script>
 <script>
-import { Price, EditableField, EditableDate, EditableTag } from '#components';
+import { Price, FormEditableField, FormEditableDate, FormEditableTag } from '#components';
 
 export default {
-    components: { Price, EditableField, EditableDate, EditableTag }
+    components: { Price, FormEditableField, FormEditableDate, FormEditableTag }
 }
 </script>
 <style lang="scss" scoped>

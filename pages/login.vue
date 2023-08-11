@@ -1,6 +1,6 @@
-<template lang="">
+<template>
     <div class="container">
-        <component :is="AccessDenied" @login="auth0.loginWithRedirect" />
+        <error-banner :is-login="true" status="403" message="access-denied" @login="auth0.loginWithRedirect"/>
     </div>
 </template>
 

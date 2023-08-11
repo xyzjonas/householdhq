@@ -1,32 +1,118 @@
+<template>
+  <div class="container">
+    <MonthHero :date="date" @reload="monthReloaded"/>
+    <section v-if="loading" class="center">
+      <MosaicLoader />
+    </section>
+    <div v-else>
+
+      <TopSummary :expense="expense" :income="income"/>
+
+      <HomeCarousel
+        :tags="categories"
+        :incomes="incomes"
+        :sources="sources"
+        :targets="targets"
+        @filter="tagId => filterTagId = tagId"
+      />
+
+      <hr>
+
+      <BalanceRow :sources="balances" class="card" />
+
+      <!-- ADD NEW TRANSACTION -->
+      <section id="add-t-button" class="row-simple py">
+        <button @click="addTransaction = !addTransaction" class="item button">
+          <i v-if="!addTransaction" class="fa-solid fa-coins" style="margin-right: 0.8em;"></i>
+          <span>{{ addTransaction ? $t('cancel') : $t('t_add') }}</span>
+        </button>
+      </section>
+      <transition name="page">
+      <section v-if="addTransaction" style="padding-top: 0;">
+        <TransactionForm
+          v-if="addTransaction"
+          @cancel="addTransaction = false"
+          @send="putTransaction"
+          :processing="putLoading"
+        />
+      </section>
+      </transition>
+
+      <!-- SHOW UPCOMMING -->
+      <h4 id="remaining-bills" class="title row-simple">
+        <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
+        <button 
+          @click="showUpcomming = !showUpcomming"
+          class="tag ml"
+        >
+          <Price class="tag" :amount="remainingBills" :currency="currency"/>
+        </button>
+        <button @click="showHidden = !showHidden" style="margin-left: auto;"><i class="fa-solid fa-eye-slash"></i></button>
+      </h4>
+
+      <transition name="page">
+      <section v-if="showUpcomming || filterTagId > 0">
+          <TransactionRow
+            v-for="transaction in upcommingTransactions"
+            :key="transaction.id"
+            :transaction="transaction"
+            :transparent="true"
+            class="upcomming"
+            @patched="updateTransaction"
+            @delete="deleteTransaction"
+          />
+      </section>
+      </transition>
+      <section>
+          <TransactionRow
+            v-for="transaction in transactions"
+            :key="transaction.id"
+            :transaction="transaction"
+            @patched="updateTransaction"
+            @delete="deleteTransaction"
+          />
+      </section>
+
+    </div>
+
+  </div>
+</template>
 <script setup lang="ts">
 import {
-  TransactionRow, HomeCarousel, TagSummary,
-  MonthHero, BarGraph, MosaicLoader, TransactionForm,
-  Spinner, BalanceRow, RadialGraph
+  TransactionRow, HomeCarousel,
+  MonthHero, MosaicLoader, TransactionForm,
+  TopSummary, BalanceRow
 } from '#components';
 import { useAuth0 } from '@auth0/auth0-vue';
+import type Prisma from '@prisma/client';
+import { storeToRefs } from 'pinia';
 
+import { useTokenStore } from '@/stores/tokenStore';
+import { useCategoriesStore } from '@/stores/categories';
+import { Source, Tag } from 'stores/types';
 
-const tags = ref([]);
+const tokenStore = useTokenStore();
+const { token } = storeToRefs(tokenStore);
+
+// const categoriesStore = useCategoriesStore();
+// const { categories } = storeToRefs(categoriesStore);
+
+const categories = ref<Prisma.Tag[]>([]);
 const loading = ref(true);
 const authError = ref(null);
 const putLoading = ref(false);
 const deleteLoading = ref(false);
-const allTransactions = ref([]);
+const allTransactions = ref<Prisma.Transaction[]>([]);
 const showUpcomming = ref(false);
 const showHidden = ref(false);
 const date = ref(new Date());
 
 const addTransaction = ref(false);
-const allTags = ref([]);
-const filterTag = ref(-1);
-const allSources = ref([]);
-const sources = ref([]);
-const targets = ref([]);
+const filterTagId = ref<number>(-1);
+const allSources = ref<Source[]>([]);
+const sources = ref<Source[]>([]);
+const targets = ref<Source[]>([]);
 const incomes =ref([]);
-  
-const token = ref<string>();
-
 
 const router = useRouter();
 const { yearPath, monthPath } = useRoute().query
@@ -36,10 +122,12 @@ const month = ref(monthPath);
 
 
 const auth0 = useAuth0();
+
 onMounted(() => {
   auth0.getAccessTokenSilently()
   .then(tok => {
     token.value = tok;
+    console.log(tok);
     initialFetch();
   })
   .catch(err => {
@@ -50,15 +138,16 @@ onMounted(() => {
 
 
 const currency = computed(() => {
-  if (allTransactions.value && allTransactions.value.length > 0) {
-    const curr = allTransactions.value[0].currency;
-    return curr;
-  } else {
-    return "NaN"
-  }
+  // if (allTransactions.value && allTransactions.value.length > 0) {
+  //   const curr = allTransactions.value[0].currency;
+  //   return curr;
+  // } else {
+  //   return "NaN"
+  // }
+  return "Kč";
 })
-provide("currency", currency);
-provide("token", token);
+//todo: remove
+provide("currency", "Kč");
 
 
 const transactions = computed(() => {
@@ -67,9 +156,36 @@ const transactions = computed(() => {
     return tmp;
   }
   return tmp
-    .filter(trans => isTransactionTagged(trans, filterTag.value))
+    .filter(trans => isTransactionTagged(trans, filterTagId.value))
     .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
 });
+
+const incomeTransactions = computed(() => {
+  return transactions.value.filter(trans => {
+    return !allSources.value.find(src => src.id === trans.targetId).isOut || false;
+  })
+})
+
+const expenseTransactions = computed(() => {
+  return transactions.value.filter(trans => {
+    return allSources.value.find(src => src.id === trans.targetId)?.isOut || true;
+  })
+})
+
+const income = computed(() => {
+  if (incomeTransactions.value?.length > 0) {
+    return incomeTransactions.value.map(t => t.amount).reduce((a, b) => a + b);
+  } 
+  return 0;
+})
+
+const expense = computed(() => {
+  if (expenseTransactions.value?.length > 0) {
+    return expenseTransactions.value.map(t => t.amount).reduce((a, b) => a + b);
+  } 
+  return 0;
+})
+
 
 const upcommingTransactions = computed(() => {
       const tmp = allTransactions.value
@@ -78,7 +194,7 @@ const upcommingTransactions = computed(() => {
         return tmp;
       }
       return tmp
-        .filter(trans => isTransactionTagged(trans, filterTag.value));
+        .filter(trans => isTransactionTagged(trans, filterTagId.value));
 });
 
 const remainingBills = computed(() => {
@@ -120,19 +236,19 @@ const balances = computed(() => {
     return sources;
 });
 
-const auth = computed(() => {
-  if (auth0) {
-    console.info("hey!")
-    auth0.getAccessTokenSilently()
-    .then(tok => {
-      console.info(`got token: ${tok}`)
-      token.value = tok
-    }).catch(err => {
-      console.error(err)
-    })
-    return auth0;
-  }
-})
+// const auth = computed(() => {
+//   if (auth0) {
+//     console.info("hey!")
+//     auth0.getAccessTokenSilently()
+//     .then(tok => {
+//       console.info(`got token: ${tok}`)
+//       token.value = tok
+//     }).catch(err => {
+//       console.error(err)
+//     })
+//     return auth0;
+//   }
+// })
 
 
 const login = () => {
@@ -142,7 +258,7 @@ const login = () => {
 const initialFetch = () => {
   // Fetch all the required data on startup - only after session validation
   getTransactions();
-  getTags();
+  // getTags();
   getSources();
 };
 
@@ -170,7 +286,7 @@ const getTransactions = () => {
       })
     })
     .finally(() => {
-      tags.value = remapCategories();
+      categories.value = remapCategories();
       sources.value = remapSources();
       targets.value = remapTargets();
       incomes.value = remapCategories(true);
@@ -207,16 +323,16 @@ const deleteTransaction = (transactionData) => {
     })
 }
 
-const getTags = () => {
-  const url = '/api/tags'
-  $fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + token.value
-    }
-  })
-    .then(res => allTags.value = res.data)
-};
+// const getTags = () => {
+//   const url = '/api/tags'
+//   $fetch(url, {
+//     method: 'GET',
+//     headers: {
+//       Authorization: 'Bearer ' + token.value
+//     }
+//   })
+//     .then(res => allTags.value = res.data)
+// };
 
 const getSources = () => {
   const url = '/api/sources'
@@ -339,86 +455,6 @@ const monthReloaded = (options) => {
 
 </script>
 
-
-<template>
-  <div class="container">
-    <MonthHero :date="date" @reload="monthReloaded"/>
-    <section v-if="loading" class="center">
-      <MosaicLoader />
-    </section>
-    <div v-else>
-      <HomeCarousel
-        :tags="tags"
-        :incomes="incomes"
-        :sources="sources"
-        :targets="targets"
-        @filter="tagId => filterTag = tagId"
-      />
-
-      <hr>
-
-      <section>
-        <h3 class="mb">{{ $t('balance') }}</h3>
-        <BalanceRow :sources="balances" />
-      </section>
-
-      <!-- ADD NEW TRANSACTION -->
-      <section id="add-t-button" class="row-simple py">
-        <button @click="addTransaction = !addTransaction" class="item button">
-          <i v-if="!addTransaction" class="fa-solid fa-coins" style="margin-right: 0.8em;"></i>
-          <span>{{ addTransaction ? $t('cancel') : $t('t_add') }}</span>
-        </button>
-      </section>
-      <transition name="page">
-      <section v-if="addTransaction" style="padding-top: 0;">
-        <TransactionForm
-          v-if="addTransaction"
-          @cancel="addTransaction = false"
-          @send="putTransaction"
-          :processing="putLoading"
-        />
-      </section>
-      </transition>
-
-      <!-- SHOW UPCOMMING -->
-      <h4 id="remaining-bills" class="title row-simple">
-        <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
-        <button 
-          @click="showUpcomming = !showUpcomming"
-          class="tag ml"
-        >
-          <Price class="tag" :amount="remainingBills" :currency="currency"/>
-        </button>
-        <button @click="showHidden = !showHidden" style="margin-left: auto;"><i class="fa-solid fa-eye-slash"></i></button>
-      </h4>
-
-      <transition name="page">
-      <section v-if="showUpcomming || filterTag > 0">
-          <TransactionRow
-            v-for="transaction in upcommingTransactions"
-            :key="transaction.id"
-            :transaction="transaction"
-            :transparent="true"
-            class="upcomming"
-            @patched="updateTransaction"
-            @delete="deleteTransaction"
-          />
-      </section>
-      </transition>
-      <section>
-          <TransactionRow
-            v-for="transaction in transactions"
-            :key="transaction.id"
-            :transaction="transaction"
-            @patched="updateTransaction"
-            @delete="deleteTransaction"
-          />
-      </section>
-
-    </div>
-
-  </div>
-</template>
 <style scoped lang="scss">
 #add-t-button, #remaining-bills {
   margin-top: 2em;

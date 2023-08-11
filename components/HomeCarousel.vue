@@ -54,11 +54,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 
-section {
-    height: 10em;
-    overflow: scroll;
-}
-
 h3 {
     text-transform: uppercase;
 }

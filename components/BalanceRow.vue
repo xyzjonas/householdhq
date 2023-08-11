@@ -1,10 +1,11 @@
 <template>
     <div class="balance-row">
-        <Price :amount="total" :currency="currency.value" class="sum" />
-        <div>
-            <BalanceItem v-for="bal in sources" :source="bal" :max="max"/>
-            <NuxtLink to="/sources">. . .</NuxtLink>
+        <div class="balance-row-hdr">
+            <p>{{ $t('balance') }}</p>
+            <Price :amount="total" :currency="currency.value" />
         </div>
+        <BalanceItem v-for="bal in sources" :source="bal" :max="max" class="balance-row-item"/>
+        <NuxtLink to="/sources" class="ml">. . .</NuxtLink>
     </div>
 </template>
 <script>
@@ -36,19 +37,17 @@ export default {
 </script>
 <style lang="scss" scoped>
 .balance-row {
-    display: flex;
-    flex-direction: row;
-    
-    .sum {
-        text-align: center;
-        flex-grow: 1;
-        font-size: xx-large;
-        border-right: 1px solid var(--color-primary-light-1);
-        margin-right: 0.6em;
-    }
-
-    div {
-        flex-grow: 2;
+    &-hdr {
+        p {
+            text-transform: uppercase;
+            font-size: large;
+        }
+        font-weight: 1000;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-primary-light-1);
     }
 }
 </style>

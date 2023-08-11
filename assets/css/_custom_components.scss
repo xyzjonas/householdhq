@@ -57,7 +57,7 @@
 }
 
 /* CSS */
-button {
+button, .button {
   background-color: var(--color-primary-dark-1);
   border: 1px solid var(--color-primary-dark-3);
   color: var(--color-font-light);
@@ -67,7 +67,7 @@ button {
   cursor: pointer;
   list-style: none;
   margin: 0;
-  padding: 0.3em;
+  padding: 8px;
   text-align: center;
   -webkit-user-select: none;
   touch-action: manipulation;
@@ -248,5 +248,15 @@ select {
 
     @media only screen and (max-width: $bp-small) {
         grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+
+.numpad {
+    display: grid;
+    grid: auto-flow dense / 1fr 1fr 1fr;
+
+    .button {
+        height: 4em;
     }
 }

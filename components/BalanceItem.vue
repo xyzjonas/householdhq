@@ -1,13 +1,15 @@
 <template>
     <div class="bal-wrapper">
+        <span>
+            <button @click="navigateTo(`/sources/${source.id}`)" class="bal-wrapper-btn mr">
+                <i class="fa-solid fa-pen"></i>
+            </button>
+            <span class="label">{{ source.name }}</span>
+        </span>
         <div class="text">
-            <Price v-if="!isNaN(source.balance)"  :amount="source.balance" :currency="currency.value" />
-            <Price v-else="lastEntry && lastEntryNotThisMonth" class="item" amount="???" />
+            <Price v-if="!isNaN(source.balance)" size="large" :amount="source.balance" :currency="currency.value" />
+            <Price v-else="lastEntry && lastEntryNotThisMonth" size="large" class="item" amount="???" />
         </div>
-        <div class="label">{{ source.name }}</div>
-        <NuxtLink :to="`/sources/${source.id}`" class="action">
-            <i class="fa-solid fa-arrow-right"></i>
-        </NuxtLink>
     </div>
 </template>
 <script>
@@ -75,10 +77,12 @@ export default {
     overflow: hidden;
     margin-top: 0.2em;
     margin-bottom: 0.2em;
+    align-items: center;
+    justify-content: space-between;
 
     .text {
-        flex-grow: 2;
         display: inline-flex;
+        color: v-bind('source.color');
     }
 
     .text::after {
@@ -107,10 +111,6 @@ export default {
             color: var(--color-font-light)
         }
     }
-}
-
-button {
-    margin: 5px;
 }
 
 .rotating {

@@ -46,7 +46,7 @@
                     <p>{{ $t('t_tag') }}</p>
                     <select v-model="transaction.tags">
                         <option 
-                            v-for="tag in allTags"
+                            v-for="tag in categories"
                             :key="tag.id + '-event'"
                             :value="tag.name"
                         >{{ tag.name }}</option>
@@ -72,148 +72,140 @@
             </div>
             <!-- CATEGORY SELECTION -->
             <div v-else-if="stage === 1" class="categories">
-                <CategoryBadge v-for="tag in allTags" :category="tag" @selected="categorySelected"/>
+                <CategoryBadge v-for="tag in categories" :category="tag" @selected="categorySelected"/>
             </div>
             <!-- NUMPAD  -->
-            <div v-else>
-                <Price :amount="transaction.amount"  style="font-size: xx-large; padding: 0.5em" />
-                <div class="numpad">
-                    <div class="button" v-for="index in 9">
-                        <button @click="add(index)" style="width: 100%">{{ index }}</button>
-                    </div>
+            <div v-else class="calculator">
+                <Price :amount="transaction.amount" class="calculator-display" />
+                <div class="calculator-numpad">
+                    <button v-for="index in 9" @click="add(index)" style="width: 100%">{{ index }}</button>
+                    <button @click="remove">DEL</button>
+                    <button @click="add(0)">0</button>
+                    <button @click="stage+=1">OK</button>
                 </div>
                 <div class="numpad">
-                    <div class="button"><button @click="remove">DEL</button></div>
-                    <div class="button"><button @click="add(0)">0</button></div>
-                    <div class="button"><button @click="stage+=1">OK</button></div>
+                    
                 </div>
             </div>
         </transition>
         <p class="error" style="text-align: right">{{ error }}</p>
     </div>
 </template>
-<script>
+<script setup lang="ts">
 import { Price, Icon, Spinner, CategoryBadge } from "#components";
+import { storeToRefs } from "pinia";
+import { useCategoriesStore } from "@/stores/categories";
+import { useSourcesStore } from "@/stores/sources";
+import { CreateUpdateTransaction, Transaction } from "stores/types";
 
-export default {
 
-    components: { Price, Icon, Spinner, CategoryBadge },
 
-    props: ['processing', 'transactionIn', 'startStage', 'noFrame', 'error'],
+const props =defineProps<{
+    transactionIn: Transaction | undefined,
+    processing: boolean,
+    startStage: number,
+    noFrame: boolean,
+    error: string
+}>();
 
-    // inject: ['token'],
 
-    data() {
-        return {
-            stage: 0,
-            date: this.formatDate(new Date()),
-            time: this.formatTime(new Date()),
-            transaction: {
-                created: null,
-                amount: 0,
-                description: undefined,
-                sourceId: 1,
-                targetId: 2,
-                recurring: 0,
-            },
-            isRecurring: false,
-            allTags: [],
-            allSources: [],
-        }
-    },
+    
+const stage = ref(0);
+const transaction = ref({
+    created: undefined,
+    amount: 0,
+    description: undefined,
+    sourceId: 1,
+    targetId: 2,
+    recurring: 0,
+});
+const date = ref<string>();
+const time = ref<string>();
 
-    async created() {
-        const tok = await this.$auth0.getAccessTokenSilently();
-        this.token = tok;
-        this.getTags();
-        this.getSources();
+const boxColor = ref<string>();
+const borderColor = ref<string>();
 
-        if (this.transactionIn) {
-            this.transaction = { ...this.transactionIn };
-            this.transaction.created = this.transactionIn.created;
-            this.transaction.tags = this.transactionIn.tags.map(t => t.name).join(",");
-            delete this.transaction.source; // discard prisma-included properties
-            delete this.transaction.target; // discard prisma-included properties
-            delete this.transaction.category; // discard prisma-included properties
-            delete this.transaction.confirmed; // discard explicit confirmed property - only for confirm action
-            this.date = this.formatDate(new Date(this.transaction.created));
-            this.time = this.formatTime(new Date(this.transaction.created));
-        }
-        if (this.startStage) {
-            this.stage = this.startStage;
-        }
-        if (this.noFrame) {
-            this.boxColor = 'var(--color-background-dark)';
-            this.borderColor = "#00000000";
-        }
-        this.isRecurring = this.transaction.recurring !== 0
-    },
+onMounted(() => {
 
-    mounted() {
-        this.$refs.focusDiv.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    },
+    sourcesStore.fetchAllSources();
+    categoriesStore.fetchCategories();
 
-    computed: {
-        firstOut() {
-            this.allSources.filter(s => s.isOut).reduce((a, b) => a);
-        }
-    },
+    date.value = formatDate(new Date());
+    time.value = formatTime(new Date());
+    // transaction.value = ;
 
-    methods: {
-        add(amount) {
-            this.transaction.amount = parseInt(`${this.transaction.amount}${amount}`);
-        },
-        remove() {
-            const amountStr = `${this.transaction.amount}`;
-            this.transaction.amount = parseInt(amountStr.substring(0, amountStr.length - 1)) || 0
-        },
-        send() {
-            if (!this.transaction.description) {
-                this.transaction.description = this.$t('t_placeholder')
-            }
-            const datetime = new Date(this.date);
-            if (this.time) {
-                const hour = this.time.split(":")[0];
-                const minute = this.time.split(":")[1];
-                datetime.setHours(hour, minute);
-            }
-            this.transaction.created = datetime.toUTCString();
-            this.$emit('send', this.transaction);
-        },
-        formatDate(date) {
-            return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        },
-        formatTime(date) {
-            return `${date.getHours()}:${date.getMinutes()}`
-        },
+    if (props.transactionIn) {
+        transaction.value = { ...props.transactionIn };
+        transaction.value.created = props.transactionIn.created;
+        transaction.value.tags = props.transactionIn.tags.map(t => t.name).join(",");
+        delete transaction.value.source; // discard prisma-included properties
+        delete transaction.value.target; // discard prisma-included properties
+        delete transaction.value.category; // discard prisma-included properties
+        delete transaction.value.confirmed; // discard explicit confirmed property - only for confirm action
+        date.value = formatDate(new Date(transaction.value.created));
+        time.value = formatTime(new Date(transaction.value.created));
+    }
+    if (props.startStage) {
+        stage.value = props.startStage;
+    }
+    if (props.noFrame) {
+        boxColor.value = 'var(--color-background-dark)';
+        borderColor.value = "#00000000";
+    }
 
-        getTags() {
-        const url = '/api/tags'
-        console.info(`tok: ${this.token}`)
-        $fetch(url, {
-            method: 'GET',
-            headers: {
-                Authorization: 'Bearer ' + this.token
-            },
-        })
-            .then(res => this.allTags = res.data)
-        },
-        getSources() {
-        const url = '/api/sources'
-        $fetch(url, {
-            method: 'GET',
-            headers: {
-                Authorization: 'Bearer ' + this.token
-            },
-        })
-            .then(res => this.allSources = res.data)
-        },
-        categorySelected(categoryName) {
-            this.transaction.tags = categoryName;
-            this.stage++;
-        }
-    },
-}
+    isRecurring.value = transaction.value.recurring !== 0
+});
+
+const isRecurring = ref(false);
+
+const categoriesStore = useCategoriesStore();
+const { categories } = storeToRefs(categoriesStore);
+
+const sourcesStore = useSourcesStore();
+const { allSources } = storeToRefs(sourcesStore);
+
+const firstOut = computed(() => {
+    allSources.value.filter(s => s.isOut).reduce((a, b) => a);
+});
+
+const add = (amount: number) => {
+    transaction.value.amount = parseInt(`${transaction.value.amount}${amount}`);
+};
+
+const remove = () => {
+    const amountStr = `${transaction.value.amount}`;
+    transaction.value.amount = parseInt(amountStr.substring(0, amountStr.length - 1)) || 0
+};
+
+const { t } = useI18n();
+const emit = defineEmits(["send"]);
+
+const send = () => {
+    if (!transaction.value.description) {
+        transaction.value.description = t('t_placeholder')
+    }
+    const datetime = new Date(date.value);
+    if (time.value) {
+        const hour = parseInt(time.value.split(":")[0]);
+        const minute = parseInt(time.value.split(":")[1]);
+        datetime.setHours(hour, minute);
+    }
+    transaction.value.created = datetime.toUTCString();
+    emit('send', transaction.value);
+};
+
+const formatDate = (date: Date) => {
+    return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
+const formatTime = (date: Date) => {
+    return `${date.getHours()}:${date.getMinutes()}`
+};
+
+const categorySelected = (categoryName: string) => {
+    transaction.value.tags = categoryName;
+    stage.value++;
+};
 </script>
 <style lang="scss" scoped>
 .frame {
@@ -230,17 +222,30 @@ export default {
     padding-bottom: 0;
 }
 
-.button {
-    padding: 3px;
-    min-height: 5em;
 
-    button {
+.calculator {
+    &-display {
         font-size: xx-large;
-        background-color: z;
-        height: 100%;
-        width: 100%;
+        padding: 0.5em;
+        background-color: #00000035;
+        border-radius: 8px;
+        margin-bottom: 8px;
     }
+
+    &-numpad {
+        display: grid;
+        grid: auto-flow dense / 1fr 1fr 1fr;
+        gap: 8px;
+
+        button {
+            width: 100%;
+            height: 64px;
+            font-size: x-large;
+        }
+    }
+
 }
+
 
 .button-sm {
     min-height: 3em;
