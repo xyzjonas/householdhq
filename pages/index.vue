@@ -168,7 +168,7 @@ const incomeTransactions = computed(() => {
 
 const expenseTransactions = computed(() => {
   return transactions.value.filter(trans => {
-    return allSources.value.find(src => src.id === trans.targetId)?.isOut || true;
+    return allSources.value.find(src => src.id === trans.targetId)?.isOut;
   })
 })
 
