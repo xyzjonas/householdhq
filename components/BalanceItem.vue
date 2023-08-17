@@ -34,7 +34,6 @@ export default {
         },
         lastEntryNotThisMonth() {
             if (this.lastEntry) {
-                console.info(this.lastEntry.created)
                 const now = new Date();
                 const d = new Date(this.lastEntry.created);
                 if (now.getFullYear() === d.getFullYear() && now.getMonth() === d.getMonth()) {

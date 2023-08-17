@@ -1,18 +1,12 @@
 <template>
     <div>
-        <transition name="slide" mode="out-in">
-        <!-- EXPENSES -->
-        <section v-if="item === 0">
-            <BarGraph :items="tags" @filter="tagId => $emit('filter', tagId)"/>
-        </section>
-
-        <!-- INCOMES -->
-        <section v-else-if="item === 1">
-            <BarGraph :items="incomes" @filter="id => $emit('filter', id)"/>
+        <!-- EXPENSES & INCOMES -->
+        <section v-if="item <= 1">
+            <BarGraph :items="graphContent" @filter="tagId => $emit('filter', tagId)"/>
         </section>
 
         <!-- SOURCES STATE -->
-        <section v-else-if="item === 2" class="row-simple">
+        <!-- <section v-else-if="item === 2" class="row-simple">
             <div class="item border-left">
                 <h3>{{ $t('sources') }}</h3>
                 <BarGraph class="item" :items="sources" @filter="id => $emit('filterSource', id)"/>
@@ -25,8 +19,7 @@
                 <h3>{{ $t('targets') }}</h3>
                 <BarGraph :items="targets" @filter="id => $emit('filterTarget', id)" />
             </div>            
-        </section>
-        </transition>
+        </section> -->
     </div>
     <div class="center my-2">
         <div class="toggle-bar m-1">
@@ -35,22 +28,25 @@
         </div>
     </div>
 </template>
-<script>
-import { BarGraph } from "#components";
+<script setup lang="ts">
 
-export default {
+const props = defineProps(['tags', 'incomes', 'sources', 'targets']);
 
-    components: { BarGraph },
+const item = ref(0);
 
-    props: ['tags', 'incomes', 'sources', 'targets'],
-
-    data() {
-        return {
-            item: 0
-        }
+const graphContent = computed(() => {
+    if (item.value === 1) {
+        return props.incomes;
     }
-    
-}
+    if (item.value === 2) {
+        return props.sources;
+    }
+    if (item.value === 3) {
+        return props.targets;
+    }
+    return props.tags;
+})
+
 </script>
 <style lang="scss" scoped>
 

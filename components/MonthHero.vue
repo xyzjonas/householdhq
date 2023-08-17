@@ -1,6 +1,6 @@
 <template>
     <section class="title">
-        <UserBadge />
+        <!-- <UserBadge /> -->
         <p>{{ formatMMYYYY() }}</p>
         <!-- <a><i class="fa-solid fa-calendar"></i></a> -->
         <NuxtLink :to="previousMonth" @click="$emit('reload', prev)" class="left">

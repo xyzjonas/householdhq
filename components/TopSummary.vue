@@ -1,6 +1,6 @@
 <template>
     <div class="card my center">
-        <section class="hdr">
+        <section class="hdr" v-if="!loading">
             <p class="in">
                 <i class="fa-solid fa-arrow-trend-up"></i>
                 {{ new Intl.NumberFormat().format(income) ?? 'N/A' }}
@@ -13,6 +13,7 @@
                 {{ expense ? currency : ''}}
             </p>
         </section>
+        <Spinner v-else />
     </div>
 </template>
 <script setup lang="ts">
@@ -21,7 +22,7 @@ import { useTransactionStore } from '@/stores/transactions';
 
 
 const transactionStore = useTransactionStore();
-const { currency } = storeToRefs(transactionStore);
+const { currency, loading } = storeToRefs(transactionStore);
 
 defineProps(["expense", "income"])
 </script>

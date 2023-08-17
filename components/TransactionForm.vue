@@ -1,4 +1,4 @@
-<template lang="">
+<template>
     <div ref="focusDiv" :class="`frame ${noFrame ? 'background': ''}`">
 
         <transition name="slide" mode="out-in">

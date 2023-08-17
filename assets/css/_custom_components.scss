@@ -90,31 +90,6 @@ button, .button {
   }
 }
 
-@mixin input-mixin {
-    background-color: var(--color-primary-dark-2);
-    border-radius: 5px;
-    border: 1px solid;
-    border-color: var(--color-primary-dark-2);
-
-    width: 100%;
-    
-    outline: 0;
-    padding: 4px;
-    color: var(--color-grey-dark-3);
-}
-
-input {
-    @include input-mixin();
-}
-
-textarea {
-    @include input-mixin();
-}
-
-select {
-    @include input-mixin();
-}
-
 /* .slideOne */
 .slideOne {
     --h: 1.5em;
@@ -149,7 +124,39 @@ select {
     }
   }
   /* end .slideOne */
-
+  
+  
+@mixin input-group($padd, $font, $font-top) {
+    // $padd: 30px;
+    // $font: 2em;
+    // $font-top: 1.5em;
+    position: relative;
+    label {
+      position: absolute;
+      left: calc(#{$padd}/4);
+      padding: 0px 8px;
+      top: calc(#{$padd} - #{$font}/4);
+      font-size: $font;
+      transition: 0.1s ease-in-out;
+      color: var(--color-primary-light-1);
+    //   height: $font;
+      
+      &.active {
+        top: calc(0px - #{$font-top}/1.5);
+        // top: 0px;
+        // left: $padd;
+        // font-size: $font-top;
+        color: var(--color-font-light);
+        font-size: $font-top;
+        background-color: rgba(var(--color-primary-dark-2-rgb), 0.9);
+        // color: red;
+      }
+      
+    }
+    input {
+      padding: $padd;
+    }
+}
 
 .graph {
 

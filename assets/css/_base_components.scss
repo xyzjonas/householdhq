@@ -7,5 +7,35 @@ hr {
 }
 
 button {
+    border-color: white;
+}
+
+@mixin input-mixin {
+    background-color: transparent;
+    border-radius: 5px;
+    border: 1px solid var(--color-primary-light-1);
+    // border-color: white;
+    outline: 0;
+    // width: 100%;
     
+    // outline: 0;
+    padding: 8px;
+    color: var(--color-font-light);
+}
+
+input {
+    @include input-mixin();
+
+    &:focus {
+        border: 1px solid white;
+        // border: 1px solid red;
+    }
+}
+
+textarea {
+    @include input-mixin();
+}
+
+select {
+    @include input-mixin();
 }

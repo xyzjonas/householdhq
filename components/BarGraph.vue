@@ -146,18 +146,15 @@ button {
 .empty {
     background-color: rgba(var(--color-primary-dark-2-rgb), 0.3);
 
-    border: 1px dashed var(--color-primary-light-1);
     border-radius: 3px;
 
     padding: 16px;
-    margin: 16px;
 
     display: grid;
     gap: 8px;
     justify-content: center;
     align-content: center;
     width: 100%;
-    // aspect-ratio: 1.8;
     
     height: 320px;
 

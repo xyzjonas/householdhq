@@ -48,7 +48,8 @@ const en = {
   s_isdisp: "include in expense report",
   s_state: "entry",
   s_states: "entries",
-  log_in: "Log in",
+  sign_in: "Sign In",
+  login_failed: "Invalid username or password",
   access_denied: "Access not granted"
 }
 
