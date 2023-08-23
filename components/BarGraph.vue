@@ -1,10 +1,12 @@
 <template>
     <div class="center card">
-        <section v-if="items.length === 0" class="empty">
-            <h1><i class="fa-solid fa-money-bill-trend-up"></i></h1>
-            <h1>{{ $t('no_data') }}</h1>
-            <h5>{{ $t('no_data_will_appear') }}</h5>
-        </section>
+        <ui-empty
+            v-if="items.length === 0"
+            :loading="loading"
+            icon="fa-solid fa-money-bill-trend-up"
+            :title="$t('no_data')"
+            :subtitle="$t('no_data_will_appear')"
+        />
         <section v-else class="row-to-column ">
             <Doughnut :data="data" :options="options" />
             <transition name="page" mode="out-in">
@@ -46,7 +48,7 @@ const selectedCategory= computed(() => {
 });
 
 
-const { currency } = storeToRefs(useTransactionStore());
+const { currency, loading } = storeToRefs(useTransactionStore());
 
 const emit = defineEmits(["filter"]);
 watch(selectedCategory, (value) => {
@@ -108,6 +110,10 @@ const options = {
 <style lang="scss" scoped>
 @import '@/assets/css/base.scss';
 
+.card {
+    height: 320px;
+}
+
 .details {
     gap: 32px;
     padding: 32px;
@@ -155,8 +161,6 @@ button {
     justify-content: center;
     align-content: center;
     width: 100%;
-    
-    height: 320px;
 
     @media only screen and (max-width: $bp-small) {
         height: 240px;
