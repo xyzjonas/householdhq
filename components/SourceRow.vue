@@ -4,11 +4,9 @@
     </NuxtLink>
     </template>
     <script>
-    import { CategoryBadge, Price, DateTile, Icon } from '#components';
     
     export default {
-    
-        components: { CategoryBadge, Price, DateTile, Icon },
+
         props: ['source'],
     
     }

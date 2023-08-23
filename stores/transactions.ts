@@ -4,7 +4,8 @@ import { useTokenStore } from "./tokenStore";
 
 export const useTransactionStore = defineStore("transaction", () => {
 
-    const { token } = storeToRefs(useTokenStore());
+    const tokenStore = useTokenStore();
+    const { token } = storeToRefs(tokenStore);
 
     const currency = ref<string>();
     currency.value = "Kč";
@@ -41,17 +42,8 @@ export const useTransactionStore = defineStore("transaction", () => {
         }
 
         try {
-            const response = await fetch(
-                url,
-                {
-                    method: 'GET',
-                    headers: {
-                        Authorization: 'Bearer ' + token.value
-                    }
-                }
-            );
-            const { data, errors } = await response.json();
-            currentMonth.value = (data as Transaction[]).filter(trans => {
+            const response = await tokenStore.get(url);
+            currentMonth.value = (response.data as Transaction[]).filter(trans => {
                 return trans.target.isDisponible || trans.source.isDisponible
             })
         } finally {

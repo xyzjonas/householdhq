@@ -1,87 +1,92 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import { Source } from "./types";
+import { Source, SourceApi, Transaction } from "./types";
 import { useTokenStore } from "./tokenStore";
+import { useTransactionStore } from "./transactions";
+
+// export interface SourceWithTransactions extends Source {
+//   transactions: Transaction[];
+// }
 
 export const useSourcesStore = defineStore("source", () => {
 
-    const { token } = storeToRefs(useTokenStore());
+    const tokenStore = useTokenStore();
+    const { currentMonth } = storeToRefs(useTransactionStore())
 
-    const allSources = ref<Source[]>([]);
+    const allSources = ref<SourceApi[]>([]);
+    const currentSourceId = ref<number>();
 
     const sources = computed<Source[]>(() => {
-        return allSources.value.filter(src => !src.isOut);
+      return allSources.value.map(src => {
+        const in_ =  currentMonth.value.filter(trans => trans.target.id === src.id);
+        const out_ = currentMonth.value.filter(trans => trans.source.id === src.id);
+        return {
+          ...src,
+          transactionsIn: in_,
+          transactionsOut: out_,
+          sum: in_.map(tr => tr.amount).reduce((a, b) => a + b, 0) - out_.map(tr => tr.amount).reduce((a, b) => a + b, 0)
+        }
+      })
     })
 
-    const targets = computed<Source[]>(() => {
-        return allSources.value.filter(src => src.isOut);
+    const currentSource = computed<Source | undefined>(() => {
+      return sources.value.find(src => src.id === currentSourceId.value ?? -1)
+    });
+
+    const incomeSources = computed<Source[]>(() => {
+        return sources.value.filter(src => !src.isOut);
     })
 
-    const loading = ref(false);
+    const expenseSources = computed<Source[]>(() => {
+        return sources.value
+        .filter(src => src.isOut);
+    })
+
+    const sourceLoading = ref(false);
 
     const fetchAllSources = async () => {
         const url = '/api/sources'
-        loading.value = true;
-        const response = await fetch(
-            url,
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: 'Bearer ' + token.value
-                }
-            }
-        );
-        const { data, errors } = await response.json();
-        allSources.value = data;
-        loading.value = false;
-      };
+        sourceLoading.value = true;
+        try {
+          const response = await tokenStore.get(url);
+          allSources.value = response.data;
+        } finally {
+          sourceLoading.value = false;
+        }
+    };
 
-      const remapSources = () => {
-        const sourcesTmp = {}
-        currentMonth.value.forEach(trans => {
-            if (trans.source) {
-              if (sourcesTmp[trans.sourceId]) {
-                sourcesTmp[trans.sourceId].transactions.push(trans);
-              } else {
-                sourcesTmp[trans.sourceId] = {...trans.source};
-                sourcesTmp[trans.sourceId].transactions = [trans];
-              }
-            }
-        });
-      
-        const sources = Object.values(sourcesTmp);
-        sources.forEach(source => {
-          let sum = 0;
-          source.transactions.forEach(trans => { sum += trans.amount; })
-          source.sum = sum;
-        });
-        sources.sort((a, b) => { return b.sum - a.sum; });
-        return sources;
-      };
+    const fetchSingleSource = async (srcId: number) => {
+        const url = `/api/sources/${srcId}`;
+        sourceLoading.value = true;
+        try {
+          const response = await tokenStore.get(url);
+          allSources.value = allSources.value.filter(src => src.id !== srcId)
+          allSources.value.push(response.data);
+        } finally {
+          sourceLoading.value = false;
+        }
+    };
 
-      const remapTargets = () => {
-          const targetsTmp: any = {}
-          currentMonth.value.forEach(trans => {
-              if (trans.target) {
-                if (targetsTmp[trans.targetId]) {
-                  targetsTmp[trans.targetId].transactions.push(trans);
-                } else {
-                  targetsTmp[trans.targetId] = {...trans.target};
-                  targetsTmp[trans.targetId].transactions = [trans];
-                }
-              }
-          });
-      
-          const targets = Object.values(targetsTmp);
-          targets.forEach(target => {
-            let sum = 0;
-            target.transactions.forEach(trans => { sum += trans.amount; })
-            target.sum = sum;
-          });
-          targets.sort((a, b) => { return b.sum - a.sum; });
-          return targets
-      };
+    const patchSource = async (sourceId: number, sourceData: any) => {
+      sourceLoading.value = true;
+      const url = "/api/sources";
+      // console.info(sourceData)
+      sourceData.id = sourceId;
+      try {
+        const newSource = await tokenStore.patch(url, sourceData);
+        allSources.value = allSources.value.filter(src => src.id !== sourceId)
+        allSources.value.push(newSource.data);
+      } finally {
+        sourceLoading.value = false;
+      }
+    };
+    
+    const deleteEntry = async (srcId: number, entryId: number) => {
+        const url = "/api/sources/update";
+        await tokenStore.del(url, { id: entryId });
+        await fetchSingleSource(srcId);
+    };
 
-    return { allSources, sources, targets, fetchAllSources }
+    return { allSources, sources, incomeSources, expenseSources, sourceLoading, currentSourceId, currentSource, fetchAllSources, fetchSingleSource, patchSource, deleteEntry }
 })
 
 

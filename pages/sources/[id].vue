@@ -1,156 +1,113 @@
 <template>
-    <div class="container more-p">
-        <Transition name="page" mode="out-in">
-        <div v-if="loading" class="center"><MosaicLoader /></div>
-        <div v-else-if="source.id">
-            <h1 class="title">{{ source.name }}</h1>
-            <div class="row">
-                <p class="item">{{ $t('name') }}</p>
-                <form-editable-field
-                    :value="source.name"
-                    keyName="name"
-                    @send="patchSource"
-                    class="item"
-                />
-            </div>
-            <div class="row">
-                <p class="item">{{ $t('s_isout') }}</p>
-                <form-editable-boolean
-                    keyName="isOut"
-                    :value="source.isOut"
-                    @send="patchSource"
-                    class="item"
-                />
-            </div>
+<div class="container more-p">
+    <Transition name="page" mode="out-in">
+    <div v-if="!currentSource && sourceLoading" class="center"><MosaicLoader /></div>
+    <div v-else-if="currentSource" class="flex-col">
+        <section class="row title">
+            <h1 class="item">{{ currentSource.name }}</h1>
+            <Transition name="page" mode="out-in">
+            <spinner v-show="sourceLoading" class="item"/>
+            </Transition>
+        </section>
+        
+        <div class="row card">
+            <p class="item">{{ $t('name') }}</p>
+            <form-editable-field
+                :value="currentSource.name"
+                keyName="name"
+                @send="data => sourceStore.patchSource(sourceId, data)"
+                class="item"
+            />
+        </div>
+        <div class="row card">
+            <p class="item">{{ $t('s_isout') }}</p>
+            <form-editable-boolean
+                keyName="isOut"
+                :value="currentSource.isOut"
+                @send="data => sourceStore.patchSource(sourceId, data)"
+                class="item"
+            />
+        </div>
 
-            <div class="row">
-                <p class="item">{{ $t('s_isdisp') }}</p>
-                <form-editable-boolean
-                    keyName="isDisponible"
-                    :value="source.isDisponible"
-                    @send="patchSource"
-                    class="item"
-                />
-            </div>
+        <div class="row card">
+            <p class="item">{{ $t('s_isdisp') }}</p>
+            <form-editable-boolean
+                keyName="isDisponible"
+                :value="currentSource.isDisponible"
+                @send="data => sourceStore.patchSource(sourceId, data)"
+                class="item"
+            />
+        </div>
 
-            <div class="row">
-                <p class="item">{{ $t('color') }}</p>
-                <div class="item">
-                    <form-editable-color
-                        keyName="color"
-                        :value="source.color || '#ffffffff'"
-                        @send="patchSource"
-                    />
-                    </div>
-            </div> 
-            <h3 class="item">{{ $t('s_states') }}</h3>
-            <div v-for="state in source.states" class="row">
-                <div class="item">
-                    <button @click="deleteEntry(state.id)">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                    {{ state.created }}
+        <div class="row card">
+            <p class="item">{{ $t('color') }}</p>
+            <div class="item">
+                <form-editable-color
+                    keyName="color"
+                    :value="currentSource.color || '#ffffffff'"
+                    @send="data => sourceStore.patchSource(sourceId, data)"
+                />
                 </div>
-                <Price class="item" :amount="state.amount" :currency="currency" />
+        </div>
+        <section class="card flex-col">
+            <h3 class="title">{{ $t('s_states') }}</h3>
+            <div v-for="state in currentSource.states" class="row">
+                <div class="item">
+                    <ui-button @click="sourceStore.deleteEntry(sourceId, state.id)" :outlined="true" icon="fa-solid fa-trash" />
+                    <span class="ml">{{ new Date(state.created).toLocaleString() }}</span>
+                </div>
+                <ui-price class="item" :amount="state.amount" :currency="currency" />
             </div>
-
             <hr>
-            
+            <Transition name="page" mode="out-in">
+            <balance-entry-form
+                v-if="edit"
+                @close="edit=!edit"
+                @created="newEntry"
+                :sourceId="currentSource.id"
+            />
+            <ui-button
+                v-else
+                @click="edit = !edit"
+                :outlined="true"
+            >{{ $t('t_add') }}</ui-button>
+            </Transition>
+        </section>
 
-            <button @click="edit=!edit" v-if="!edit">{{ $t('t_add') }}</button>
-            <UpdateBalanceFrom  @close="edit=!edit" @created="newEntry" :sourceId="source.id" v-else />
 
-        </div>
-        <div v-else class="center">
-            NOT FOUND
-        </div>
-        </Transition>
     </div>
+    <error-banner v-else status="404" message="not found" :is-login="false" />
+    </Transition>
+</div>
 </template>
-<script>
-import { FormEditableBoolean, FormEditableField, FormEditableColor, MosaicLoader, UpdateBalanceFrom } from '#components';
 
-export default {
+<script setup lang="ts">
+import { useSourcesStore } from '@/stores/sources';
+import { storeToRefs } from 'pinia';
 
-    components: { FormEditableBoolean, FormEditableField, FormEditableColor, MosaicLoader, UpdateBalanceFrom },
+const sourceStore = useSourcesStore();
+const { sourceLoading, currentSourceId, currentSource } = storeToRefs(sourceStore);
 
-    inject: ['currency'],
+const route = useRoute();
+const sourceId = parseInt(route.params.id as string);
 
-    data() {
-        return {
-            loading: false,
-            edit: false,
-            source: {}
-        }
-    },
-    
-    methods: {
-        getSource() {
-            this.loading = true;
-            const url = `/api/sources/${this.sourceId}`;
-            $fetch(url, {
-                method: 'GET',
-                headers: {
-                    Authorization: 'Bearer ' + this.token
-                }
-            })
-            .then(res => this.source = res.data)
-            .finally(() => this.loading = false)
-        },
-        patchSource(sourceData) {
-            const url = "/api/sources";
-            console.info(sourceData)
-            sourceData.id = this.source.id;
-            $fetch(url, {
-                method: 'PATCH',
-                body: sourceData,
-                headers: {
-                    Authorization: 'Bearer ' + this.token
-                }
-            })
-                .then(res => this.source = res.data)
-                .finally(() => { this.patching = false; this.edit = false; this.details = false })
-        },
-        deleteEntry(entryId) {
-            const url = "/api/sources/update";
-            $fetch(url, {
-                method: 'DELETE',
-                body: { id: entryId },
-                headers: {
-                    Authorization: 'Bearer ' + this.token
-                }
-            })
-                .then(res => this.source.states = this.source.states.filter(s => s.id !== res.data.id))
-                .finally(() => { this.patching = false; this.edit = false; this.details = false })
-        },
-        newEntry() {
-            this.edit = false;
-            this.getSource();
-        }
-    },
+const edit = ref<boolean>();
 
-    setup() {
-        const route = useRoute();
-        const sourceId = route.params.id
-        return { sourceId: sourceId }
-    },
+currentSourceId.value = sourceId;
 
-    async created() {
-        const tok = await this.$auth0.getAccessTokenSilently();
-        this.token = tok;
-        this.getSource();
+onMounted(() => {
+    if (!currentSource.value) {
+        sourceStore.fetchSingleSource(sourceId);
     }
+});
+
+const newEntry = () => {
+    edit.value = false;
+    sourceStore.fetchSingleSource(sourceId);
 }
 </script>
-<style lang="scss" scoped>
-button {
-    padding: 0.5em;
-}
 
-.title {
-    border-color: v-bind('source.color');
-    color: v-bind('source.color');
-}
+<style lang="scss" scoped>
 
 .title {
     text-transform: uppercase;

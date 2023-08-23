@@ -27,9 +27,13 @@ const { currency, loading } = storeToRefs(transactionStore);
 defineProps(["expense", "income"])
 </script>
 <style lang="scss" scoped>
+.card {
+    height: 48px;
+    padding: 4px;
+}
 .separator {
     height: 2em;
-    border-left: 1px solid var(--color-primary-light-1);
+    border-left: 1px solid var(--color-border-dark);
 }
 
 p {

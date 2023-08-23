@@ -11,7 +11,7 @@
             <div v-if="selectedCategory" class="details column-to-row">
                 <div>
                     <h1 :style="`color: ${selectedCategory.color}`">{{ selectedCategory.name }}</h1>
-                    <Price :amount="selectedCategory.sum" />
+                    <ui-price :amount="selectedCategory.sum" />
                 </div>
                 <div class="row mobile-text-center center">
                     <button class="button" @click="navigateTo(`/tags/${ selectedCategory.id }`)">

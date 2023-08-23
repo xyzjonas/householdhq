@@ -42,15 +42,19 @@ export interface SourceState {
     source: Source;
 }
 
-export interface Source {
+export interface SourceApi {
     id: number
     name: string;
-    transactionsIn: Transaction[];
-    transactionsOut: Transaction[];
     isOut: boolean;
     isDisponible: boolean;
     states: SourceState[];
     color: string;
+}
+
+export interface Source extends SourceApi {
+    transactionsIn: Transaction[];
+    transactionsOut: Transaction[];
+    sum: number;
   }
     
     

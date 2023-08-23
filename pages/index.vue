@@ -1,22 +1,20 @@
 <template>
   <div class="container">
-    {{ token }}
     <MonthHero :date="date" @reload="monthReloaded"/>
     <div>
-
-      <TopSummary :expense="expense" :income="income"/>
+      <top-summary :expense="expense" :income="income"/>
 
       <HomeCarousel
         :tags="categories"
         :incomes="incomes"
-        :sources="sources"
-        :targets="targets"
+        :sources="incomeSources"
+        :targets="expenseSources"
         @filter="tagId => filterTagId = tagId"
       />
 
       <hr>
 
-      <BalanceRow :sources="balances" class="card" />
+      <BalanceRow :sources="incomeSources" class="card" />
 
       <!-- ADD NEW TRANSACTION -->
       <section id="add-t-button" class="row-simple py">
@@ -41,9 +39,9 @@
         <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
           @click="showUpcomming = !showUpcomming"
-          class="tag ml"
+          class="card font-l ml"
         >
-          <Price class="tag" :amount="remainingBills" :currency="currency"/>
+          <ui-price :amount="upcommingTransactionsAmount" :currency="currency"/>
         </button>
         <button @click="showHidden = !showHidden" style="margin-left: auto;"><i class="fa-solid fa-eye-slash"></i></button>
       </h4>
@@ -88,7 +86,6 @@ import { storeToRefs } from 'pinia';
 import { useTokenStore } from '@/stores/tokenStore';
 import { useCategoriesStore } from '@/stores/categories';
 import { useSourcesStore } from '@/stores/sources';
-import { Source, Tag } from '@/stores/types';
 import { useTransactionStore } from '@/stores/transactions';
 
 const tokenStore = useTokenStore();
@@ -96,17 +93,15 @@ const { token } = storeToRefs(tokenStore);
 
 
 const transactionStore = useTransactionStore();
-const { currentMonth, year, month } = storeToRefs(transactionStore);
+const { currentMonth, currency, year, month } = storeToRefs(transactionStore);
 
 const sourcesStore = useSourcesStore();
-const { allSources, sources, targets } = storeToRefs(sourcesStore);
+const { allSources, incomeSources, expenseSources } = storeToRefs(sourcesStore);
 
-// const categoriesStore = useCategoriesStore();
-// const { categories } = storeToRefs(categoriesStore);
+const categoriesStore = useCategoriesStore();
+const { categories } = storeToRefs(categoriesStore);
 
-const categories = ref<Prisma.Tag[]>([]);
-const loading = ref(true);
-const authError = ref(null);
+// const categories = ref<Prisma.Tag[]>([]);
 const putLoading = ref(false);
 const deleteLoading = ref(false);
 // const currentMonth = ref<Prisma.Transaction[]>([]);
@@ -134,37 +129,17 @@ year.value = parseInt(yearPath as string);
 // const auth0 = useAuth0();
 
 onMounted(() => {
-  console.info("Querying token...")
   transactionStore.fetchTransactions();
   sourcesStore.fetchAllSources();
-  // const x = auth0.checkSession();
-  // x.then(y => console.info(y));
-  // auth0.getAccessTokenSilently()
-  // .then(tok => {
-  //   console.info("Got token.")
-  //   token.value = tok;
-  //   console.log(tok);
-  //   transactionStore.fetchTransactions();
-  //   initialFetch();
-  // })
-  // .catch(err => {
-  //   console.error(err);
-  //   router.push("/login");
-  // })
+  categoriesStore.fetchCategories();
 })
 
 
-const currency = computed(() => {
-  // if (currentMonth.value && currentMonth.value.length > 0) {
-  //   const curr = currentMonth.value[0].currency;
-  //   return curr;
-  // } else {
-  //   return "NaN"
-  // }
-  return "Kč";
-})
-//todo: remove
-provide("currency", "Kč");
+// const currency = computed(() => {
+//   return "Kč";
+// })
+// //todo: remove
+// provide("currency", "Kč");
 
 
 const transactions = computed(() => {
@@ -177,31 +152,15 @@ const transactions = computed(() => {
     .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
 });
 
-const incomeTransactions = computed(() => {
-  return transactions.value.filter(trans => {
-    return !allSources.value.find(src => src.id === trans.targetId).isOut || false;
-  })
-})
+const incomeTransactions = computed(() => transactions.value
+  .filter(tr => !tr.target.isOut && tr.source.isOut)
+);
+const expenseTransactions = computed(() => transactions.value
+  .filter(tr => tr.target.isOut && !tr.source.isOut)
+);
 
-const expenseTransactions = computed(() => {
-  return transactions.value.filter(trans => {
-    return allSources.value.find(src => src.id === trans.targetId)?.isOut;
-  })
-})
-
-const income = computed(() => {
-  if (incomeTransactions.value?.length > 0) {
-    return incomeTransactions.value.map(t => t.amount).reduce((a, b) => a + b);
-  } 
-  return 0;
-})
-
-const expense = computed(() => {
-  if (expenseTransactions.value?.length > 0) {
-    return expenseTransactions.value.map(t => t.amount).reduce((a, b) => a + b);
-  } 
-  return 0;
-})
+const income = computed(() => incomeTransactions.value.map(tr => tr.amount).reduce((a, b) => a + b, 0));
+const expense = computed(() => expenseTransactions.value.map(tr => tr.amount).reduce((a, b) => a + b, 0));
 
 
 const upcommingTransactions = computed(() => {
@@ -214,44 +173,41 @@ const upcommingTransactions = computed(() => {
         .filter(trans => isTransactionTagged(trans, filterTagId.value));
 });
 
-const remainingBills = computed(() => {
-  let sum = 0;
-  upcommingTransactions.value.forEach(t => {
-    if (!t.source.isOut) {
-      sum += t.amount;
-    }
-  })
-  return sum;
-});
+const upcommingTransactionsAmount = computed<number>(() => {
+  return upcommingTransactions.value
+    .filter(trans => trans.target.isOut)
+    .map(trans => trans.amount)
+    .reduce((a, b) => a + b, 0)
+})
 
-const balances = computed(() => {
-    const sources = allSources.value
-      .filter(s => !s.isOut)
-      .filter(s => s.isDisponible)
-      .map(s => {
-        const source = { ...s };
-        if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
-          source.balance = undefined;  // can't calculate actual balance without the user's correction
-        } else {
-          const last_entry = source.states[source.states.length - 1];
-          let current_balance = last_entry.amount;
+// const balances = computed(() => {
+//     const sources = allSources.value
+//       .filter(s => !s.isOut)
+//       .filter(s => s.isDisponible)
+//       .map(s => {
+//         const source = { ...s };
+//         if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
+//           source.balance = undefined;  // can't calculate actual balance without the user's correction
+//         } else {
+//           const last_entry = source.states[source.states.length - 1];
+//           let current_balance = last_entry.amount;
           
-          const applicableTransactions = currentMonth.value.filter(trans => new Date(trans.created) <= new Date());
-          const out_ = applicableTransactions
-            .filter(trans => new Date(trans.created) > new Date(last_entry.created))
-            .filter(trans => trans.sourceId === source.id);
-          const in_ = applicableTransactions
-            .filter(t => new Date(t.created) > new Date(last_entry.created))
-            .filter(t => t.targetId === source.id);
+//           const applicableTransactions = currentMonth.value.filter(trans => new Date(trans.created) <= new Date());
+//           const out_ = applicableTransactions
+//             .filter(trans => new Date(trans.created) > new Date(last_entry.created))
+//             .filter(trans => trans.sourceId === source.id);
+//           const in_ = applicableTransactions
+//             .filter(t => new Date(t.created) > new Date(last_entry.created))
+//             .filter(t => t.targetId === source.id);
           
-          in_.forEach(trans => current_balance += trans.amount);
-          out_.forEach(trans => current_balance -= trans.amount);
-          source.balance = current_balance;
-        }
-        return source;
-      })
-    return sources;
-});
+//           in_.forEach(trans => current_balance += trans.amount);
+//           out_.forEach(trans => current_balance -= trans.amount);
+//           source.balance = current_balance;
+//         }
+//         return source;
+//       })
+//     return sources;
+// });
 
 // const auth = computed(() => {
 //   if (auth0) {
@@ -268,48 +224,50 @@ const balances = computed(() => {
 // })
 
 
-const login = () => {
-  auth0.loginWithRedirect();
-};
+// const login = () => {
+//   auth0.loginWithRedirect();
+// };
 
 const initialFetch = () => {
   // Fetch all the required data on startup - only after session validation
-  getTransactions();
+  transactionStore.fetchTransactions();
+  sourcesStore.fetchAllSources();
+  // getTransactions();
   // getTags();
-  getSources();
+  // getSources();
 };
 
-const getTransactions = () => {
-  loading.value = true;
-  let url;
-  if (year.value && month.value) {
-    date.value = new Date(`${year.value}-${month.value}`);
-    url = `/api/transactions/?year=${year.value}&month=${month.value}`
-  } else {
-    url = '/api/transactions'
-  }
+// const getTransactions = () => {
+//   loading.value = true;
+//   let url;
+//   if (year.value && month.value) {
+//     date.value = new Date(`${year.value}-${month.value}`);
+//     url = `/api/transactions/?year=${year.value}&month=${month.value}`
+//   } else {
+//     url = '/api/transactions'
+//   }
   
-  $fetch(
-    url,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer ' + token.value
-      }
-    })
-    .then(res => {
-      currentMonth.value = res.data.filter(trans => {
-        return trans.target.isDisponible || trans.source.isDisponible
-      })
-    })
-    .finally(() => {
-      categories.value = remapCategories();
-      sources.value = remapSources();
-      targets.value = remapTargets();
-      incomes.value = remapCategories(true);
-      loading.value = false;
-    })
-};
+//   $fetch(
+//     url,
+//     {
+//       method: 'GET',
+//       headers: {
+//         Authorization: 'Bearer ' + token.value
+//       }
+//     })
+//     .then(res => {
+//       currentMonth.value = res.data.filter(trans => {
+//         return trans.target.isDisponible || trans.source.isDisponible
+//       })
+//     })
+//     .finally(() => {
+//       categories.value = remapCategories();
+//       sources.value = remapSources();
+//       targets.value = remapTargets();
+//       incomes.value = remapCategories(true);
+//       loading.value = false;
+//     })
+// };
 
 const putTransaction = (transactionData) => {
   putLoading.value = true;
@@ -464,9 +422,10 @@ const isTransactionTagged = (transaction: any, tagId: number) => {
 //     return targets
 // };
 
-const monthReloaded = (options) => {
-  year.value = options.year;
-  month.value = options.month;
+const monthReloaded = (newDate: Date) => {
+  console.info(newDate)
+  year.value = newDate.getFullYear();
+  month.value = newDate.getMonth() + 1;
   initialFetch();
 }
 

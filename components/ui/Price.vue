@@ -1,7 +1,7 @@
 <template>
     <div class="amount">
-        <span>{{ new Intl.NumberFormat().format(amount) }}</span>
-        <span style="font-size: medium; margin-left: 2px;">{{ curr }}</span>
+        <span>{{ displayedAmount }}</span>
+        <span v-if="amounAsNumber" style="font-size: medium; margin-left: 2px;">{{ curr }}</span>
     </div>
 </template>
 <script setup lang="ts">
@@ -10,8 +10,9 @@ import { useTransactionStore } from '@/stores/transactions';
 
 const props = defineProps({
     amount: {
-        type: Number,
-        default: 0,
+        type: String,
+        default: "N/A",
+        required: true,
     },
     size: {
         type: String,
@@ -27,6 +28,17 @@ const curr = computed(() => {
         return 'Kč';
     }
     return currency.value;
+})
+
+const amounAsNumber = computed(() => {
+    return parseInt(props.amount);
+})
+
+const displayedAmount = computed(() => {
+    if(amounAsNumber.value) {
+        return new Intl.NumberFormat().format(amounAsNumber.value);
+    }
+    return props.amount;
 })
 
 </script>

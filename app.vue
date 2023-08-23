@@ -1,12 +1,13 @@
 <template>
-<NuxtLayout>
+  <div class="noise-background" />
+  <NuxtLayout>
     <NuxtPage />
-</NuxtLayout>
+  </NuxtLayout>
 </template>
 <style>
 .page-enter-active,
 .page-leave-active {
-  transition: all 0.4s;
+  transition: all 0.3s;
 }
 .page-enter-from,
 .page-leave-to {
@@ -27,17 +28,29 @@
   opacity: 0;
 }
 
-body {
-    background-image: url('@/assets/blurry-gradient-haikei.svg');
-    backdrop-filter: blur(7px);
-    background-repeat: repeat;
-    background-position: center;
-    background-position-x: center;
-    overflow: scroll;
+.noise-background {
+  position: absolute;
+  inset: 0;
+  z-index: -100;
+  opacity: 0.6;
+  mix-blend-mode: overlay;
+  background-image: url('@/assets/noise.webp');
+  overflow: auto;
 }
 
+body {
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-font-light);
+    background-color: var(--color-background-dark);
+    
+}
 #__nuxt {
-  position: absolute;
+  position: relative;
+  min-height: 100vh;
+/* position: absolute; */
   top: 0;
   bottom: 0;
   left: 0;

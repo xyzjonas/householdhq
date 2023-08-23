@@ -1,23 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 :root {
-    --color-primary: rgb(255, 184, 76);
+    --color-primary: #befdea;
     --color-success: #2EB086;
     --color-danger: #B8405E;
-    --color-primary-dark-1-rgb: 15, 23, 42;
-    --color-primary-dark-2-rgb: 24, 34, 52;
-    --color-primary-dark-1: #0f172a;
-    --color-primary-dark-2: #182234;
-    --color-primary-dark-3: #232529;
+
+    // --color-background-dark: #1f1f1f;
+    --color-background-dark: #242635;
     
-    --color-primary-light-1: #383c40;
+    --color-foreground-dark: #323548;
+
+    --color-border-dark: #9ea2a1;
+
+    // --color-primary-dark-1-rgb: 15, 23, 42;
+    // --color-primary-dark-2-rgb: 24, 34, 52;
+    // --color-primary-dark-1: #0f172a;
+    // --color-primary-dark-2: #0c0c0d;
+    // --color-primary-dark-3: #232529;
+    
+    // --color-primary-light-1: #383c40;
 
     --color-grey-light-1: #bec5ce;
     --color-grey-light-2: var(--color-primary-dark-2);
 
     --color-font-light: #cdd6df;
-    --color-font-gray: #2f3439;
-    --color-font-dark: var(--color-primary-dark-1);
+    --color-font-gray: #252535;
+    --color-font-dark: #252535;
 
     --shadow-dark: 0 2rem 6rem rgba(0,0,0,.3);
     --shadow-light: 0 2rem 5rem rgba(0,0,0,.06);
@@ -48,19 +56,6 @@ $bp-smallest: 31.25em; // 500px
     box-sizing: inherit;
 }
 
-html {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-    line-height: 1.4;
-    color: var(--color-font-light);
-    min-height: 100vh;
-    background-color: var(--color-primary-dark-1);
-}
-
 a {
     text-decoration: none;
 }
@@ -70,5 +65,13 @@ a:link, a:visited {
 }
 
 hr {
-    color: var(--color-primary-dark-3);
+    color: var(--color-border-dark);
+}
+
+.font-l {
+    color: var(--color-font-light);
+}
+
+.font-d {
+    color: var(--color-font-dark);
 }

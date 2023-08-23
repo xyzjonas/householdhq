@@ -71,29 +71,16 @@ onMounted(() => {
 
 .input-group {
     @include input-group(16px, 16px, 10px);
-    $padd: 1px;
 }
 
 .form-wrapper {
-    // text-align: center;
-    // padding: 32px;
-    width: 100%;
-    padding: 0;
+    margin: 16px;
+    padding: 15vh 0;
     border: 1px solid var(--color-primary-light-1);
-    // border-radius: 16px;
-
-    // display: flex;
-    // gap: 12px;
-
-    input {
-        width: 100%;
-    }
 
     text-align: center;
 
     &-hero {
-        // background-color: var(--color-font-light);
-        // color: var(--color-font-dark);
         padding: 64px;
         flex: 1;
         display: grid;
@@ -105,72 +92,18 @@ onMounted(() => {
     }
 
     &-form {
-        justify-self: center;
-        padding: 32px;
+        // padding: 32px;
         flex: 1;
 
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: 1fr;
         gap: 32px;
-        justify-content: space-between;
+        padding: 32px;
 
         button {
+            padding: 16px 0;
             width: 100%;
-            padding: 16px;
         }
-
     }
-    // height: 100%;
-    // justify-content: space-between;
-
-    // section {
-    //     margin-bottom: 32px;
-    // }
 }
-form {
-    // display: flex;
-    // flex-direction: column;
-    // gap: 32px;
-    // justify-content: space-between;
-    // text-align: center;
-    // max-width: 480px;
-    // margin-left: auto;
-    // margin-right: auto;
-
-    // .input-group {
-    //     display: flex;
-    //     flex-direction: column;
-    // }
-
-    // label {
-    //     text-align: left;
-    //     font-weight: 100;
-    //     margin-bottom: 4px;
-    // }
-
-    // input {
-    //     border-bottom: 1px solid var(--color-primary-light-2);
-    //     border-radius: 0px;
-    //     padding: 8px 16px;
-
-    //     font-size: 16px;
-
-    //     &:focus {
-    //         border: 1px solid var(--color-primary-light-1);
-    //     }
-    // }
-
-
-}
-// .button {
-//     padding: 8px 16px;
-//     color: white;
-//     font-weight: 600;
-//     // background-color:  #e8ae01;
-//     border-radius: 6px;
-
-//     &:hover {
-//       background-color:  rgb(212, 164, 19);
-//     }
-// }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="form-wrapper">
         <div class="row" style="padding-top: 3px; padding-bottom: 3px">
             <p>{{ $t('t_date') }}</p>
             <input v-model="date" type="date"/>
@@ -15,12 +15,12 @@
         <div v-if="error">
             <small class="error">{{ $t(error.statusMessage) }}</small>
         </div>
-        <div class="row mt">
-            <button @click="$emit('close')" style="margin-left: auto" class="button-sm ">{{ $t('close') }}</button>
-            <button @click="send" :class="`button-sm ${ error ? 'danger' : 'success'}`">
+        <div class="row-simple mt">
+            <ui-button @click="$emit('close')">{{ $t('close') }}</ui-button>
+            <ui-button @click="send" :class="`button-sm ${ error ? 'danger' : 'success'}`">
                 <span v-if="!processing">{{ $t('t_send') }}</span>
                 <Spinner v-else />
-            </button>
+            </ui-button>
         </div>
     </div>
 </template>
@@ -89,5 +89,16 @@ export default {
 }
 button {
     margin: 0.3em;
+}
+.form-wrapper {
+    border-top: 1px solid var(--color-border-dark);
+    padding-top: 16px;
+    display: grid;
+    justify-content: center;
+    gap: 8px;
+
+    input {
+        width: 100%;
+    }
 }
 </style>

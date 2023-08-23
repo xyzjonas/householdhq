@@ -2,7 +2,7 @@
 
 
 @mixin background {
-    background-color: var(--color-primary-dark-2);
+    background-color: var(--color-foreground-dark);
     border-radius: 5px;
 }
 
@@ -58,9 +58,9 @@
 
 /* CSS */
 button, .button {
-  background-color: var(--color-primary-dark-1);
-  border: 1px solid var(--color-primary-dark-3);
-  color: var(--color-font-light);
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  color: var(--color-font-dark);
   border-radius: 5px;
   width: fit-content;
 
@@ -73,7 +73,7 @@ button, .button {
   touch-action: manipulation;
 
   i {
-    color: var(--color-font-light);
+    color: var(--color-font-dark);
   }
 
   &:hover {
@@ -98,7 +98,7 @@ button, .button {
     background: var(--color-primary-dark-3);
     position: relative;
     border-radius: calc(var(--h) / 2);
-    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px var(--color-primary-dark-3);
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px var(--color-background-dark);
     label {
         --gap: 5%;
         display: block;
@@ -131,6 +131,9 @@ button, .button {
     // $font: 2em;
     // $font-top: 1.5em;
     position: relative;
+    input {
+      width: calc(100% - 2 * #{$padd});
+    }
     label {
       position: absolute;
       left: calc(#{$padd}/4);
@@ -143,12 +146,12 @@ button, .button {
       
       &.active {
         top: calc(0px - #{$font-top}/1.5);
-        // top: 0px;
-        // left: $padd;
-        // font-size: $font-top;
         color: var(--color-font-light);
         font-size: $font-top;
-        background-color: rgba(var(--color-primary-dark-2-rgb), 0.9);
+        background-color: var(--color-foreground-dark);
+        // background-color: transparent;
+        // backdrop-filter: blur(0.1);
+
         // color: red;
       }
       
@@ -207,11 +210,11 @@ button, .button {
         height: 15px;
         width: 15px;
         border: 1px solid red;
-        border-color: var(--color-grey-light-1);
+        border-color: var(--color-border-dark);
     }
 
     .carousel-circle.selected {
-        background-color: var(--color-grey-light-1);
+        background-color: var(--color-font-light);
     }
 
 }
@@ -220,7 +223,7 @@ button, .button {
     --h: 2.5em;
     height: var(--h);
     width: fit-content;
-    border: 1px solid var(--color-primary-light-1);
+    border: 1px solid var(--color-border-dark);
     display: flex;
     border-radius: var(--h);
     padding-left: 3px;

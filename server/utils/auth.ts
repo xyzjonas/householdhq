@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 
 const SECRET_KEY = process.env.SECRET_KEY as string;
 
-export const EXPIRES_SECONDS = parseInt(process.env.EXPIRES_SECONDS ?? "30");
+const EXPIRES_SECONDS = parseInt(process.env.EXPIRES_SECONDS ?? "30");
 
 
 export interface User {
@@ -47,7 +47,23 @@ export const encodeSession = (partialSession: PartialSession): string => {
 
 }
 
-export function decodeSession(tokenString: string): Session {
+
+export const renewSession = (session: Session): string => {
+    // const algorithm: TAlgorithm = "HS512";
+    // const issued = Date.now();
+    // const expires = Math.floor(Date.now() / 1000) + (60 * 60);
+    // const session: Session = {
+    //     ...partialSession,
+    //     exp: expires,
+    // }
+    const newSession: any = { ... session }
+    delete newSession.exp;
+    delete newSession.iat;
+    console.info(newSession)
+    return jwt.sign(newSession, SECRET_KEY, {expiresIn: EXPIRES_SECONDS});
+}
+
+export const  decodeSession = (tokenString: string): Session => {
     // Always use HS512 to decode the token
     // const algorithm: TAlgorithm = "HS512";
     return jwt.verify(tokenString, SECRET_KEY) as Session;

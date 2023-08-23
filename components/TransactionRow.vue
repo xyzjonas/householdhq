@@ -15,7 +15,7 @@
                 <small style="font-size: xx-small">{{ transaction.source.name }} <i class="fa-solid fa-arrow-right"></i> {{ transaction.target.name }}</small>
             </div>
             <p class="item">
-                <Price :amount="transaction.amount" :currency="transaction.currency" />
+                <ui-price :amount="transaction.amount" :currency="transaction.currency" />
             </p>
         </div>
         <div class="panel" :style="`width: ${details ? 40 : 0}%`">
@@ -47,12 +47,8 @@
 </div>
 </template>
 <script>
-import { CategoryBadge, Price, DateTile, Icon, TransactionForm } from '#components';
-
 export default {
 
-  components: { CategoryBadge, Price, DateTile, Icon, TransactionForm },
-    
     props: ['transaction', 'transparent'],
 
     data() {

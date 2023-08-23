@@ -76,7 +76,7 @@
             </div>
             <!-- NUMPAD  -->
             <div v-else class="calculator">
-                <Price :amount="transaction.amount" class="calculator-display" />
+                <ui-price :amount="transaction.amount" class="calculator-display" />
                 <div class="calculator-numpad">
                     <button v-for="index in 9" @click="add(index)" style="width: 100%">{{ index }}</button>
                     <button @click="remove">DEL</button>
@@ -92,11 +92,10 @@
     </div>
 </template>
 <script setup lang="ts">
-import { Price, Icon, Spinner, CategoryBadge } from "#components";
 import { storeToRefs } from "pinia";
 import { useCategoriesStore } from "@/stores/categories";
 import { useSourcesStore } from "@/stores/sources";
-import { CreateUpdateTransaction, Transaction } from "stores/types";
+import { Transaction } from "stores/types";
 
 
 
