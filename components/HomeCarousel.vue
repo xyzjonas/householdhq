@@ -29,8 +29,15 @@
     </div>
 </template>
 <script setup lang="ts">
+import { Source, TagWithSum } from 'stores/types';
 
-const props = defineProps(['tags', 'incomes', 'sources', 'targets']);
+
+const props = defineProps<{
+    expenses: TagWithSum[],
+    incomes: TagWithSum[],
+    sources: Source[],
+    targets: Source[],
+}>();
 
 const item = ref(0);
 
@@ -44,7 +51,7 @@ const graphContent = computed(() => {
     if (item.value === 3) {
         return props.targets;
     }
-    return props.tags;
+    return props.expenses;
 })
 
 </script>

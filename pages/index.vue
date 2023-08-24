@@ -5,8 +5,8 @@
       <top-summary :expense="expense" :income="income"/>
 
       <HomeCarousel
-        :tags="categories"
-        :incomes="incomes"
+        :expenses="expenseCategories"
+        :incomes="incomeCategories"
         :sources="incomeSources"
         :targets="expenseSources"
         @filter="tagId => filterTagId = tagId"
@@ -99,7 +99,7 @@ const sourcesStore = useSourcesStore();
 const { allSources, incomeSources, expenseSources } = storeToRefs(sourcesStore);
 
 const categoriesStore = useCategoriesStore();
-const { categories } = storeToRefs(categoriesStore);
+const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
 
 // const categories = ref<Prisma.Tag[]>([]);
 const putLoading = ref(false);
