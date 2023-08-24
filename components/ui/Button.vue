@@ -1,10 +1,8 @@
 <template>
-    <button :class="clazz">
+    <button :class="clazz" :disabled="disabled">
         <spinner v-if="loading" />
-        <div v-else>
-            <span v-if="icon" class="icon"><i :class="icon"></i></span>
-            <slot />
-        </div>
+        <span v-if="!loading && icon" class="icon"><i :class="icon"></i></span>
+        <slot v-if="!loading"/>
     </button>
 </template>
 
@@ -13,6 +11,8 @@ const props = defineProps<{
     loading?: boolean,
     icon?: string,
     outlined?: boolean,
+    width?: string,
+    disabled?: boolean,
 }>()
 
 const clazz = computed(() => {
@@ -25,9 +25,11 @@ const clazz = computed(() => {
 .ui-btn {
     display: grid;
     justify-content: center;
+    align-content: center;
     border: 1px solid var(--color-primary-light-1);
     background-color: var(--color-primary);
     color: var(--color-font-gray);
+    width: v-bind(width);
 
     &:hover {
         border-color: #aaa;
@@ -38,6 +40,8 @@ const clazz = computed(() => {
     background-color: var(--color-foreground-dark);
     border: 1px solid var(--color-primary);
     color: var(--color-primary);
+    width: v-bind(width);
+
 
     i {
         color: var(--color-primary) !important;
@@ -50,6 +54,16 @@ const clazz = computed(() => {
             color: var(--color-font-gray) !important;
         }
     }
+}
+
+button[disabled] {
+    background-color: #aaaaaa55;
+    color: #ccc;
+    border: 1px solid transparent;
+    i {
+        color: #ccc !important;
+    }
+    cursor: not-allowed;
 }
 
 </style>

@@ -1,15 +1,17 @@
 <template>
     <div class="center card">
         <ui-empty
-            v-if="items.length === 0"
+            v-if="!areThereTransactions || loading"
             :loading="loading"
             icon="fa-solid fa-money-bill-trend-up"
             :title="$t('no_data')"
             :subtitle="$t('no_data_will_appear')"
         />
-        <section v-else class="row-to-column ">
-            <Doughnut :data="data" :options="options" />
-            <transition name="page" mode="out-in">
+        <section v-else class="row ">
+            <div v-if="!selectedCategory" class="graph-wrapper">
+                <Doughnut :data="data" :options="options" />
+            </div>
+            <transition name="slide" mode="out-in">
             <div v-if="selectedCategory" class="details column-to-row">
                 <div>
                     <h1 :style="`color: ${selectedCategory.color}`">{{ selectedCategory.name }}</h1>
@@ -62,6 +64,10 @@ const showedItems = computed(() => {
     return props.items;
 });
 
+const areThereTransactions = computed(() => {
+    return showedItems.value.map(cat => cat.transactions).flat().length > 0;
+});
+
 const data = computed(() => {
     return {
         labels: showedItems.value.map(it => it.name),
@@ -111,13 +117,24 @@ const options = {
 @import '@/assets/css/base.scss';
 
 .card {
-    height: 320px;
+    height: 360px;
+    overflow: hidden;
+}
+
+.graph-wrapper {
+    margin: 8px;
+    transition: transform 1s ease-in-out;
+    
+    &-active {
+        transform: translate(-160px);
+    }
 }
 
 .details {
     gap: 32px;
     padding: 32px;
     text-align: center;
+    // transform: translate(-100px);
     h1 {
         font-size: x-large;
         text-transform: uppercase;
@@ -149,37 +166,4 @@ button {
     }
 }
 
-.empty {
-    background-color: rgba(var(--color-primary-dark-2-rgb), 0.3);
-
-    border-radius: 3px;
-
-    padding: 16px;
-
-    display: grid;
-    gap: 8px;
-    justify-content: center;
-    align-content: center;
-    width: 100%;
-
-    @media only screen and (max-width: $bp-small) {
-        height: 240px;
-    }
-
-    text-align: center;
-
-    h1, h5 {
-        text-transform: uppercase;
-    }
-
-    h1 {
-        font-size: 2em;
-    }
-
-    h5 {
-        font-size: 0.8em;
-        font-weight: 100;
-    }
-    
-}
 </style>
