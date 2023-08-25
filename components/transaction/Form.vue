@@ -8,7 +8,7 @@
                 <ui-input :label="$t('t_time')" v-model="time" type="time" :required="true"/>
                 <ui-input :label="$t('t_desc')" v-model="transaction.description" type="text" :required="true"/>
 
-                <ui-select v-model="transaction.sourceId" :label="$t('t_from')">
+                <ui-select v-model.number="transaction.sourceId" :label="$t('t_from')">
                     <option
                         v-for="source in allSources"
                         :key="'option-source-' + source.id"

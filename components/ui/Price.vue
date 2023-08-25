@@ -1,7 +1,7 @@
 <template>
     <div class="amount">
         <span>{{ displayedAmount }}</span>
-        <span v-if="amounAsNumber" style="font-size: medium; margin-left: 2px;">{{ curr }}</span>
+        <span v-if="amounAsNumber != undefined" style="font-size: medium; margin-left: 2px;">{{ curr }}</span>
     </div>
 </template>
 <script setup lang="ts">

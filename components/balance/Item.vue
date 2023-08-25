@@ -22,6 +22,7 @@ import { Source } from '@/stores/types'
 const props = defineProps<{
     source: Source,
     max: number,
+    modelValue: number,
 }>();
 
 const updating = ref(false);
@@ -44,6 +45,7 @@ const balance = computed<string | number>(() => {
     props.source.transactionsOut
         .filter(tr => new Date(tr.created) < new Date() && new Date(tr.created) > lastDate)
         .forEach(tr => sum -= tr.amount)
+    emit('update:modelValue', sum);
     return sum;
 });
 
@@ -78,7 +80,7 @@ const opacity = computed(() => {
     return 'opacity(0)'
 });
 
-const emit = defineEmits(["autoupdated"]);
+const emit = defineEmits(["autoupdated", 'update:modelValue']);
 const autoUpdate = () => {
     updating.value = true;
     const url = '/sources/update';

@@ -2,9 +2,15 @@
     <div class="balance-row">
         <div class="balance-row-hdr">
             <p>{{ $t('balance') }}</p>
-            <ui-price :amount="total" :currency="currency" />
+            <ui-price :amount="balanceSums.reduce((a, b) => a + b, 0).toString()" :currency="currency" />
         </div>
-        <BalanceItem v-for="bal in sources" :source="bal" :max="max" class="balance-row-item"/>
+        <BalanceItem
+            v-for="bal, index in sources"
+            :source="bal"
+            v-model="balanceSums[index]"
+            :max="max"
+            class="balance-row-item"
+        />
         <NuxtLink to="/sources" class="ml">. . .</NuxtLink>
     </div>
 </template>
@@ -14,6 +20,8 @@ import { useTransactionStore } from '@/stores/transactions';
 import { Source } from 'stores/types';
 
 const { currency } = storeToRefs(useTransactionStore());
+
+const balanceSums = ref<number[]>([]);
 
 const props = defineProps<{
     sources: Source[]
