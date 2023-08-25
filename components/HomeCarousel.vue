@@ -4,22 +4,6 @@
         <section v-if="item <= 1">
             <BarGraph :items="graphContent" @filter="tagId => $emit('filter', tagId)"/>
         </section>
-
-        <!-- SOURCES STATE -->
-        <!-- <section v-else-if="item === 2" class="row-simple">
-            <div class="item border-left">
-                <h3>{{ $t('sources') }}</h3>
-                <BarGraph class="item" :items="sources" @filter="id => $emit('filterSource', id)"/>
-            </div>            
-            <button @click="item+=1" class="chevron right item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-right"></i></button>
-        </section>
-        <section v-else-if="item === 3" class="row-simple">
-            <button  @click="item-=1" class="chevron left item-shrink" style="min-height: 100%;"><i class="fa-solid fa-chevron-left"></i></button>
-            <div class="item border-left">
-                <h3>{{ $t('targets') }}</h3>
-                <BarGraph :items="targets" @filter="id => $emit('filterTarget', id)" />
-            </div>            
-        </section> -->
     </div>
     <div class="center my-2">
         <div class="toggle-bar m-1">

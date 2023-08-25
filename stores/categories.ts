@@ -12,6 +12,11 @@ export const useCategoriesStore = defineStore("category", () => {
 
     const categoryLoading = ref(false);
 
+    const currentCategoryId = ref<number>();
+    const currentCategory = computed(() => {
+        return categories.value.find(cat => cat.id === currentCategoryId.value);
+    })
+
     const fetchCategories = async () => {
         const url = '/api/tags'
         categoryLoading.value = true;
@@ -54,35 +59,64 @@ export const useCategoriesStore = defineStore("category", () => {
     //     return tags;
     //   });
 
-      const incomeCategories = computed<TagWithSum[]>(() => {
-        return categories.value.map(cat => {
-          const transactions: Transaction[] = currentMonth.value
-            .filter(tr => tr.tags.find(tag => tag.id === cat.id))
-            .filter(tr => tr.source.isOut && !tr.target.isOut);
-          const mapped: TagWithSum = {
-            ...cat,
-            transactions: transactions,
-            sum: transactions.map(tr => tr.amount).reduce((a, b) => a + b, 0),
-          };
-          return mapped;
-        })
-      });
-
-      const expenseCategories = computed<TagWithSum[]>(() => {
-        return categories.value.map(cat => {
-          const transactions: Transaction[] = currentMonth.value
-            .filter(tr => tr.tags.find(tag => tag.id === cat.id))
-            .filter(tr => !tr.source.isOut && tr.target.isOut);
-          const mapped: TagWithSum = {
-            ...cat,
-            transactions: transactions,
-            sum: transactions.map(tr => tr.amount).reduce((a, b) => a + b, 0),
-          };
-          return mapped;
-        })
+    const incomeCategories = computed<TagWithSum[]>(() => {
+      return categories.value.map(cat => {
+        const transactions: Transaction[] = currentMonth.value
+          .filter(tr => tr.tags.find(tag => tag.id === cat.id))
+          .filter(tr => tr.source.isOut && !tr.target.isOut);
+        const mapped: TagWithSum = {
+          ...cat,
+          transactions: transactions,
+          sum: transactions.map(tr => tr.amount).reduce((a, b) => a + b, 0),
+        };
+        return mapped;
       })
+    });
 
-    return { categories, incomeCategories, expenseCategories, fetchCategories }
+    const expenseCategories = computed<TagWithSum[]>(() => {
+      return categories.value.map(cat => {
+        const transactions: Transaction[] = currentMonth.value
+          .filter(tr => tr.tags.find(tag => tag.id === cat.id))
+          .filter(tr => !tr.source.isOut && tr.target.isOut);
+        const mapped: TagWithSum = {
+          ...cat,
+          transactions: transactions,
+          sum: transactions.map(tr => tr.amount).reduce((a, b) => a + b, 0),
+        };
+        return mapped;
+      })
+    })
+
+
+    const fetchSingleCategory = async (categoryId: number) => {
+      const url = `/api/tags/${categoryId}`;
+      categoryLoading.value = true;
+      try {
+        const response = await tokenStore.get(url);
+        console.info(response);
+        categories.value = categories.value.filter(cat => cat.id !== categoryId);
+        categories.value.push(response.data);
+      } finally {
+        categoryLoading.value = false;
+      }
+    };
+
+    const patchCategory = async (categoryId: number, categoryData: any) => {
+      categoryLoading.value = true;
+      const url = "/api/tags";
+      // console.info(sourceData)
+      categoryData.id = categoryId;
+      try {
+        const newCategory = await tokenStore.patch(url, categoryData);
+        categories.value = categories.value.filter(cat => cat.id !== categoryId)
+        categories.value.push(newCategory.data);
+      } finally {
+        categoryLoading.value = false;
+      }
+    };
+
+
+    return { categories, currentCategoryId, categoryLoading, currentCategory, incomeCategories, expenseCategories, fetchCategories, fetchSingleCategory, patchCategory }
 })
 
 

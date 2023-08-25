@@ -1,26 +1,14 @@
 <template>
     <div class="form-wrapper">
-        <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-            <p>{{ $t('t_date') }}</p>
-            <input v-model="date" type="date"/>
-        </div>
-        <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-            <p>{{ $t('t_time') }}</p>
-            <input v-model="time" type="time"/>
-        </div>
-        <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-            <p>{{ $t('t_amount') }}</p>
-            <input v-model.number="state.amount"/>
-        </div>
+        <ui-input v-model="date" type="date" :label="$t('t_date')"/>
+        <ui-input v-model="time" type="time" :label="$t('t_time')"/>
+        <ui-input v-model.number="state.amount" type="number" :label="$t('t_amount')"/>
         <div v-if="error">
             <small class="error">{{ $t(error.statusMessage) }}</small>
         </div>
-        <div class="row-simple mt">
-            <ui-button @click="$emit('close')">{{ $t('close') }}</ui-button>
-            <ui-button @click="send" :class="`button-sm ${ error ? 'danger' : 'success'}`">
-                <span v-if="!processing">{{ $t('t_send') }}</span>
-                <Spinner v-else />
-            </ui-button>
+        <div class="row-simple">
+            <ui-button @click="$emit('close')" width="100%" height="32px" icon="fa-solid fa-xmark">{{ $t('close') }}</ui-button>
+            <ui-button @click="send" :loading="processing" width="100%" height="32px" icon="fa-regular fa-calendar-check">{{ $t('t_send') }}</ui-button>
         </div>
     </div>
 </template>
@@ -84,17 +72,18 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.row > p {
-    min-width: 5em;
+.row-simple {
+    gap: 4px;
 }
 button {
-    margin: 0.3em;
+    text-transform: lowercase;
 }
 .form-wrapper {
     border-top: 1px solid var(--color-border-dark);
     padding-top: 16px;
-    display: grid;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    // justify-content: center;
     gap: 8px;
 
     input {

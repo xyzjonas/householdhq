@@ -3,71 +3,53 @@
         <transition name="slide" mode="out-in" class="navigation-container">
             <!-- ENTIRE FORM -->
             <div v-if="stage === 2" class="form">
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_amount') }}</p>
-                    <input v-model.number="transaction.amount"/>
-                </div>
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_date') }}</p>
-                    <input v-model="date" type="date"/>
-                </div>
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_time') }}</p>
-                    <input v-model="time" type="time"/>
-                </div>
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_desc') }}</p>
-                    <textarea v-model="transaction.description" type="date" :placeholder="$t('t_placeholder')"></textarea>
-                </div>
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_from') }}</p>
-                    <select v-model.number="transaction.sourceId">
-                        <option
-                            v-for="source in allSources"
-                            :key="'option-source-' + source.id"
-                            :value="source.id"
-                        >{{ source.name }}</option>
-                    </select>
-                </div>
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_to') }}</p>
-                    <select v-model.number="transaction.targetId">
-                        <option
-                            v-for="source in allSources"
-                            :key="'option-target-' + source.id"
-                            :value="source.id"
-                        >
-                            {{ source.name }}
-                        </option>
-                    </select>
-                </div>
-                <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-                    <p>{{ $t('t_tag') }}</p>
-                    <select v-model="transaction.tags">
-                        <option 
-                            v-for="tag in categories"
-                            :key="tag.id + '-event'"
-                            :value="tag.name"
-                        >{{ tag.name }}</option>
-                    </select>
-                </div>
+                <ui-input :label="$t('t_amount')" v-model.number="transaction.amount" type="number" :required="true"/>
+                <ui-input :label="$t('t_date')" v-model="date" type="date" :required="true"/>
+                <ui-input :label="$t('t_time')" v-model="time" type="time" :required="true"/>
+                <ui-input :label="$t('t_desc')" v-model="transaction.description" type="text" :required="true"/>
+
+                <ui-select v-model="transaction.sourceId" :label="$t('t_from')">
+                    <option
+                        v-for="source in allSources"
+                        :key="'option-source-' + source.id"
+                        :value="source.id"
+                    >{{ source.name }}</option>
+                </ui-select>
+
+                <ui-select v-model.number="transaction.targetId" :label="$t('t_to')">
+                    <option
+                        v-for="source in allSources"
+                        :key="'option-target-' + source.id"
+                        :value="source.id"
+                    >{{ source.name }}</option>
+                </ui-select>
+                <ui-select v-model.number="transaction.tags" :label="$t('t_tag')">
+                    <option 
+                        v-for="tag in categories"
+                        :key="tag.id + '-event'"
+                        :value="tag.name"
+                    >{{ tag.name }}</option>
+                </ui-select>
+
                 <div class="row" style="padding-top: 3px; padding-bottom: 3px">
                     <p>{{ $t('recurring') }}</p>
                     <div class="slideOne" @click="isRecurring = !isRecurring">
                         <input v-model="isRecurring" type="checkbox" id="slideOne" name="check" disabled/>
                         <label for="slideOne"></label>
                     </div>
-                    <input v-if="isRecurring" v-model="transaction.recurring" type="number">
+                    <transition name="slide" mode="out-in">
+                        <input v-if="isRecurring" v-model="transaction.recurring" type="number">
+                    </transition>
                 </div>
-                <div class="space"></div>
 
-                <div class="row">
-                    <button @click="stage -= 1" style="margin-left: auto" class="button-sm ">{{ $t('back') }}</button>
-                    <button @click="send" :class="`${error ? 'danger' : 'success'} button-sm`">
-                        <span v-if="!processing">{{ $t('t_send') }}</span>
-                        <Spinner v-else />
-                    </button>
-                </div>
+                <ui-button
+                    @click="send"
+                    :loading="processing"
+                    icon="fa-solid fa-floppy-disk"
+                    height="64px"
+                    :outlined="true"
+                >{{ $t('t_send') }}</ui-button>
+
             </div>
             <!-- CATEGORY SELECTION -->
             <div v-else-if="stage === 1" class="categories">
@@ -215,8 +197,8 @@ const categorySelected = (categoryName: string) => {
 </script>
 <style lang="scss" scoped>
 .navigation-container {
-height: 500px;
-overflow: scroll;
+height: 510px;
+// overflow: scroll;
 }
 
 .collapsed {
@@ -232,6 +214,7 @@ overflow: scroll;
     gap: 32px;
     align-items: center;
     margin-top: auto;
+    padding-top: 32px;
     margin-bottom: 16px;
 
     &-stage {
@@ -260,9 +243,9 @@ overflow: scroll;
 
     p {
         // margin-right: 1em;
-        width: 30%;
+        // width: 30%;
         padding-right: 1em;
-        text-align: right;
+        // text-align: right;
     }
 
     textarea, input, select {
@@ -272,6 +255,18 @@ overflow: scroll;
 }
 
 input[type=number] {
-    width: 5em;
+    width: 128px;
+}
+
+.save-btn {
+    width: 100%;
+    padding: 8px 0;
+    height: 64px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 </style>

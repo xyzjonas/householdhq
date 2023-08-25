@@ -17,12 +17,13 @@
       <BalanceRow :sources="incomeSources" class="card" />
 
       <!-- ADD NEW TRANSACTION -->
-      <section id="add-t-button" class="row-simple py">
-        <button @click="addTransaction = !addTransaction" class="item button">
-          <i v-if="!addTransaction" class="fa-solid fa-coins" style="margin-right: 0.8em;"></i>
-          <span>{{ addTransaction ? $t('cancel') : $t('t_add') }}</span>
-        </button>
-      </section>
+      <ui-button
+        @click="addTransaction = !addTransaction"
+        width="100%"
+        height="64px"
+        :icon="addTransaction ? 'fa-solid fa-xmark' : 'fa-solid fa-coins'"
+        class="mb mt"
+      >{{ addTransaction ? $t('cancel') : $t('t_add') }}</ui-button>
       <transition name="page">
       <section v-if="addTransaction" style="padding-top: 0;">
         <TransactionForm
@@ -43,7 +44,14 @@
         >
           <ui-price :amount="upcommingTransactionsAmount" :currency="currency"/>
         </button>
-        <button @click="showHidden = !showHidden" style="margin-left: auto;"><i class="fa-solid fa-eye-slash"></i></button>
+        <ui-button
+          @click="showHidden = !showHidden"
+          icon="fa-solid fa-eye-slash"
+          width="36px"
+          height="36px"
+          :outlined="true"
+          style="margin-left: auto;"
+        />
       </h4>
 
       <transition name="page">
@@ -93,7 +101,7 @@ const { token } = storeToRefs(tokenStore);
 
 
 const transactionStore = useTransactionStore();
-const { currentMonth, currency, year, month } = storeToRefs(transactionStore);
+const { currentMonth, currency, loading, year, month } = storeToRefs(transactionStore);
 
 const sourcesStore = useSourcesStore();
 const { allSources, incomeSources, expenseSources } = storeToRefs(sourcesStore);
@@ -103,7 +111,6 @@ const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
 
 // const categories = ref<Prisma.Tag[]>([]);
 const putLoading = ref(false);
-const deleteLoading = ref(false);
 // const currentMonth = ref<Prisma.Transaction[]>([]);
 const showUpcomming = ref(false);
 const showHidden = ref(false);
@@ -270,7 +277,7 @@ const initialFetch = () => {
 // };
 
 const putTransaction = (transactionData) => {
-  putLoading.value = true;
+  loading.value = true;
   const url = "/api/transactions";
   $fetch(url, {
     method: 'PUT',
@@ -282,11 +289,12 @@ const putTransaction = (transactionData) => {
     .then(res =>
       currentMonth.value.unshift(res.data)
     )
-    .finally(() => { addTransaction.value = false; putLoading.value = false })
+    .finally(() => { addTransaction.value = false; loading.value = false; })
 };
     
 const deleteTransaction = (transactionData) => {
   const url = "/api/transactions";
+  loading.value = true;
   $fetch(url, {
     method: 'DELETE',
     headers: {
@@ -296,38 +304,16 @@ const deleteTransaction = (transactionData) => {
     .then(res => {
       currentMonth.value = currentMonth.value.filter(t => t.id != transactionData.id);
     })
+    .finally(() => loading.value = false);
 }
-
-// const getTags = () => {
-//   const url = '/api/tags'
-//   $fetch(url, {
-//     method: 'GET',
-//     headers: {
-//       Authorization: 'Bearer ' + token.value
-//     }
-//   })
-//     .then(res => allTags.value = res.data)
-// };
-
-const getSources = () => {
-  const url = '/api/sources'
-  $fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + token.value
-    }
-  })
-    .then(res => {
-      allSources.value = res.data;
-  })
-};
 
 const updateTransaction = (transaction) => {
   for (let index = 0; index < currentMonth.value.length; index++) {
     const element = currentMonth.value[index]; if (element.id === transaction.id)
     if (element.id === transaction.id) {
       currentMonth.value[index] = transaction;
-      getTransactions();
+      transactionStore.fetchTransactions();
+      // transactionStore.fetchgetTransactions();
     }
   }
 };
@@ -433,7 +419,8 @@ const monthReloaded = (newDate: Date) => {
 
 <style scoped lang="scss">
 #add-t-button, #remaining-bills {
-  margin-top: 2em;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 h3 {

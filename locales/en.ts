@@ -27,7 +27,7 @@ const en = {
   t_tag: "category",
   t_add: "Add expense",
   t_placeholder: "Unspecified expense",
-  t_send: "Send",
+  t_send: "Save",
   t_from: "From",
   t_to: "Where to",
   t_new_recurring: "+ add a copy",

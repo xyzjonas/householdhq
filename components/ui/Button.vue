@@ -12,36 +12,62 @@ const props = defineProps<{
     icon?: string,
     outlined?: boolean,
     width?: string,
+    height?: string,
     disabled?: boolean,
+    color?: 'danger' | 'success'
 }>()
 
 const clazz = computed(() => {
-    return props.outlined ? 'ui-btn-outlined' : 'ui-btn';
+    let cls = props.outlined ? 'ui-btn-outlined' : 'ui-btn';
+    if (props.color) {
+        cls += ` ${props.color}`
+    }
+    return cls;
 })
 
 </script>
 
 <style lang="scss" scoped>
-.ui-btn {
-    display: grid;
+
+@mixin common() {
+    display: flex;
     justify-content: center;
-    align-content: center;
-    border: 1px solid var(--color-primary-light-1);
+    align-items: center;
+    border-radius: 4px;
+    gap: 4px;
+    border: 1px solid var(--color-primary);
+    width: v-bind(width);
+    height: v-bind(height);
+
+    i {
+        transform: translateY(1px)
+    }
+}
+
+
+.ui-btn {
+    @include common();
     background-color: var(--color-primary);
     color: var(--color-font-gray);
-    width: v-bind(width);
 
     &:hover {
-        border-color: #aaa;
+        border-color: var(--color-font-dark);
+        cursor: pointer;
+    }
+
+    &.danger {
+        background-color: var(--color-danger);
+        color: var(--color-font-light);
+        border-color: var(--color-danger);
     }
 }
 
 .ui-btn-outlined {
+    @include common();
     background-color: var(--color-foreground-dark);
-    border: 1px solid var(--color-primary);
+    // border: 1px solid var(--color-primary);
     color: var(--color-primary);
-    width: v-bind(width);
-
+    // width: v-bind(width);
 
     i {
         color: var(--color-primary) !important;
@@ -50,6 +76,7 @@ const clazz = computed(() => {
     &:hover {
         background-color: var(--color-primary);
         color: var(--color-font-gray);
+        cursor: pointer;
         i {
             color: var(--color-font-gray) !important;
         }

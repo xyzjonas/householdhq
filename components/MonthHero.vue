@@ -1,7 +1,6 @@
 <template>
     <section class="title">
         <p>{{ formatMMYYYY }}</p>
-        <!-- <a><i class="fa-solid fa-calendar"></i></a> -->
         <NuxtLink
             :to="`/?year=${prev.getFullYear()}&month=${prev.getMonth() + 1}`"
             @click="$emit('reload', prev)"
@@ -67,8 +66,9 @@ const formatMMYYYY = computed(() => {
 .title {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: 1.5em;
+
+    padding: 16px 12px;
 
     p {
         font-size: x-large;
@@ -76,8 +76,6 @@ const formatMMYYYY = computed(() => {
     }
 
 }
-
-
 
 a {
     display: flex;
@@ -101,26 +99,11 @@ a:hover {
     margin-left: auto;
 }
 
-.right {
-    margin-right: 2em;
-}
-
 .left:hover {
-    color: var(--color-font-light);
+    color: var(--color-primary);
 }
 
 .right:hover {
-    color: var(--color-font-light);
-}
-
-h1 {
-    font-size: x-large;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    text-align: center;
-}
-section {
-    padding-top: 2em;
-    padding-bottom: 2em;
+    color: var(--color-primary);
 }
 </style>

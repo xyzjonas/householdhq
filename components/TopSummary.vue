@@ -34,6 +34,7 @@ defineProps(["expense", "income"])
 .separator {
     height: 2em;
     border-left: 1px solid var(--color-border-dark);
+    flex: 0;
 }
 
 p {
@@ -45,11 +46,15 @@ i {
 }
 
 .in {
-    color: var(--color-success)
+    color: var(--color-success);
+    text-align: center;
+    flex: 1;
 }
 
 .out {
-    color: var(--color-danger)
+    color: var(--color-danger);
+    text-align: center;
+    flex: 1;
 }
 
 .hdr {

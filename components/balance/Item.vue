@@ -1,14 +1,16 @@
 <template>
     <div class="bal-wrapper">
-        <span>
+        <div class="row">
             <ui-button
                 @click="navigateTo(`/sources/${source.id}`)"
                 :outlined="true"
                 icon="fa-solid fa-pen"
+                width="24px"
+                height="24px"
                 class="mr"
             />
             <span class="label">{{ source.name }}</span>
-        </span>
+        </div>
         <div class="text">
             <ui-price size="large" :amount="balance" />
         </div>

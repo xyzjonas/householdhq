@@ -52,9 +52,15 @@
         <section class="card flex-col">
             <h3 class="title">{{ $t('s_states') }}</h3>
             <div v-for="state in currentSource.states" class="row">
-                <div class="item">
-                    <ui-button @click="sourceStore.deleteEntry(sourceId, state.id)" :outlined="true" icon="fa-solid fa-trash" />
-                    <span class="ml">{{ new Date(state.created).toLocaleString() }}</span>
+                <div class="row-simple">
+                    <ui-button
+                        @click="sourceStore.deleteEntry(sourceId, state.id)"
+                        :outlined="true"
+                        icon="fa-solid fa-trash"
+                        width="32px"
+                        height="36px"
+                    />
+                    <span>{{ new Date(state.created).toLocaleString() }}</span>
                 </div>
                 <ui-price class="item" :amount="state.amount" :currency="currency" />
             </div>
@@ -69,7 +75,7 @@
             <ui-button
                 v-else
                 @click="edit = !edit"
-                :outlined="true"
+                height="32px"
             >{{ $t('t_add') }}</ui-button>
             </Transition>
         </section>
@@ -108,15 +114,11 @@ const newEntry = () => {
 </script>
 
 <style lang="scss" scoped>
-
+.flex-col {
+    gap: 8px;
+}
 .title {
     text-transform: uppercase;
-}
-.row {
-    margin-top: 0.1em;
-    margin-bottom: 0.1em;
-    min-height: 1.8em;
-       
 }
 
 .row > p {

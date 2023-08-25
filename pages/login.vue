@@ -7,16 +7,8 @@
             </div>
         </section>
         <form class="form-wrapper-form" @submit.prevent="useLogin">
-            <div class="input-group">
-                <label for="uname">Username</label>
-                <input ref="usernameInput" id="uname" v-model="username" type="text" name="username" required>
-            </div>
-
-            <div class="input-group">
-                <label for="psw">Password</label>
-                <input ref="passwordInput" id="psw" v-model="password" type="password" name="password" required>
-            </div>
-
+            <ui-input label="Username" v-model="username" type="text" :required="true"/>
+            <ui-input label="Password" v-model="password" type="password" :required="true"/>
             <ui-button
                 :loading="loginLoading"
                 icon="fa-solid fa-unlock-keyhole mr"
@@ -32,6 +24,7 @@ import { useTokenStore } from '@/stores/tokenStore';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 
+const foooo = ref("");
 
 definePageMeta({
   layout: "single",

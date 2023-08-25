@@ -30,9 +30,10 @@ const pathSegments = computed(() => {
 .crumbs {
     display: flex;
     flex-direction: row;
-    margin-top: 1em;
-    margin-bottom: 1.5em;
-    padding: 0 1em;
+    // margin-top: 1em;
+    // margin-bottom: 1.5em;
+    padding: 16px;
+    padding-top: 16px;
 
     span {
         display: flex;

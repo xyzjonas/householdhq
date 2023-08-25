@@ -18,7 +18,7 @@ export default {
     border: 1px solid;
     border-radius: 5px;
     border-color: var(--color-primary-dark-3);
-    aspect-ratio: 1.5;
+    // aspect-ratio: 1.5;
     display: flex;
     flex-direction: row;
     align-items: center;
