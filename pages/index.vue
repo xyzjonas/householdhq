@@ -109,18 +109,13 @@ const { allSources, incomeSources, expenseSources } = storeToRefs(sourcesStore);
 const categoriesStore = useCategoriesStore();
 const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
 
-// const categories = ref<Prisma.Tag[]>([]);
 const putLoading = ref(false);
-// const currentMonth = ref<Prisma.Transaction[]>([]);
 const showUpcomming = ref(false);
 const showHidden = ref(false);
 const date = ref(new Date());
 
 const addTransaction = ref(false);
 const filterTagId = ref<number>(-1);
-// const allSources = ref<Source[]>([]);
-// const sources = ref<Source[]>([]);
-// const targets = ref<Source[]>([]);
 const incomes =ref([]);
 
 const router = useRouter();
@@ -129,25 +124,16 @@ const { yearPath, monthPath } = useRoute().query
 month.value = parseInt(monthPath as string);
 year.value = parseInt(yearPath as string);
 
-// const year = ref(yearPath);
-// const month = ref(monthPath);
-
-
-// const auth0 = useAuth0();
-
 onMounted(() => {
   transactionStore.fetchTransactions();
   sourcesStore.fetchAllSources();
   categoriesStore.fetchCategories();
 })
 
-
-// const currency = computed(() => {
-//   return "Kč";
-// })
-// //todo: remove
-// provide("currency", "Kč");
-
+const initialFetch = () => {
+  transactionStore.fetchTransactions();
+  sourcesStore.fetchAllSources();
+};
 
 const transactions = computed(() => {
   const tmp = currentMonth.value.filter(trans => new Date(trans.created) <= new Date())
@@ -186,95 +172,6 @@ const upcommingTransactionsAmount = computed<number>(() => {
     .map(trans => trans.amount)
     .reduce((a, b) => a + b, 0)
 })
-
-// const balances = computed(() => {
-//     const sources = allSources.value
-//       .filter(s => !s.isOut)
-//       .filter(s => s.isDisponible)
-//       .map(s => {
-//         const source = { ...s };
-//         if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
-//           source.balance = undefined;  // can't calculate actual balance without the user's correction
-//         } else {
-//           const last_entry = source.states[source.states.length - 1];
-//           let current_balance = last_entry.amount;
-          
-//           const applicableTransactions = currentMonth.value.filter(trans => new Date(trans.created) <= new Date());
-//           const out_ = applicableTransactions
-//             .filter(trans => new Date(trans.created) > new Date(last_entry.created))
-//             .filter(trans => trans.sourceId === source.id);
-//           const in_ = applicableTransactions
-//             .filter(t => new Date(t.created) > new Date(last_entry.created))
-//             .filter(t => t.targetId === source.id);
-          
-//           in_.forEach(trans => current_balance += trans.amount);
-//           out_.forEach(trans => current_balance -= trans.amount);
-//           source.balance = current_balance;
-//         }
-//         return source;
-//       })
-//     return sources;
-// });
-
-// const auth = computed(() => {
-//   if (auth0) {
-//     console.info("hey!")
-//     auth0.getAccessTokenSilently()
-//     .then(tok => {
-//       console.info(`got token: ${tok}`)
-//       token.value = tok
-//     }).catch(err => {
-//       console.error(err)
-//     })
-//     return auth0;
-//   }
-// })
-
-
-// const login = () => {
-//   auth0.loginWithRedirect();
-// };
-
-const initialFetch = () => {
-  // Fetch all the required data on startup - only after session validation
-  transactionStore.fetchTransactions();
-  sourcesStore.fetchAllSources();
-  // getTransactions();
-  // getTags();
-  // getSources();
-};
-
-// const getTransactions = () => {
-//   loading.value = true;
-//   let url;
-//   if (year.value && month.value) {
-//     date.value = new Date(`${year.value}-${month.value}`);
-//     url = `/api/transactions/?year=${year.value}&month=${month.value}`
-//   } else {
-//     url = '/api/transactions'
-//   }
-  
-//   $fetch(
-//     url,
-//     {
-//       method: 'GET',
-//       headers: {
-//         Authorization: 'Bearer ' + token.value
-//       }
-//     })
-//     .then(res => {
-//       currentMonth.value = res.data.filter(trans => {
-//         return trans.target.isDisponible || trans.source.isDisponible
-//       })
-//     })
-//     .finally(() => {
-//       categories.value = remapCategories();
-//       sources.value = remapSources();
-//       targets.value = remapTargets();
-//       incomes.value = remapCategories(true);
-//       loading.value = false;
-//     })
-// };
 
 const putTransaction = (transactionData) => {
   loading.value = true;
@@ -335,78 +232,6 @@ const isTransactionTagged = (transaction: any, tagId: number) => {
   }
   return transaction.tags.filter(t => t.id === tagId).length > 0;
 };
-
-// const remapCategories = (incomeOnly=false) => {
-//   const tagsTmp: any = {}
-//   transactions.value.forEach(trans => {
-//     if(trans.confirmed) {
-//       if (trans.tags && trans.tags.length > 0 && ((!incomeOnly && trans.target.isOut) || (incomeOnly && !trans.target.isOut))) {
-//         trans.tags.forEach(tag => {
-//           if (!tagsTmp[tag.id]) {
-//             tagsTmp[tag.id] = {...tag}
-//             tagsTmp[tag.id].transactions = [trans];
-//         } else {
-//           tagsTmp[tag.id].transactions.push(trans)
-//         }
-//       })
-//       }
-//     }
-//   });
-
-//   const tags = Object.values(tagsTmp)
-//   tags.forEach(tag => {
-//     let sum = 0;
-//     tag.transactions.forEach(trans => { sum += trans.amount; })
-//     tag.sum = sum;
-//   });
-//   tags.sort((a, b) => { return b.sum - a.sum; });
-//   return tags;
-// };
-
-// const remapSources = () => {
-//   const sourcesTmp = {}
-//   currentMonth.value.forEach(trans => {
-//       if (trans.source) {
-//         if (sourcesTmp[trans.sourceId]) {
-//           sourcesTmp[trans.sourceId].transactions.push(trans);
-//         } else {
-//           sourcesTmp[trans.sourceId] = {...trans.source};
-//           sourcesTmp[trans.sourceId].transactions = [trans];
-//         }
-//       }
-//   });
-
-//   const sources = Object.values(sourcesTmp);
-//   sources.forEach(source => {
-//     let sum = 0;
-//     source.transactions.forEach(trans => { sum += trans.amount; })
-//     source.sum = sum;
-//   });
-//   sources.sort((a, b) => { return b.sum - a.sum; });
-//   return sources;
-// };
-// const remapTargets = () => {
-//     const targetsTmp: any = {}
-//     currentMonth.value.forEach(trans => {
-//         if (trans.target) {
-//           if (targetsTmp[trans.targetId]) {
-//             targetsTmp[trans.targetId].transactions.push(trans);
-//           } else {
-//             targetsTmp[trans.targetId] = {...trans.target};
-//             targetsTmp[trans.targetId].transactions = [trans];
-//           }
-//         }
-//     });
-
-//     const targets = Object.values(targetsTmp);
-//     targets.forEach(target => {
-//       let sum = 0;
-//       target.transactions.forEach(trans => { sum += trans.amount; })
-//       target.sum = sum;
-//     });
-//     targets.sort((a, b) => { return b.sum - a.sum; });
-//     return targets
-// };
 
 const monthReloaded = (newDate: Date) => {
   console.info(newDate)
