@@ -37,6 +37,7 @@ import { Tag, TagWithSum } from 'stores/types';
 import { Doughnut } from 'vue-chartjs'
 
 import { useTransactionStore } from '@/stores/transactions';
+import { isMimeType } from 'class-validator';
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -45,8 +46,8 @@ const props = defineProps<{
 }>();
 
 const selectedCategoryName = ref<string>('');
-const selectedCategory= computed(() => {
-    return props.items.find(it => it.name === selectedCategoryName.value);
+const selectedCategory = computed(() => {
+    return props.items.find(it => it.name && it.name === selectedCategoryName.value);
 });
 
 
@@ -54,7 +55,7 @@ const { currency, loading } = storeToRefs(useTransactionStore());
 
 const emit = defineEmits(["filter"]);
 watch(selectedCategory, (value) => {
-    emit('filter', value?.id || -1)
+    emit('filter', value?.id ?? -1)
 })
 
 const showedItems = computed(() => {
@@ -74,8 +75,8 @@ const data = computed(() => {
         datasets: [
             {
                 data: showedItems.value.map(it => it.sum),
-                backgroundColor: showedItems.value.map(it => it.color || 'white'),
-                borderColor: showedItems.value.map(it => it.color || 'white'),
+                backgroundColor: showedItems.value.map(it => it.color ?? 'white'),
+                borderColor: showedItems.value.map(it => it.color ?? 'white'),
             }
         ],
         borderColor: "red",
