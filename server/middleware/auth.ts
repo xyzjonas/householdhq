@@ -1,13 +1,21 @@
 // import jwt from 'jsonwebtoken';
 
+import { LazyFormEditableTag } from ".nuxt/components";
+
 const EXPIRES_SECONDS = parseInt(process.env.EXPIRES_SECONDS ?? "3600");
 const isDisabled = process.env.DISABLE_AUTH === "true";
 
 const redirectOr401 = (event) => {
-  if (String(event.node.req.url).startsWith("/api")) {
-    setResponseStatus(event, 401, 'invalid token');
-    return;
+  try {
+    console.info(`redirecting from: ${event.node.req.url}`)
+    if (String(event.node.req.url).startsWith("/api")) {
+      setResponseStatus(event, 401, 'invalid token');
+      return;
+    }
+  } catch(e) {
+    console.error(e)
   }
+
   return sendRedirect(event, "/login", 302);
 }
 
@@ -22,6 +30,7 @@ export default defineEventHandler(async (event) => {
     // try cookie first (for page loads)
     let token = getCookie(event, 'token');
     if (!token) {
+      console.info('no cookie \'token\' was found')
       // ...and if not there, go for auth header (API calls)
       const authHdr = event.node.req.headers.authorization;
       const parts = authHdr?.split(" ");
