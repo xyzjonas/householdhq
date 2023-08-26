@@ -17,6 +17,7 @@ const redirectOr401 = (event) => {
   }
 
   sendRedirect(event, "/login", 302);
+  return;
 }
 
 export default defineEventHandler(async (event) => {
@@ -36,9 +37,10 @@ export default defineEventHandler(async (event) => {
       const parts = authHdr?.split(" ");
       if (!parts || parts.length !== 2 || parts[0] !== "Bearer") {
         console.error("reason: invalid authorization header (missing/format)");
-        redirectOr401(event);
+        return redirectOr401(event);
+      } else {
+        token = parts[1];
       }
-      token = parts[1];
     }
 
     try {
