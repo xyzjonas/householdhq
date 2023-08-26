@@ -16,8 +16,7 @@ const redirectOr401 = (event) => {
     console.error(e)
   }
 
-  // return sendRedirect(event, "/login", 302);
-  navigateTo("/login");
+  sendRedirect(event, "/login", 302);
 }
 
 export default defineEventHandler(async (event) => {
