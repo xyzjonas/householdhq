@@ -1,32 +1,29 @@
 <template>
   <div class="container">
-    <MonthHero :date="date" @reload="monthReloaded"/>
-    <section v-if="loading" class="center">
-      <MosaicLoader />
-    </section>
-    <div v-else>
-
-      <TopSummary :expense="expense" :income="income"/>
+    <MonthHero @reload="monthReloaded"/>
+    <div>
+      <top-summary :expense="expense" :income="income"/>
 
       <HomeCarousel
-        :tags="categories"
-        :incomes="incomes"
-        :sources="sources"
-        :targets="targets"
+        :expenses="expenseCategories"
+        :incomes="incomeCategories"
+        :sources="incomeSources"
+        :targets="expenseSources"
         @filter="tagId => filterTagId = tagId"
       />
 
-      <hr>
-
-      <BalanceRow :sources="balances" class="card" />
+      <transition name="slide" mode="out-in">
+        <BalanceRow v-if="isCurrentMonth" :sources="incomeSources" class="card" />
+      </transition>
 
       <!-- ADD NEW TRANSACTION -->
-      <section id="add-t-button" class="row-simple py">
-        <button @click="addTransaction = !addTransaction" class="item button">
-          <i v-if="!addTransaction" class="fa-solid fa-coins" style="margin-right: 0.8em;"></i>
-          <span>{{ addTransaction ? $t('cancel') : $t('t_add') }}</span>
-        </button>
-      </section>
+      <ui-button
+        @click="addTransaction = !addTransaction"
+        width="100%"
+        height="64px"
+        :icon="addTransaction ? 'fa-solid fa-xmark' : 'fa-solid fa-coins'"
+        class="mb mt"
+      >{{ addTransaction ? $t('cancel') : $t('t_add') }}</ui-button>
       <transition name="page">
       <section v-if="addTransaction" style="padding-top: 0;">
         <TransactionForm
@@ -43,11 +40,18 @@
         <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
           @click="showUpcomming = !showUpcomming"
-          class="tag ml"
+          class="card font-l ml"
         >
-          <Price class="tag" :amount="remainingBills" :currency="currency"/>
+          <ui-price :amount="upcommingTransactionsAmount" :currency="currency"/>
         </button>
-        <button @click="showHidden = !showHidden" style="margin-left: auto;"><i class="fa-solid fa-eye-slash"></i></button>
+        <ui-button
+          @click="showHidden = !showHidden"
+          icon="fa-solid fa-eye-slash"
+          width="36px"
+          height="36px"
+          :outlined="true"
+          style="margin-left: auto;"
+        />
       </h4>
 
       <transition name="page">
@@ -83,75 +87,60 @@ import {
   MonthHero, MosaicLoader, TransactionForm,
   TopSummary, BalanceRow
 } from '#components';
-import { useAuth0 } from '@auth0/auth0-vue';
+// import { useAuth0 } from '@auth0/auth0-vue';
 import type Prisma from '@prisma/client';
 import { storeToRefs } from 'pinia';
 
 import { useTokenStore } from '@/stores/tokenStore';
 import { useCategoriesStore } from '@/stores/categories';
-import { Source, Tag } from 'stores/types';
+import { useSourcesStore } from '@/stores/sources';
+import { useTransactionStore } from '@/stores/transactions';
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
 
-// const categoriesStore = useCategoriesStore();
-// const { categories } = storeToRefs(categoriesStore);
 
-const categories = ref<Prisma.Tag[]>([]);
-const loading = ref(true);
-const authError = ref(null);
+const transactionStore = useTransactionStore();
+const { currentMonth, currency, loading, year, month } = storeToRefs(transactionStore);
+const isCurrentMonth = computed(() => {
+  if (!month.value && !year.value) {
+    return true;
+  }
+  const now = new Date();
+  return year.value === now.getFullYear() && month.value === now.getMonth() + 1;
+})
+
+const sourcesStore = useSourcesStore();
+const { incomeSources, expenseSources } = storeToRefs(sourcesStore);
+
+const categoriesStore = useCategoriesStore();
+const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
+
 const putLoading = ref(false);
-const deleteLoading = ref(false);
-const allTransactions = ref<Prisma.Transaction[]>([]);
 const showUpcomming = ref(false);
 const showHidden = ref(false);
-const date = ref(new Date());
 
 const addTransaction = ref(false);
 const filterTagId = ref<number>(-1);
-const allSources = ref<Source[]>([]);
-const sources = ref<Source[]>([]);
-const targets = ref<Source[]>([]);
-const incomes =ref([]);
 
-const router = useRouter();
 const { yearPath, monthPath } = useRoute().query
 
-const year = ref(yearPath);
-const month = ref(monthPath);
-
-
-const auth0 = useAuth0();
+month.value = parseInt(monthPath as string);
+year.value = parseInt(yearPath as string);
 
 onMounted(() => {
-  auth0.getAccessTokenSilently()
-  .then(tok => {
-    token.value = tok;
-    console.log(tok);
-    initialFetch();
-  })
-  .catch(err => {
-    console.error(err);
-    router.push("/login");
-  })
+  transactionStore.fetchTransactions();
+  sourcesStore.fetchAllSources();
+  categoriesStore.fetchCategories();
 })
 
-
-const currency = computed(() => {
-  // if (allTransactions.value && allTransactions.value.length > 0) {
-  //   const curr = allTransactions.value[0].currency;
-  //   return curr;
-  // } else {
-  //   return "NaN"
-  // }
-  return "Kč";
-})
-//todo: remove
-provide("currency", "Kč");
-
+const initialFetch = () => {
+  transactionStore.fetchTransactions();
+  sourcesStore.fetchAllSources();
+};
 
 const transactions = computed(() => {
-  const tmp = allTransactions.value.filter(trans => new Date(trans.created) <= new Date())
+  const tmp = currentMonth.value.filter(trans => new Date(trans.created) <= new Date())
   if (showHidden.value) {
     return tmp;
   }
@@ -160,35 +149,19 @@ const transactions = computed(() => {
     .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
 });
 
-const incomeTransactions = computed(() => {
-  return transactions.value.filter(trans => {
-    return !allSources.value.find(src => src.id === trans.targetId).isOut || false;
-  })
-})
+const incomeTransactions = computed(() => transactions.value
+  .filter(tr => !tr.target.isOut && tr.source.isOut)
+);
+const expenseTransactions = computed(() => transactions.value
+  .filter(tr => tr.target.isOut && !tr.source.isOut)
+);
 
-const expenseTransactions = computed(() => {
-  return transactions.value.filter(trans => {
-    return allSources.value.find(src => src.id === trans.targetId)?.isOut;
-  })
-})
-
-const income = computed(() => {
-  if (incomeTransactions.value?.length > 0) {
-    return incomeTransactions.value.map(t => t.amount).reduce((a, b) => a + b);
-  } 
-  return 0;
-})
-
-const expense = computed(() => {
-  if (expenseTransactions.value?.length > 0) {
-    return expenseTransactions.value.map(t => t.amount).reduce((a, b) => a + b);
-  } 
-  return 0;
-})
+const income = computed(() => incomeTransactions.value.map(tr => tr.amount).reduce((a, b) => a + b, 0));
+const expense = computed(() => expenseTransactions.value.map(tr => tr.amount).reduce((a, b) => a + b, 0));
 
 
 const upcommingTransactions = computed(() => {
-      const tmp = allTransactions.value
+      const tmp = currentMonth.value
         .filter(trans => new Date(trans.created) > new Date())
       if (showHidden.value) {
         return tmp;
@@ -197,105 +170,15 @@ const upcommingTransactions = computed(() => {
         .filter(trans => isTransactionTagged(trans, filterTagId.value));
 });
 
-const remainingBills = computed(() => {
-  let sum = 0;
-  upcommingTransactions.value.forEach(t => {
-    if (!t.source.isOut) {
-      sum += t.amount;
-    }
-  })
-  return sum;
-});
-
-const balances = computed(() => {
-    const sources = allSources.value
-      .filter(s => !s.isOut)
-      .filter(s => s.isDisponible)
-      .map(s => {
-        const source = { ...s };
-        if (source.states.length === 0) {  // user inputs a balance manually (=state) to correct any mistakes
-          source.balance = undefined;  // can't calculate actual balance without the user's correction
-        } else {
-          const last_entry = source.states[source.states.length - 1];
-          let current_balance = last_entry.amount;
-          
-          const applicableTransactions = allTransactions.value.filter(trans => new Date(trans.created) <= new Date());
-          const out_ = applicableTransactions
-            .filter(trans => new Date(trans.created) > new Date(last_entry.created))
-            .filter(trans => trans.sourceId === source.id);
-          const in_ = applicableTransactions
-            .filter(t => new Date(t.created) > new Date(last_entry.created))
-            .filter(t => t.targetId === source.id);
-          
-          in_.forEach(trans => current_balance += trans.amount);
-          out_.forEach(trans => current_balance -= trans.amount);
-          source.balance = current_balance;
-        }
-        return source;
-      })
-    return sources;
-});
-
-// const auth = computed(() => {
-//   if (auth0) {
-//     console.info("hey!")
-//     auth0.getAccessTokenSilently()
-//     .then(tok => {
-//       console.info(`got token: ${tok}`)
-//       token.value = tok
-//     }).catch(err => {
-//       console.error(err)
-//     })
-//     return auth0;
-//   }
-// })
-
-
-const login = () => {
-  auth0.loginWithRedirect();
-};
-
-const initialFetch = () => {
-  // Fetch all the required data on startup - only after session validation
-  getTransactions();
-  // getTags();
-  getSources();
-};
-
-const getTransactions = () => {
-  loading.value = true;
-  let url;
-  if (year.value && month.value) {
-    date.value = new Date(`${year.value}-${month.value}`);
-    url = `/api/transactions/?year=${year.value}&month=${month.value}`
-  } else {
-    url = '/api/transactions'
-  }
-  
-  $fetch(
-    url,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer ' + token.value
-      }
-    })
-    .then(res => {
-      allTransactions.value = res.data.filter(trans => {
-        return trans.target.isDisponible || trans.source.isDisponible
-      })
-    })
-    .finally(() => {
-      categories.value = remapCategories();
-      sources.value = remapSources();
-      targets.value = remapTargets();
-      incomes.value = remapCategories(true);
-      loading.value = false;
-    })
-};
+const upcommingTransactionsAmount = computed<number>(() => {
+  return upcommingTransactions.value
+    .filter(trans => trans.target.isOut)
+    .map(trans => trans.amount)
+    .reduce((a, b) => a + b, 0)
+})
 
 const putTransaction = (transactionData) => {
-  putLoading.value = true;
+  loading.value = true;
   const url = "/api/transactions";
   $fetch(url, {
     method: 'PUT',
@@ -305,13 +188,14 @@ const putTransaction = (transactionData) => {
     body: transactionData}
   )
     .then(res =>
-      allTransactions.value.unshift(res.data)
+      currentMonth.value.unshift(res.data)
     )
-    .finally(() => { addTransaction.value = false; putLoading.value = false })
+    .finally(() => { addTransaction.value = false; loading.value = false; })
 };
     
 const deleteTransaction = (transactionData) => {
   const url = "/api/transactions";
+  loading.value = true;
   $fetch(url, {
     method: 'DELETE',
     headers: {
@@ -319,40 +203,18 @@ const deleteTransaction = (transactionData) => {
     },
     body: transactionData})
     .then(res => {
-      allTransactions.value = allTransactions.value.filter(t => t.id != transactionData.id);
+      currentMonth.value = currentMonth.value.filter(t => t.id != transactionData.id);
     })
+    .finally(() => loading.value = false);
 }
 
-// const getTags = () => {
-//   const url = '/api/tags'
-//   $fetch(url, {
-//     method: 'GET',
-//     headers: {
-//       Authorization: 'Bearer ' + token.value
-//     }
-//   })
-//     .then(res => allTags.value = res.data)
-// };
-
-const getSources = () => {
-  const url = '/api/sources'
-  $fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + token.value
-    }
-  })
-    .then(res => {
-      allSources.value = res.data;
-  })
-};
-
 const updateTransaction = (transaction) => {
-  for (let index = 0; index < allTransactions.value.length; index++) {
-    const element = allTransactions.value[index]; if (element.id === transaction.id)
+  for (let index = 0; index < currentMonth.value.length; index++) {
+    const element = currentMonth.value[index]; if (element.id === transaction.id)
     if (element.id === transaction.id) {
-      allTransactions.value[index] = transaction;
-      getTransactions();
+      currentMonth.value[index] = transaction;
+      transactionStore.fetchTransactions();
+      // transactionStore.fetchgetTransactions();
     }
   }
 };
@@ -375,81 +237,10 @@ const isTransactionTagged = (transaction: any, tagId: number) => {
   return transaction.tags.filter(t => t.id === tagId).length > 0;
 };
 
-const remapCategories = (incomeOnly=false) => {
-  const tagsTmp: any = {}
-  transactions.value.forEach(trans => {
-    if(trans.confirmed) {
-      if (trans.tags && trans.tags.length > 0 && ((!incomeOnly && trans.target.isOut) || (incomeOnly && !trans.target.isOut))) {
-        trans.tags.forEach(tag => {
-          if (!tagsTmp[tag.id]) {
-            tagsTmp[tag.id] = {...tag}
-            tagsTmp[tag.id].transactions = [trans];
-        } else {
-          tagsTmp[tag.id].transactions.push(trans)
-        }
-      })
-      }
-    }
-  });
-
-  const tags = Object.values(tagsTmp)
-  tags.forEach(tag => {
-    let sum = 0;
-    tag.transactions.forEach(trans => { sum += trans.amount; })
-    tag.sum = sum;
-  });
-  tags.sort((a, b) => { return b.sum - a.sum; });
-  return tags;
-};
-
-const remapSources = () => {
-  const sourcesTmp = {}
-  allTransactions.value.forEach(trans => {
-      if (trans.source) {
-        if (sourcesTmp[trans.sourceId]) {
-          sourcesTmp[trans.sourceId].transactions.push(trans);
-        } else {
-          sourcesTmp[trans.sourceId] = {...trans.source};
-          sourcesTmp[trans.sourceId].transactions = [trans];
-        }
-      }
-  });
-
-  const sources = Object.values(sourcesTmp);
-  sources.forEach(source => {
-    let sum = 0;
-    source.transactions.forEach(trans => { sum += trans.amount; })
-    source.sum = sum;
-  });
-  sources.sort((a, b) => { return b.sum - a.sum; });
-  return sources;
-};
-const remapTargets = () => {
-    const targetsTmp: any = {}
-    allTransactions.value.forEach(trans => {
-        if (trans.target) {
-          if (targetsTmp[trans.targetId]) {
-            targetsTmp[trans.targetId].transactions.push(trans);
-          } else {
-            targetsTmp[trans.targetId] = {...trans.target};
-            targetsTmp[trans.targetId].transactions = [trans];
-          }
-        }
-    });
-
-    const targets = Object.values(targetsTmp);
-    targets.forEach(target => {
-      let sum = 0;
-      target.transactions.forEach(trans => { sum += trans.amount; })
-      target.sum = sum;
-    });
-    targets.sort((a, b) => { return b.sum - a.sum; });
-    return targets
-};
-
-const monthReloaded = (options) => {
-  year.value = options.year;
-  month.value = options.month;
+const monthReloaded = (newDate: Date) => {
+  console.info(newDate)
+  year.value = newDate.getFullYear();
+  month.value = newDate.getMonth() + 1;
   initialFetch();
 }
 
@@ -457,7 +248,8 @@ const monthReloaded = (options) => {
 
 <style scoped lang="scss">
 #add-t-button, #remaining-bills {
-  margin-top: 2em;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 h3 {

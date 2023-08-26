@@ -1,9 +1,8 @@
 <template>
     <NuxtLink :to="`/tags/${tagInfo.tag.id}`" class="card center" :style="colorStyle">
         <div>
-            <!-- <CategoryBadge :category="tagInfo.tag" /> -->
             <div>{{ tagInfo.tag.name.toUpperCase() }}</div>
-            <Price :amount="sum" :currency="tagInfo.transactions[0].currency" />
+            <ui-price :amount="sum" :currency="tagInfo.transactions[0].currency" />
         </div>
     </NuxtLink>
 </template>

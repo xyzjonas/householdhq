@@ -48,7 +48,9 @@ const cs = {
   s_state: "záznam",
   s_states: "záznamy",
   log_in: "Přihlásit",
-  access_denied: "Nepovolaným vstup zakázán!"
+  access_denied: "Nepovolaným vstup zakázán!",
+  sign_in: "Přihlásit",
+  login_failed: "Špatné uživatelské jméno nebo heslo"
 }
 
 export { cs }

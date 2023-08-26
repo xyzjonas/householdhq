@@ -27,7 +27,7 @@ const en = {
   t_tag: "category",
   t_add: "Add expense",
   t_placeholder: "Unspecified expense",
-  t_send: "Send",
+  t_send: "Save",
   t_from: "From",
   t_to: "Where to",
   t_new_recurring: "+ add a copy",
@@ -48,7 +48,8 @@ const en = {
   s_isdisp: "include in expense report",
   s_state: "entry",
   s_states: "entries",
-  log_in: "Log in",
+  sign_in: "Sign In",
+  login_failed: "Invalid username or password",
   access_denied: "Access not granted"
 }
 

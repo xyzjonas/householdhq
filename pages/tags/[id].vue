@@ -1,133 +1,109 @@
 <template>
     <div class="container more-p">
-        <div v-if="loading" class="center"><MosaicLoader /></div>
-        <div v-else-if="tag.id">
-            <h1 class="title">
-                <Icon :iconName="tag.icon" />
-                {{ tag.name }}
-            </h1>
-            <div class="row">
+        <div v-if="!currentCategory && categoryLoading" class="center"><MosaicLoader /></div>
+        <div v-else-if="currentCategory" class="flex-col">
+            <section class="row title">
+                <Icon :iconName="currentCategory.icon" class="mr" />
+                <h1 class="item">{{ currentCategory.name }}</h1>
+                <Transition name="page" mode="out-in">
+                    <spinner v-show="categoryLoading" class="item"/>
+                </Transition>
+            </section>
+            <div class="row card">
                 <div class="item">{{ $t('name') }}</div>
                 <form-editable-field
-                    :value="tag.name"
+                    :value="currentCategory.name"
                     keyName="name"
-                    @send="patchTag"
+                    @send="patchCategory"
                     class="item"
                 />
             </div>
-            <div class="row">
+            <div class="row card">
                 <div class="item">{{ $t('description') }}</div>
                 <form-editable-field
                     keyName="description"
-                    :value="tag.description"
-                    @send="patchTag"
+                    :value="currentCategory.description"
+                    @send="patchCategory"
                     class="item"
                 />
             </div>
-            <div class="row">
+            <div class="row card">
                 <div class="item">{{ $t('icon') }}</div>
                 <form-editable-field
                     keyName="icon"
-                    :value="tag.icon"
-                    @send="patchTag"
+                    :value="currentCategory.icon"
+                    @send="patchCategory"
                     class="item"
                 />
             </div>
-            <div class="row">
+            <!-- <div class="row">
                 <div class="item">{{ $t('tag_parent') }}</div>
                 <div class="item">{{ tag.parentId || $t('tag_no_parent') }}</div>
             </div>
             <div class="row">
                 <div class="item">{{ $t('tag_child') }}</div>
                 <div class="item">{{ childTag || $t('tag_no_child')}}</div>
-            </div>
+            </div> -->
 
-            <div class="row">
+            <div class="row card">
                 <div class="item">{{ $t('color') }}</div>
                 <div class="item">
                     <form-editable-color
                         keyName="color"
-                        :value="tag.color || '#ffffffff'"
-                        @send="patchTag"
+                        :value="currentCategory.color || '#ffffffff'"
+                        @send="patchCategory"
                     />
                     </div>
             </div>
         </div>
-        <div v-else class="center">
-            NOT FOUND
-        </div>
+        <error-banner v-else status="404" message="not found" :is-login="false" />
     </div>
 </template>
-<script>
-import { FormEditableField, FormEditableColor, MosaicLoader, Icon } from '#components';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useCategoriesStore } from '@/stores/categories';
 
-export default {
+// import { FormEditableField, FormEditableColor, MosaicLoader, Icon } from '#components';
 
-    components: { FormEditableField, FormEditableColor, MosaicLoader, Icon },
+// export default {
 
-    computed: {
-        childTag() {
-            if (this.tag && this.tag.childTags && this.tag.childTags.length > 0) {
-                return this.tag.childTags[0].id;
-            }
-        }
-    },
+// components: { FormEditableField, FormEditableColor, MosaicLoader, Icon },
 
-    data() {
-        return {
-            loading: false,
-            tag: {}
-        }
-    },
-    
-    methods: {
-        getTag() {
-            this.loading = true;
-            const url = `/api/tags/${this.tagId}`;
-            $fetch(url, {
-                method: 'GET',
-                headers: {
-                    Authorization: 'Bearer ' + this.token
-                }
-            })
-            .then(res => this.tag = res.data)
-            .finally(() => this.loading = false)
-        },
-        patchTag(tagData) {
-            const url = "/api/tags";
-            console.info(tagData)
-            tagData.id = this.tag.id;
-            $fetch(url, {
-                method: 'PATCH',
-                body: tagData,
-                headers: {
-                    Authorization: 'Bearer ' + this.token
-                }
-            })
-                .then(res => this.tag = res.data)
-                .finally(() => { this.patching = false; this.edit = false; this.details = false })
-        }
-    },
 
-    setup() {
-        const route = useRoute();
-        const tagId = route.params.id
-        return { tagId }
-    },
+const categoriesStore = useCategoriesStore();
 
-    async created() {
-        const tok = await this.$auth0.getAccessTokenSilently();
-        this.token = tok;
-        this.getTag();
+const { currentCategoryId, categoryLoading, currentCategory } = storeToRefs(categoriesStore);
+
+const route = useRoute();
+const categoryId = parseInt(route.params.id as string);
+currentCategoryId.value = categoryId;
+
+onMounted(() => {
+    if(!currentCategory.value) {
+        categoriesStore.fetchSingleCategory(categoryId);
     }
+})
+
+// const childTag = computed(() => {
+//     if (this.tag && this.tag.childTags && this.tag.childTags.length > 0) {
+//         return this.tag.childTags[0].id;
+//     }
+// });
+
+
+const patchCategory = (tagData: any) => {
+    categoriesStore.patchCategory(categoryId, tagData);
 }
+
+
+
+
+
+const loading = ref(false);
+const tag = ref({});
+
 </script>
 <style lang="scss" scoped>
-
-.title {
-    border-color: v-bind('tag.color');
-    color: v-bind('tag.color');
-}
 
 .title {
     text-transform: uppercase;

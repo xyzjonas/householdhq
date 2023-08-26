@@ -1,78 +1,74 @@
 <template>
     <section class="title">
-        <UserBadge />
-        <p>{{ formatMMYYYY() }}</p>
-        <!-- <a><i class="fa-solid fa-calendar"></i></a> -->
-        <NuxtLink :to="previousMonth" @click="$emit('reload', prev)" class="left">
+        <p>{{ formatMMYYYY }}</p>
+        <NuxtLink
+            :to="`/?year=${prev.getFullYear()}&month=${prev.getMonth() + 1}`"
+            @click="$emit('reload', prev)"
+            class="left"
+        >
             <i class="fa-solid fa-chevron-left"></i>
         </NuxtLink>
-        <NuxtLink :to="previousMonth" @click="$emit('reload', next)" class="right">
+        <NuxtLink
+            :to="`/?year=${next.getFullYear()}&month=${next.getMonth() + 1}`"
+            @click="$emit('reload', next)"
+            class="right"
+        >
             <i class="fa-solid fa-chevron-right"></i>
         </NuxtLink>
     </section>
 </template>
-<script>
-import { UserBadge } from '#components';
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useTransactionStore } from '@/stores/transactions';
 
-export default {
 
-    components: { UserBadge },
-    props: ["date"],
+// const date = ref<Date>(new Date());
 
-    computed: {
-        prev() {
-            const [year, month] = this.getMonth(this.date, -1);
-            return { year: year, month: month }
-        },
-        next() {
-            const [year, month] = this.getMonth(this.date, +1);
-            return { year: year, month: month }
-        },
-        previousMonth() {
-            const [year, month] = this.getMonth(this.date, -1);
-            return `/?year=${year}&month=${month}`
-        },
-        nextMonth() {
-            const [year, month] = this.getMonth(this.date, +1);
-            return `/?year=${year}&month=${month}`
-        },
-    },
+const route = useRoute();
+const { month, year } = storeToRefs(useTransactionStore());
 
-    methods: {
+defineEmits(["reload"]);
 
-        formatMMYYYY() {
-            const locale = this.$i18n.locale;
-            const month = this.date.toLocaleDateString(locale, {month: "long"}).toUpperCase();
-            return `${month} ${this.date.getFullYear()}`;
-        },
-
-        getMonth(date, plusOrMinus) {
-            let year = date.getFullYear();
-            const currMonth = date.getMonth();  // ...0-11
-            let nextMonth = currMonth;
-            if (plusOrMinus > 0 && currMonth === 11) {
-                nextMonth = 0;
-                year++;
-            } else if (plusOrMinus < 0 && currMonth === 0) {
-                nextMonth = 11;
-                year--;
-            } else {
-                nextMonth += plusOrMinus;
-            }
-
-            // and back to 12 digit format
-            nextMonth++;
-            return [year, nextMonth];
-        }
+const date = computed<Date>(() => {
+    const now = new Date();
+    if (year.value) {
+        now.setFullYear(year.value);
     }
-}
+    if (month.value) {
+        now.setMonth(month.value - 1);
+    }
+    return now;
+});
+
+
+const prev = computed<Date>(() => {
+    // PREVIOUS month URL path
+    const d = new Date(date.value);
+    d.setMonth(d.getMonth() - 1);
+    return d;
+})
+
+const next = computed<Date>(()=> {
+    // NEXT month URL path
+    const d = new Date(date.value);
+    d.setMonth(d.getMonth() + 1);
+    
+    return d;
+});
+
+const i18n = useI18n();
+const formatMMYYYY = computed(() => {
+    const monthName = date.value.toLocaleDateString(i18n.locale, {month: "long"}).toUpperCase();
+    return `${monthName} ${date.value.getFullYear()}`;
+});
 </script>
 <style lang="scss" scoped>
 .title {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: 1.5em;
+
+    padding: 16px 12px;
 
     p {
         font-size: x-large;
@@ -80,8 +76,6 @@ export default {
     }
 
 }
-
-
 
 a {
     display: flex;
@@ -105,26 +99,11 @@ a:hover {
     margin-left: auto;
 }
 
-.right {
-    margin-right: 2em;
-}
-
 .left:hover {
-    color: var(--color-font-light);
+    color: var(--color-primary);
 }
 
 .right:hover {
-    color: var(--color-font-light);
-}
-
-h1 {
-    font-size: x-large;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    text-align: center;
-}
-section {
-    padding-top: 2em;
-    padding-bottom: 2em;
+    color: var(--color-primary);
 }
 </style>

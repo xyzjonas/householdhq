@@ -15,14 +15,14 @@ export default defineNuxtConfig({
             }
         },
     },
-    runtimeConfig: {
-        public: {
-            auth0_domain: process.env.AUTH0_DOMAIN,
-            auth0_clientId: process.env.AUTH0_CLIENT_ID,
-            auth0_redirectUri: process.env.AUTH0_REDIRECT_URI,
-            auth0_audience: process.env.AUTH0_AUDIENCE,
-        }
-    },
+    // runtimeConfig: {
+    //     public: {
+    //         auth0_domain: process.env.AUTH0_DOMAIN,
+    //         auth0_clientId: process.env.AUTH0_CLIENT_ID,
+    //         auth0_redirectUri: process.env.AUTH0_REDIRECT_URI,
+    //         auth0_audience: process.env.AUTH0_AUDIENCE,
+    //     }
+    // },
     app: {
         pageTransition: { name: 'page', mode: 'out-in' },
         head: {
