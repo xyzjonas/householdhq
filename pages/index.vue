@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <MonthHero :date="date" @reload="monthReloaded"/>
+    <MonthHero @reload="monthReloaded"/>
     <div>
       <top-summary :expense="expense" :income="income"/>
 
@@ -12,9 +12,9 @@
         @filter="tagId => filterTagId = tagId"
       />
 
-      <hr>
-
-      <BalanceRow :sources="incomeSources" class="card" />
+      <transition name="slide" mode="out-in">
+        <BalanceRow v-if="isCurrentMonth" :sources="incomeSources" class="card" />
+      </transition>
 
       <!-- ADD NEW TRANSACTION -->
       <ui-button
@@ -102,9 +102,16 @@ const { token } = storeToRefs(tokenStore);
 
 const transactionStore = useTransactionStore();
 const { currentMonth, currency, loading, year, month } = storeToRefs(transactionStore);
+const isCurrentMonth = computed(() => {
+  if (!month.value && !year.value) {
+    return true;
+  }
+  const now = new Date();
+  return year.value === now.getFullYear() && month.value === now.getMonth() + 1;
+})
 
 const sourcesStore = useSourcesStore();
-const { allSources, incomeSources, expenseSources } = storeToRefs(sourcesStore);
+const { incomeSources, expenseSources } = storeToRefs(sourcesStore);
 
 const categoriesStore = useCategoriesStore();
 const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
@@ -112,13 +119,10 @@ const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
 const putLoading = ref(false);
 const showUpcomming = ref(false);
 const showHidden = ref(false);
-const date = ref(new Date());
 
 const addTransaction = ref(false);
 const filterTagId = ref<number>(-1);
-const incomes =ref([]);
 
-const router = useRouter();
 const { yearPath, monthPath } = useRoute().query
 
 month.value = parseInt(monthPath as string);
