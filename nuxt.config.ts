@@ -1,6 +1,3 @@
-import 'dotenv/config';
-// import { cs } from 'locales/cz';
-
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -15,14 +12,6 @@ export default defineNuxtConfig({
             }
         },
     },
-    // runtimeConfig: {
-    //     public: {
-    //         auth0_domain: process.env.AUTH0_DOMAIN,
-    //         auth0_clientId: process.env.AUTH0_CLIENT_ID,
-    //         auth0_redirectUri: process.env.AUTH0_REDIRECT_URI,
-    //         auth0_audience: process.env.AUTH0_AUDIENCE,
-    //     }
-    // },
     app: {
         pageTransition: { name: 'page', mode: 'out-in' },
         head: {
@@ -41,11 +30,42 @@ export default defineNuxtConfig({
     modules: [
         '@nuxtjs/i18n',
         '@pinia/nuxt',
+        '@vite-pwa/nuxt'
     ],
     i18n: {
         locales: ['en', 'fr', 'es'],
         defaultLocale: 'en',
         vueI18n: './i18n.config.ts',
+    },
+    pwa: {
+        registerType: "autoUpdate",
+        manifest: {
+            name: 'Household HQ PWA',
+            short_name: 'HomePWA',
+            theme_color: '#000000',
+            icons: [
+                {
+                  src: 'manifest-icon-192.maskable.png',
+                  sizes: '192x192',
+                  type: 'image/png',
+                },
+                {
+                    src: 'manifest-icon-512.maskable.png',
+                    sizes: '512x512',
+                    type: 'image/png',
+                },
+                {
+                    src: 'manifest-icon-512.maskable.png',
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'any maskable',
+                },
+            ],
+        },
+        strategies: "generateSW",
+        devOptions: {
+            enabled: true,
+        }
     },
     vite: {
         css: {

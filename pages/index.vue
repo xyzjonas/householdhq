@@ -3,7 +3,7 @@
     <MonthHero @reload="monthReloaded"/>
     <div>
       <top-summary :expense="expense" :income="income"/>
-
+      {{ $pwa }}
       <HomeCarousel
         :expenses="expenseCategories"
         :incomes="incomeCategories"
@@ -128,7 +128,12 @@ const { yearPath, monthPath } = useRoute().query
 month.value = parseInt(monthPath as string);
 year.value = parseInt(yearPath as string);
 
-onMounted(() => {
+
+const { $pwa } = useNuxtApp();
+
+onMounted(async () => {
+  // await $pwa.install();
+
   transactionStore.fetchTransactions();
   sourcesStore.fetchAllSources();
   categoriesStore.fetchCategories();
