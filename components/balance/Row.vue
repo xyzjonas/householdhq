@@ -21,11 +21,13 @@ import { Source } from 'stores/types';
 
 const { currency } = storeToRefs(useTransactionStore());
 
-const balanceSums = ref<number[]>([]);
 
 const props = defineProps<{
     sources: Source[]
 }>();
+
+const balanceSums = ref<number[]>([]);
+
 const max = computed(() => {
     let max = 0;
     props.sources.forEach(source => { if (source.sum && source.sum > max) { max = source.sum; } });

@@ -22,7 +22,7 @@ import { Source } from '@/stores/types'
 const props = defineProps<{
     source: Source,
     max: number,
-    modelValue: number,
+    modelValue: number | undefined,
 }>();
 
 const updating = ref(false);

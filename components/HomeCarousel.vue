@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { Source, TagWithSum } from 'stores/types';
 
+defineEmits(['filter']);
 
 const props = defineProps<{
     expenses: TagWithSum[],

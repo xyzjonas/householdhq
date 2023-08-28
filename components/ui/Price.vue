@@ -10,7 +10,7 @@ import { useTransactionStore } from '@/stores/transactions';
 
 const props = defineProps({
     amount: {
-        type: String,
+        type: [String, Number],
         default: "N/A",
         required: true,
     },
@@ -31,6 +31,9 @@ const curr = computed(() => {
 })
 
 const amounAsNumber = computed(() => {
+    if (typeof props.amount === 'number') {
+        return props.amount;
+    }
     return parseInt(props.amount);
 })
 

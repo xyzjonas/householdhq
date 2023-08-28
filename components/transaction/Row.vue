@@ -70,7 +70,7 @@ const { loading } = storeToRefs(useTransactionStore());
 
 const props = defineProps<{
     transaction: Transaction
-    transparent: boolean,
+    transparent?: boolean,
 }>();
 
 const details = ref(false);
