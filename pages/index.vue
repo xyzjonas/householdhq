@@ -3,7 +3,6 @@
     <MonthHero @reload="monthReloaded"/>
     <div>
       <top-summary :expense="expense" :income="income"/>
-      {{ $pwa }}
       <HomeCarousel
         :expenses="expenseCategories"
         :incomes="incomeCategories"
