@@ -16,16 +16,19 @@
       </transition>
 
       <!-- ADD NEW TRANSACTION -->
-      <ui-button
-        @click="addTransaction = !addTransaction"
-        width="100%"
-        height="64px"
-        :icon="addTransaction ? 'fa-solid fa-xmark' : 'fa-solid fa-coins'"
-        class="mb mt"
-      >{{ addTransaction ? $t('cancel') : $t('t_add') }}</ui-button>
+      <transition name="slide" mode="out-in">
+        <ui-button
+          v-if="isCurrentMonth"
+          @click="addTransaction = !addTransaction"
+          width="100%"
+          height="64px"
+          :icon="addTransaction ? 'fa-solid fa-xmark' : 'fa-solid fa-coins'"
+          class="mb mt"
+        >{{ addTransaction ? $t('cancel') : $t('t_add') }}</ui-button>
+      </transition>
       <transition name="page">
       <section v-if="addTransaction" style="padding-top: 0;">
-        <TransactionForm
+        <transaction-form
           v-if="addTransaction"
           @cancel="addTransaction = false"
           @send="putTransaction"
@@ -35,7 +38,8 @@
       </transition>
 
       <!-- SHOW UPCOMMING -->
-      <h4 id="remaining-bills" class="title row-simple">
+      <transition name="slide" mode="out-in">
+      <h4 v-if="isCurrentMonth" id="remaining-bills" class="title row-simple">
         <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
           @click="showUpcomming = !showUpcomming"
@@ -52,6 +56,7 @@
           style="margin-left: auto;"
         />
       </h4>
+      </transition>
 
       <transition name="page">
       <section v-if="showUpcomming || filterTagId > 0">

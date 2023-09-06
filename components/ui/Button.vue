@@ -60,6 +60,12 @@ const clazz = computed(() => {
         color: var(--color-font-light);
         border-color: var(--color-danger);
     }
+
+    &.success {
+        background-color: var(--color-success);
+        color: var(--color-font-dark);
+        border-color: var(--color-success);
+    }
 }
 
 .ui-btn-outlined {

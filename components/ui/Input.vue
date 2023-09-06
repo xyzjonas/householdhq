@@ -31,7 +31,7 @@ const uniqueId = (Math.random()).toString(16).substring(2);
 const inputRef = ref<HTMLInputElement | null>(null);
 
 onMounted(() => {
-    if (props.modelValue != undefined) {
+    if (props.modelValue != undefined && props.modelValue !== "") {
         document.querySelector(`[for='${inputRef.value?.id}']`)?.classList?.add("active");
     }
 

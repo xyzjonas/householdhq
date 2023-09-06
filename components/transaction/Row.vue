@@ -37,13 +37,17 @@
             >{{ edit ? $t('cancel') : $t('edit') }}</ui-button>
         </div>
         <div class="panel y" :style="`width: ${confirmable ? 20 : 0}%`">
-            <button class="success" @click="patchTransaction({ id: transaction.id, confirmed: true, created: transaction.created })">
+            <ui-button
+                color="success"
+                :loading="patching"
+                @click="patchTransaction({ id: transaction.id, confirmed: true, created: transaction.created })"
+            >
                 {{ $t('confirm') }}
                 <span v-if="transaction.recurring > 0">
                     <br>
                     <small>{{ $t('t_new_recurring') }} {{ transaction.recurring }} {{ $t('months') }}</small>
                 </span>
-            </button>
+            </ui-button>
         </div>
     </div>
     <transition name="page" mode="in-out">
