@@ -42,9 +42,30 @@ export default defineEventHandler(async (event) => {
                     amount: element.amount,
                 });
             }
+        }
 
+        if (element.source.isOut && !element.target.isOut) {
+            const year = element.created.getFullYear();
+            const month = element.created.getMonth();
+            const summ = months.find(summary => summary.month === month && summary.year === year);
+
+            if (summ) {
+                summ.amount -= element.amount;
+            } else {
+                months.push({
+                    month: month,
+                    year: year,
+                    amount: -1 * element.amount,
+                });
+            }
         }
     }
     months.sort((a, b) => 1000*(a.year - b.year) + a.month - b.month);
-    return months;
+    return months.map(summ => {
+        return {
+            year: summ.year,
+            month: summ.month,
+            amount: Math.abs(summ.amount),
+        };
+    });
 });
