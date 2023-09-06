@@ -38,10 +38,10 @@
       </transition>
 
       <!-- SHOW UPCOMMING -->
-      <transition name="slide" mode="out-in">
-      <h4 v-if="isCurrentMonth" id="remaining-bills" class="title row-simple">
-        <span>{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
+      <h4 id="remaining-bills" class="title row-simple">
+        <span v-if="isCurrentMonth">{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
+          v-if="isCurrentMonth"
           @click="showUpcomming = !showUpcomming"
           class="card font-l ml"
         >
@@ -56,7 +56,6 @@
           style="margin-left: auto;"
         />
       </h4>
-      </transition>
 
       <transition name="page">
       <section v-if="showUpcomming || filterTagId > 0">

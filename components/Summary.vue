@@ -22,10 +22,17 @@ onMounted(() => {
     categoriesStore.fetchSummary(props.category.id);
 })
 
+const i18n = useI18n();
+const formatMMYYYY = (date: Date) => {
+    return date.toLocaleDateString(
+        i18n.locale,
+        { month: "long" }
+    ).toUpperCase();
+}
 
 const chartData = computed(() => {
     return {
-        labels: summary.value.map(s => `${s.year}-${s.month}`),
+        labels: summary.value.map(s => formatMMYYYY(new Date(s.year, s.month))),
         datasets: [
             {
                 label: props.category.name,
