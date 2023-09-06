@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const data = await doValidate(IdDto, event.context.params);
 
     const from = new Date();
-    from.setMonth(from.getMonth() - 6);
+    from.setMonth(from.getMonth() - 12);
     const trans = await transactions.findInterval(from, new Date());
 
     const categoryId = data.id;

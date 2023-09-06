@@ -50,7 +50,9 @@ const en = {
   s_states: "entries",
   sign_in: "Sign In",
   login_failed: "Invalid username or password",
-  access_denied: "Access not granted"
+  access_denied: "Access not granted",
+  no_transactions: "No transactions",
+  no_transactions_will_appear: "Transactions will appear once entered"
 }
 
 export { en }

@@ -10,27 +10,50 @@
         <section v-else class="column">
             <Doughnut v-if="!selectedCategory" :data="data" :options="options"/>
             <Summary v-if="selectedCategory" :category="selectedCategory" />
-            <div v-if="selectedCategory" class="column">
-                <h1 :style="`color: ${selectedCategory.color}`">{{ selectedCategory.name }}</h1>
-                <spinner v-if="summaryLoading" />
+            <!-- <div v-if="selectedCategory" class="title row" style="margin-top: 12px;">
+                <ui-button
+                    :outlined="true"
+                    width="32px"
+                    height="32px"
+                    @click="navigateTo(`/tags/${ selectedCategory.id }`)"
+                >6m</ui-button>
+                <ui-button
+                    :outlined="true"
+                    width="32px"
+                    height="32px"
+                    @click="navigateTo(`/tags/${ selectedCategory.id }`)"
+                >1yr</ui-button>
+                <ui-button
+                    :outlined="true"
+                    width="32px"
+                    height="32px"
+                    @click="navigateTo(`/tags/${ selectedCategory.id }`)"
+                >all</ui-button>
+            </div> -->
+            <div v-if="selectedCategory">
                 <ui-price :amount="selectedCategory.sum" />
+                <div class="row">
+                    <h1 :style="`color: ${selectedCategory.color}`">{{ selectedCategory.name }}</h1>
+                </div>
+                <spinner v-if="summaryLoading" />
             </div>
             <div v-if="selectedCategory" class="row center">
                 <ui-button
                     :outlined="true"
-                    width="56px"
-                    height="48px"
+                    width="48px"
+                    height="36px"
                     icon="fa-solid fa-pen mr"
                     @click="navigateTo(`/tags/${ selectedCategory.id }`)"
                 />
                 <ui-button
                     :outlined="true"
-                    width="56px"
-                    height="48px"
+                    width="48px"
+                    height="36px"
                     icon="fa-solid fa-xmark"
                     @click="selectedCategoryName = ''"
                 />
             </div>
+            
         </section>
     </div>
 </template>
@@ -126,14 +149,14 @@ const options = {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap: 12px;
+    gap: 3px;
     width: 90%;
     height: 90%;
 
     text-align: center;
 
     h1 {
-        font-size: x-large;
+        font-size: large;
         text-transform: uppercase;
         border-bottom: 1px solid var(--color-primary-light-1);
     }

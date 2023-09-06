@@ -19,6 +19,7 @@ const cs = {
   edit: "upravit",
   delete: "smazat",
   no_data: "Žádná data",
+  no_data_will_appear: "Shrnutí se zobrazí po zaúčtování",
   t_date: "Datum",
   t_time: "Čas",
   t_desc: "Popis",
@@ -50,7 +51,9 @@ const cs = {
   log_in: "Přihlásit",
   access_denied: "Nepovolaným vstup zakázán!",
   sign_in: "Přihlásit",
-  login_failed: "Špatné uživatelské jméno nebo heslo"
+  login_failed: "Špatné uživatelské jméno nebo heslo",
+  no_transactions: "Žádné zaúčtované transakce",
+  no_transactions_will_appear: "Transakce se zobrazí po zaúčtování"
 }
 
 export { cs }

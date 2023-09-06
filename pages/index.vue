@@ -38,7 +38,7 @@
       </transition>
 
       <!-- SHOW UPCOMMING -->
-      <h4 id="remaining-bills" class="title row-simple">
+      <h4 v-if="currentMonth && currentMonth.length > 0" id="remaining-bills" class="title row-simple">
         <span v-if="isCurrentMonth">{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span>
         <button 
           v-if="isCurrentMonth"
@@ -71,6 +71,14 @@
       </section>
       </transition>
       <section>
+          <ui-empty
+              v-if="!transactions || transactions.length <= 0"
+              :loading="loading"
+              icon="fa-solid fa-list"
+              :title="$t('no_transactions')"
+              :subtitle="$t('no_transactions_will_appear')"
+              class="no-transactions"
+          />
           <TransactionRow
             v-for="transaction in transactions"
             :key="transaction.id"
@@ -265,5 +273,12 @@ h3 {
 }
 .button {
   min-height: 60px;
+}
+
+.no-transactions {
+  height: 320px;
+  padding: 0;
+  border: 1px dashed var(--color-border-dark);
+  border-radius: 8px;
 }
 </style>
