@@ -4,6 +4,14 @@ import { IdDto } from "../validators/common.dto"
 
 const DEFAULT_INCLUDE = { category: true, source: true, target:true, tags: true };
 
+
+export interface GetTransactionsResponse {
+  month: string;
+  count: number;
+  data: Transaction[];
+}
+
+
 class Transactions {
 
     private transactions = new PrismaClient().transaction;
@@ -25,7 +33,7 @@ class Transactions {
         return transaction
     }
 
-    public async findRecent(data: TransactionMonthDto): Promise<any> {
+    public async findRecent(data: TransactionMonthDto): Promise<GetTransactionsResponse> {
         const now = new Date();
         let month = data.month;
         let year = data.year;
@@ -45,16 +53,7 @@ class Transactions {
         }
         const queryDate = new Date(year=year,month=month)
         const queryDateNext = new Date(year=yearNext, month=monthNext);
-        console.log(`Querying transactions from='${queryDate}' to='${queryDateNext}'`);
-        const allTrans: Transaction[] = await this.transactions.findMany({
-          where: {
-            created: {
-                gte: queryDate,
-                lt: queryDateNext,
-            }
-        },
-          include: DEFAULT_INCLUDE,
-        });
+        const allTrans = await this.findInterval(queryDate, queryDateNext);
         allTrans.sort((a, b) => b.created.getTime() - a.created.getTime());
         return {
             month: `${year}-${month}`,
@@ -62,47 +61,61 @@ class Transactions {
             data: allTrans
         };
     }
-    
-      public async createTransaction(transactionData: CreateTransactionDto): Promise<Transaction> {
-        let parsed_date = undefined;
-        if (transactionData.created) {
-            parsed_date = new Date(transactionData.created);
-        }
-        const tags = transactionData.tags.map(tagName => ({ name: tagName }));
-        
-        let category = undefined;
-        if (transactionData.categoryId) {
-          category = { connect: { id: transactionData.categoryId } }
-        }
 
-        transactionData.currency ??= 'CZK';
-        const now = new Date();
-        const trans: Transaction = await this.transactions.create({
-          data: {
-            confirmed: parsed_date > now ? false : true,
-            created: parsed_date,
-            currency: transactionData.currency,
-            description: transactionData.description,
-            amount: transactionData.amount,
-            recurring: transactionData.recurring,
-            tags: {
-              connect: tags,
-            },
-            category: category,
-            source: {
-              connect: {
-                id: transactionData.sourceId,
-              },
-            },
-            target: {
-              connect: {
-                id: transactionData.targetId,
-              },
+    public async findInterval(from: Date, to: Date): Promise<Transaction[]> {
+      console.log(`Querying transactions from='${from}' to='${to}'`);
+      const allTrans: Transaction[] = await this.transactions.findMany({
+        where: {
+          created: {
+              gte: from,
+              lt: to,
+          }
+      },
+        include: DEFAULT_INCLUDE,
+      });
+      return allTrans
+    }
+    
+    public async createTransaction(transactionData: CreateTransactionDto): Promise<Transaction> {
+      let parsed_date = undefined;
+      if (transactionData.created) {
+          parsed_date = new Date(transactionData.created);
+      }
+      const tags = transactionData.tags.map(tagName => ({ name: tagName }));
+      
+      let category = undefined;
+      if (transactionData.categoryId) {
+        category = { connect: { id: transactionData.categoryId } }
+      }
+
+      transactionData.currency ??= 'CZK';
+      const now = new Date();
+      const trans: Transaction = await this.transactions.create({
+        data: {
+          confirmed: parsed_date > now ? false : true,
+          created: parsed_date,
+          currency: transactionData.currency,
+          description: transactionData.description,
+          amount: transactionData.amount,
+          recurring: transactionData.recurring,
+          tags: {
+            connect: tags,
+          },
+          category: category,
+          source: {
+            connect: {
+              id: transactionData.sourceId,
             },
           },
-          include: DEFAULT_INCLUDE
-        });
-        return trans;
+          target: {
+            connect: {
+              id: transactionData.targetId,
+            },
+          },
+        },
+        include: DEFAULT_INCLUDE
+      });
+      return trans;
     }
 
     public async editTransaction(transactionData: EditTransactionDto): Promise<Transaction> {

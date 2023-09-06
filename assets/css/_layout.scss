@@ -46,6 +46,16 @@
     }
 }
 
+.graph-card {
+    height: 480px;
+    overflow: hidden;
+
+    @media only screen and (max-width: $bp-medium) {
+        height: 360px;
+    }
+}
+
+
 .center {
     display: flex;
     justify-content: center;

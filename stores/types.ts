@@ -96,3 +96,9 @@ export interface CreateUpdateTransaction {
     tags: string[];
 
 }
+
+export interface Summary {
+    month: number;
+    year: number;
+    amount: number;
+}

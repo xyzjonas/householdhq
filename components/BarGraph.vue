@@ -1,5 +1,5 @@
 <template>
-    <div class="center card">
+    <div class="center graph-card card">
         <ui-empty
             v-if="!areThereTransactions || loading"
             :loading="loading"
@@ -7,26 +7,30 @@
             :title="$t('no_data')"
             :subtitle="$t('no_data_will_appear')"
         />
-        <section v-else class="row ">
-            <div v-if="!selectedCategory" class="graph-wrapper">
-                <Doughnut :data="data" :options="options" />
+        <section v-else class="column">
+            <Doughnut v-if="!selectedCategory" :data="data" :options="options"/>
+            <Summary v-if="selectedCategory" :category="selectedCategory" />
+            <div v-if="selectedCategory" class="column">
+                <h1 :style="`color: ${selectedCategory.color}`">{{ selectedCategory.name }}</h1>
+                <spinner v-if="summaryLoading" />
+                <ui-price :amount="selectedCategory.sum" />
             </div>
-            <transition name="slide" mode="out-in">
-            <div v-if="selectedCategory" class="details column-to-row">
-                <div>
-                    <h1 :style="`color: ${selectedCategory.color}`">{{ selectedCategory.name }}</h1>
-                    <ui-price :amount="selectedCategory.sum" />
-                </div>
-                <div class="row mobile-text-center center">
-                    <button class="button" @click="navigateTo(`/tags/${ selectedCategory.id }`)">
-                        <i class="fa-solid fa-pen mr"></i>
-                    </button>
-                    <button class="button" @click="selectedCategoryName = ''">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
+            <div v-if="selectedCategory" class="row center">
+                <ui-button
+                    :outlined="true"
+                    width="56px"
+                    height="48px"
+                    icon="fa-solid fa-pen mr"
+                    @click="navigateTo(`/tags/${ selectedCategory.id }`)"
+                />
+                <ui-button
+                    :outlined="true"
+                    width="56px"
+                    height="48px"
+                    icon="fa-solid fa-xmark"
+                    @click="selectedCategoryName = ''"
+                />
             </div>
-            </transition>
         </section>
     </div>
 </template>
@@ -37,7 +41,7 @@ import { Tag, TagWithSum } from 'stores/types';
 import { Doughnut } from 'vue-chartjs'
 
 import { useTransactionStore } from '@/stores/transactions';
-import { isMimeType } from 'class-validator';
+import { useCategoriesStore } from '@/stores/categories';
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -50,6 +54,8 @@ const selectedCategory = computed(() => {
     return props.items.find(it => it.name && it.name === selectedCategoryName.value);
 });
 
+
+const { summary, summaryLoading } = storeToRefs(useCategoriesStore());
 
 const { currency, loading } = storeToRefs(useTransactionStore());
 
@@ -115,27 +121,17 @@ const options = {
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/css/base.scss';
+.column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    width: 90%;
+    height: 90%;
 
-.card {
-    height: 360px;
-    overflow: hidden;
-}
-
-.graph-wrapper {
-    margin: 8px;
-    transition: transform 1s ease-in-out;
-    
-    &-active {
-        transform: translate(-160px);
-    }
-}
-
-.details {
-    gap: 32px;
-    padding: 32px;
     text-align: center;
-    // transform: translate(-100px);
+
     h1 {
         font-size: x-large;
         text-transform: uppercase;
@@ -144,27 +140,7 @@ const options = {
 
     .row {
         white-space: nowrap;
-        gap: 3px;
+        gap: 8px;
     }
 }
-
-button {
-    width: 64px;
-    height: 48px;
-}
-
-.row-to-column {
-    align-items: center;
-    justify-items: center;
-    max-width: 100%;
-    padding: 16px;
-    gap: 32px;
-
-    // chart renders from 0 size, let's constraint the parent div...
-    min-height: 360px;
-    @media only screen and (max-width: $bp-medium) {
-        min-height: 320px;
-    }
-}
-
 </style>

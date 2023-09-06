@@ -49,10 +49,10 @@
         </button>
         <ui-button
           @click="showHidden = !showHidden"
-          icon="fa-solid fa-eye-slash"
+          :icon="!showHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
           width="36px"
           height="36px"
-          :outlined="true"
+          :outlined="!showHidden"
           style="margin-left: auto;"
         />
       </h4>

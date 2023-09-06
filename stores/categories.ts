@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import { Category, Tag, TagWithSum, Transaction } from "./types";
+import { Category, Summary, Tag, TagWithSum, Transaction } from "./types";
 import { useTokenStore } from "./tokenStore";
 import { useTransactionStore } from "./transactions";
 
@@ -18,14 +18,27 @@ export const useCategoriesStore = defineStore("category", () => {
     })
 
     const fetchCategories = async () => {
-        const url = '/api/tags'
-        categoryLoading.value = true;
-        try {
-          categories.value = (await tokenStore.get(url)).data;
-        } finally {
-          categoryLoading.value = false;
-        }
-      };
+      const url = '/api/tags'
+      categoryLoading.value = true;
+      try {
+        categories.value = (await tokenStore.get(url)).data;
+      } finally {
+        categoryLoading.value = false;
+      }
+    };
+
+    const summaryId = ref<number>();
+    const summaryLoading = ref(false);
+    const summary = ref<Summary[]>([]);
+    const fetchSummary = async (categoryId: number) => {
+      const url = `/api/categories/${categoryId}/summary`;
+      summaryLoading.value = true;
+      try {
+        summary.value = (await tokenStore.get(url));
+      } finally {
+        summaryLoading.value = false;
+      }
+    };
 
     // const categoriesWithTransactions = computed<TagWithSum>(() => {
 
@@ -116,7 +129,21 @@ export const useCategoriesStore = defineStore("category", () => {
     };
 
 
-    return { categories, currentCategoryId, categoryLoading, currentCategory, incomeCategories, expenseCategories, fetchCategories, fetchSingleCategory, patchCategory }
+    return {
+      categories,
+      currentCategoryId,
+      categoryLoading,
+      currentCategory,
+      incomeCategories,
+      expenseCategories,
+      fetchCategories,
+      fetchSingleCategory,
+      patchCategory,
+      summaryId,
+      summaryLoading,
+      summary,
+      fetchSummary,
+    }
 })
 
 
