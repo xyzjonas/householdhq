@@ -1,31 +1,27 @@
 <template>
-<div class="calculator">
+  <div class="calculator">
     <div class="calculator-display">
-        <h1 :class="operand ? 'active' : ''">{{ modelValue }}</h1>
-        <h2 v-if="operand">{{ operand }} {{ anotherNumber }}</h2>
+      <h1 :class="operand ? 'active' : ''">{{ modelValue }}</h1>
+      <h2 v-if="operand">{{ operand }} {{ anotherNumber }}</h2>
     </div>
     <div class="calculator-numpad">
-        <ui-button v-for="index in 9" @click="add(index)">{{ index }}</ui-button>
-        <ui-button @click="newOperand('-')"  icon="fa-regular fa-square-minus" />
-        <ui-button @click="add(0)">0</ui-button>
-        <ui-button @click="newOperand('+')" icon="fa-regular fa-square-plus" />
-        <ui-button @click="remove" icon="fa-solid fa-delete-left" />
-        <ui-button @click="clear" icon="fa-regular fa-trash-can" />
-        <ui-button v-if="operand" @click="addOrSubstract" icon="fa-solid fa-equals" />
-        <ui-button v-else @click="$emit('confirm')">OK</ui-button>
+      <ui-button v-for="index in 9" @click="add(index)">{{ index }}</ui-button>
+      <ui-button @click="newOperand('-')" icon="fa-regular fa-square-minus" />
+      <ui-button @click="add(0)">0</ui-button>
+      <ui-button @click="newOperand('+')" icon="fa-regular fa-square-plus" />
+      <ui-button @click="remove" icon="fa-solid fa-delete-left" />
+      <ui-button @click="clear" icon="fa-regular fa-trash-can" />
+      <ui-button v-if="operand" @click="addOrSubstract" icon="fa-solid fa-equals" />
+      <ui-button v-else @click="$emit('confirm')">OK</ui-button>
     </div>
-    <div class="numpad">
-        
-    </div>
-</div>
+    <div class="numpad"></div>
+  </div>
 </template>
 <script setup lang="ts">
-
-
 const props = defineProps<{
-    modelValue: number
+  modelValue: number;
 }>();
-const emit = defineEmits(['update:modelValue', 'confirm']);
+const emit = defineEmits(["update:modelValue", "confirm"]);
 
 const anotherNumber = ref<number>(0);
 const operand = ref<string | undefined>(undefined);
@@ -34,117 +30,112 @@ const operand = ref<string | undefined>(undefined);
 // const result = ref(0);
 
 const addNumber = (x: number, y: number): number => {
-    return parseInt(`${x}${y}`);
-}
-
+  return parseInt(`${x}${y}`);
+};
 
 const add = (amount: number) => {
-    if (operand.value) {
-        anotherNumber.value = addNumber(anotherNumber.value, amount);
-        return;
-    }
-    if (props.modelValue === 0) {
-        emit('update:modelValue', amount)
-    } else {
-        emit('update:modelValue', addNumber(props.modelValue, amount));
-    }
+  if (operand.value) {
+    anotherNumber.value = addNumber(anotherNumber.value, amount);
+    return;
+  }
+  if (props.modelValue === 0) {
+    emit("update:modelValue", amount);
+  } else {
+    emit("update:modelValue", addNumber(props.modelValue, amount));
+  }
 };
 
 const clear = () => {
-    if (operand.value) {
-        anotherNumber.value = 0;
-    } else {
-        emit('update:modelValue', 0);
-    }
-}
+  if (operand.value) {
+    anotherNumber.value = 0;
+  } else {
+    emit("update:modelValue", 0);
+  }
+};
 
 const remove = () => {
-    if (operand.value) {
-        if (anotherNumber.value >= 10) {
-            anotherNumber.value = parseInt(`${anotherNumber.value }`.subst(0, `${anotherNumber.value}`.length - 1));
-        } else {
-            anotherNumber.value = 0;
-        }
+  if (operand.value) {
+    if (anotherNumber.value >= 10) {
+      anotherNumber.value = parseInt(`${anotherNumber.value}`.substring(0, `${anotherNumber.value}`.length - 1));
     } else {
-        if (props.modelValue >= 10) {
-            const asString = `${props.modelValue}`;
-            emit('update:modelValue', parseInt(asString.substr(0, asString.length - 1)));
-        } else {
-            emit('update:modelValue', 0);
-        }
+      anotherNumber.value = 0;
     }
+  } else {
+    if (props.modelValue >= 10) {
+      const asString = `${props.modelValue}`;
+      emit("update:modelValue", parseInt(asString.substr(0, asString.length - 1)));
+    } else {
+      emit("update:modelValue", 0);
+    }
+  }
 };
 
 const addOrSubstract = () => {
-    if (operand.value === "+") {
-        emit('update:modelValue', props.modelValue + anotherNumber.value);
-    }
-    if (operand.value === "-") {
-        emit('update:modelValue', props.modelValue - anotherNumber.value);
-    }
+  if (operand.value === "+") {
+    emit("update:modelValue", props.modelValue + anotherNumber.value);
+  }
+  if (operand.value === "-") {
+    emit("update:modelValue", props.modelValue - anotherNumber.value);
+  }
 
-    operand.value = undefined;
-    anotherNumber.value = 0;
-}
+  operand.value = undefined;
+  anotherNumber.value = 0;
+};
 
 const newOperand = (newOperand: string) => {
-    if (operand.value) {
-        addOrSubstract();
-    }
-    operand.value = newOperand;
-}
-
+  if (operand.value) {
+    addOrSubstract();
+  }
+  operand.value = newOperand;
+};
 </script>
 <style lang="scss" scoped>
-
 .calculator {
-    &-display {
-        position: relative;
-        font-size: xx-large;
-        padding: 0.5em;
-        background-color: #00000035;
-        border-radius: 8px;
-        margin-bottom: 16px;
-        overflow: hidden;
+  &-display {
+    position: relative;
+    font-size: xx-large;
+    padding: 0.5em;
+    background-color: #00000035;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
 
-        height: 72px;
+    height: 72px;
 
-        h1 {
-            font-size: 64px;
-            position: absolute;
-            left: 16px;
-            top: 2px;
+    h1 {
+      font-size: 64px;
+      position: absolute;
+      left: 16px;
+      top: 2px;
 
-            transition: 0.5s;
+      transition: 0.5s;
 
-            &.active {
-                // top: 2px;
-                font-size: 32px;
-                color: var(--color-success);
-            }
-        }
-        h2 {
-            top: 32px;
-            position: absolute
-        }
+      &.active {
+        // top: 2px;
+        font-size: 32px;
+        color: var(--color-success);
+      }
     }
-
-    &-numpad {
-        display: grid;
-        grid: auto-flow dense / 1fr 1fr 1fr;
-        gap: 8px;
-
-        button {
-            width: 100%;
-            height: 64px;
-            font-size: x-large;
-            padding: 0;
-        }
+    h2 {
+      top: 32px;
+      position: absolute;
     }
+  }
+
+  &-numpad {
+    display: grid;
+    grid: auto-flow dense / 1fr 1fr 1fr;
+    gap: 8px;
+
+    button {
+      width: 100%;
+      height: 64px;
+      font-size: x-large;
+      padding: 0;
+    }
+  }
 }
 
 .display-active {
-    
 }
-
 </style>

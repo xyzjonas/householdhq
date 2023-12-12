@@ -1,10 +1,8 @@
-import { PrismaClient, Category, Prisma } from '@prisma/client';
-import { IdDto } from '../validators/common.dto';
-import { CategoryDto, EditCategoryDto } from '../validators/categories.dto';
-
+import { PrismaClient, type Category, Prisma } from "@prisma/client";
+import { IdDto } from "../validators/common.dto";
+import { CategoryDto, EditCategoryDto } from "../validators/categories.dto";
 
 class Categories {
-
   private categories = new PrismaClient().category;
 
   public async findAllCategories(): Promise<Category[]> {
@@ -25,10 +23,10 @@ class Categories {
 
   public async createCategory(categoryData: CategoryDto): Promise<Category> {
     try {
-      return await this.categories.create({ data: { ...categoryData } });
+      return await this.categories.create({ data: { ...categoryData } as any });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
+        if (e.code === "P2002") {
           throw createError({ statusCode: 400, statusMessage: `Tag '${categoryData.name}' aready exists.` });
         }
       }
@@ -40,14 +38,14 @@ class Categories {
     try {
       const tag = await this.categories.update({
         where: {
-          id: categoryData.id
+          id: categoryData.id,
         },
         data: { ...categoryData },
       });
       return tag;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
+        if (e.code === "P2002") {
           throw createError({ statusCode: 400, statusMessage: `Tag '${categoryData.name}' aready exists.` });
         }
       }
