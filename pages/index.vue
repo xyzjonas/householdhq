@@ -193,7 +193,7 @@ const upcommingTransactionsAmount = computed<number>(() => {
 });
 
 const putTransaction = (transactionData: Transaction) => {
-  loading.value = true;
+  putLoading.value = true;
   const url = "/api/transactions";
   $fetch(url, {
     method: "PUT",
@@ -205,7 +205,7 @@ const putTransaction = (transactionData: Transaction) => {
     .then((res: any) => currentMonth.value.unshift(res.data))
     .finally(() => {
       addTransaction.value = false;
-      loading.value = false;
+      putLoading.value = false;
     });
 };
 

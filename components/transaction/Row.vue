@@ -33,7 +33,7 @@
           color="danger"
           :loading="loading"
           @click="emit('delete', { id: transaction.id })"
-          >{{ $t("yes") }}: {{ $t("delete") }}!</ui-button
+          >{{ $t("confirm") }}</ui-button
         >
         <ui-button @click="edit = !edit" :icon="edit ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'">{{
           edit ? $t("cancel") : $t("edit")
@@ -97,7 +97,6 @@ const { token } = storeToRefs(useTokenStore());
 const emit = defineEmits(["patched", "delete"]);
 
 const patchTransaction = (transactionData: any) => {
-  console.info(typeof transactionData.amount);
   patching.value = true;
   const url = "/api/transactions";
   $fetch(url, {

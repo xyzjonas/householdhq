@@ -5,6 +5,13 @@
     <NuxtPage />
   </NuxtLayout>
 </template>
+<script setup lang="ts">
+// import VueApexCharts from "vue3-apexcharts";
+
+const nuxtApp = useNuxtApp();
+
+// nuxtApp.vueApp.use(VueApexCharts);
+</script>
 <style>
 .page-enter-active,
 .page-leave-active {
@@ -35,27 +42,25 @@
   z-index: -100;
   opacity: 0.6;
   mix-blend-mode: overlay;
-  background-image: url('@/assets/noise.webp');
+  background-image: url("@/assets/noise.webp");
   overflow: auto;
 }
 
 body {
-    min-height: 100vh;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-    line-height: 1.4;
-    color: var(--color-font-light);
-    background-color: var(--color-background-dark);
-    
+  min-height: 100vh;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-font-light);
+  background-color: var(--color-background-dark);
 }
 #__nuxt {
   position: relative;
   min-height: 100vh;
-/* position: absolute; */
+  /* position: absolute; */
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
 }
-
 </style>
