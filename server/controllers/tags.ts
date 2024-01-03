@@ -1,10 +1,8 @@
-import { PrismaClient, Tag, Prisma } from '@prisma/client';
-import { TagDto, EditTagDto } from '../validators/tags.dto';
-import { IdDto } from '../validators/common.dto';
-
+import { PrismaClient, type Tag, Prisma } from "@prisma/client";
+import { TagDto, EditTagDto } from "../validators/tags.dto";
+import { IdDto } from "../validators/common.dto";
 
 class Tags {
-
   private tags = new PrismaClient().tag;
 
   public async findAllTags(): Promise<Tag[]> {
@@ -15,7 +13,7 @@ class Tags {
   public async findSingle(data: IdDto): Promise<Tag> {
     const tag = await this.tags.findUnique({
       where: { id: data.id },
-      include: { childTags: true }
+      include: { childTags: true },
     });
     if (!tag) {
       throw createError({ statusCode: 404, statusMessage: `Tag '${data.id}' nof found.` });
@@ -29,23 +27,23 @@ class Tags {
 
   public async createTag(tagData: TagDto): Promise<Tag> {
     try {
-      const data = {
+      const data: any = {
         name: tagData.name,
         description: tagData.description,
         icon: tagData.icon,
         // color: tagData.color,
-      }
+      };
       if (tagData.parentId) {
-        data['parentTag'] = { connect: { id: tagData.parentId }, }
+        data["parentTag"] = { connect: { id: tagData.parentId } };
       }
       const tag = await this.tags.create({ data: data });
       return tag;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
+        if (e.code === "P2002") {
           throw createError({ statusCode: 400, statusMessage: `Tag '${tagData.name}' aready exists.` });
         }
-        if (e.code === 'P2025') {
+        if (e.code === "P2025") {
           throw createError({ statusCode: 400, statusMessage: `Parent tag '${tagData.parentId}' not found.` });
         }
       }
@@ -54,33 +52,35 @@ class Tags {
   }
 
   public async editTag(tagData: EditTagDto): Promise<Tag> {
-    let data = {...tagData}
+    let data = { ...tagData };
     const parentId = data.parentId;
     delete data.parentId;
     try {
       const tag = await this.tags.update({
         where: {
-          id: tagData.id
+          id: tagData.id,
         },
         data: {
           name: tagData.name,
           description: tagData.description,
           icon: tagData.icon,
           color: tagData.color,
-          parentTag: parentId ? {
-            connect: {
-              id: parentId ? tagData.parentId : undefined,
-            },
-          } : undefined,
+          parentTag: parentId
+            ? {
+                connect: {
+                  id: parentId ? tagData.parentId : undefined,
+                },
+              }
+            : undefined,
         },
       });
       return tag;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
+        if (e.code === "P2002") {
           throw createError({ statusCode: 400, statusMessage: `Tag '${tagData.name}' aready exists.` });
         }
-        if (e.code === 'P2025') {
+        if (e.code === "P2025") {
           throw createError({ statusCode: 400, statusMessage: `Parent tag '${tagData.parentId}' not found.` });
         }
       }

@@ -1,8 +1,8 @@
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from "class-validator";
 
 export class LoginDto {
   @IsString()
-  public username: string;
+  public username?: string;
   @IsString()
-  public password: string;
+  public password?: string;
 }

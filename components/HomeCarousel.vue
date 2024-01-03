@@ -1,49 +1,47 @@
 <template>
-    <div>
-        <!-- EXPENSES & INCOMES -->
-        <section v-if="item <= 1">
-            <BarGraph :items="graphContent" @filter="tagId => $emit('filter', tagId)"/>
-        </section>
+  <div>
+    <!-- EXPENSES & INCOMES -->
+    <section v-if="item <= 1">
+      <BarGraph :items="(graphContent as TagWithSum[])" @filter="(tagId) => $emit('filter', tagId)" />
+    </section>
+  </div>
+  <div class="center my-2">
+    <div class="toggle-bar m-1">
+      <a @click="item = 0" :class="`bar-item ${item === 0 ? 'active' : ''}`">{{ $t("expenses") }}</a>
+      <a @click="item = 1" :class="`bar-item ${item === 1 ? 'active' : ''}`">{{ $t("incomes") }}</a>
     </div>
-    <div class="center my-2">
-        <div class="toggle-bar m-1">
-        <a @click="item = 0" :class="`bar-item ${item === 0 ? 'active' : ''}`">{{ $t('expenses') }}</a>
-        <a @click="item = 1" :class="`bar-item ${item === 1 ? 'active' : ''}`">{{ $t('incomes') }}</a>
-        </div>
-    </div>
+  </div>
 </template>
 <script setup lang="ts">
-import { Source, TagWithSum } from 'stores/types';
+import type { Source, TagWithSum } from "@/stores/types";
 
-defineEmits(['filter']);
+defineEmits(["filter"]);
 
 const props = defineProps<{
-    expenses: TagWithSum[],
-    incomes: TagWithSum[],
-    sources: Source[],
-    targets: Source[],
+  expenses: TagWithSum[];
+  incomes: TagWithSum[];
+  sources: Source[];
+  targets: Source[];
 }>();
 
 const item = ref(0);
 
 const graphContent = computed(() => {
-    if (item.value === 1) {
-        return props.incomes;
-    }
-    if (item.value === 2) {
-        return props.sources;
-    }
-    if (item.value === 3) {
-        return props.targets;
-    }
-    return props.expenses;
-})
-
+  if (item.value === 1) {
+    return props.incomes;
+  }
+  if (item.value === 2) {
+    return props.sources;
+  }
+  if (item.value === 3) {
+    return props.targets;
+  }
+  return props.expenses;
+});
 </script>
 <style lang="scss" scoped>
-
 h3 {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 .circle {
@@ -60,20 +58,20 @@ h3 {
 }
 
 .chevron {
-    background-color: #ffffff00;
+  background-color: #ffffff00;
 }
 .chevron.left {
-    margin-right: 0.5em;   
+  margin-right: 0.5em;
 }
 
 .chevron.right {
-    margin-right: 0.5em;
+  margin-right: 0.5em;
 }
 
 .border-left {
-    padding-left: 1em;
-    border-left: 1px solid var(--color-grey-dark-2);
-    padding-right: 1em;
-    border-right: 1px solid var(--color-grey-dark-2);
+  padding-left: 1em;
+  border-left: 1px solid var(--color-grey-dark-2);
+  padding-right: 1em;
+  border-right: 1px solid var(--color-grey-dark-2);
 }
 </style>

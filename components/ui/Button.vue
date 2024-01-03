@@ -1,5 +1,5 @@
 <template>
-    <button :class="clazz" :disabled="disabled">
+    <button :class="clazz" :disabled="disabled || loading">
         <spinner v-if="loading" />
         <span v-if="!loading && icon" class="icon"><i :class="icon"></i></span>
         <slot v-if="!loading"/>

@@ -1,25 +1,25 @@
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from "class-validator";
 
 export class TagDto {
   @IsString()
-  public name: string;
+  public name?: string;
   @IsString()
   @IsOptional()
-  public description: string;
+  public description?: string;
   @IsString()
   @IsOptional()
-  public icon: string;
+  public icon?: string;
   @IsString()
   @IsOptional()
-  public color: string;
+  public color?: string;
   @IsOptional()
   @IsInt()
-  public parentId: number;
+  public parentId?: number;
 }
 
 export class EditTagDto {
   @IsInt()
-  public id: number;
+  public id?: number;
   @IsOptional()
   @IsString()
   public name?: string;
