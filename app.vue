@@ -53,6 +53,7 @@ body {
   line-height: 1.4;
   color: var(--color-font-light);
   background-color: var(--color-background-dark);
+  touch-action: pan-x pan-y;
 }
 #__nuxt {
   position: relative;
