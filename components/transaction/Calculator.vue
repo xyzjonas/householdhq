@@ -135,7 +135,4 @@ const newOperand = (newOperand: string) => {
     }
   }
 }
-
-.display-active {
-}
 </style>

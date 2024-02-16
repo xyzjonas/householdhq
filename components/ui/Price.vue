@@ -1,7 +1,7 @@
 <template>
   <div class="amount">
-    <span>{{ displayedAmount }}</span>
-    <span v-if="amounAsNumber != undefined" style="font-size: medium; margin-left: 2px">{{ curr }}</span>
+    <h1>{{ displayedAmount }}</h1>
+    <span v-if="amounAsNumber != undefined" class="currency">{{ curr }}</span>
   </div>
 </template>
 <script setup lang="ts">
@@ -43,10 +43,31 @@ const displayedAmount = computed(() => {
   }
   return props.amount;
 });
+
+const currSize = computed(() => {
+  return {
+    'x-large': 'medium',
+    small: 'x-small'
+  }[props.size] ?? 'small'
+})
+  
 </script>
 <style lang="scss" scoped>
 .amount {
+  font-weight: 200;
+  display: flex;
+  align-items: center;
+  gap: .1rem;
+}
+
+.currency {
+  font-size: v-bind('currSize');
+  font-weight: 400;
+  font-family: "Roboto Slab", serif;
+}
+
+h1 {
+  font-weight: 400;
   font-size: v-bind("size");
-  font-family: sans-serif;
 }
 </style>

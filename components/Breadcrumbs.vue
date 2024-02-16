@@ -27,18 +27,28 @@ const pathSegments = computed(() => {
 </script>
 
 <style scoped lang="scss">
+
 .crumbs {
     display: flex;
     flex-direction: row;
     // margin-top: 1em;
-    // margin-bottom: 1.5em;
-    padding: 16px;
-    padding-top: 16px;
+    margin-bottom: 1.5em;
+    // padding: 16px;
+    // padding-top: 16px;
+    color: var(--bg-300);
 
     span {
         display: flex;
         flex-direction: row;
         align-items: center;
+    }
+}
+
+a {
+    color: var(--bg-300);
+
+    &:hover {
+        color: var(--text-100)
     }
 }
 

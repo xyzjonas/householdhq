@@ -1,5 +1,5 @@
 <template>
-  <div class="container more-p">
+  <div>
     <Transition name="page" mode="out-in">
       <div v-if="!currentSource && sourceLoading" class="center"><MosaicLoader /></div>
       <div v-else-if="currentSource" class="flex-col">
@@ -67,7 +67,7 @@
           <hr />
           <Transition name="page" mode="out-in">
             <balance-entry-form v-if="edit" @close="edit = !edit" @created="newEntry" :sourceId="currentSource.id" />
-            <ui-button v-else @click="edit = !edit" height="32px">{{ $t("t_add") }}</ui-button>
+            <ui-button v-else @click="edit = !edit" height="32px">{{ $t("s_add_state") }}</ui-button>
           </Transition>
         </section>
       </div>

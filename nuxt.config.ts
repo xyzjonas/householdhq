@@ -28,9 +28,10 @@ export default defineNuxtConfig({
   css: ["@/assets/css/main.scss", "@/assets/fontawesome/css/all.css"],
   modules: ["@nuxtjs/i18n", "@pinia/nuxt", "@vite-pwa/nuxt"],
   i18n: {
-    locales: ["en", "fr", "es"],
+    locales: ["en", "fr", "es", "cs"],
     defaultLocale: "en",
     vueI18n: "./i18n.config.ts",
+    strategy: "no_prefix",
   },
   pwa: {
     registerType: "autoUpdate",

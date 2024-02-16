@@ -1,18 +1,27 @@
 <template>
-  <div class="balance-row">
-    <div class="balance-row-hdr">
-      <p>{{ $t("balance") }}</p>
-      <ui-price :amount="balanceSums.reduce((a, b) => a + b, 0).toString()" :currency="currency" />
+  <section>
+    <div>
+      <div class="row-simple center">
+        <ui-price
+          :amount="balanceSums.reduce((a, b) => a + b, 0).toString()"
+          :currency="currency"
+          size="3rem"
+        />
+      </div>
+      <h4>{{ $t("balance") }}</h4>
     </div>
-    <BalanceItem
-      v-for="(bal, index) in sources"
-      :source="bal"
-      v-model="balanceSums[index]"
-      :max="max"
-      class="balance-row-item"
-    />
+    <BalanceIndicator :forecast="forecast" :spent="spent" :total-income="totalIncome" />
+
+    <div>
+      <BalanceItem
+        v-for="(bal, index) in sources"
+        :source="bal"
+        v-model="balanceSums[index]"
+        :max="max"
+      />
+    </div>
     <NuxtLink to="/sources" class="ml">. . .</NuxtLink>
-  </div>
+  </section>
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
@@ -22,7 +31,11 @@ import type { Source } from "@/stores/types";
 const { currency } = storeToRefs(useTransactionStore());
 
 const props = defineProps<{
+  upcomming?: number;
   sources: Source[];
+  spent: number;
+  forecast: number;
+  totalIncome: number;
 }>();
 
 const balanceSums = ref<number[]>([]);
@@ -48,18 +61,21 @@ const total = computed(() => {
 });
 </script>
 <style lang="scss" scoped>
-.balance-row {
-  &-hdr {
-    p {
-      text-transform: uppercase;
-      font-size: large;
-    }
-    font-weight: 1000;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--color-primary-light-1);
-  }
+section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+h4 {
+  font-weight: 100;
+  text-transform: uppercase;
+}
+
+h1 {
+  text-transform: uppercase;
+  font-size: x-large;
+  font-weight: 300;
 }
 </style>

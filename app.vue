@@ -1,6 +1,5 @@
 <template>
   <VitePwaManifest />
-  <div class="noise-background" />
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
@@ -36,31 +35,26 @@ const nuxtApp = useNuxtApp();
   opacity: 0;
 }
 
-.noise-background {
-  position: absolute;
-  inset: 0;
-  z-index: -100;
-  opacity: 0.6;
-  mix-blend-mode: overlay;
-  background-image: url("@/assets/noise.webp");
-  overflow: auto;
+
+.slide-top-enter-active,
+.slide-top-leave-active {
+  transition: all 0.2s ease-in-out;
+}
+.slide-top-enter-from {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+.slide-top-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
 }
 
 body {
-  min-height: 100vh;
+  position: absolute;
+  inset: 0;
   font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--color-font-light);
-  background-color: var(--color-background-dark);
+  color: var(--text-200);
+  background-color: var(--bg-100);
 }
-#__nuxt {
-  position: relative;
-  min-height: 100vh;
-  /* position: absolute; */
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
+
 </style>

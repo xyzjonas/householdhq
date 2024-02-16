@@ -8,6 +8,7 @@
         width="24px"
         height="24px"
         class="mr"
+        link
       />
       <span class="label">{{ source.name }}</span>
     </div>
@@ -90,9 +91,14 @@ const autoUpdate = () => {
   align-items: center;
   justify-content: space-between;
 
+  background-color: var(--bg-200);
+  padding: .5rem 1rem;
+  border-top-right-radius: .3rem;
+  border-bottom-right-radius: .3rem;
+  border-left: .5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
+
   .text {
     display: inline-flex;
-    color: v-bind("source.color");
   }
 
   .text::after {

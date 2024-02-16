@@ -22,12 +22,6 @@
   }
 }
 
-.app-wrapper {
-  margin-inline: auto;
-  padding-block: 2rem;
-  width: min(100% - 2rem, 960px);
-}
-
 .graph-card {
   height: 480px;
   overflow: hidden;
@@ -41,10 +35,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.container {
-  padding: 0px 8px;
 }
 
 .py {
@@ -67,7 +57,11 @@
 }
 
 .mt {
-  margin-top: 0.5em;
+  margin-top: 0.5rem;
+}
+
+.mt-1 {
+  margin-top: 1rem;
 }
 
 .mb {
@@ -92,8 +86,9 @@
 .card {
   border-radius: 6px;
   border: 1px solid rgba(var(--color-border-dark), 1);
-  background-color: var(--color-foreground-dark);
+  background-color: var(--bg-200);
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .space {
@@ -104,7 +99,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: .3rem;
 
   .item {
     flex: 15 1 50%;

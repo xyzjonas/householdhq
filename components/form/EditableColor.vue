@@ -1,10 +1,20 @@
 <template>
     <div>
         <div class="input row-simple">
-            <div v-if="value !== valueCopy" style="margin-right: 1em;">
-                <button @click="send" class="success">{{ $t('ok') }}</button>
-                <button @click="valueCopy = value">{{ $t('cancel') }}</button>
-            </div>
+            <transition name="slide">
+                <div v-if="value !== valueCopy" class="btn-group">
+                    <ui-button
+                        @click="send"
+                        color="success"
+                        width="2rem"
+                        height="2rem"
+                    >{{ $t('ok') }}</ui-button>
+                    <ui-button
+                        @click="valueCopy = value"
+                        width="3rem"
+                    >{{ $t('cancel') }}</ui-button>
+                </div>
+            </transition>
             <label id="test_wrapper" class="color-circle" :style="`background-color: ${valueCopy}`">
                 <input
                     id="primary_color"
@@ -58,9 +68,11 @@ export default {
         visibility: hidden;
     }
 }
-button {
-    margin-left: 3px;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+
+.btn-group {
+    display: flex;
+    gap: .1rem;
+
+    margin-right: 1rem;
 }
 </style>

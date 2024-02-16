@@ -3,36 +3,31 @@
     <MonthHero @reload="monthReloaded" />
     <div>
       <top-summary :expense="expense" :income="income" />
+
       <HomeCarousel
         :expenses="expenseCategories"
         :incomes="incomeCategories"
-        :sources="incomeSources"
-        :targets="expenseSources"
         @filter="(tagId: number) => (filterTagId = tagId)"
       />
 
       <transition name="slide" mode="out-in">
-        <BalanceRow v-if="isCurrentMonth" :sources="incomeSources" class="card" />
+        <BalanceRow
+          v-if="isCurrentMonth"
+          :sources="incomeSources"
+          :upcomming="upcommingTransactionsAmount"
+          :forecast="upcommingTransactionsAmount"
+          :spent="expense"
+          :total-income="income"
+        />
       </transition>
 
-      <!-- ADD NEW TRANSACTION -->
-      <transition name="slide" mode="out-in">
-        <ui-button
-          v-if="isCurrentMonth"
-          @click="addTransaction = !addTransaction"
-          width="100%"
-          height="64px"
-          :icon="addTransaction ? 'fa-solid fa-xmark' : 'fa-solid fa-coins'"
-          class="mb mt"
-          >{{ addTransaction ? $t("cancel") : $t("t_add") }}</ui-button
-        >
-      </transition>
       <transition name="page">
-        <section v-if="addTransaction" style="padding-top: 0">
+        <section v-if="addExpense" class="mt-1">
           <transaction-form
-            v-if="addTransaction"
-            @cancel="addTransaction = false"
+            v-if="addExpense"
+            @cancel="addExpense = false"
             @send="putTransaction"
+            @close="addExpense = false"
             :processing="putLoading"
           />
         </section>
@@ -40,21 +35,26 @@
 
       <!-- SHOW UPCOMMING -->
       <h4 v-if="currentMonth && currentMonth.length > 0" id="remaining-bills" class="title row-simple">
-        <span v-if="isCurrentMonth"
-          >{{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}</span
-        >
-        <button v-if="isCurrentMonth" @click="showUpcomming = !showUpcomming" class="card font-l ml">
-          <ui-price :amount="upcommingTransactionsAmount" :currency="currency" />
-        </button>
+        <span class="icon"><i class="fa-solid fa-calendar"></i></span>
+        <span v-if="isCurrentMonth">
+          {{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}:
+        </span>
+        <ui-price :amount="upcommingTransactionsAmount" :currency="currency" style="margin-left: 1rem;"/>
         <ui-button
-          @click="showHidden = !showHidden"
-          :icon="!showHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
-          width="36px"
-          height="36px"
-          :outlined="!showHidden"
-          style="margin-left: auto"
+          v-if="isCurrentMonth"
+          @click="showUpcomming = !showUpcomming"
+          width="1.5rem"
+          height="1.5rem"
+          link
+          :icon="showUpcomming ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"
         />
       </h4>
+      <!-- <ui-button
+        @click="showHidden = !showHidden"
+        :icon="!showHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
+        color="light"
+        style="padding: .5rem;"
+      /> -->
 
       <transition name="page">
         <section v-if="showUpcomming || filterTagId > 0">
@@ -87,18 +87,19 @@
         />
       </section>
     </div>
+    <div id="floating" :class="{ active: addExpense }">
+      <ui-button
+        :color="addExpense ? 'secondary' : 'primary'"
+        icon="fa fa-plus"
+        width="3rem"
+        height="3rem"
+        rounded
+        @click="addExpense = !addExpense"
+      />
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-// import {
-//   TransactionRow,
-//   HomeCarousel,
-//   MonthHero,
-//   MosaicLoader,
-//   TransactionForm,
-//   TopSummary,
-//   BalanceRow,
-// } from "@/components";
 import { storeToRefs } from "pinia";
 
 import { useTokenStore } from "@/stores/tokenStore";
@@ -130,7 +131,8 @@ const putLoading = ref(false);
 const showUpcomming = ref(false);
 const showHidden = ref(false);
 
-const addTransaction = ref(false);
+const addExpense = ref(false);
+
 const filterTagId = ref<number>(-1);
 
 const { yearPath, monthPath } = useRoute().query;
@@ -204,7 +206,7 @@ const putTransaction = (transactionData: Transaction) => {
   })
     .then((res: any) => currentMonth.value.unshift(res.data))
     .finally(() => {
-      addTransaction.value = false;
+      addExpense.value = false;
       putLoading.value = false;
     });
 };
@@ -264,17 +266,18 @@ const monthReloaded = (newDate: Date) => {
 </script>
 
 <style scoped lang="scss">
-#add-t-button,
 #remaining-bills {
-  margin-top: 8px;
+  padding-inline: 1rem;
+  margin-top: 2rem;
   margin-bottom: 8px;
+
+  button:last-child {
+    margin-left: auto;
+  }
 }
 
 h3 {
   text-transform: uppercase;
-}
-.button {
-  min-height: 60px;
 }
 
 .no-transactions {
@@ -282,5 +285,33 @@ h3 {
   padding: 0;
   border: 1px dashed var(--color-border-dark);
   border-radius: 8px;
+}
+
+
+.btn-collapsible {
+  flex: 1;
+
+  &-out {
+    flex: 2;
+  }
+}
+
+.hide {
+  flex: 0;
+  overflow: hidden;
+  border: none;
+}
+
+#floating {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  border-radius: 50%;
+  box-shadow: 1px 1px 20px var(--bg-100);
+  transition: transform .1s ease-in-out;
+  
+  &.active {
+    transform: rotate(45deg);
+  }
 }
 </style>

@@ -1,8 +1,9 @@
 <template>
   <div>
     <!-- EXPENSES & INCOMES -->
-    <section v-if="item <= 1">
-      <BarGraph :items="(graphContent as TagWithSum[])" @filter="(tagId) => $emit('filter', tagId)" />
+    <section>
+      <BarGraph v-if="item === 1" :items="incomes" @filter="(tagId: number) => $emit('filter', tagId)" />
+      <BarGraph v-else :items="topExpenses" @filter="(tagId: number) => $emit('filter', tagId)" />
     </section>
   </div>
   <div class="center my-2">
@@ -20,24 +21,19 @@ defineEmits(["filter"]);
 const props = defineProps<{
   expenses: TagWithSum[];
   incomes: TagWithSum[];
-  sources: Source[];
-  targets: Source[];
 }>();
 
 const item = ref(0);
 
-const graphContent = computed(() => {
-  if (item.value === 1) {
-    return props.incomes;
+const topExpenses = computed(() => {
+  if (props.expenses.length > 5) {
+    return props.expenses
+    .filter(e => e.sum > 0)
+    .sort((a, b) => b.sum - a.sum)
   }
-  if (item.value === 2) {
-    return props.sources;
-  }
-  if (item.value === 3) {
-    return props.targets;
-  }
-  return props.expenses;
-});
+  return props.expenses
+})
+
 </script>
 <style lang="scss" scoped>
 h3 {
@@ -55,17 +51,6 @@ h3 {
 
 .circle.selected {
   background-color: #fff;
-}
-
-.chevron {
-  background-color: #ffffff00;
-}
-.chevron.left {
-  margin-right: 0.5em;
-}
-
-.chevron.right {
-  margin-right: 0.5em;
 }
 
 .border-left {
