@@ -53,8 +53,12 @@ body {
   position: absolute;
   inset: 0;
   font-family: "Roboto", sans-serif;
+
+  font-weight: 400;
+  line-height: 1.4;
   color: var(--text-200);
   background-color: var(--bg-100);
+  touch-action: pan-x pan-y;
 }
 
 </style>
