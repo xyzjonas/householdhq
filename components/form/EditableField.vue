@@ -7,8 +7,8 @@
                 :rows="rowCount"
                 :placeholder="$t('undefined')"
             ></textarea>
-            <button @click="send" class="success">{{ $t('ok') }}</button>
-            <button @click="editting = false">{{ $t('cancel') }}</button>
+            <ui-button @click="send" color="success" height="2rem" width="2rem">{{ $t('ok') }}</ui-button>
+            <ui-button @click="editting = false" color="secondary"  height="2rem" width="3rem">{{ $t('cancel') }}</ui-button>
         </div>
         <p v-else @click="editting = true" style="text-align: end;">{{ value || $t('undefined')}}</p>
     </div>

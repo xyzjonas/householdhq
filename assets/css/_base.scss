@@ -1,9 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
 
 :root {
-    --color-primary: #befdea;
-    --color-success: #2EB086;
-    --color-danger: #B8405E;
+    // --color-success: #2EB086;
+    --color-success: #8ab68c;
+    // --color-success: #5BAF9A;
+    // --color-danger: #B8405E;
+    --color-danger: #9B1C31;
+
 
     // --color-background-dark: #1f1f1f;
     --color-background-dark: #242635;
@@ -11,6 +16,20 @@
     --color-foreground-dark: #323548;
 
     --color-border-dark: #565857;
+
+    --primary-100:#D35459;
+    --primary-200:#ff8586;
+    --primary-300:#ffebe8;
+    --accent-100:#2C3E50;
+    --accent-200:#b4c7dd;
+    --text-100:#FFFFFF;
+    --text-200:#e0e0e0;
+    --bg-100:#1A1A1A;
+    --bg-200:#292929;
+    --bg-300:#404040;
+
+    --color-primary: var(--primary-100);
+      
 
     // --color-primary-dark-1-rgb: 15, 23, 42;
     // --color-primary-dark-2-rgb: 24, 34, 52;

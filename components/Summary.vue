@@ -1,6 +1,6 @@
 <template>
   <div v-if="loaded">
-    <graph-line :data="chartData.data" :categoryName="category.name"/>
+    <Line :data="chartData" :options="options"/>
     <div class="row center">
       <ui-button
         :outlined="true"
@@ -22,6 +22,7 @@
   <!-- <Bar :data="chartData" :options="(options as any)" :style="myStyles" /> -->
 </template>
 <script lang="ts" setup>
+import { Line } from 'vue-chartjs'
 import { useCategoriesStore } from "../stores/categories";
 import { storeToRefs } from "pinia";
 import type { TagWithSum } from "../stores/types";
@@ -43,28 +44,52 @@ const formatMMYYYY = (date: Date) => {
   return date.toLocaleDateString(i18n.locale.value, { month: "long" }).toUpperCase();
 };
 
-const chartData = computed(() => {
-  return {
-    labels: summary.value.map((s) => formatMMYYYY(new Date(s.year, s.month))),
-    data: summary.value.map((s) => s.amount)
-  };
-});
+// const chartData = computed(() => {
+//   return {
+//     labels: summary.value.map((s) => formatMMYYYY(new Date(s.year, s.month))),
+//     data: summary.value.map((s) => s.amount)
+//   };
+// });
 
-const myStyles = computed(() => {
-  return {
-    width: "100%",
-  };
-});
+const chartData = computed<any>(() => {
+    return {
+        labels: summary.value.map(s => formatMMYYYY(new Date(s.year, s.month))),
+        datasets: [
+            {
+                label: props.category.name,
+                borderColor: props.category.color,
+                // borderWidth: 2,
+                // borderRadius: 5,
+                // backgroundColor: `${props.category.color}35`,
+                data: summary.value.map(s => s.amount),
+                cubicInterpolationMode: 'monotone',
+                tension: 0.4,
+                pointStyle: false,
+            }
+        ]
+    }
+})
+
+// const myStyles = computed(() => {
+//   return {
+//     width: "100%",
+//   };
+// });
 
 const options = {
-  responsive: false,
-  plugins: {
-    legend: {
+  type: 'line',
+  responsive: true,
+  scales: {
+    y: {
       display: false,
-      position: "right",
-      fullSize: true,
+      title: {
+        display: false,
+      }
     },
-  },
+    x: {
+      display: false,
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

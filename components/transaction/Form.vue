@@ -1,8 +1,18 @@
 <template>
   <div ref="focusDiv" class="card">
+    <div class="row-simple">
+        <ui-button
+          id="close-t-form"
+          width="2rem"
+          height="2rem"
+          color="light"
+          link icon="fa-solid fa-xmark"
+          @click="$emit('close')"
+        />
+      </div>
     <transition name="slide" mode="out-in" class="navigation-container">
       <!-- ENTIRE FORM -->
-      <div v-if="stage === 2" class="form">
+      <div v-if="stage === 3" class="form">
         <ui-input :label="$t('t_amount')" v-model.number="transaction.amount" type="number" :required="true" />
         <ui-input :label="$t('t_date')" v-model="date" type="date" :required="true" />
         <ui-input :label="$t('t_time')" v-model="time" type="time" :required="true" />
@@ -34,16 +44,47 @@
           </transition>
         </div>
 
-        <ui-button @click="send" :loading="processing" icon="fa-solid fa-floppy-disk" height="64px" :outlined="true">{{
-          $t("t_send")
-        }}</ui-button>
+        <ui-button
+          @click="send"
+          :loading="processing"
+          icon="fa-solid fa-floppy-disk"
+          height="64px"
+          color="primary"
+        >
+          {{ $t("t_send") }}
+        </ui-button>
       </div>
+
       <!-- CATEGORY SELECTION -->
-      <div v-else-if="stage === 1" class="categories">
+      <div v-else-if="stage === 2" class="categories">
         <CategoryBadge v-for="tag in categories" :category="tag" @selected="categorySelected" />
       </div>
+
       <!-- NUMPAD  -->
-      <transaction-calculator v-else v-model="transaction.amount" @confirm="stage = stage + 1" />
+      <transaction-calculator v-else-if="stage === 1" v-model="transaction.amount" @confirm="stage = stage + 1" />
+
+      <div v-else class="income-expense">
+        <ui-button
+          color="success"
+          icon="fa-solid fa-arrow-trend-up"
+          @click="makeIncome"
+          width="8rem"
+          height="8rem"
+          rounded
+        >
+          {{ $t('t_add_in') }}
+        </ui-button>
+        <ui-button
+          color="danger"
+          icon="fa-solid fa-arrow-trend-down"
+          rounded
+          width="8rem"
+          height="8rem"
+          @click="makeExpense"
+        >
+          {{ $t('t_add_out') }}
+        </ui-button>
+      </div>
     </transition>
     <div class="navigation">
       <ui-button
@@ -88,7 +129,7 @@ const props = defineProps<{
 }>();
 
 const stage = ref(0);
-const stages = 3;
+const stages = 4;
 const transaction = ref<CreateUpdateTransaction>({
   created: undefined,
   amount: 0,
@@ -113,19 +154,12 @@ onMounted(() => {
 
   if (props.transactionIn) {
     transaction.value = transactionToUpdateTransaction(props.transactionIn);
-    //   ...props.transactionIn,
-    //   source: undefined,
-    //   target: undefined,
-
-    // };
     transaction.value.tags = props.transactionIn.tags.map((t) => t.name).join(",");
-    // delete transaction.value.source; // discard prisma-included properties
-    // delete transaction.value.target; // discard prisma-included properties
-    // delete transaction.value.category; // discard prisma-included properties
     delete transaction.value.confirmed; // discard explicit confirmed property - only for confirm action
     date.value = formatDate(new Date(transaction.value.created ?? new Date()));
     time.value = formatTime(new Date(transaction.value.created ?? new Date()));
   }
+  
   if (props.startStage) {
     stage.value = props.startStage;
   }
@@ -139,6 +173,18 @@ onMounted(() => {
   focusDiv.value.scrollIntoView({ block: "center", behavior: "smooth" });
 });
 
+const makeIncome = () => {
+  transaction.value.sourceId = allSources.value.find(s => s.isOut)?.id ?? 2;
+  transaction.value.targetId = allSources.value.find(s => !s.isOut)?.id ?? 1;
+  stage.value++;
+}
+
+const makeExpense = () => {
+  transaction.value.sourceId = allSources.value.find(s => !s.isOut)?.id ?? 1;
+  transaction.value.targetId = allSources.value.find(s => s.isOut)?.id ?? 2;
+  stage.value++;
+}
+
 const isRecurring = ref(false);
 
 const categoriesStore = useCategoriesStore();
@@ -148,7 +194,7 @@ const sourcesStore = useSourcesStore();
 const { allSources } = storeToRefs(sourcesStore);
 
 const { t } = useI18n();
-const emit = defineEmits(["send"]);
+const emit = defineEmits(["send", "close"]);
 
 const send = () => {
   if (!transaction.value.description) {
@@ -205,13 +251,13 @@ const categorySelected = (categoryName: string) => {
   &-stage {
     width: 12px;
     height: 12px;
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--bg-300);
     border-radius: 50%;
   }
 }
 
 .active {
-  background-color: var(--color-primary);
+  background-color: var(--bg-300);
 }
 
 .button-sm {
@@ -254,5 +300,17 @@ input[type="number"] {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.income-expense {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#close-t-form {
+  margin-left: auto;
+  margin-right: .3rem;
+  margin-bottom: 1rem;
 }
 </style>

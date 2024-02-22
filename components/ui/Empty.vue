@@ -4,7 +4,7 @@
         <section v-else>
             <h1 v-show="icon"><i :class="icon"></i></h1>
             <h1>{{ title }}</h1>
-            <h5 v-show="subtitle">{{ subtitle }}</h5>
+            <h2 v-show="subtitle">{{ subtitle }}</h2>
         </section>
     </section>
 </template>
@@ -38,17 +38,9 @@ const props = defineProps<{
 
     text-align: center;
 
-    h1, h5 {
+    h1 {
         text-transform: uppercase;
     }
 
-    h1 {
-        font-size: 2em;
-    }
-
-    h5 {
-        font-size: 0.8em;
-        font-weight: 100;
-    }
 }
 </style>

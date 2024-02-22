@@ -23,33 +23,36 @@
           <ui-price :amount="transaction.amount" :currency="transaction.currency" />
         </p>
       </div>
+
+      <!-- BUTTONS -->
       <div class="panel" :style="`width: ${details ? 40 : 0}%`">
-        <ui-button v-if="!confirmDelete" icon="fa-solid fa-trash" @click="confirmDelete = !confirmDelete">{{
-          $t("delete")
-        }}</ui-button>
+        <ui-button
+          v-if="!confirmDelete"
+          icon="fa-solid fa-trash"
+          color="danger"
+          @click="confirmDelete = !confirmDelete"
+        />
+          <!-- {{ $t("delete") }}</ui-button> -->
         <ui-button
           v-else
-          icon="fa-solid fa-trash"
+          icon="fa-solid fa-circle-check"
           color="danger"
           :loading="loading"
           @click="emit('delete', { id: transaction.id })"
-          >{{ $t("confirm") }}</ui-button
-        >
-        <ui-button @click="edit = !edit" :icon="edit ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'">{{
-          edit ? $t("cancel") : $t("edit")
-        }}</ui-button>
+        />
+        <ui-button @click="edit = !edit" :icon="edit ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'" />
+          <!-- {{ edit ? $t("cancel") : $t("edit") }}
+        </ui-button> -->
       </div>
+
       <div class="panel y" :style="`width: ${confirmable ? 20 : 0}%`">
         <ui-button
           color="success"
           :loading="patching"
+          :icon="transaction.recurring ? 'fa-regular fa-copy' : 'fa-regular fa-circle-check'"
           @click="patchTransaction({ id: transaction.id, confirmed: true, created: transaction.created })"
         >
-          {{ $t("confirm") }}
-          <span v-if="transaction.recurring > 0">
-            <br />
-            <small>{{ $t("t_new_recurring") }} {{ transaction.recurring }} {{ $t("months") }}</small>
-          </span>
+          <small v-if="transaction.recurring > 0">{{ transaction.recurring }}m</small>
         </ui-button>
       </div>
     </div>
@@ -145,12 +148,14 @@ const confirmable = computed(() => {
 <style lang="scss" scoped>
 .transaction {
   border-right: solid 10px;
-  border-right-color: v-bind("tagColor");
+  border-right-color: v-bind("tagColor") !important;
   transition: 250ms;
+  cursor: pointer;
 
   &:hover {
     transition: 250ms;
     border-right-color: v-bind("tagColor");
+    filter: brightness(1.05);
   }
 }
 

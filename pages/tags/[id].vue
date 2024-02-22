@@ -1,5 +1,5 @@
 <template>
-  <div class="container more-p">
+  <div class="container">
     <div v-if="!currentCategory && categoryLoading" class="center"><MosaicLoader /></div>
     <div v-else-if="currentCategory" class="flex-col">
       <section class="row title">
@@ -86,6 +86,8 @@ const tag = ref({});
 <style lang="scss" scoped>
 .title {
   text-transform: uppercase;
+  border: none;
+  margin-bottom: 1.5rem !important;
 }
 .row {
   margin-top: 0.1em;

@@ -2,7 +2,7 @@
 
 
 @mixin background {
-    background-color: var(--color-foreground-dark);
+    background-color: var(--bg-200);
     border-radius: 5px;
 }
 
@@ -17,7 +17,7 @@
 
     border: solid;
     border-width: 1px;
-    border-color: #aaaaaa00;
+    border-color: transparent;
 
     margin-top: 0.25em;
     margin-bottom: 0.25em;
@@ -29,6 +29,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+
 
     overflow: hidden;
 
@@ -148,7 +149,7 @@
         top: calc(0px - #{$font-top}/1.5);
         color: var(--color-font-light);
         font-size: $font-top;
-        background-color: var(--color-foreground-dark);
+        background-color: var(--bg-200);
         // background-color: transparent;
         // backdrop-filter: blur(0.1);
 
@@ -258,15 +259,5 @@
 
     @media only screen and (max-width: $bp-small) {
         grid-template-columns: 1fr 1fr 1fr;
-    }
-}
-
-
-.numpad {
-    display: grid;
-    grid: auto-flow dense / 1fr 1fr 1fr;
-
-    .button {
-        height: 4em;
     }
 }

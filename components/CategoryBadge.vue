@@ -24,19 +24,33 @@ export default {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border-color: v-bind('category.color');
+    background-color: v-bind('category.color');
+    backdrop-filter: opacity(.1);
 
-    &:hover {
-        border-color: v-bind('category.color');
-    }
+    max-height: 7rem;
 
+    
     i {
-        // font-size: small;
         margin-right: 0.5em;
         color: v-bind('category.color');
     }
-
+    
     p {
         text-align: center;
+        padding: .3rem;
+        border-radius: .3rem;
+        backdrop-filter: invert(20%) opacity(.3);
+        font-weight: 500;
+        color: white;
+        text-shadow: 1px 1px 3px var(--bg-100);
+        transition: .2s ease-in-out;
+    }
+    
+    &:hover {
+        p {
+            backdrop-filter: invert(50%) opacity(.9);
+        }
     }
 }
 </style>
