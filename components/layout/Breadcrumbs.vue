@@ -1,8 +1,8 @@
-<template lang="">
+<template>
     <div v-if="pathSegments.length" class="crumbs">
-        <NuxtLink to="/" class="segment"><i class="fa-solid fa-house"></i></NuxtLink>
+        <NuxtLink id="home" to="/" class="segment i-ic-baseline-home" />
         <span v-for="segment, index in pathSegments">
-            <i class="fa-solid fa-angle-right caret"></i>
+            <i class="i-ic-baseline-chevron-right"></i>
             <NuxtLink
                 :to="`/${pathSegments.slice(0, index + 1).join('/')}`"
                 class="segment">{{ segment }}
@@ -16,7 +16,6 @@ const route = useRoute()
 const pathSegments = computed(() => {
     const fullPath = route.fullPath;
 
-    // ignored pages:
     if (fullPath === '/login') {
         return []
     }
@@ -27,15 +26,16 @@ const pathSegments = computed(() => {
 </script>
 
 <style scoped lang="scss">
+#home {
+    font-size: larger;
+}
 
 .crumbs {
     display: flex;
     flex-direction: row;
-    // margin-top: 1em;
     margin-bottom: 1.5em;
-    // padding: 16px;
-    // padding-top: 16px;
     color: var(--bg-300);
+    align-items: center;
 
     span {
         display: flex;
@@ -61,7 +61,6 @@ a {
 .segment {
     margin-left: 0.3em;
     margin-right: 0.3em;
-    font-weight: 600;
     transition: 0.2s color;
 
     &:hover {

@@ -18,8 +18,10 @@ const cs = {
   incomes: "příjmy",
   edit: "upravit",
   delete: "smazat",
+  delete_desc: "*jen pokud neexistují žádné závislé transakce",
   no_data: "Žádná data",
   no_data_will_appear: "Shrnutí se zobrazí po zaúčtování",
+  c_new: "Nová",
   t_date: "Datum",
   t_time: "Čas",
   t_desc: "Popis",
@@ -35,6 +37,10 @@ const cs = {
   t_upcomming_1: "nadcházející platba",
   t_upcomming_2: "nadcházející platby",
   t_upcomming_5: "nadcházející platby",
+  t_added: "Transakce zaúčtována.",
+  t_editted: "Transakce uložena.",
+  t_confirmed: "Transakce zaúčtována.",
+  t_confirmed_reccuring: "Transaction zaúčtována a kopie vytvořena.",
   months: "měsíců",
   tag_name: "Název kategorie",
   tag_parent: "Nadkategorie",
@@ -46,7 +52,9 @@ const cs = {
   balance: "zůstatek",
   balance_auto_update: "dopočítat",
   s_isout: "výdaje",
+  s_isout_desc: "poznačit tento účet jako 'výdajový'",
   s_isdisp: "zahrnout do zůstatku",
+  s_isdisp_desc: "transakce mířící z/do tohoto účtu budou součástí měsíčního soupisu",
   s_add_state: "přidat záznam",
   s_state: "záznam",
   s_states: "záznamy",
@@ -55,7 +63,8 @@ const cs = {
   sign_in: "Přihlásit",
   login_failed: "Špatné uživatelské jméno nebo heslo",
   no_transactions: "Žádné transakce",
-  no_transactions_will_appear: "Transakce se zobrazí po zaúčtování"
+  no_transactions_will_appear: "Transakce se zobrazí po zaúčtování",
+  server_error: "Něco se někde pořádně vysralo, zkus to pozdeji...",
 }
 
 export { cs }

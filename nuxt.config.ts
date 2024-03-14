@@ -25,8 +25,13 @@ export default defineNuxtConfig({
       ],
     },
   },
-  css: ["@/assets/css/main.scss", "@/assets/fontawesome/css/all.css"],
-  modules: ["@nuxtjs/i18n", "@pinia/nuxt", "@vite-pwa/nuxt"],
+  css: ["@/assets/css/main.scss"],
+  modules: [
+    "@nuxtjs/i18n",
+    "@pinia/nuxt",
+    "@vite-pwa/nuxt",
+    '@unocss/nuxt',
+  ],
   i18n: {
     locales: ["en", "fr", "es", "cs"],
     defaultLocale: "en",
@@ -38,7 +43,7 @@ export default defineNuxtConfig({
     manifest: {
       name: "Household HQ PWA",
       short_name: "HomePWA",
-      theme_color: "#000000",
+      theme_color: "#eee",
       icons: [
         {
           src: "manifest-icon-192.maskable.png",
@@ -72,4 +77,8 @@ export default defineNuxtConfig({
       },
     },
   },
+  alias: {
+    "@server": "../server",
+    "@/stores": "../stores",
+  }
 });

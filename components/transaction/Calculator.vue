@@ -6,11 +6,11 @@
     </div>
     <div class="calculator-numpad">
       <ui-button v-for="index in 9" @click="add(index)">{{ index }}</ui-button>
-      <ui-button @click="newOperand('-')" icon="fa-regular fa-square-minus" />
+      <ui-button @click="newOperand('-')" icon="i-ic-baseline-minus" />
       <ui-button @click="add(0)">0</ui-button>
-      <ui-button @click="newOperand('+')" icon="fa-regular fa-square-plus" />
-      <ui-button @click="remove" icon="fa-solid fa-delete-left" />
-      <ui-button @click="clear" icon="fa-regular fa-trash-can" />
+      <ui-button @click="newOperand('+')" icon="i-ic-baseline-plus" />
+      <ui-button @click="remove" icon="i-ic-outline-backspace" />
+      <ui-button @click="clear" icon="i-ic-baseline-delete" />
       <ui-button v-if="operand" @click="addOrSubstract" icon="fa-solid fa-equals" />
       <ui-button v-else @click="$emit('confirm')">OK</ui-button>
     </div>

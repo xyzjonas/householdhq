@@ -60,6 +60,12 @@ class Sources {
     return sourceState;
   }
 
+  public async deleteSource(sourceData: IdDto) {
+    await this.sources.delete({
+      where: { id: sourceData.id }
+    })
+  }
+
   public async deleteState(entryData: IdDto) {
     const sourceState: SourceState = await this.sourceStates.delete({ where: { id: entryData.id } });
     return sourceState;

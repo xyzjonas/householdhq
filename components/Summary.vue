@@ -1,31 +1,18 @@
 <template>
-  <div v-if="loaded">
-    <Line :data="chartData" :options="options"/>
-    <div class="row center">
-      <ui-button
-        :outlined="true"
-        width="48px"
-        height="36px"
-        icon="fa-solid fa-pen mr"
-        @click="$emit('edit')"
-      />
-      <ui-button
-        :outlined="true"
-        width="48px"
-        height="36px"
-        icon="fa-solid fa-xmark"
-        @click="$emit('close')"
-      />
+  <div class="summary" v-if="loaded">
+    <div class="row-simple center mb-1">
+      <h1>FOO</h1>
     </div>
+    <Line :data="chartData" :options="options"/>
   </div>
   <spinner name="roller" class="center" v-else />
-  <!-- <Bar :data="chartData" :options="(options as any)" :style="myStyles" /> -->
 </template>
 <script lang="ts" setup>
 import { Line } from 'vue-chartjs'
 import { useCategoriesStore } from "../stores/categories";
 import { storeToRefs } from "pinia";
 import type { TagWithSum } from "../stores/types";
+import { shouldInvert } from '~/utils/color';
 
 const categoriesStore = useCategoriesStore();
 const { summaryId, summary, summaryLoading } = storeToRefs(categoriesStore);
@@ -41,15 +28,8 @@ onMounted(() => {
 
 const i18n = useI18n();
 const formatMMYYYY = (date: Date) => {
-  return date.toLocaleDateString(i18n.locale.value, { month: "long" }).toUpperCase();
+  return date.toLocaleDateString(i18n.locale.value, { month: "long" }).toUpperCase().substring(0,3);
 };
-
-// const chartData = computed(() => {
-//   return {
-//     labels: summary.value.map((s) => formatMMYYYY(new Date(s.year, s.month))),
-//     data: summary.value.map((s) => s.amount)
-//   };
-// });
 
 const chartData = computed<any>(() => {
     return {
@@ -70,15 +50,25 @@ const chartData = computed<any>(() => {
     }
 })
 
-// const myStyles = computed(() => {
-//   return {
-//     width: "100%",
-//   };
-// });
-
 const options = {
   type: 'line',
   responsive: true,
+  plugins: {
+    datalabels: {
+      backgroundColor: props.category.color,
+      color: shouldInvert(props.category.color) ? '#333' : '#ddd',
+      borderRadius: 3,
+      anchor: 'end',
+      offset: 100,
+      labels: {
+        title: {
+          font: {
+            weight: 'bold'
+          }
+        },
+      }
+    }
+  },
   scales: {
     y: {
       display: false,
@@ -87,10 +77,10 @@ const options = {
       }
     },
     x: {
-      display: false,
+      display: true,
     }
   }
-};
+} as any;
 </script>
 <style lang="scss" scoped>
 .row {

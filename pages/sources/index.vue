@@ -1,29 +1,62 @@
-<template lang="">
-    <div class="container">
-        <div v-if="sources" v-for="source in sources.value.data">
-            <component :is="SourceRow" :source="source"></component>
+<template>
+  <div class="container">
+      <div v-if="sources" v-for="source in sources">
+        <source-row :source="source" />
+    </div>
+    <div class="new-source-card">
+        <h2>new source</h2>
+        <div class="new-source">
+        <ui-input :label="$t('c_new')" v-model="newSourceName" />
+        <ui-button
+            @click="createSource()"
+            :loading="sourceLoading"
+            :disabled="!newSourceName"
+            >{{ $t("t_send") }}</ui-button
+        >
         </div>
     </div>
+  </div>
 </template>
 <script setup lang="ts">
-// import { useAuth0 } from '@auth0/auth0-vue';
+import { useSourcesStore } from "@/stores/sources";
+import { storeToRefs } from "pinia";
 
-const SourceRow = resolveComponent('SourceRow')
+const sourcesStore = useSourcesStore();
+const { sources, sourceLoading } = storeToRefs(sourcesStore);
+await sourcesStore.fetchAllSources();
 
-// const auth0 = useAuth0();
-// const token = await auth0.getAccessTokenSilently();
-
-// useFetch()
-const sources = ref();
-useFetch(
-    '/api/sources',
-    {
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + "token"
-        },
-}).then(res => sources.value = res.data)
+const newSourceName = ref();
+const createSource = () => {
+  sourcesStore
+    .createSource({ name: newSourceName.value })
+    .then(() => (newSourceName.value = undefined));
+};
 </script>
-<style lang="">
-    
+
+<style lang="css" scoped>
+.new-source-card {
+    background-color: var(--bg-200);
+    padding: 1rem;
+    padding-top: .6rem;
+    border-radius: .3rem;
+}
+
+.new-source {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.input-box {
+  flex: 3;
+}
+
+button {
+  flex: 1;
+}
+
+h2 {
+    font-weight: 400;
+    margin-bottom: .5rem;
+    text-transform: uppercase;
+}
 </style>

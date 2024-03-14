@@ -18,8 +18,10 @@ const en = {
   incomes: "incomes",
   edit: "edit",
   delete: "delete",
+  delete_desc: "*only if no transactions are linked to it",
   no_data: "no data",
   no_data_will_appear: "Summary will appear once transactions are added",
+  c_new: "New",
   t_date: "date",
   t_time: "time",
   t_desc: "description",
@@ -35,6 +37,10 @@ const en = {
   t_upcomming_1: "upcomming expense",
   t_upcomming_2: "upcomming expenses",
   t_upcomming_5: "upcomming expenses",
+  t_added: "Transaction added.",
+  t_editted: "Transaction saved.",
+  t_confirmed: "Transaction confirmed.",
+  t_confirmed_reccuring: "Transaction confirmed and a copy was created.",
   months: "months",
   tag_name: "Category name",
   tag_parent: "Parent category",
@@ -46,7 +52,9 @@ const en = {
   balance: "balance",
   balance_auto_update: "auto update",
   s_isout: "expenses",
+  s_isout_desc: "mark this account as an 'expense' one",
   s_isdisp: "include in expense report",
+  s_isdisp_desc: "transactions related to this account will be shown in the monthly summary",
   s_state: "entry",
   s_add_state: "add entry",
   s_states: "entries",
@@ -54,7 +62,8 @@ const en = {
   login_failed: "Invalid username or password",
   access_denied: "Access not granted",
   no_transactions: "No transactions",
-  no_transactions_will_appear: "Transactions will appear once entered"
+  no_transactions_will_appear: "Transactions will appear once entered",
+  server_error: "Something wrong happened, try again later...",
 }
 
 export { en }

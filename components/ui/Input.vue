@@ -16,13 +16,13 @@
 const props = defineProps<{
   modelValue: any;
   label: string;
-  type: string;
-  required: boolean;
+  type?: string;
+  required?: boolean;
   size?: ["md", "lg"];
 }>();
 
 const clazz = computed(() => {
-  return `input-group-${props.size ?? "md"}`;
+  return `input-box input-group-${props.size ?? "md"}`;
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -56,5 +56,9 @@ onMounted(() => {
 
 .input-group-lg {
   @include input-group(16px, 16px, 10px);
+}
+
+input {
+  width: 100%;
 }
 </style>

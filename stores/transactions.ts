@@ -1,6 +1,7 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
 import type { Transaction } from "./types";
 import { useTokenStore } from "./tokenStore";
+import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
 export const useTransactionStore = defineStore("transaction", () => {
   const tokenStore = useTokenStore();
@@ -11,8 +12,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   const loading = ref(false);
 
-  const year = ref<number>();
-  const month = ref<number>();
+  const { month, year } = useCurrentMonth();
 
   const currentMonth = ref<Transaction[]>([]);
 
@@ -50,7 +50,51 @@ export const useTransactionStore = defineStore("transaction", () => {
     }
   };
 
-  return { loading, currency, currentMonth, year, month, passed, upcomming, fetchTransactions };
+  const createTransaction = async (transactionData: Transaction) => {
+    loading.value = true;
+    const url = "/api/transactions";
+    try {
+      const response = await tokenStore.put("/api/transactions", transactionData)
+      const transaction: Transaction = response.data
+      if (new Date(transaction.created).getMonth() + 1 === month.value) {
+        currentMonth.value.unshift(transaction)
+      }
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  const editTransaction = async (transactionData: {[K in keyof Transaction]?: any}) => {
+    loading.value = true;
+    try {
+      const response = await tokenStore.patch("/api/transactions", transactionData)
+      const transaction: Transaction = response.data
+      currentMonth.value = currentMonth.value.map(t => {
+        if (t.id === transaction.id) {
+          return transaction
+        }
+        return t
+      })
+      // if (new Date(transaction.created).getMonth() + 1 === month.value) {
+      //   currentMonth.value.unshift(transaction)
+      // }
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return {
+    loading,
+    currency,
+    currentMonth,
+    year,
+    month,
+    passed,
+    upcomming,
+    fetchTransactions,
+    createTransaction,
+    editTransaction,
+  };
 });
 
 if (import.meta.hot) {

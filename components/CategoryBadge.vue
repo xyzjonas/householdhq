@@ -1,17 +1,24 @@
 <template>
     <a @click="$emit('selected', category.name)" class="badge">
         <p>
-            <Icon v-if="category && category.icon" :iconName="category.icon" />
+            <!-- <Icon v-if="category && category.icon" :iconName="category.icon" /> -->
             <span>{{ category.name }}</span>
         </p>
     </a>
 </template>
-<script>
-import { Icon } from '#components';
-export default {
-    components: { Icon },
-    props: ['category'],
-}
+<script lang="ts" setup>
+import { shouldInvert } from '~/utils/color';
+
+const props = defineProps<{ category: Category }>();
+
+const textColor = computed(() => {
+    if (props.category.color) {
+        return shouldInvert(props.category.color) ? 'var(--bg-200)' : 'var(--text-200)';
+    }
+
+    return;
+})
+
 </script>
 <style lang="scss" scoped>
 .badge {
@@ -30,6 +37,11 @@ export default {
 
     max-height: 7rem;
 
+    transition: filter .2s ease-in-out;
+    &:hover {
+        filter: brightness(1.2);
+    }
+
     
     i {
         margin-right: 0.5em;
@@ -40,17 +52,10 @@ export default {
         text-align: center;
         padding: .3rem;
         border-radius: .3rem;
-        backdrop-filter: invert(20%) opacity(.3);
-        font-weight: 500;
-        color: white;
-        text-shadow: 1px 1px 3px var(--bg-100);
+        font-weight: 400;
+        color: v-bind("textColor");
+        // text-shadow: 1px 1px 3px v-bind("textColor");
         transition: .2s ease-in-out;
-    }
-    
-    &:hover {
-        p {
-            backdrop-filter: invert(50%) opacity(.9);
-        }
     }
 }
 </style>

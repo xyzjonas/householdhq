@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { Source, SourceApi } from "./types";
+import type { CreateSource, DeleteSource, Source, SourceApi } from "./types";
 import { useTokenStore } from "./tokenStore";
 import { useTransactionStore } from "./transactions";
 
@@ -86,6 +86,29 @@ export const useSourcesStore = defineStore("source", () => {
     await fetchSingleSource(srcId);
   };
 
+  const createSource = async (sourceData: CreateSource) => {
+    sourceLoading.value = true;
+    const url = "/api/sources";
+    try {
+      const newSource = await tokenStore.put(url, sourceData);
+      allSources.value.push(newSource);
+      return newSource;
+    } finally {
+      sourceLoading.value = false;
+    }
+  }
+
+  const deleteSource = async (sourceData: DeleteSource) => {
+    sourceLoading.value = true;
+    const url = "/api/sources";
+    try {
+      const newSource = await tokenStore.del(url, sourceData);
+      allSources.value = allSources.value.filter(s => s.id !== sourceData.id);
+    } finally {
+      sourceLoading.value = false;
+    }
+  }
+
   return {
     allSources,
     sources,
@@ -97,7 +120,9 @@ export const useSourcesStore = defineStore("source", () => {
     fetchAllSources,
     fetchSingleSource,
     patchSource,
+    createSource,
     deleteEntry,
+    deleteSource,
   };
 });
 

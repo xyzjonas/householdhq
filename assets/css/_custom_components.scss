@@ -50,47 +50,6 @@
     background-color: var(--color-primary-dark-1);
 }
 
-.title {
-    border-bottom: 1px solid;
-    border-bottom-color: var(--color-primary-light-1);
-    padding-bottom: 0.5em;
-    margin-bottom: 1em;
-}
-
-/* CSS */
-// button, .button {
-//   background-color: var(--color-primary);
-//   border: 1px solid var(--color-primary);
-//   color: var(--color-font-dark);
-//   border-radius: 5px;
-//   width: fit-content;
-
-//   cursor: pointer;
-//   list-style: none;
-//   margin: 0;
-//   padding: 8px;
-//   text-align: center;
-//   -webkit-user-select: none;
-//   touch-action: manipulation;
-
-//   i {
-//     color: var(--color-font-dark);
-//   }
-
-//   &:hover {
-//     filter: brightness(0.9)
-//   }
-
-//   &:active {
-//     filter: opacity(0.5);
-//   }
-
-//   &.outlined {
-//     background-color: #00000000;
-//     border-color: var(--color-primary-light-1);
-//   }
-// }
-
 /* .slideOne */
 .slideOne {
     --h: 1.5em;
@@ -132,18 +91,22 @@
     // $font: 2em;
     // $font-top: 1.5em;
     position: relative;
+    box-sizing: border-box;
+
     input, select {
-      width: calc(100% - 2 * #{$padd});
+      // width: calc(100% - 2 * #{$padd});
     }
     label {
+      
       position: absolute;
-      left: calc(#{$padd}/4);
+      left: calc(#{$padd}/2);
       padding: 0px 8px;
-      top: calc(#{$padd} - #{$font}/4);
+      top: calc(#{$padd} - #{$font}/4 + #{$font}/8);
       font-size: $font;
       transition: 0.1s ease-in-out;
       color: #777;
-    //   height: $font;
+      white-space: nowrap;
+      text-transform: lowercase;
       
       &.active {
         top: calc(0px - #{$font-top}/1.5);

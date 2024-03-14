@@ -1,7 +1,7 @@
 <template>
-    <div class="single-center">
+    <layout-base>
         <slot />
-    </div>
+    </layout-base>
 </template>
 <style lang="scss" scoped>
 .single-center {
@@ -10,7 +10,5 @@
     align-items: center;
     padding: 8px;
     height: 100%;
-
-    // padding: 0 16px;
 }
 </style>

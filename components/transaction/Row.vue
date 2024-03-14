@@ -16,7 +16,7 @@
           {{ transaction.description }}
           <br />
           <small style="font-size: xx-small"
-            >{{ transaction.source.name }} <i class="fa-solid fa-arrow-right"></i> {{ transaction.target.name }}</small
+            >{{ transaction.source.name }} ⤍ {{ transaction.target.name }}</small
           >
         </div>
         <p class="item">
@@ -28,29 +28,27 @@
       <div class="panel" :style="`width: ${details ? 40 : 0}%`">
         <ui-button
           v-if="!confirmDelete"
-          icon="fa-solid fa-trash"
+          icon="i-ic-baseline-delete"
           color="danger"
           @click="confirmDelete = !confirmDelete"
         />
           <!-- {{ $t("delete") }}</ui-button> -->
         <ui-button
           v-else
-          icon="fa-solid fa-circle-check"
+          icon="i-ic-round-delete-forever"
           color="danger"
           :loading="loading"
           @click="emit('delete', { id: transaction.id })"
         />
-        <ui-button @click="edit = !edit" :icon="edit ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'" />
-          <!-- {{ edit ? $t("cancel") : $t("edit") }}
-        </ui-button> -->
+        <ui-button @click="edit = !edit" :icon="edit ? 'i-ic-baseline-close' : 'i-ic-baseline-mode-edit'" />
       </div>
 
       <div class="panel y" :style="`width: ${confirmable ? 20 : 0}%`">
         <ui-button
           color="success"
-          :loading="patching"
-          :icon="transaction.recurring ? 'fa-regular fa-copy' : 'fa-regular fa-circle-check'"
-          @click="patchTransaction({ id: transaction.id, confirmed: true, created: transaction.created })"
+          :loading="loading"
+          :icon="transaction.recurring ? 'i-ic-baseline-content-copy' : 'i-ic-baseline-check-circle'"
+          @click="confirmPendingTransaction(transaction)"
         >
           <small v-if="transaction.recurring > 0">{{ transaction.recurring }}m</small>
         </ui-button>
@@ -61,10 +59,9 @@
         <TransactionForm
           :transactionIn="transaction"
           :startStage="2"
-          :processing="patching"
-          :error="patchingError"
+          :processing="loading"
           @cancel="edit = false"
-          @send="patchTransaction"
+          @send="editTransaction"
         />
       </div>
     </transition>
@@ -72,11 +69,8 @@
 </template>
 <script setup lang="ts">
 import type { Transaction } from "@/stores/types";
-import { useTokenStore } from "@/stores/tokenStore";
 import { useTransactionStore } from "@/stores/transactions";
 import { storeToRefs } from "pinia";
-
-const { loading } = storeToRefs(useTransactionStore());
 
 const props = defineProps<{
   transaction: Transaction;
@@ -95,33 +89,36 @@ if (props.transparent) {
   transparentStyle.value = "filter: opacity(0.3);";
 }
 
-const { token } = storeToRefs(useTokenStore());
-
 const emit = defineEmits(["patched", "delete"]);
 
-const patchTransaction = (transactionData: any) => {
-  patching.value = true;
-  const url = "/api/transactions";
-  $fetch(url, {
-    method: "PATCH",
-    headers: {
-      Authorization: "Bearer " + token.value,
-    },
-    body: transactionData,
-  })
-    .then((res) => {
-      emit("patched", res.data);
-      edit.value = false;
-      details.value = false;
-    })
-    // .catch(err => {
-    //     console.info(err)
-    //     patchingError.value = err.statusMessage;
-    // })
-    .finally(() => {
-      patching.value = false;
+const { t } = useI18n();
+const transactions = useTransactionStore();
+const { loading } = storeToRefs(transactions);
+const notifications = useNotifications();
+
+const confirmPendingTransaction = (transaction: Transaction) => {
+  transactions.editTransaction({ id: transaction.id, confirmed: true, created: transaction.created })
+  .then(() => {
+    notifications.addNotification({
+      text: transaction.recurring > 0 ? t('t_confirmed_reccuring') : t('t_confirmed'),
+      level: 'success',
     });
-};
+    details.value = false;
+    edit.value =false;
+  })
+}
+
+const editTransaction = (transactionData: Transaction) => {
+  transactions.editTransaction(transactionData)
+  .then(() => {
+    notifications.addNotification({
+      text: t('t_editted'),
+      level: 'success',
+    })
+    details.value = false;
+    edit.value =false;
+  })
+}
 
 const date = computed(() => {
   return new Date(props.transaction.created);
