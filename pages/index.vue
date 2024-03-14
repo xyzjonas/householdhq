@@ -18,6 +18,7 @@
           :forecast="upcommingTransactionsAmount"
           :spent="expense"
           :total-income="income"
+          class="mb-1"
         />
       </transition>
 
@@ -34,28 +35,14 @@
       </transition>
 
       <!-- SHOW UPCOMMING -->
-      <h4 v-if="currentMonth && currentMonth.length > 0" id="remaining-bills" class="title row-simple">
-        <span class="icon"><i class="fa-solid fa-calendar"></i></span>
-        <span v-if="isCurrentMonth">
+      <h4 v-if="isCurrentMonth && currentMonth.length > 0" id="remaining-bills" class="title row-simple">
+        <i class="i-ic-baseline-calendar-today"></i>
+        <span @click="showUpcomming = !showUpcomming">
           {{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}:
         </span>
-        <ui-price :amount="upcommingTransactionsAmount" :currency="currency" style="margin-left: 1rem;"/>
-        <ui-button
-          v-if="isCurrentMonth"
-          @click="showUpcomming = !showUpcomming"
-          width="1.5rem"
-          height="1.5rem"
-          link
-          :icon="showUpcomming ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"
-        />
+        <ui-price @click="showUpcomming = !showUpcomming" :amount="upcommingTransactionsAmount" :currency="currency" style="margin-left: 1rem;"/>
+        <ui-chevron v-model="showUpcomming" />
       </h4>
-      <!-- <ui-button
-        @click="showHidden = !showHidden"
-        :icon="!showHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
-        color="light"
-        style="padding: .5rem;"
-      /> -->
-
       <transition name="page">
         <section v-if="showUpcomming || filterTagId > 0">
           <TransactionRow
@@ -90,7 +77,7 @@
     <div id="floating" :class="{ active: addExpense }">
       <ui-button
         :color="addExpense ? 'secondary' : 'primary'"
-        icon="fa fa-plus"
+        icon="i-ic-baseline-plus"
         width="3rem"
         height="3rem"
         rounded
@@ -107,6 +94,7 @@ import { useCategoriesStore } from "@/stores/categories";
 import { useSourcesStore } from "@/stores/sources";
 import { useTransactionStore } from "@/stores/transactions";
 import type { Tag, Transaction } from "@/stores/types";
+import { useNotifications } from "@/composables/useNotifications";
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
@@ -134,6 +122,8 @@ const showHidden = ref(false);
 const addExpense = ref(false);
 
 const filterTagId = ref<number>(-1);
+
+const notifications = useNotifications();
 
 const { yearPath, monthPath } = useRoute().query;
 
@@ -195,20 +185,14 @@ const upcommingTransactionsAmount = computed<number>(() => {
 });
 
 const putTransaction = (transactionData: Transaction) => {
-  putLoading.value = true;
-  const url = "/api/transactions";
-  $fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: "Bearer " + token.value,
-    },
-    body: transactionData,
+  transactionStore.createTransaction(transactionData).then(() => {
+    addExpense.value = false;
+    putLoading.value = false;
+    notifications.addNotification({
+      text: t("t_added"),
+      level: "success",
+    })
   })
-    .then((res: any) => currentMonth.value.unshift(res.data))
-    .finally(() => {
-      addExpense.value = false;
-      putLoading.value = false;
-    });
 };
 
 const deleteTransaction = (transactionData: Transaction) => {

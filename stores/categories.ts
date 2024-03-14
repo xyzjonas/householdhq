@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { Category, Summary, Tag, TagWithSum, Transaction } from "./types";
+import type { Category, CreateCategory, Summary, Tag, TagWithSum, Transaction } from "./types";
 import { useTokenStore } from "./tokenStore";
 import { useTransactionStore } from "./transactions";
 
@@ -36,16 +36,6 @@ export const useCategoriesStore = defineStore("category", () => {
       summary.value = await tokenStore.get(url);
     } finally {
       summaryLoading.value = false;
-    }
-  };
-
-  const addCategory = async () => {
-    const url = "/api/tags";
-    categoryLoading.value = true;
-    try {
-      categories.value = (await tokenStore.get(url)).data;
-    } finally {
-      categoryLoading.value = false;
     }
   };
 
@@ -142,6 +132,17 @@ export const useCategoriesStore = defineStore("category", () => {
     }
   };
 
+  const createCategory = async (categoryData: CreateCategory) => {
+    categoryLoading.value = true;
+    const url = "/api/tags";
+    try {
+      const newCategory = await tokenStore.put(url, categoryData);
+      categories.value.push(newCategory.data);
+    } finally {
+      categoryLoading.value = false;
+    }
+  };
+
   return {
     categories,
     currentCategoryId,
@@ -152,6 +153,7 @@ export const useCategoriesStore = defineStore("category", () => {
     fetchCategories,
     fetchSingleCategory,
     patchCategory,
+    createCategory,
     summaryId,
     summaryLoading,
     summary,

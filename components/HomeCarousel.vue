@@ -1,12 +1,10 @@
 <template>
-  <div>
+  <div class="carousel">
     <!-- EXPENSES & INCOMES -->
-    <section>
-      <BarGraph v-if="item === 1" :items="incomes" @filter="(tagId: number) => $emit('filter', tagId)" />
-      <BarGraph v-else :items="topExpenses" @filter="(tagId: number) => $emit('filter', tagId)" />
-    </section>
+    <BarGraph :items="data" @filter="(tagId: number) => $emit('filter', tagId)" />
+    <!-- <BarGraph v-else :items="topExpenses" @filter="(tagId: number) => $emit('filter', tagId)" /> -->
   </div>
-  <div class="center my-2">
+  <div class="center my-1">
     <div class="toggle-bar m-1">
       <a @click="item = 0" :class="`bar-item ${item === 0 ? 'active' : ''}`">{{ $t("expenses") }}</a>
       <a @click="item = 1" :class="`bar-item ${item === 1 ? 'active' : ''}`">{{ $t("incomes") }}</a>
@@ -14,7 +12,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Source, TagWithSum } from "@/stores/types";
+import type { TagWithSum } from "@/stores/types";
 
 defineEmits(["filter"]);
 
@@ -25,10 +23,12 @@ const props = defineProps<{
 
 const item = ref(0);
 
+const data = computed(() => (item.value === 1 ? props.incomes : topExpenses.value));
+
 const topExpenses = computed(() => {
   if (props.expenses.length > 5) {
     return props.expenses
-    .filter(e => e.sum > 0)
+    .filter(e => e.sum > 1000)
     .sort((a, b) => b.sum - a.sum)
   }
   return props.expenses

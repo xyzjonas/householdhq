@@ -18,20 +18,27 @@
         @edit="navigateTo(`/tags/${selectedCategory.id}`)"
         @close="selectedCategoryName = ''"
       />
+      <div id="actions" class="row center">
+        <ui-button
+          width="48px"
+          height="36px"
+          icon="i-ic-baseline-mode-edit"
+          @click="navigateTo(`/tags/${selectedCategory.id}`)"
+        />
+        <ui-button
+          width="48px"
+          height="36px"
+          icon="i-ic-baseline-close"
+          @click="selectedCategoryName = ''"
+        />
+      </div>
     </section>
-    <ui-button
-      id="show-legend"
-      icon="fa fa-chevron-down"
-      rounded link
-      width="1.5rem" height="1.5rem"
-      :style="showLegend ? 'transform: rotate(180deg);' : ''"
-      @click="showLegend = !showLegend"
-    />
+    <ui-chevron id="show-legend" v-model="showLegend" />
   </div>
   <transition name="slide-top">
   <section v-if="showLegend" class="center card legend">
     <div  class="legend-content">
-      <div v-for="item in items" class="legend-content-item">
+      <div v-for="item in items" class="legend-content-item" @click="selectCategoryByName(item.name)">
         <span class="circle" :style="`background-color: ${item.color};`"></span>
         <span class="mr">{{ item.name }}</span>
         <span><ui-price :amount="item.sum" size="small"/></span>
@@ -104,20 +111,39 @@ const data = computed(() => {
     }
 });
 
+const selectCategoryByName = (name: string) => {
+    if (selectedCategoryName.value === name) {
+        selectedCategoryName.value = '';
+    } else {
+        selectedCategoryName.value = name;
+    }
+}
+
+
 const callback = (e: any) => {
     // OnClick emit filter by category
     const label = e.chart.tooltip.title[0];
-    if (selectedCategoryName.value === label) {
-        selectedCategoryName.value = '';
-    } else {
-        selectedCategoryName.value = label;
-    }
+    selectCategoryByName(label)
 }
 
 const options = {
     responsive: true,
     onClick: callback,
-}
+    plugins: {
+      datalabels: {
+          // color: shouldInvert(props.category.color) ? '#333' : '#ddd',
+          backgroundColor: '#292929',
+          color: 'white',
+          borderRadius: 3,
+          anchor: 'center',
+          labels: {
+            title: {
+              font: {}
+            },
+          }
+        },
+    }
+} as any;
 
 </script>
 <style lang="scss" scoped>
@@ -150,6 +176,12 @@ section {
       background-color: var(--bg-300);
       padding: .1rem .3rem;
       border-radius: 2rem;
+      cursor: pointer;
+      transition: filter .1s ease-in-out;
+
+      &:hover {
+        filter: brightness(1.2);
+      }
 
       .circle {
         width: .8rem;
@@ -165,11 +197,20 @@ section {
 
 .graph-card {
   position: relative;
+  height: 100%;
 }
 
 #show-legend {
   position: absolute;
   bottom: 1rem;
   right: 1rem;
+}
+
+#actions {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: .3rem;
 }
 </style>

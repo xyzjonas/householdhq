@@ -1,7 +1,7 @@
 <template>
   <button :class="clazz" :disabled="disabled || loading">
     <spinner v-if="loading" />
-    <span v-if="!loading && icon" class="icon"><i :class="icon"></i></span>
+    <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
   </button>
 </template>
@@ -10,6 +10,7 @@
 const props = defineProps<{
   loading?: boolean;
   icon?: string;
+  iconSize?: string;
   outlined?: boolean;
   width?: string;
   height?: string;
@@ -38,9 +39,22 @@ const clazz = computed(() => {
 
   return cls;
 });
+
+const w = computed(() => props.width ?? '100%')
+const h = computed(() => {
+  if (props.height) {
+    return props.height;
+  }
+  if (props.rounded)
+  props.height ?? w.value
+})
 </script>
 
 <style lang="scss" scoped>
+i {
+  font-size: v-bind('iconSize');  
+}
+
 @mixin common() {
   display: flex;
   justify-content: center;
@@ -48,15 +62,12 @@ const clazz = computed(() => {
   outline: none;
   border-radius: 0.3rem;
   gap: .3rem;
-  width: v-bind(width);
-  height: v-bind(height);
+  width: v-bind(w);
+  height: v-bind(h);
   border: 1px solid transparent;
+  user-select: none;
 
   transition: 0.2s ease-in-out;
-
-  i {
-    transform: translateY(0px);
-  }
 }
 
 button:hover {
@@ -128,9 +139,9 @@ button[disabled] {
   background-color: var(--bg-300);
   color: #777;
   border: 1px solid transparent;
+  pointer-events: none;
   i {
     color: #777 !important;
   }
-  cursor: auto !important;
 }
 </style>

@@ -2,11 +2,18 @@
   <div ref="focusDiv" class="card">
     <div class="row-simple">
         <ui-button
+          v-if="stage === 2"
+          icon="i-ic-baseline-new-label"
+          icon-size="1.5rem"
+          width="2rem"
+          @click="showNewCategory = !showNewCategory"
+        />
+        <ui-button
           id="close-t-form"
           width="2rem"
           height="2rem"
           color="light"
-          link icon="fa-solid fa-xmark"
+          link icon="i-ic-baseline-close"
           @click="$emit('close')"
         />
       </div>
@@ -56,8 +63,24 @@
       </div>
 
       <!-- CATEGORY SELECTION -->
-      <div v-else-if="stage === 2" class="categories">
-        <CategoryBadge v-for="tag in categories" :category="tag" @selected="categorySelected" />
+      <div v-else-if="stage === 2" class="flex-col">
+        <div class="categories">
+          <CategoryBadge v-for="tag in categories" :category="tag" @selected="categorySelected" />
+        </div>
+        <transition name="slide">
+          <div class="new-category" v-if="showNewCategory">
+            <ui-input
+            :label="$t('c_new')"
+            v-model="newCategoryName"
+            />
+            <ui-button
+            @click="createCategory()"
+            height="100%"
+            :loading="categoryLoading"
+            :disabled="!newCategoryName"
+            >{{ $t('t_send') }}</ui-button>
+          </div>
+        </transition>
       </div>
 
       <!-- NUMPAD  -->
@@ -92,7 +115,7 @@
         :disabled="stage <= 0"
         width="32px"
         :outlined="true"
-        icon="fa-solid fa-caret-left"
+        icon="i-ic-baseline-arrow-left"
       />
       <a
         v-for="index in stages"
@@ -104,7 +127,7 @@
         :disabled="stage >= stages - 1"
         width="32px"
         :outlined="true"
-        icon="fa-solid fa-caret-right"
+        icon="i-ic-baseline-arrow-right"
       />
     </div>
     <p class="error" style="text-align: right">{{ error }}</p>
@@ -115,7 +138,6 @@ import { storeToRefs } from "pinia";
 import { useCategoriesStore } from "@/stores/categories";
 import { useSourcesStore } from "@/stores/sources";
 import type { Transaction, CreateUpdateTransaction } from "@/stores/types";
-import type { Source } from "@/stores/types";
 import { transactionToUpdateTransaction } from "@/stores/utils";
 
 const focusDiv = ref<any>(null);
@@ -188,7 +210,7 @@ const makeExpense = () => {
 const isRecurring = ref(false);
 
 const categoriesStore = useCategoriesStore();
-const { categories } = storeToRefs(categoriesStore);
+const { categories, categoryLoading } = storeToRefs(categoriesStore);
 
 const sourcesStore = useSourcesStore();
 const { allSources } = storeToRefs(sourcesStore);
@@ -225,7 +247,16 @@ const categorySelected = (categoryName: string) => {
   transaction.value.tags = categoryName;
   stage.value++;
 };
+
+const showNewCategory = ref(false);
+const newCategoryName = ref();
+const createCategory = () => {
+  categoriesStore.createCategory({ name: newCategoryName.value })
+    .then(() => newCategoryName.value = undefined);
+}
+
 </script>
+
 <style lang="scss" scoped>
 .navigation-container {
   height: 510px;
@@ -310,7 +341,25 @@ input[type="number"] {
 
 #close-t-form {
   margin-left: auto;
-  margin-right: .3rem;
-  margin-bottom: 1rem;
+}
+
+.row-simple {
+  align-items: center;
+  margin-bottom: .5rem;
+}
+
+.categories {
+  height: 100%;
+}
+
+.new-category {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  border: 1px solid #eee;
+  border-radius: .3rem;
+  max-height: 7rem;
+  filter: opacity(.5);
+  padding: .3rem;
 }
 </style>

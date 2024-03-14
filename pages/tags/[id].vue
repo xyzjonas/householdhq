@@ -26,15 +26,6 @@
         <div class="item">{{ $t("icon") }}</div>
         <form-editable-field keyName="icon" :value="currentCategory.icon" @send="patchCategory" class="item" />
       </div>
-      <!-- <div class="row">
-                <div class="item">{{ $t('tag_parent') }}</div>
-                <div class="item">{{ tag.parentId || $t('tag_no_parent') }}</div>
-            </div>
-            <div class="row">
-                <div class="item">{{ $t('tag_child') }}</div>
-                <div class="item">{{ childTag || $t('tag_no_child')}}</div>
-            </div> -->
-
       <div class="row card">
         <div class="item">{{ $t("color") }}</div>
         <div class="item">
@@ -47,17 +38,9 @@
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-// import { useCategoriesStore } from '@/stores/categories';
 import { useCategoriesStore } from "@/stores/categories";
 
-// import { FormEditableField, FormEditableColor, MosaicLoader, Icon } from '#components';
-
-// export default {
-
-// components: { FormEditableField, FormEditableColor, MosaicLoader, Icon },
-
 const categoriesStore = useCategoriesStore();
-
 const { currentCategoryId, categoryLoading, currentCategory } = storeToRefs(categoriesStore);
 
 const route = useRoute();
@@ -70,33 +53,23 @@ onMounted(() => {
   }
 });
 
-// const childTag = computed(() => {
-//     if (this.tag && this.tag.childTags && this.tag.childTags.length > 0) {
-//         return this.tag.childTags[0].id;
-//     }
-// });
-
 const patchCategory = (tagData: any) => {
   categoriesStore.patchCategory(categoryId, tagData);
 };
-
-const loading = ref(false);
-const tag = ref({});
 </script>
 <style lang="scss" scoped>
-.title {
-  text-transform: uppercase;
-  border: none;
-  margin-bottom: 1.5rem !important;
+.flex-col {
+  gap: .3rem !important;
 }
-.row {
-  margin-top: 0.1em;
-  margin-bottom: 0.1em;
-  min-height: 1.8em;
 
+.row {
   .item:first-child {
     text-transform: capitalize;
     filter: contrast(0.2);
   }
+}
+
+.title {
+  text-transform: uppercase;
 }
 </style>

@@ -11,7 +11,10 @@
         </section>
 
         <div class="row card">
-          <p class="item">{{ $t("name") }}</p>
+          <div class="row-label">
+            <p class="item">{{ $t("name") }}</p>
+            <small></small>
+          </div>
           <form-editable-field
             :value="currentSource.name"
             keyName="name"
@@ -20,7 +23,10 @@
           />
         </div>
         <div class="row card">
-          <p class="item">{{ $t("s_isout") }}</p>
+          <div class="row-label">
+            <p class="item">{{ $t("s_isout") }}</p>
+            <p class="desc">{{ $t("s_isout_desc") }}</p>
+          </div>
           <form-editable-boolean
             keyName="isOut"
             :value="currentSource.isOut"
@@ -30,7 +36,10 @@
         </div>
 
         <div class="row card">
-          <p class="item">{{ $t("s_isdisp") }}</p>
+          <div class="row-label">
+            <p class="item">{{ $t("s_isdisp") }}</p>
+            <p class="desc">{{ $t("s_isdisp_desc") }}</p>
+          </div>
           <form-editable-boolean
             keyName="isDisponible"
             :value="currentSource.isDisponible"
@@ -40,7 +49,10 @@
         </div>
 
         <div class="row card">
-          <p class="item">{{ $t("color") }}</p>
+          <div class="row-label">
+            <p class="item">{{ $t("color") }}</p>
+            <small></small>
+          </div>
           <div class="item">
             <form-editable-color
               keyName="color"
@@ -49,6 +61,17 @@
             />
           </div>
         </div>
+
+        <div class="row card">
+          <div class="row-label">
+            <p class="item">{{ $t("delete") }}</p>
+            <small>{{ $t("delete_desc") }}</small>
+          </div>
+          <div class="item">
+            <ui-button @click="deleteSource" icon="fa-solid fa-trash" link width="2rem" height="2rem" :loading="sourceLoading" color="danger"/>
+          </div>
+        </div>
+
         <section class="card flex-col">
           <h3 class="title">{{ $t("s_states") }}</h3>
           <div v-for="state in currentSource.states" class="row">
@@ -56,7 +79,7 @@
               <ui-button
                 @click="sourceStore.deleteEntry(sourceId, state.id)"
                 :outlined="true"
-                icon="fa-solid fa-trash"
+                icon="i-ic-baseline-delete"
                 width="32px"
                 height="36px"
               />
@@ -64,7 +87,7 @@
             </div>
             <ui-price class="item" :amount="state.amount" :currency="currency" />
           </div>
-          <hr />
+      
           <Transition name="page" mode="out-in">
             <balance-entry-form v-if="edit" @close="edit = !edit" @created="newEntry" :sourceId="currentSource.id" />
             <ui-button v-else @click="edit = !edit" height="32px">{{ $t("s_add_state") }}</ui-button>
@@ -79,7 +102,7 @@
 <script setup lang="ts">
 import { useSourcesStore } from "@/stores/sources";
 import { storeToRefs } from "pinia";
-import { useTransactionStore } from "~/stores/transactions";
+import { useTransactionStore } from "@/stores/transactions";
 
 const sourceStore = useSourcesStore();
 const { sourceLoading, currentSourceId, currentSource } = storeToRefs(sourceStore);
@@ -104,18 +127,37 @@ const newEntry = () => {
   edit.value = false;
   sourceStore.fetchSingleSource(sourceId);
 };
+
+
+const router = useRouter();
+const deleteSource = async () => {
+  await sourceStore.deleteSource({ id: sourceId })
+  navigateTo('/sources')
+}
+
 </script>
 
 <style lang="scss" scoped>
 .flex-col {
-  gap: 8px;
+  gap: .3rem;
 }
 .title {
   text-transform: uppercase;
+  font-weight: 100;
 }
 
-.row > p {
-  text-transform: capitalize;
-  filter: contrast(0.2);
+.row-label {
+  filter: contrast(0.7);
+
+  p {
+    text-transform: capitalize;
+  }
+
+  .desc {
+    font-size: small;
+    line-height: 100%;
+    filter: contrast(0.3);
+    text-transform: none;
+  }
 }
 </style>

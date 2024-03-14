@@ -6,25 +6,26 @@
       @click="$emit('reload', prev)"
       class="left"
     >
-      <i class="fa-solid fa-chevron-left"></i>
+      <i class="i-ic-chevron-left"></i>
     </NuxtLink>
     <NuxtLink
       :to="`/?year=${next.getFullYear()}&month=${next.getMonth() + 1}`"
       @click="$emit('reload', next)"
       class="right"
     >
-      <i class="fa-solid fa-chevron-right"></i>
+      <i class="i-ic-chevron-right"></i>
     </NuxtLink>
   </section>
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
+import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
 // const date = ref<Date>(new Date());
 
 const route = useRoute();
-const { month, year } = storeToRefs(useTransactionStore());
+const { month, year } = useCurrentMonth();
 
 defineEmits(["reload"]);
 
@@ -89,7 +90,7 @@ a:hover {
 
 .left,
 .right {
-  font-size: small;
+  font-size: x-large;
   color: var(--color-primary-light-1);
 }
 

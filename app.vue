@@ -5,11 +5,8 @@
   </NuxtLayout>
 </template>
 <script setup lang="ts">
-// import VueApexCharts from "vue3-apexcharts";
-
-const nuxtApp = useNuxtApp();
-
-// nuxtApp.vueApp.use(VueApexCharts);
+import { useNotifications } from "@/composables/useNotifications";
+const { notifications } = useNotifications();
 </script>
 <style>
 .page-enter-active,
@@ -35,7 +32,6 @@ const nuxtApp = useNuxtApp();
   opacity: 0;
 }
 
-
 .slide-top-enter-active,
 .slide-top-leave-active {
   transition: all 0.2s ease-in-out;
@@ -50,8 +46,6 @@ const nuxtApp = useNuxtApp();
 }
 
 body {
-  position: absolute;
-  inset: 0;
   font-family: "Roboto", sans-serif;
 
   font-weight: 400;

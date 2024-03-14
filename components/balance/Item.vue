@@ -4,10 +4,10 @@
       <ui-button
         @click="navigateTo(`/sources/${source.id}`)"
         :outlined="true"
-        icon="fa-solid fa-pen"
+        icon="i-ic-baseline-mode-edit"
         width="24px"
         height="24px"
-        class="mr"
+        class="mr-1"
         link
       />
       <span class="label">{{ source.name }}</span>

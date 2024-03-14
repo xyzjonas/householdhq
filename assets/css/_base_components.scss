@@ -1,11 +1,3 @@
-hr {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    background-image: linear-gradient(90deg, transparent, var(--color-border-dark), transparent);
-    height: 1px;
-    border: 0;
-}
-
 @mixin input-mixin {
     background-color: transparent;
     border-radius: 5px;

@@ -13,6 +13,11 @@ export interface Category {
   parentId?: number;
 }
 
+export interface CreateCategory {
+  name: string;
+}
+
+
 export interface Tag {
   id: number;
   name: string;
@@ -53,6 +58,15 @@ export interface Source extends SourceApi {
   transactionsOut: Transaction[];
   sum: number;
 }
+
+export interface CreateSource {
+  name: string;
+}
+
+export interface DeleteSource {
+  id: number;
+}
+
 
 export interface Transaction {
   id: number;

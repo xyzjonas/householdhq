@@ -1,4 +1,5 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
+import { useNotifications } from "@/composables/useNotifications"
 
 export class ServerError extends Error {
     
@@ -6,6 +7,8 @@ export class ServerError extends Error {
 
 export const useTokenStore = defineStore("token", () => {
 
+    const n = useNotifications()
+    const { t } = useI18n();
 
     const token = useCookie('token')
 
@@ -31,6 +34,10 @@ export const useTokenStore = defineStore("token", () => {
             navigateTo("/login")
         }
         if (response.status >= 400) {
+            n.addNotification({
+                text: t('server_error'),
+                level: 'error'
+            })
             throw new ServerError(`Error response ${response.status}`);
         }
         if (response.headers.has("x-token-renewal")) {
@@ -41,7 +48,6 @@ export const useTokenStore = defineStore("token", () => {
     }
 
     const post = async (url: string, requestData?: object, method: string = "POST") => {
-        console.debug(`POST '${url}'.`)
         const result = await fetch(url, {
             method: method,
             headers: {
