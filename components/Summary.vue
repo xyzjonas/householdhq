@@ -1,7 +1,7 @@
 <template>
   <div class="summary" v-if="loaded">
     <div class="row-simple center mb-1">
-      <h1>FOO</h1>
+      <h1>{{ category.name }}</h1>
     </div>
     <Line :data="chartData" :options="options"/>
   </div>
@@ -85,5 +85,15 @@ const options = {
 <style lang="scss" scoped>
 .row {
   gap: 0.33rem
+}
+
+h1 {
+  text-transform: uppercase;
+  position: absolute;
+  top: 0.3rem;
+  left: 1rem;
+  z-index: 1000;
+  color: v-bind('category.color');
+  font-weight: 300;
 }
 </style>
