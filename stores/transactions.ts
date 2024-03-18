@@ -5,7 +5,6 @@ import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
 export const useTransactionStore = defineStore("transaction", () => {
   const tokenStore = useTokenStore();
-  const { token } = storeToRefs(tokenStore);
 
   const currency = ref<string>();
   currency.value = "Kč";
@@ -18,12 +17,6 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   const passed = computed(() => {
     const tmp = currentMonth.value.filter((trans) => new Date(trans.created) <= new Date());
-    // if (showHidden.value) {
-    //   return tmp;
-    // }
-    // return tmp
-    //   .filter(trans => isTransactionTagged(trans, filterTagId.value))
-    //   .filter(trans => !(!trans.source.isOut && !trans.target.isOut));
   });
 
   const upcomming = computed(() => {
@@ -34,7 +27,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     loading.value = true;
     let url;
     if (year.value && month.value) {
-      // date.value = new Date(`${year.value}-${month.value}`);
       url = `/api/transactions/?year=${year.value}&month=${month.value}`;
     } else {
       url = "/api/transactions";
@@ -56,8 +48,15 @@ export const useTransactionStore = defineStore("transaction", () => {
     try {
       const response = await tokenStore.put("/api/transactions", transactionData)
       const transaction: Transaction = response.data
-      if (new Date(transaction.created).getMonth() + 1 === month.value) {
-        currentMonth.value.unshift(transaction)
+
+      let actualMonth = month.value;
+      if (!actualMonth) {
+        actualMonth = new Date().getMonth() + 1
+      }
+
+      if (new Date(transaction.created).getMonth() + 1 === actualMonth) {
+        currentMonth.value.push(transaction);
+        currentMonth.value.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime() )
       }
     } finally {
       loading.value = false;
@@ -75,9 +74,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         }
         return t
       })
-      // if (new Date(transaction.created).getMonth() + 1 === month.value) {
-      //   currentMonth.value.unshift(transaction)
-      // }
+      currentMonth.value.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime() )
     } finally {
       loading.value = false;
     }

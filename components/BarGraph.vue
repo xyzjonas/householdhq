@@ -198,6 +198,7 @@ section {
 .graph-card {
   position: relative;
   height: 100%;
+  max-height: 30rem;
 }
 
 #show-legend {
