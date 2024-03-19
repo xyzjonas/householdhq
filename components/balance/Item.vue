@@ -5,8 +5,8 @@
         @click="navigateTo(`/sources/${source.id}`)"
         :outlined="true"
         icon="i-ic-baseline-mode-edit"
-        width="24px"
-        height="24px"
+        width="2rem"
+        squared
         class="mr-1"
         link
       />

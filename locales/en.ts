@@ -22,6 +22,7 @@ const en = {
   no_data: "no data",
   no_data_will_appear: "Summary will appear once transactions are added",
   c_new: "New",
+  c_name: "Category name",
   t_date: "date",
   t_time: "time",
   t_desc: "description",

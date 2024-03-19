@@ -3,7 +3,7 @@
     <header >
       <div class="header page-wrapper">
         <span>Household HQ</span>
-        <span class="version">v{{ VERSION }}</span>
+        <span class="version">{{ VERSION }}</span>
       </div>
     </header>
     <div class="page-wrapper">
@@ -63,6 +63,7 @@ footer {
 .version {
   font-style: italic;
   margin-left: auto;
+  filter: brightness(0.5);
 }
 
 main {

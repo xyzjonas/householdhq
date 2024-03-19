@@ -1,53 +1,100 @@
 <template>
   <div ref="focusDiv" class="card">
     <div class="row-simple">
-        <ui-button
-          v-if="stage === 2"
-          icon="i-ic-baseline-new-label"
-          icon-size="1.5rem"
-          width="2rem"
-          @click="showNewCategory = !showNewCategory"
-        />
-        <ui-button
-          id="close-t-form"
-          width="2rem"
-          height="2rem"
-          color="light"
-          link icon="i-ic-baseline-close"
-          @click="$emit('close')"
-        />
-      </div>
+      <ui-button
+        v-if="stage === 2"
+        icon="i-ic-baseline-new-label"
+        icon-size="1.5rem"
+        width="2rem"
+        squared
+        @click="showNewCategory = !showNewCategory"
+      />
+      <ui-button
+        id="close-t-form"
+        width="2rem"
+        color="light"
+        link
+        squared
+        icon="i-ic-baseline-close"
+        @click="$emit('close')"
+      />
+    </div>
     <transition name="slide" mode="out-in" class="navigation-container">
       <!-- ENTIRE FORM -->
       <div v-if="stage === 3" class="form">
-        <ui-input :label="$t('t_amount')" v-model.number="transaction.amount" type="number" :required="true" />
-        <ui-input :label="$t('t_date')" v-model="date" type="date" :required="true" />
-        <ui-input :label="$t('t_time')" v-model="time" type="time" :required="true" />
-        <ui-input :label="$t('t_desc')" v-model="transaction.description" type="text" :required="true" />
+        {{ time }}
+        <ui-input
+          :label="$t('t_amount')"
+          v-model.number="transaction.amount"
+          type="number"
+          :required="true"
+        />
+        <ui-input
+          :label="$t('t_date')"
+          v-model="date"
+          type="date"
+          :required="true"
+        />
+        <ui-input
+          :label="$t('t_time')"
+          v-model="time"
+          type="time"
+          :required="true"
+        />
+        <ui-input
+          :label="$t('t_desc')"
+          v-model="transaction.description"
+          type="text"
+          :required="true"
+        />
 
         <ui-select v-model.number="transaction.sourceId" :label="$t('t_from')">
-          <option v-for="source in allSources" :key="'option-source-' + source.id" :value="source.id">
+          <option
+            v-for="source in allSources"
+            :key="'option-source-' + source.id"
+            :value="source.id"
+          >
             {{ source.name }}
           </option>
         </ui-select>
 
         <ui-select v-model.number="transaction.targetId" :label="$t('t_to')">
-          <option v-for="source in allSources" :key="'option-target-' + source.id" :value="source.id">
+          <option
+            v-for="source in allSources"
+            :key="'option-target-' + source.id"
+            :value="source.id"
+          >
             {{ source.name }}
           </option>
         </ui-select>
         <ui-select v-model.number="transaction.tags" :label="$t('t_tag')">
-          <option v-for="tag in categories" :key="tag.id + '-event'" :value="tag.name">{{ tag.name }}</option>
+          <option
+            v-for="tag in categories"
+            :key="tag.id + '-event'"
+            :value="tag.name"
+          >
+            {{ tag.name }}
+          </option>
         </ui-select>
 
         <div class="row" style="padding-top: 3px; padding-bottom: 3px">
           <p>{{ $t("recurring") }}</p>
           <div class="slideOne" @click="isRecurring = !isRecurring">
-            <input v-model="isRecurring" type="checkbox" id="slideOne" name="check" disabled />
+            <input
+              v-model="isRecurring"
+              type="checkbox"
+              id="slideOne"
+              name="check"
+              disabled
+            />
             <label for="slideOne"></label>
           </div>
           <transition name="slide" mode="out-in">
-            <input v-if="isRecurring" v-model="transaction.recurring" type="number" />
+            <input
+              v-if="isRecurring"
+              v-model="transaction.recurring"
+              type="number"
+            />
           </transition>
         </div>
 
@@ -55,7 +102,6 @@
           @click="send"
           :loading="processing"
           icon="fa-solid fa-floppy-disk"
-          height="64px"
           color="primary"
         >
           {{ $t("t_send") }}
@@ -65,26 +111,37 @@
       <!-- CATEGORY SELECTION -->
       <div v-else-if="stage === 2" class="flex-col">
         <div class="categories">
-          <CategoryBadge v-for="tag in categories" :category="tag" @selected="categorySelected" />
+          <CategoryBadge
+            v-for="tag in categories"
+            :category="tag"
+            @selected="categorySelected"
+          />
         </div>
         <transition name="slide">
           <div class="new-category" v-if="showNewCategory">
-            <ui-input
-            :label="$t('c_new')"
-            v-model="newCategoryName"
-            />
-            <ui-button
-            @click="createCategory()"
-            height="100%"
-            :loading="categoryLoading"
-            :disabled="!newCategoryName"
-            >{{ $t('t_send') }}</ui-button>
+            <ui-input :label="$t('c_name')" v-model="newCategoryName" />
+            <div class="row-simple">
+              <ui-button
+                @click="createCategory()"
+                height="3rem"
+                :loading="categoryLoading"
+                :disabled="!newCategoryName"
+                >{{ $t("confirm") }}</ui-button
+              >
+              <ui-button @click="showNewCategory = false" height="3rem">{{
+                $t("cancel")
+              }}</ui-button>
+            </div>
           </div>
         </transition>
       </div>
 
       <!-- NUMPAD  -->
-      <transaction-calculator v-else-if="stage === 1" v-model="transaction.amount" @confirm="stage = stage + 1" />
+      <transaction-calculator
+        v-else-if="stage === 1"
+        v-model="transaction.amount"
+        @confirm="stage = stage + 1"
+      />
 
       <div v-else class="income-expense">
         <ui-button
@@ -95,7 +152,7 @@
           height="8rem"
           rounded
         >
-          {{ $t('t_add_in') }}
+          {{ $t("t_add_in") }}
         </ui-button>
         <ui-button
           color="danger"
@@ -105,7 +162,7 @@
           height="8rem"
           @click="makeExpense"
         >
-          {{ $t('t_add_out') }}
+          {{ $t("t_add_out") }}
         </ui-button>
       </div>
     </transition>
@@ -113,19 +170,23 @@
       <ui-button
         @click="stage = stage - 1"
         :disabled="stage <= 0"
-        width="32px"
+        width="2rem"
+        squared
         :outlined="true"
         icon="i-ic-baseline-arrow-left"
       />
       <a
         v-for="index in stages"
-        :class="stage === index - 1 ? 'navigation-stage active' : 'navigation-stage'"
+        :class="
+          stage === index - 1 ? 'navigation-stage active' : 'navigation-stage'
+        "
         @click="stage = index - 1"
       />
       <ui-button
         @click="stage = stage + 1"
         :disabled="stage >= stages - 1"
-        width="32px"
+        width="2rem"
+        squared
         :outlined="true"
         icon="i-ic-baseline-arrow-right"
       />
@@ -176,12 +237,14 @@ onMounted(() => {
 
   if (props.transactionIn) {
     transaction.value = transactionToUpdateTransaction(props.transactionIn);
-    transaction.value.tags = props.transactionIn.tags.map((t) => t.name).join(",");
+    transaction.value.tags = props.transactionIn.tags
+      .map((t) => t.name)
+      .join(",");
     delete transaction.value.confirmed; // discard explicit confirmed property - only for confirm action
     date.value = formatDate(new Date(transaction.value.created ?? new Date()));
     time.value = formatTime(new Date(transaction.value.created ?? new Date()));
   }
-  
+
   if (props.startStage) {
     stage.value = props.startStage;
   }
@@ -196,16 +259,16 @@ onMounted(() => {
 });
 
 const makeIncome = () => {
-  transaction.value.sourceId = allSources.value.find(s => s.isOut)?.id ?? 2;
-  transaction.value.targetId = allSources.value.find(s => !s.isOut)?.id ?? 1;
+  transaction.value.sourceId = allSources.value.find((s) => s.isOut)?.id ?? 2;
+  transaction.value.targetId = allSources.value.find((s) => !s.isOut)?.id ?? 1;
   stage.value++;
-}
+};
 
 const makeExpense = () => {
-  transaction.value.sourceId = allSources.value.find(s => !s.isOut)?.id ?? 1;
-  transaction.value.targetId = allSources.value.find(s => s.isOut)?.id ?? 2;
+  transaction.value.sourceId = allSources.value.find((s) => !s.isOut)?.id ?? 1;
+  transaction.value.targetId = allSources.value.find((s) => s.isOut)?.id ?? 2;
   stage.value++;
-}
+};
 
 const isRecurring = ref(false);
 
@@ -233,14 +296,15 @@ const send = () => {
 };
 
 const formatDate = (date: Date) => {
-  return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(
-    2,
-    "0"
-  )}`;
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${date.getUTCFullYear()}-${m}-${d}`;
 };
 
 const formatTime = (date: Date) => {
-  return `${date.getHours()}:${date.getMinutes()}`;
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return hours + ":" + minutes
 };
 
 const categorySelected = (categoryName: string) => {
@@ -251,10 +315,10 @@ const categorySelected = (categoryName: string) => {
 const showNewCategory = ref(false);
 const newCategoryName = ref();
 const createCategory = () => {
-  categoriesStore.createCategory({ name: newCategoryName.value })
-    .then(() => newCategoryName.value = undefined);
-}
-
+  categoriesStore
+    .createCategory({ name: newCategoryName.value })
+    .then(() => (newCategoryName.value = undefined));
+};
 </script>
 
 <style lang="scss" scoped>
@@ -345,7 +409,7 @@ input[type="number"] {
 
 .row-simple {
   align-items: center;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .categories {
@@ -353,13 +417,13 @@ input[type="number"] {
 }
 
 .new-category {
+  box-sizing: content-box;
   display: flex;
   flex-direction: column;
-  gap: .3rem;
-  border: 1px solid #eee;
-  border-radius: .3rem;
+  gap: 0.3rem;
+  border: 1px solid #eeeeee33;
+  border-radius: 0.3rem;
   max-height: 7rem;
-  filter: opacity(.5);
-  padding: .3rem;
+  padding: 0.5rem;
 }
 </style>

@@ -199,6 +199,7 @@ section {
   position: relative;
   height: 100%;
   max-height: 30rem;
+  min-height: 20rem;
 }
 
 #show-legend {

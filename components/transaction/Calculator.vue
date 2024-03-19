@@ -11,7 +11,7 @@
       <ui-button @click="newOperand('+')" icon="i-ic-baseline-plus" />
       <ui-button @click="remove" icon="i-ic-outline-backspace" />
       <ui-button @click="clear" icon="i-ic-baseline-delete" />
-      <ui-button v-if="operand" @click="addOrSubstract" icon="fa-solid fa-equals" />
+      <ui-button v-if="operand" @click="addOrSubstract" icon="i-ic-baseline-equals" />
       <ui-button v-else @click="$emit('confirm')">OK</ui-button>
     </div>
     <div class="numpad"></div>
@@ -100,24 +100,25 @@ const newOperand = (newOperand: string) => {
     margin-bottom: 16px;
     overflow: hidden;
 
-    height: 72px;
+    height: 6rem;
 
     h1 {
-      font-size: 64px;
+      font-size: 4rem;
       position: absolute;
-      left: 16px;
-      top: 2px;
+      left: 1rem;
+      top: 0;
 
       transition: 0.5s;
 
       &.active {
         // top: 2px;
-        font-size: 32px;
+        font-size: 3rem;
         color: var(--color-success);
       }
     }
     h2 {
-      top: 32px;
+      top: 3rem;
+      font-size: 2rem;
       position: absolute;
     }
   }

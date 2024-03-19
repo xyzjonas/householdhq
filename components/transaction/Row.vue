@@ -6,7 +6,8 @@
         :style="`width: ${details ? 60 : 100}%`"
         @click="
           details = !details;
-          confirmDelete = false;
+          edit = false;
+          buttons.deleteCancel.onClick();
         "
       >
         <div class="item">
@@ -25,22 +26,14 @@
       </div>
 
       <!-- BUTTONS -->
-      <div class="panel" :style="`width: ${details ? 40 : 0}%`">
-        <ui-button
-          v-if="!confirmDelete"
-          icon="i-ic-baseline-delete"
-          color="danger"
-          @click="confirmDelete = !confirmDelete"
+      <div class="panel y" :style="`width: ${details ? 40 : 0}%`">
+        <ui-button v-for="btn in [leftBtn, rightBtn]"
+          :color="btn?.color as any ?? 'secondary'"
+          :icon="btn?.icon"
+          :loading="btn?.loading as any ?? false"
+          iconSize="1.2rem"
+          @click="btn?.onClick"
         />
-          <!-- {{ $t("delete") }}</ui-button> -->
-        <ui-button
-          v-else
-          icon="i-ic-round-delete-forever"
-          color="danger"
-          :loading="loading"
-          @click="emit('delete', { id: transaction.id })"
-        />
-        <ui-button @click="edit = !edit" :icon="edit ? 'i-ic-baseline-close' : 'i-ic-baseline-mode-edit'" />
       </div>
 
       <div class="panel y" :style="`width: ${confirmable ? 20 : 0}%`">
@@ -82,8 +75,6 @@ const edit = ref(false);
 const patching = ref(false);
 const patchingError = ref("");
 
-const confirmDelete = ref(false);
-
 const transparentStyle = ref("");
 if (props.transparent) {
   transparentStyle.value = "filter: opacity(0.3);";
@@ -95,6 +86,8 @@ const { t } = useI18n();
 const transactions = useTransactionStore();
 const { loading } = storeToRefs(transactions);
 const notifications = useNotifications();
+
+
 
 const confirmPendingTransaction = (transaction: Transaction) => {
   transactions.editTransaction({ id: transaction.id, confirmed: true, created: transaction.created })
@@ -141,13 +134,67 @@ const tagColor = computed(() => {
 const confirmable = computed(() => {
   return !props.transaction.confirmed && date.value <= new Date();
 });
+
+type Button = { icon: string, onClick: () => void, color?: string, loading?: Ref<boolean>}
+
+
+const leftBtn = ref<Button>();
+const rightBtn = ref<Button>();
+
+const buttons: {[key: string]: Button} = {
+  delete: {
+    icon: 'i-ic-baseline-delete',
+    color: 'danger',
+    onClick: () => {
+      leftBtn.value = buttons.deleteConfirm;
+      rightBtn.value = buttons.deleteCancel;
+      edit.value = false;
+    },
+  },
+  deleteConfirm: {
+    icon: 'i-ic-round-delete-forever',
+    onClick: () => (emit('delete', { id: props.transaction.id })),
+    loading: loading,
+    color: 'success',
+  },
+  deleteCancel: {
+    icon: 'i-ic-baseline-close',
+    onClick: () => {
+      leftBtn.value = buttons.delete;
+      rightBtn.value = buttons.edit;
+    }
+  },
+  edit: {
+    icon: 'i-ic-baseline-mode-edit',
+    onClick: () => {
+      rightBtn.value = buttons.editCancel;
+      edit.value = true;
+    }
+  },
+  editCancel: {
+    icon: 'i-ic-baseline-close',
+    onClick: () => {
+      rightBtn.value = buttons.edit;
+      edit.value = false;
+    }
+  }
+}
+
+leftBtn.value = buttons.delete;
+rightBtn.value = buttons.edit;
+
 </script>
 <style lang="scss" scoped>
 .transaction {
+  border: none;
   border-right: solid 10px;
   border-right-color: v-bind("tagColor") !important;
   transition: 250ms;
   cursor: pointer;
+  
+  border-radius: 0;
+  border-bottom-left-radius: .3rem;
+  border-top-left-radius: .3rem;
 
   &:hover {
     transition: 250ms;
@@ -182,6 +229,11 @@ const confirmable = computed(() => {
 }
 
 .income {
-  border-color: var(--color-success);
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+  border-top-color: var(--color-success) !important;
+  border-bottom-color: var(--color-success) !important;
+  border-left-color: var(--color-success) !important;
 }
 </style>

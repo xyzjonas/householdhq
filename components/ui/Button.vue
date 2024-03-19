@@ -16,6 +16,7 @@ const props = defineProps<{
   height?: string;
   disabled?: boolean;
   rounded?: boolean;
+  squared?: boolean;
   link?: boolean;
   breakLine?: boolean;
   color?: "primary" | "secondary" | "light" | "success" | "danger";
@@ -25,6 +26,8 @@ const clazz = computed(() => {
   let cls = props.outlined ? "ui-btn-outlined" : "ui-btn";
   if (props.rounded) {
     cls += " rounded";
+  } else if (props.squared) {
+    cls += " squared";
   }
 
   if (props.color) {
@@ -45,8 +48,9 @@ const h = computed(() => {
   if (props.height) {
     return props.height;
   }
-  if (props.rounded)
-  props.height ?? w.value
+  if (props.rounded) {
+    return props.height ?? w.value
+  }
 })
 </script>
 
@@ -62,10 +66,11 @@ i {
   outline: none;
   border-radius: 0.3rem;
   gap: .3rem;
-  width: v-bind(w);
-  height: v-bind(h);
+  width: v-bind("w");
+  // height: ;
   border: 1px solid transparent;
   user-select: none;
+  padding-block: 1rem;
 
   transition: 0.2s ease-in-out;
 }
@@ -113,8 +118,15 @@ button:hover {
   color: var(--bg-200);
 }
 
+.squared {
+  aspect-ratio: 1;
+  padding-block: 0 !important;
+}
+
 .rounded {
   border-radius: 50% !important;
+  aspect-ratio: 1;
+  padding-block: 0 !important;
 }
 
 .ui-btn {

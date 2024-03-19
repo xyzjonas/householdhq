@@ -60,5 +60,6 @@ onMounted(() => {
 
 input {
   width: 100%;
+  font-size: medium;
 }
 </style>

@@ -78,8 +78,8 @@
       <ui-button
         :color="addExpense ? 'secondary' : 'primary'"
         icon="i-ic-baseline-plus"
+        iconSize="1.2rem"
         width="3rem"
-        height="3rem"
         rounded
         @click="addExpense = !addExpense"
       />
