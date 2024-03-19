@@ -22,7 +22,6 @@
     <transition name="slide" mode="out-in" class="navigation-container">
       <!-- ENTIRE FORM -->
       <div v-if="stage === 3" class="form">
-        {{ time }}
         <ui-input
           :label="$t('t_amount')"
           v-model.number="transaction.amount"
