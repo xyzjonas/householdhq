@@ -78,8 +78,8 @@
       <ui-button
         :color="addExpense ? 'secondary' : 'primary'"
         icon="i-ic-baseline-plus"
-        iconSize="1.2rem"
-        width="3rem"
+        iconSize="1.5rem"
+        width="4rem"
         rounded
         @click="addExpense = !addExpense"
       />
@@ -293,6 +293,7 @@ h3 {
   border-radius: 50%;
   box-shadow: 1px 1px 20px var(--bg-100);
   transition: transform .1s ease-in-out;
+  opacity: .95;
   
   &.active {
     transform: rotate(45deg);

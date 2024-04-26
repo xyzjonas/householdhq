@@ -10,7 +10,12 @@ export const useTokenStore = defineStore("token", () => {
     const n = useNotifications()
     const { t } = useI18n();
 
-    const token = useCookie('token')
+    const token = useCookie(
+        'token',
+        {
+            // maxAge: new Date(2147483647 * 1000).getTime() / 1000,
+            expires: new Date(2147483647 * 1000),
+        })
 
     const loginLoading = ref(false);
     const loginError = ref<string>();
