@@ -99,7 +99,7 @@
         </div>
         <ui-button
           @click="send"
-          :loading="processing"
+          :loading="loading"
           icon="i-ic-baseline-attach-money"
           color="primary"
           width="100%"
@@ -205,7 +205,6 @@ const focusDiv = ref<any>(null);
 
 const props = defineProps<{
   transactionIn?: Transaction;
-  processing?: boolean;
   startStage?: number;
   noFrame?: boolean;
   error?: string;
@@ -278,6 +277,9 @@ const { categories, categoryLoading } = storeToRefs(categoriesStore);
 
 const sourcesStore = useSourcesStore();
 const { allSources } = storeToRefs(sourcesStore);
+
+const transactionStore = useTransactionStore();
+const { loading } = storeToRefs(transactionStore);
 
 const { t } = useI18n();
 const emit = defineEmits(["send", "close"]);

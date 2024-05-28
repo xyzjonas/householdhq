@@ -67,7 +67,8 @@ const cs = {
   login_failed: "Špatné uživatelské jméno nebo heslo",
   no_transactions: "Žádné transakce",
   no_transactions_will_appear: "Transakce se zobrazí po zaúčtování",
-  server_error: "Něco se někde pořádně vysralo, zkus to pozdeji...",
+  server_error_500: "Něco se někde pořádně vysralo, zkus to pozdeji...",
+  server_error_wrong_login: "Špatné přihlašovací jméno nebo heslo."
 }
 
 export { cs }

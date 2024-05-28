@@ -1,14 +1,13 @@
 <template>
     <layout-base>
-        <slot />
+        <div class="center-vertical">
+            <slot />
+        </div>
     </layout-base>
 </template>
 <style lang="scss" scoped>
-// .single-center {
-//     min-height: 100vh;
-//     display: grid;
-//     align-items: center;
-//     padding: 8px;
-//     height: 100%;
-// }
+.center-vertical {
+  flex: 1;
+  align-content: center
+}
 </style>

@@ -66,7 +66,7 @@ export default defineNuxtConfig({
     },
     strategies: "generateSW",
     devOptions: {
-      enabled: true,
+      enabled: false,
     },
   },
   vite: {

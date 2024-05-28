@@ -242,7 +242,6 @@ const isTransactionTagged = (transaction: any, tagId: number) => {
 };
 
 const monthReloaded = (newDate: Date) => {
-  console.info(newDate);
   year.value = newDate.getFullYear();
   month.value = newDate.getMonth() + 1;
   initialFetch();

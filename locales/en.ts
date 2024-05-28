@@ -66,7 +66,8 @@ const en = {
   access_denied: "Access not granted",
   no_transactions: "No transactions",
   no_transactions_will_appear: "Transactions will appear once entered",
-  server_error: "Something wrong happened, try again later...",
+  server_error_500: "Something wrong happened, try again later...",
+  server_error_wrong_login: "Login failed. Wrong username or password.",
 }
 
 export { en }

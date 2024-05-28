@@ -1,7 +1,6 @@
 import type { CreateUpdateTransaction, Transaction } from "./types";
 
 export function transactionToUpdateTransaction(trans: Transaction): CreateUpdateTransaction {
-  console.info(typeof trans.created)
   let created;
   if (typeof trans.created === 'string') {
     created = trans.created;

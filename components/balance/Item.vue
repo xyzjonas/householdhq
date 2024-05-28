@@ -41,7 +41,6 @@ const onAutoUpdate = () => {
 };
 
 const lastEntry = computed(() => {
-  console.info("new entry");
   if (props.source.states && props.source.states.length > 0) {
     return props.source.states.reduce((_, b) => b);
   }

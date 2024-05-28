@@ -1,12 +1,13 @@
 <template>
   <main>
     <header >
-      <div class="header page-wrapper">
+      <div class="header page">
         <span>Household HQ</span>
         <span class="version">{{ VERSION }}</span>
       </div>
     </header>
-    <div class="page-wrapper">
+
+    <div class="page page-wrapper">
       <slot />
     </div>
    
@@ -28,6 +29,12 @@ const { notifications } = useNotifications();
 </script>
 
 <style scoped lang="css">
+
+.page {
+  width: min(100% - .7rem, 960px);
+  margin-inline: auto;
+}
+
 main {
   min-height: 100%;
   display: flex;
@@ -40,6 +47,7 @@ header {
   color: var(--text-200);
   box-shadow: 0px 0px 10px #1f1d1d;
 }
+
 .header {
   font-size: x-small;
   padding: .3rem .5rem;
@@ -84,7 +92,7 @@ main {
 }
 
 .page-wrapper {
-  margin-inline: auto;
-  width: min(100% - .7rem, 960px);
+  flex: 1;
+  display: grid;
 }
 </style>

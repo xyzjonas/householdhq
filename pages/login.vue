@@ -10,7 +10,7 @@
         <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
       </span>
     </div>
-    <ui-button :loading="loginLoading" icon="i-ic-baseline-key">{{ $t("sign_in") }}</ui-button>
+    <ui-button :loading="loginLoading" width="100%" icon="i-ic-baseline-key">{{ $t("sign_in") }}</ui-button>
   </form>
 </template>
 <script setup lang="ts">
@@ -23,7 +23,7 @@ definePageMeta({
 });
 
 const tokenStore = useTokenStore();
-const { loginLoading, loginError, token } = storeToRefs(tokenStore);
+const { loginLoading } = storeToRefs(tokenStore);
 
 const username = ref<string>("");
 const usernameInput = ref<HTMLInputElement | null>(null);
@@ -69,12 +69,12 @@ onMounted(() => {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: .5rem;
+    gap: 1rem;
   }
 }
 
 img {
-  filter: grayscale(1);
+  filter: grayscale(1) opacity(.4);
   margin-bottom: .5rem;
 }
 </style>
