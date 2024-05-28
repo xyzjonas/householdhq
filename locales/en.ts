@@ -59,6 +59,8 @@ const en = {
   s_state: "entry",
   s_add_state: "add entry",
   s_states: "entries",
+  s_state_autocomplete: "autofill",
+  sign_in_keep_logged_in: "Keep logged in",
   sign_in: "Sign In",
   login_failed: "Invalid username or password",
   access_denied: "Access not granted",

@@ -41,9 +41,10 @@ export default defineNuxtConfig({
   pwa: {
     registerType: "autoUpdate",
     manifest: {
-      name: "Household HQ PWA",
+      name: "Household HQ",
       short_name: "HomePWA",
-      theme_color: "#eee",
+      theme_color: "#1a1a1a",
+      background_color: "#1a1a1a",
       icons: [
         {
           src: "manifest-icon-192.maskable.png",

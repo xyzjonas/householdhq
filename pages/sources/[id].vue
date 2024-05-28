@@ -1,7 +1,9 @@
 <template>
   <div>
     <Transition name="page" mode="out-in">
-      <div v-if="!currentSource && sourceLoading" class="center"><MosaicLoader /></div>
+      <div v-if="!currentSource && sourceLoading" class="center">
+        <MosaicLoader />
+      </div>
       <div v-else-if="currentSource" class="flex-col">
         <section class="row title">
           <h1 class="item">{{ currentSource.name }}</h1>
@@ -68,30 +70,66 @@
             <small>{{ $t("delete_desc") }}</small>
           </div>
           <div class="item">
-            <ui-button @click="deleteSource" icon="fa-solid fa-trash" link width="2rem" height="2rem" :loading="sourceLoading" color="danger"/>
+            <ui-button
+              @click="deleteSource"
+              icon="i-ic-baseline-delete"
+              height="2rem"
+              :loading="sourceLoading"
+              color="danger"
+            />
           </div>
         </div>
 
-        <section class="card flex-col">
+        <section class="card states flex-col">
           <h3 class="title">{{ $t("s_states") }}</h3>
-          <div v-for="state in currentSource.states" class="row">
-            <div class="row-simple">
-              <ui-button
-                @click="sourceStore.deleteEntry(sourceId, state.id)"
-                :outlined="true"
-                icon="i-ic-baseline-delete"
-                width="32px"
-                height="36px"
-              />
+
+          <Transition name="page" mode="out-in" class="my-2">
+            <balance-entry-form
+              v-if="edit"
+              @close="edit = !edit"
+              @created="newEntry"
+              :sourceId="currentSource.id"
+            />
+            <ui-button
+              v-else
+              color="primary"
+              @click="edit = !edit"
+              icon="i-ic-baseline-add"
+              width="100%"
+              >{{ $t("s_add_state") }}</ui-button
+            >
+          </Transition>
+
+          <div v-for="state in sourceStates" class="state-row">
+            <div>
               <span>{{ new Date(state.created).toLocaleString() }}</span>
             </div>
-            <ui-price class="item" :amount="state.amount" :currency="currency" />
+            <ui-price
+              class="item"
+              :amount="state.amount"
+              :currency="currency"
+            />
+            <ui-button
+              @click="sourceStore.deleteEntry(sourceId, state.id)"
+              icon="i-ic-baseline-delete"
+              width="2rem"
+              squared
+              color="danger"
+            />
           </div>
-      
-          <Transition name="page" mode="out-in">
-            <balance-entry-form v-if="edit" @close="edit = !edit" @created="newEntry" :sourceId="currentSource.id" />
-            <ui-button v-else @click="edit = !edit" height="32px">{{ $t("s_add_state") }}</ui-button>
-          </Transition>
+          <ui-button
+            link
+            v-if="
+              !showMore &&
+              currentSource &&
+              currentSource.states.length > MAX_ITEMS
+            "
+            class="mt-5"
+            icon="i-ic-baseline-expand-more"
+            @click="showMore = true"
+            width="100%"
+            >{{ $t("show_more") }}</ui-button
+          >
         </section>
       </div>
       <error-banner v-else status="404" message="not found" :is-login="false" />
@@ -105,7 +143,8 @@ import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
 
 const sourceStore = useSourcesStore();
-const { sourceLoading, currentSourceId, currentSource } = storeToRefs(sourceStore);
+const { sourceLoading, currentSourceId, currentSource } =
+  storeToRefs(sourceStore);
 
 const transactionStore = useTransactionStore();
 const { currency } = storeToRefs(transactionStore);
@@ -128,18 +167,34 @@ const newEntry = () => {
   sourceStore.fetchSingleSource(sourceId);
 };
 
-
 const router = useRouter();
 const deleteSource = async () => {
-  await sourceStore.deleteSource({ id: sourceId })
-  navigateTo('/sources')
-}
+  await sourceStore.deleteSource({ id: sourceId });
+  navigateTo("/sources");
+};
 
+const MAX_ITEMS = 5;
+const showMore = ref(false);
+const sourceStates = computed(() => {
+  if (!currentSource.value) {
+    return;
+  }
+
+  const states = currentSource.value.states.toSorted(
+    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
+  );
+
+  if (!showMore.value && states.length > MAX_ITEMS) {
+    states.length = MAX_ITEMS;
+  }
+
+  return states;
+});
 </script>
 
 <style lang="scss" scoped>
 .flex-col {
-  gap: .3rem;
+  gap: 0.3rem;
 }
 .title {
   text-transform: uppercase;
@@ -158,6 +213,22 @@ const deleteSource = async () => {
     line-height: 100%;
     filter: contrast(0.3);
     text-transform: none;
+  }
+}
+
+.state-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+
+  :nth-child(2) {
+    margin-left: auto;
+  }
+
+  &:nth-child(even) {
+    backdrop-filter: brightness(0.8);
   }
 }
 </style>

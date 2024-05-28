@@ -51,10 +51,11 @@
       <div v-if="edit && details">
         <TransactionForm
           :transactionIn="transaction"
-          :startStage="2"
+          :startStage="3"
           :processing="loading"
           @cancel="edit = false"
           @send="editTransaction"
+          hideClose
         />
       </div>
     </transition>

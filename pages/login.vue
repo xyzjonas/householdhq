@@ -1,27 +1,22 @@
 <template>
-  <div class="form-wrapper card row-to-column">
-    <section class="form-wrapper-hero">
-      <div>
-        <h1 class="title">{{ $t("sign_in") }}</h1>
-        <h4>New and better!</h4>
-      </div>
-    </section>
-    <form class="form-wrapper-form" @submit.prevent="useLogin">
+  <form class="form-wrapper-form card" @submit.prevent="useLogin">
+    <img src="/favicon.ico" alt="">
+    <h1 class="title mb-10">Household HQ</h1>
+    <div class="form-wrapper-form-inputs mb-10">
       <ui-input label="Username" v-model="username" type="text" :required="true" />
       <ui-input label="Password" v-model="password" type="password" :required="true" />
-      <ui-button :loading="loginLoading" icon="fa-solid fa-unlock-keyhole mr">{{ $t("sign_in") }}</ui-button>
-      <div v-if="loginError" class="mt">
-        <small class="error" style="font-weight: 500">{{ $t("login_failed") }}</small>
-      </div>
-    </form>
-  </div>
+      <span class="flex items-center mt-3">
+        <input type="checkbox" checked disabled>
+        <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
+      </span>
+    </div>
+    <ui-button :loading="loginLoading" icon="i-ic-baseline-key">{{ $t("sign_in") }}</ui-button>
+  </form>
 </template>
 <script setup lang="ts">
 import { useTokenStore } from "@/stores/tokenStore";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
-
-const foooo = ref("");
 
 definePageMeta({
   layout: "single",
@@ -61,37 +56,25 @@ onMounted(() => {
   @include input-group(16px, 16px, 10px);
 }
 
-.form-wrapper {
-  margin: 16px;
-  padding: 15vh 0;
-  border: 1px solid var(--color-primary-light-1);
+.form-wrapper-form {
+  max-width: 30rem;
+  margin-inline: auto;
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem;
 
-  text-align: center;
-
-  &-hero {
-    padding: 64px;
-    flex: 1;
-    display: grid;
-    justify-content: center;
-    .title {
-      font-size: 48px;
-      margin-bottom: 32px;
-    }
+  &-inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
   }
+}
 
-  &-form {
-    // padding: 32px;
-    flex: 1;
-
-    display: grid;
-    grid-template-rows: 1fr;
-    gap: 32px;
-    padding: 32px;
-
-    button {
-      padding: 16px 0;
-      width: 100%;
-    }
-  }
+img {
+  filter: grayscale(1);
+  margin-bottom: .5rem;
 }
 </style>

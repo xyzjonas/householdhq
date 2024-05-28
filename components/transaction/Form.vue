@@ -10,6 +10,7 @@
         @click="showNewCategory = !showNewCategory"
       />
       <ui-button
+        v-if="!hideClose"
         id="close-t-form"
         width="2rem"
         color="light"
@@ -96,12 +97,13 @@
             />
           </transition>
         </div>
-
         <ui-button
           @click="send"
           :loading="processing"
-          icon="fa-solid fa-floppy-disk"
+          icon="i-ic-baseline-attach-money"
           color="primary"
+          width="100%"
+          height="5rem"
         >
           {{ $t("t_send") }}
         </ui-button>
@@ -169,10 +171,10 @@
       <ui-button
         @click="stage = stage - 1"
         :disabled="stage <= 0"
-        width="2rem"
+        width="3rem"
         squared
-        :outlined="true"
         icon="i-ic-baseline-arrow-left"
+        icon-size="2rem"
       />
       <a
         v-for="index in stages"
@@ -184,10 +186,9 @@
       <ui-button
         @click="stage = stage + 1"
         :disabled="stage >= stages - 1"
-        width="2rem"
         squared
-        :outlined="true"
         icon="i-ic-baseline-arrow-right"
+        icon-size="1.5rem"
       />
     </div>
     <p class="error" style="text-align: right">{{ error }}</p>
@@ -208,6 +209,7 @@ const props = defineProps<{
   startStage?: number;
   noFrame?: boolean;
   error?: string;
+  hideClose?: boolean;
 }>();
 
 const stage = ref(0);
@@ -345,13 +347,13 @@ const createCategory = () => {
   &-stage {
     width: 12px;
     height: 12px;
-    border: 1px solid var(--bg-300);
+    border: 1px solid var(--color-font-light);
     border-radius: 50%;
   }
 }
 
 .active {
-  background-color: var(--bg-300);
+  background-color: var(--color-font-light);
 }
 
 .button-sm {

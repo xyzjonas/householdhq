@@ -93,15 +93,22 @@
     position: relative;
     box-sizing: border-box;
 
-    input, select {
-      // width: calc(100% - 2 * #{$padd});
+    /* Change the white to any color */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active{
+        -webkit-box-shadow: 0 0 0 30px var(--bg-200) inset !important;
+        -webkit-text-fill-color: var(--color-font-light);
     }
+
+
     label {
       
       position: absolute;
       left: calc(#{$padd}/2);
       padding: 0px 8px;
-      top: calc(#{$padd} - #{$font}/4 + #{$font}/8);
+      top: calc(#{$padd} - #{$font}/4 + #{$font}/3);
       font-size: $font;
       transition: 0.1s ease-in-out;
       color: #777;

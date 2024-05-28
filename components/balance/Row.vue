@@ -10,7 +10,7 @@
       </div>
       <h4>{{ $t("balance") }}</h4>
     </div>
-    <BalanceIndicator :forecast="forecast" :spent="spent" :total-income="totalIncome" />
+    <!-- <BalanceIndicator :forecast="forecast" :spent="spent" :total-income="totalIncome" /> -->
 
     <div>
       <BalanceItem
@@ -20,7 +20,7 @@
         :max="max"
       />
     </div>
-    <NuxtLink to="/sources" class="ml">. . .</NuxtLink>
+    <NuxtLink to="/sources">. . .</NuxtLink>
   </section>
 </template>
 <script setup lang="ts">

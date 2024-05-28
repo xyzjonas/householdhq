@@ -13,7 +13,14 @@
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
-      <ui-price size="large" :amount="balance" />
+      <ui-button
+      v-if="lastEntryNotThisMonth"
+      @click="onAutoUpdate"
+      :loading="updating"
+      icon="i-ic-baseline-auto-fix-high"
+      >{{ $t("s_state_autocomplete") }}</ui-button
+      >
+      <ui-price v-else size="large" :amount="balance" />
     </div>
   </div>
 </template>
@@ -26,11 +33,17 @@ const props = defineProps<{
   modelValue: number | undefined;
 }>();
 
+const { autoCompleteSourceState } = useSourcesStore();
+
 const updating = ref(false);
+const onAutoUpdate = () => {
+  autoCompleteSourceState(props.source.id, updating);
+};
 
 const lastEntry = computed(() => {
+  console.info("new entry");
   if (props.source.states && props.source.states.length > 0) {
-    return props.source.states.reduce((a, b) => b);
+    return props.source.states.reduce((_, b) => b);
   }
 });
 
@@ -41,10 +54,16 @@ const balance = computed<string | number>(() => {
   const lastDate = new Date(lastEntry.value.created);
   let sum = lastEntry.value.amount;
   props.source.transactionsIn
-    .filter((tr) => new Date(tr.created) < new Date() && new Date(tr.created) > lastDate)
+    .filter(
+      (tr) =>
+        new Date(tr.created) < new Date() && new Date(tr.created) > lastDate
+    )
     .forEach((tr) => (sum += tr.amount));
   props.source.transactionsOut
-    .filter((tr) => new Date(tr.created) < new Date() && new Date(tr.created) > lastDate)
+    .filter(
+      (tr) =>
+        new Date(tr.created) < new Date() && new Date(tr.created) > lastDate
+    )
     .forEach((tr) => (sum -= tr.amount));
   emit("update:modelValue", sum);
   return sum;
@@ -57,7 +76,10 @@ const lastEntryNotThisMonth = computed(() => {
   if (lastEntry.value) {
     const now = new Date();
     const d = new Date(lastEntry.value.created);
-    if (now.getFullYear() === d.getFullYear() && now.getMonth() === d.getMonth()) {
+    if (
+      now.getFullYear() === d.getFullYear() &&
+      now.getMonth() === d.getMonth()
+    ) {
       return false;
     }
     return true;
@@ -92,20 +114,13 @@ const autoUpdate = () => {
   justify-content: space-between;
 
   background-color: var(--bg-200);
-  padding: .5rem 1rem;
-  border-top-right-radius: .3rem;
-  border-bottom-right-radius: .3rem;
-  border-left: .5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
+  padding: 0.5rem 1rem;
+  border-top-right-radius: 0.3rem;
+  border-bottom-right-radius: 0.3rem;
+  border-left: 0.5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
 
   .text {
     display: inline-flex;
-  }
-
-  .text::after {
-    content: "*";
-    margin-left: 0.3em;
-    color: var(--color-danger);
-    filter: v-bind("opacity");
   }
 
   .label {

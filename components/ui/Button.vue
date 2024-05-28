@@ -1,6 +1,6 @@
 <template>
   <button :class="clazz" :disabled="disabled || loading">
-    <spinner v-if="loading" />
+    <spinner name="spinner" v-if="loading" />
     <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
   </button>
@@ -43,20 +43,23 @@ const clazz = computed(() => {
   return cls;
 });
 
-const w = computed(() => props.width ?? '100%')
+const w = computed(() => props.width ?? 'fit-content')
 const h = computed(() => {
+  if (props.rounded || props.squared) {
+    return w.value;
+  }
+
   if (props.height) {
     return props.height;
   }
-  if (props.rounded) {
-    return props.height ?? w.value
-  }
 })
+
+const iSize = computed(() => props.iconSize)
 </script>
 
 <style lang="scss" scoped>
 i {
-  font-size: v-bind('iconSize');  
+  font-size: v-bind('iSize');  
 }
 
 @mixin common() {
@@ -67,10 +70,10 @@ i {
   border-radius: 0.3rem;
   gap: .3rem;
   width: v-bind("w");
-  // height: ;
+  height: v-bind("h");
   border: 1px solid transparent;
   user-select: none;
-  padding-block: 1rem;
+  padding: .3rem .6rem;
 
   transition: 0.2s ease-in-out;
 }
@@ -151,6 +154,7 @@ button[disabled] {
   background-color: var(--bg-300);
   color: #777;
   border: 1px solid transparent;
+  filter: opacity(.5);
   pointer-events: none;
   i {
     color: #777 !important;

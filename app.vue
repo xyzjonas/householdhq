@@ -55,4 +55,15 @@ body {
   touch-action: pan-x pan-y;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
 </style>

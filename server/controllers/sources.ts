@@ -1,10 +1,12 @@
 import { PrismaClient, type Source, type SourceState } from "@prisma/client";
 import { CreateSourceDto, EditSourceDto, UpdateSourceStateDto } from "../validators/sources.dto";
 import { IdDto } from "../validators/common.dto";
+import transactions from "./transactions";
 
 class Sources {
   private sources = new PrismaClient().source;
   private sourceStates = new PrismaClient().sourceState;
+  private transactions = new PrismaClient().transaction;
 
   public async findAll(): Promise<Source[]> {
     const allSources: Source[] = await this.sources.findMany({
@@ -51,6 +53,58 @@ class Sources {
           connect: {
             id: sourceData.sourceId,
           },
+        },
+      } as any,
+      include: {
+        source: true,
+      },
+    });
+    return sourceState;
+  }
+
+  public async autoInsertState(sourceId: IdDto) {
+    const { id } = sourceId;
+
+    const lastState: SourceState | null = await this.sourceStates.findFirst({
+      where: {
+        sourceId: {
+          equals: id,
+        },
+      },
+      orderBy: {
+        created: "desc",
+      }
+    })
+    
+    if (!lastState) {
+      return false
+    }
+
+    const transactions = await this.transactions.findMany({
+      where: {
+        created: {
+          gte: lastState.created,
+          lte: new Date(),
+        },
+      }
+    })
+
+    const from = transactions.filter(t => t.sourceId === id)
+    const to = transactions.filter(t => t.targetId === id)
+    console.info(`${from.length} from, ${to.length} to`)
+
+    let result = lastState.amount;
+
+    if (from.length > 0 || to.length > 0) {
+      result = to.reduce((a, b) => (a + b.amount), result)
+      result = from.reduce((a, b) => (a - b.amount), result)
+    }
+    
+    const sourceState: SourceState = await this.sourceStates.create({
+      data: {
+        amount: result,
+        source: {
+          connect: { id },
         },
       } as any,
       include: {

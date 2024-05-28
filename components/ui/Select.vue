@@ -53,4 +53,9 @@ onMounted(() => {
 .input-group {
   @include input-group(10px, 16px, 10px);
 }
+
+select {
+  width: 100%;
+  font-size: medium;
+}
 </style>
