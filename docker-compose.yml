@@ -26,6 +26,7 @@ services:
       MYSQL_USER: home
       MYSQL_PASSWORD: home
       MYSQL_DATABASE: home
+      MYSQL_ROOT_PASSWORD: root
   
   adminer:
     image: adminer

@@ -74,6 +74,7 @@ model Source {
 model Transaction {
   id              Int         @id @default(autoincrement())
   created         DateTime    @updatedAt
+  trasactedAt     DateTime?
   description     String
   amount          Float
   currency        String
