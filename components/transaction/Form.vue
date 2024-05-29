@@ -214,7 +214,7 @@ const props = defineProps<{
 const stage = ref(0);
 const stages = 4;
 const transaction = ref<CreateUpdateTransaction>({
-  created: undefined,
+  transactedAt: undefined,
   amount: 0,
   description: "",
   sourceId: 1,
@@ -241,8 +241,8 @@ onMounted(() => {
       .map((t) => t.name)
       .join(",");
     delete transaction.value.confirmed; // discard explicit confirmed property - only for confirm action
-    date.value = formatDate(new Date(transaction.value.created ?? new Date()));
-    time.value = formatTime(new Date(transaction.value.created ?? new Date()));
+    date.value = formatDate(new Date(transaction.value.transactedAt ?? new Date()));
+    time.value = formatTime(new Date(transaction.value.transactedAt ?? new Date()));
   }
 
   if (props.startStage) {
@@ -294,7 +294,7 @@ const send = () => {
     const minute = parseInt(time.value.split(":")[1]);
     datetime.setHours(hour, minute);
   }
-  transaction.value.created = datetime.toUTCString();
+  transaction.value.transactedAt = datetime.toUTCString();
   emit("send", transaction.value);
 };
 

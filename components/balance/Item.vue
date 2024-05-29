@@ -55,13 +55,13 @@ const balance = computed<string | number>(() => {
   props.source.transactionsIn
     .filter(
       (tr) =>
-        new Date(tr.created) < new Date() && new Date(tr.created) > lastDate
+        new Date(tr.transactedAt) < new Date() && new Date(tr.transactedAt) > lastDate
     )
     .forEach((tr) => (sum += tr.amount));
   props.source.transactionsOut
     .filter(
       (tr) =>
-        new Date(tr.created) < new Date() && new Date(tr.created) > lastDate
+        new Date(tr.transactedAt) < new Date() && new Date(tr.transactedAt) > lastDate
     )
     .forEach((tr) => (sum -= tr.amount));
   emit("update:modelValue", sum);

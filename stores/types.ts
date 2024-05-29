@@ -67,10 +67,10 @@ export interface DeleteSource {
   id: number;
 }
 
-
 export interface Transaction {
   id: number;
-  created: Date;
+  // created: Date;
+  transactedAt: Date;
   description: string;
   amount: number;
   currency: string;
@@ -88,7 +88,8 @@ export interface Transaction {
 
 export interface CreateUpdateTransaction {
   id?: number;
-  created?: string;
+  // created?: string;
+  transactedAt?: string;
   description?: string;
   amount: number;
   currency?: string;

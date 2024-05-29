@@ -100,7 +100,7 @@ const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
 
 const transactionStore = useTransactionStore();
-const { currentMonth, currency, loading, year, month } = storeToRefs(transactionStore);
+const { currentMonth, passed, upcomming, currency, loading, year, month } = storeToRefs(transactionStore);
 const isCurrentMonth = computed(() => {
   if (!month.value && !year.value) {
     return true;
@@ -146,7 +146,10 @@ const initialFetch = () => {
 };
 
 const transactions = computed(() => {
-  const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.created) <= new Date());
+  const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) <= new Date());
+  for (const t of currentMonth.value) {
+    console.info(t.transactedAt)
+  }
   if (showHidden.value) {
     return tmp;
   }
@@ -170,7 +173,7 @@ const expense = computed(() =>
 );
 
 const upcommingTransactions = computed(() => {
-  const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.created) > new Date());
+  const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) > new Date());
   if (showHidden.value) {
     return tmp;
   }

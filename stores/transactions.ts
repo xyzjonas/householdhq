@@ -16,11 +16,11 @@ export const useTransactionStore = defineStore("transaction", () => {
   const currentMonth = ref<Transaction[]>([]);
 
   const passed = computed(() => {
-    const tmp = currentMonth.value.filter((trans) => new Date(trans.created) <= new Date());
+    return currentMonth.value.filter((trans) => new Date(trans.transactedAt) <= new Date());
   });
 
   const upcomming = computed(() => {
-    const tmp = currentMonth.value.filter((trans) => new Date(trans.created) > new Date());
+    return currentMonth.value.filter((trans) => new Date(trans.transactedAt) > new Date());
   });
 
   const fetchTransactions = async () => {
@@ -54,9 +54,9 @@ export const useTransactionStore = defineStore("transaction", () => {
         actualMonth = new Date().getMonth() + 1
       }
 
-      if (new Date(transaction.created).getMonth() + 1 === actualMonth) {
+      if (new Date(transaction.transactedAt).getMonth() + 1 === actualMonth) {
         currentMonth.value.push(transaction);
-        currentMonth.value.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime() )
+        currentMonth.value.sort(byDate)
       }
     } finally {
       loading.value = false;
@@ -74,7 +74,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         }
         return t
       })
-      currentMonth.value.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime() )
+      currentMonth.value.sort(byDate)
     } finally {
       loading.value = false;
     }

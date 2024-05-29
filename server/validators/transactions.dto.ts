@@ -18,7 +18,7 @@ export class CreateTransactionDto {
   @IsOptional()
   @Validate(ValidDate)
   @Transform(({value}) => new Date(value))
-  public created?: Date;
+  public transactedAt?: Date;
   
   @IsString()
   public description?: string;
@@ -56,7 +56,7 @@ export class EditTransactionDto {
   @IsOptional()
   @Validate(ValidDate)
   @Transform(({value}) => new Date(value))
-  public created?: Date;
+  public transactedAt?: Date;
   
   @IsOptional()
   @IsBoolean()

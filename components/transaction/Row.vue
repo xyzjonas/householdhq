@@ -91,7 +91,7 @@ const notifications = useNotifications();
 
 
 const confirmPendingTransaction = (transaction: Transaction) => {
-  transactions.editTransaction({ id: transaction.id, confirmed: true, created: transaction.created })
+  transactions.editTransaction({ id: transaction.id, confirmed: true, transactedAt: transaction.transactedAt })
   .then(() => {
     notifications.addNotification({
       text: transaction.recurring > 0 ? t('t_confirmed_reccuring') : t('t_confirmed'),
@@ -115,7 +115,7 @@ const editTransaction = (transactionData: Transaction) => {
 }
 
 const date = computed(() => {
-  return new Date(props.transaction.created);
+  return new Date(props.transaction.transactedAt);
 });
 
 const firstTag = computed(() => {

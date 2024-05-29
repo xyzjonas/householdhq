@@ -1,15 +1,15 @@
 import type { CreateUpdateTransaction, Transaction } from "./types";
 
 export function transactionToUpdateTransaction(trans: Transaction): CreateUpdateTransaction {
-  let created;
-  if (typeof trans.created === 'string') {
-    created = trans.created;
+  let transactedAt;
+  if (typeof trans.transactedAt === 'string') {
+    transactedAt = trans.transactedAt;
   } else {
-    created = trans.created.toUTCString();
+    transactedAt = trans.transactedAt.toUTCString();
   }
   return {
     id: trans.id,
-    created: created,
+    transactedAt,
     description: trans.description,
     amount: trans.amount,
     currency: trans.currency,
@@ -21,4 +21,8 @@ export function transactionToUpdateTransaction(trans: Transaction): CreateUpdate
     targetId: trans.target.id,
     tags: trans.tags.map((tag) => tag.name).join(","),
   };
+}
+
+export function byDate(a: Transaction, b: Transaction): number {
+  return new Date(b.transactedAt).getTime() - new Date(a.transactedAt).getTime()
 }
