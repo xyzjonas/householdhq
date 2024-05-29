@@ -10,7 +10,7 @@ async function main() {
     const i = transactions.indexOf(trans)
 
     console.info(`Updating transaction ${i + 1}/${transactions.length}`)
-    if (trans.trasactedAt) {
+    if (trans.transactedAt) {
       continue
     }
 
@@ -18,7 +18,7 @@ async function main() {
       await tx.transaction.update({
         where: { id: trans.id },
         data: {
-          trasactedAt: trans.created,
+          transactedAt: trans.created,
           created: trans.created,
         },
       });
@@ -67,7 +67,7 @@ async function main() {
       await tx.transaction.update({
         where: { id: trans.id },
         data: {
-          created: trans.trasactedAt ?? undefined,
+          created: trans.transactedAt ?? undefined,
         },
       });
     })
