@@ -93,6 +93,5 @@ main {
 
 .page-wrapper {
   flex: 1;
-  display: grid;
 }
 </style>

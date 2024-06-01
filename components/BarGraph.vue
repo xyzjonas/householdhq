@@ -198,8 +198,15 @@ section {
 .graph-card {
   position: relative;
   height: 100%;
-  max-height: 30rem;
-  min-height: 20rem;
+  // max-height: 30rem;
+  // min-height: 20rem;
+  height: 25rem;
+}
+
+@media (min-width: 992px){
+  .graph-card {
+    height: 40rem;
+  }
 }
 
 #show-legend {
