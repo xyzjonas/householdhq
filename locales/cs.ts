@@ -56,6 +56,8 @@ const cs = {
   s_isout_desc: "poznačit tento účet jako 'výdajový'",
   s_isdisp: "zahrnout do zůstatku",
   s_isdisp_desc: "transakce mířící z/do tohoto účtu budou součástí měsíčního soupisu",
+  s_isport: "Portfolio",
+  s_isport_desc: "zahrnout do portfolia a zobrazovat v souhrnném zobrazení",
   s_add_state: "přidat záznam",
   s_state: "záznam",
   s_states: "záznamy",

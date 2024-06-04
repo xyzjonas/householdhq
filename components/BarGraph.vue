@@ -23,7 +23,7 @@
           width="48px"
           height="36px"
           icon="i-ic-baseline-mode-edit"
-          @click="navigateTo(`/tags/${selectedCategory.id}`)"
+          @click="navigateTo(`/categories/${selectedCategory.id}`)"
         />
         <ui-button
           width="48px"
@@ -39,11 +39,17 @@
   <section v-if="showLegend" class="center card legend">
     <div  class="legend-content">
       <div v-for="item in items" class="legend-content-item" @click="selectCategoryByName(item.name)">
-        <span class="circle" :style="`background-color: ${item.color};`"></span>
+        <span class="circle-sm mr-1" :style="`background-color: ${item.color};`"></span>
         <span class="mr">{{ item.name }}</span>
         <span><ui-price :amount="item.sum" size="small"/></span>
       </div>
+      <ui-button
+        @click="navigateTo('/categories')"
+        icon="i-ic-baseline-format-list-bulleted"
+        link
+      />
     </div>
+    
   </section>
   </transition>
 
@@ -51,7 +57,7 @@
 <script setup lang="ts">
 import { Bar, Doughnut } from 'vue-chartjs'
 import { storeToRefs } from "pinia";
-import type { Tag, TagWithSum } from "@/stores/types";
+import type { CategoryWithSum } from "@/types";
 
 import { useTransactionStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
@@ -59,7 +65,7 @@ import { useCategoriesStore } from "@/stores/categories";
 const showLegend = ref(false);
 
 const props = defineProps<{
-  items: TagWithSum[];
+  items: CategoryWithSum[];
 }>();
 
 const selectedCategoryName = ref<string>("");
@@ -73,6 +79,7 @@ const { currency, loading } = storeToRefs(useTransactionStore());
 
 const emit = defineEmits(["filter"]);
 watch(selectedCategory, (value) => {
+  console.info(`Selected: ${value?.id}`)
   emit("filter", value?.id ?? -1);
 });
 
@@ -87,7 +94,7 @@ const areThereTransactions = computed(() => {
   return showedItems.value.map((cat) => cat.transactions).flat().length > 0;
 });
 
-const borderColor = (item: TagWithSum) => {
+const borderColor = (item: CategoryWithSum) => {
   if (item.name === selectedCategoryName.value) {
     return 'white'
   }
@@ -182,14 +189,6 @@ section {
       &:hover {
         filter: brightness(1.2);
       }
-
-      .circle {
-        width: .8rem;
-        aspect-ratio: 1;
-        border-radius: 100%;
-        opacity: .7;
-      }
-
     }
   }
 }
@@ -200,12 +199,12 @@ section {
   height: 100%;
   // max-height: 30rem;
   // min-height: 20rem;
-  height: 25rem;
+  height: 320px;
 }
 
 @media (min-width: 992px){
   .graph-card {
-    height: 40rem;
+    height: 560px;
   }
 }
 

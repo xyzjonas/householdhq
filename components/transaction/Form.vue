@@ -67,13 +67,13 @@
             {{ source.name }}
           </option>
         </ui-select>
-        <ui-select v-model.number="transaction.tags" :label="$t('t_tag')">
+        <ui-select v-model.number="transaction.categoryId" :label="$t('t_tag')">
           <option
-            v-for="tag in categories"
-            :key="tag.id + '-event'"
-            :value="tag.name"
+            v-for="category in categories"
+            :key="category.id + '-event'"
+            :value="category.id"
           >
-            {{ tag.name }}
+            {{ category.name }}
           </option>
         </ui-select>
 
@@ -100,7 +100,6 @@
         <ui-button
           @click="send"
           :loading="loading"
-          icon="i-ic-baseline-attach-money"
           color="primary"
           width="100%"
           height="5rem"
@@ -113,9 +112,9 @@
       <div v-else-if="stage === 2" class="flex-col">
         <div class="categories">
           <CategoryBadge
-            v-for="tag in categories"
-            :category="tag"
-            @selected="categorySelected"
+            v-for="category in categories"
+            :category="category"
+            @selected="categorySelected(category)"
           />
         </div>
         <transition name="slide">
@@ -198,7 +197,7 @@
 import { storeToRefs } from "pinia";
 import { useCategoriesStore } from "@/stores/categories";
 import { useSourcesStore } from "@/stores/sources";
-import type { Transaction, CreateUpdateTransaction } from "@/stores/types";
+import type { Transaction, CreateUpdateTransaction, Category } from "@/types";
 import { transactionToUpdateTransaction } from "@/stores/utils";
 
 const focusDiv = ref<any>(null);
@@ -310,8 +309,8 @@ const formatTime = (date: Date) => {
   return hours + ":" + minutes
 };
 
-const categorySelected = (categoryName: string) => {
-  transaction.value.tags = categoryName;
+const categorySelected = (category: Category) => {
+  transaction.value.categoryId = category.id;
   stage.value++;
 };
 

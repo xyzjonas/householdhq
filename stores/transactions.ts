@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { Transaction } from "./types";
+import type { Transaction } from "~/types";
 import { useTokenStore } from "./tokenStore";
 import { useCurrentMonth } from "~/composables/useCurrentMonth";
 

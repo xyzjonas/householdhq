@@ -3,7 +3,7 @@
     <div>
       <div class="row-simple center">
         <ui-price
-          :amount="balanceSums.reduce((a, b) => a + b, 0).toString()"
+          :amount="totalBalance"
           :currency="currency"
           size="3rem"
         />
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
-import type { Source } from "@/stores/types";
+import type { Source } from "@/types";
 
 const { currency } = storeToRefs(useTransactionStore());
 
@@ -39,6 +39,15 @@ const props = defineProps<{
 }>();
 
 const balanceSums = ref<number[]>([]);
+const totalBalance = computed(() => {
+  let total = 0;
+  for (let index = 0; index < balanceSums.value.length; index++) {
+    if (props.sources[index].isDisponible) {
+      total += balanceSums.value[index];
+    }
+  }
+  return total;
+})
 
 const max = computed(() => {
   let max = 0;

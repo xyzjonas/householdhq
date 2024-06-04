@@ -52,6 +52,19 @@
 
         <div class="row card">
           <div class="row-label">
+            <p class="item">{{ $t("s_isport") }}</p>
+            <p class="desc">{{ $t("s_isport_desc") }}</p>
+          </div>
+          <form-editable-boolean
+            keyName="isPortfolio"
+            :value="currentSource.isPortfolio"
+            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
+            class="item"
+          />
+        </div>
+
+        <div class="row card">
+          <div class="row-label">
             <p class="item">{{ $t("color") }}</p>
             <small></small>
           </div>
@@ -67,7 +80,7 @@
         <div class="row card">
           <div class="row-label">
             <p class="item">{{ $t("delete") }}</p>
-            <small>{{ $t("delete_desc") }}</small>
+            <p class="desc">{{ $t("delete_desc") }}</p>
           </div>
           <div class="item">
             <ui-button
@@ -211,7 +224,7 @@ const sourceStates = computed(() => {
   .desc {
     font-size: small;
     line-height: 100%;
-    filter: contrast(0.3);
+    filter: contrast(0.3) opacity(.5);
     text-transform: none;
   }
 }

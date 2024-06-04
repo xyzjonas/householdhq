@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { Category, CreateCategory, Summary, Tag, TagWithSum, Transaction } from "./types";
+import type { Category, CreateCategory, Summary, Tag, CategoryWithSum, Transaction } from "~/types";
 import { useTokenStore } from "./tokenStore";
 import { useTransactionStore } from "./transactions";
 
@@ -7,7 +7,7 @@ export const useCategoriesStore = defineStore("category", () => {
   const tokenStore = useTokenStore();
   const { currentMonth } = storeToRefs(useTransactionStore());
 
-  const categories = ref<Tag[]>([]);
+  const categories = ref<Category[]>([]);
 
   const categoryLoading = ref(false);
 
@@ -17,7 +17,7 @@ export const useCategoriesStore = defineStore("category", () => {
   });
 
   const fetchCategories = async () => {
-    const url = "/api/tags";
+    const url = "/api/categories";
     categoryLoading.value = true;
     try {
       categories.value = (await tokenStore.get(url)).data;
@@ -70,33 +70,33 @@ export const useCategoriesStore = defineStore("category", () => {
   //     return tags;
   //   });
 
-  const incomeCategories = computed<TagWithSum[]>(() => {
+  const incomeCategories = computed<CategoryWithSum[]>(() => {
     return categories.value
     .map((cat) => {
       const transactions: Transaction[] = currentMonth.value
-      .filter((tr) => tr.tags.find((tag) => tag.id === cat.id))
-      .filter((tr) => tr.source.isOut && !tr.target.isOut)
+      .filter((transaction) => transaction.category?.id === cat.id)
+      .filter(isIncome)
 
       if (transactions.length === 0) {
         return null;
       }
       
-      const mapped: TagWithSum = {
+      const mapped: CategoryWithSum = {
         ...cat,
         transactions: transactions,
         sum: transactions.map((tr) => tr.amount).reduce((a, b) => a + b, 0),
       };
       return mapped;
     })
-    .filter(Boolean) as TagWithSum[]
+    .filter(Boolean) as CategoryWithSum[]
   });
 
-  const expenseCategories = computed<TagWithSum[]>(() => {
+  const expenseCategories = computed<CategoryWithSum[]>(() => {
     return categories.value.map((cat) => {
       const transactions: Transaction[] = currentMonth.value
-        .filter((tr) => tr.tags.find((tag) => tag.id === cat.id))
-        .filter((tr) => !tr.source.isOut && tr.target.isOut);
-      const mapped: TagWithSum = {
+        .filter((transaction) => transaction.category?.id === cat.id)
+        .filter(isExpense);
+      const mapped: CategoryWithSum = {
         ...cat,
         transactions: transactions,
         sum: transactions.map((tr) => tr.amount).reduce((a, b) => a + b, 0),
@@ -106,7 +106,7 @@ export const useCategoriesStore = defineStore("category", () => {
   });
 
   const fetchSingleCategory = async (categoryId: number) => {
-    const url = `/api/tags/${categoryId}`;
+    const url = `/api/categories/${categoryId}`;
     categoryLoading.value = true;
     try {
       const response = await tokenStore.get(url);
@@ -120,7 +120,7 @@ export const useCategoriesStore = defineStore("category", () => {
 
   const patchCategory = async (categoryId: number, categoryData: any) => {
     categoryLoading.value = true;
-    const url = "/api/tags";
+    const url = "/api/categories";
     // console.info(sourceData)
     categoryData.id = categoryId;
     try {
@@ -134,7 +134,7 @@ export const useCategoriesStore = defineStore("category", () => {
 
   const createCategory = async (categoryData: CreateCategory) => {
     categoryLoading.value = true;
-    const url = "/api/tags";
+    const url = "/api/categories";
     try {
       const newCategory = await tokenStore.put(url, categoryData);
       categories.value.push(newCategory.data);

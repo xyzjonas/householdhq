@@ -11,10 +11,13 @@ export class CreateSourceDto {
   @IsOptional()
   public isOut?: boolean
 
-
   @IsBoolean()
   @IsOptional()
   public isDisponible?: boolean
+
+  @IsBoolean()
+  @IsOptional()
+  public isPortfolio?: boolean
 
 }
 
@@ -30,6 +33,10 @@ export class EditSourceDto {
     @IsBoolean()
     @IsOptional()
     public isDisponible?: boolean
+
+    @IsBoolean()
+    @IsOptional()
+    public isPortfolio?: boolean
 
     @IsOptional()
     @IsString()

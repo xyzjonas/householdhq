@@ -5,11 +5,10 @@ import doValidate from "../validators/validator";
 
 export default defineEventHandler(async (event) => {
   const data: EditTransactionDto = await doValidate(EditTransactionDto, await readBody(event));
+  data.tags = data.tags?.filter((tag: string) => !!tag) ?? []
   const updatedTransaction = await transactions.editTransaction(data);
-  console.info(`ingress: ${data}`);
+
   if (data.confirmed) {
-    console.info(`updated: ${updatedTransaction}`);
-    console.info(updatedTransaction);
     // we are confirming pending transaction, let's create another one - if recurring...
     if (updatedTransaction.recurring > 0) {
       console.info(`${updatedTransaction.id} is recurring, each ${updatedTransaction.recurring} monhts`);

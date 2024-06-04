@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { CreateSource, DeleteSource, Source, SourceApi } from "./types";
+import type { CreateSource, DeleteSource, Source, SourceApi } from "~/types";
 import { useTokenStore } from "./tokenStore";
 import { useTransactionStore } from "./transactions";
 

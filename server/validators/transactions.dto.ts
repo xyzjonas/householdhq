@@ -44,6 +44,7 @@ export class CreateTransactionDto {
   @IsOptional()
   public currency?: string;
 
+  @IsOptional()
   @Validate(ValidArray)
   @Transform(({value}) => value.split(','))
   public tags?: string[];

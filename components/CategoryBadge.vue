@@ -7,6 +7,7 @@
     </a>
 </template>
 <script lang="ts" setup>
+import type { Category } from '~/types';
 import { shouldInvert } from '~/utils/color';
 
 const props = defineProps<{ category: Category }>();

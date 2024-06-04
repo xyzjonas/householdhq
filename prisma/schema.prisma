@@ -65,7 +65,8 @@ model Source {
   transactionsIn    Transaction[] @relation(name: "source")
   transactionsOut   Transaction[] @relation(name: "target")
   isOut             Boolean       @default(false)  // mark 'source' as output (not owned)
-  isDisponible      Boolean       @default(false)  // mark 'source' as traceable in the monthly budget
+  isDisponible      Boolean       @default(false)  // mark 'source' as disponible (available to spend)
+  isPortfolio       Boolean       @default(false)  // mark 'source' as a part of the portfolio
   states            SourceState[]
   color             String?
 }
@@ -74,7 +75,7 @@ model Source {
 model Transaction {
   id              Int         @id @default(autoincrement())
   created         DateTime    @updatedAt
-  transactedAt     DateTime?
+  transactedAt    DateTime?
   description     String
   amount          Float
   currency        String

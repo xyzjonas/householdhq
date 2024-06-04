@@ -1,7 +1,9 @@
 <template>
   <div class="container">
       <div v-if="sources" v-for="source in sources">
-        <source-row :source="source" />
+        <colored-row :link="`/sources/${source.id}`" :title="source.name" :color="source.color">
+          <div v-if="source.isPortfolio" class="circle-sm" style="background-color: var(--color-success);"></div>
+        </colored-row>
     </div>
     <div class="new-source-card">
         <h2>new source</h2>
@@ -19,6 +21,7 @@
 </template>
 <script setup lang="ts">
 import { useSourcesStore } from "@/stores/sources";
+import { color } from "chart.js/helpers";
 import { storeToRefs } from "pinia";
 
 const sourcesStore = useSourcesStore();

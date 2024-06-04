@@ -231,3 +231,17 @@
         grid-template-columns: 1fr 1fr 1fr;
     }
 }
+
+.circle-sm {
+    width: .8rem;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    opacity: .7;
+}
+
+.circle {
+    width: 1rem;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    opacity: .7;
+}

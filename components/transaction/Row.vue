@@ -2,7 +2,7 @@
   <div :style="transparent && !details ? transparentStyle : ''">
     <div class="wrapper">
       <div
-        :class="`transaction ${transaction.target.isOut ? '' : 'income'}`"
+        :class="`transaction ${isExpense(transaction) ? '' : 'income'}`"
         :style="`width: ${details ? 60 : 100}%`"
         @click="
           details = !details;
@@ -62,7 +62,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Transaction } from "@/stores/types";
+import type { Transaction } from "@/types";
 import { useTransactionStore } from "@/stores/transactions";
 import { storeToRefs } from "pinia";
 
@@ -118,18 +118,15 @@ const date = computed(() => {
   return new Date(props.transaction.transactedAt);
 });
 
-const firstTag = computed(() => {
-  if (props.transaction.tags.length > 0) {
-    return props.transaction.tags[0];
-  }
-  return undefined;
-});
+// const firstTag = computed(() => {
+//   if (props.transaction.tags.length > 0) {
+//     return props.transaction.tags[0];
+//   }
+//   return undefined;
+// });
 
 const tagColor = computed(() => {
-  if (firstTag.value && firstTag.value.color) {
-    return `${firstTag.value.color}aa`;
-  }
-  return "#00000000";
+  return props.transaction.category?.color ?? "#00000000";
 });
 
 const confirmable = computed(() => {
@@ -230,11 +227,12 @@ rightBtn.value = buttons.edit;
 }
 
 .income {
-  border-top: 1px solid;
-  border-bottom: 1px solid;
-  border-left: 1px solid;
-  border-top-color: var(--color-success) !important;
-  border-bottom-color: var(--color-success) !important;
-  border-left-color: var(--color-success) !important;
+  // border-top: 1px solid;
+  // border-bottom: 1px solid;
+  // border-left: 1px solid;
+  // border-top-color: var(--color-success) !important;
+  // border-bottom-color: var(--color-success) !important;
+  // border-left-color: var(--color-success) !important;
+  background-color: #4b77584b;
 }
 </style>

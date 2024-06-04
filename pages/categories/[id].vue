@@ -1,60 +1,55 @@
 <template>
   <div class="container">
-    <div v-if="!currentCategory && categoryLoading" class="center"><MosaicLoader /></div>
-    <div v-else-if="currentCategory" class="flex-col">
+    <div v-if="!error && !pending && category" class="flex-col">
       <section class="row title">
-        <Icon :iconName="currentCategory.icon" class="mr" />
-        <h1 class="item">{{ currentCategory.name }}</h1>
+        <Icon :iconName="category.icon" class="mr" />
+        <h1 class="item">{{ category.name }}</h1>
         <Transition name="page" mode="out-in">
           <spinner v-show="categoryLoading" class="item" />
         </Transition>
       </section>
       <div class="row card">
         <div class="item">{{ $t("name") }}</div>
-        <form-editable-field :value="currentCategory.name" keyName="name" @send="patchCategory" class="item" />
+        <form-editable-field :value="category.name" keyName="name" @send="patchCategory" class="item" />
       </div>
       <div class="row card">
         <div class="item">{{ $t("description") }}</div>
         <form-editable-field
           keyName="description"
-          :value="currentCategory.description"
+          :value="category.description"
           @send="patchCategory"
           class="item"
         />
       </div>
       <div class="row card">
         <div class="item">{{ $t("icon") }}</div>
-        <form-editable-field keyName="icon" :value="currentCategory.icon" @send="patchCategory" class="item" />
+        <form-editable-field keyName="icon" :value="category.icon" @send="patchCategory" class="item" />
       </div>
       <div class="row card">
         <div class="item">{{ $t("color") }}</div>
         <div class="item">
-          <form-editable-color keyName="color" :value="currentCategory.color || '#ffffffff'" @send="patchCategory" />
+          <form-editable-color keyName="color" :value="category.color || '#ffffffff'" @send="patchCategory" />
         </div>
       </div>
     </div>
-    <error-banner v-else status="404" message="not found" :is-login="false" />
   </div>
 </template>
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
 import { useCategoriesStore } from "@/stores/categories";
-
-const categoriesStore = useCategoriesStore();
-const { currentCategoryId, categoryLoading, currentCategory } = storeToRefs(categoriesStore);
+import type { Category } from "~/types";
 
 const route = useRoute();
 const categoryId = parseInt(route.params.id as string);
-currentCategoryId.value = categoryId;
+const { data, pending, error, refresh } = await useFetch<{ data: Category }>(`/api/categories/${categoryId}`)
 
-onMounted(() => {
-  if (!currentCategory.value) {
-    categoriesStore.fetchSingleCategory(categoryId);
-  }
-});
+const category = computed(() => data.value?.data ?? undefined)
 
-const patchCategory = (tagData: any) => {
-  categoriesStore.patchCategory(categoryId, tagData);
+const categoriesStore = useCategoriesStore();
+const { categoryLoading } = storeToRefs(categoriesStore);
+
+const patchCategory = async (tagData: any) => {
+  await categoriesStore.patchCategory(categoryId, tagData);
+  await refresh();
 };
 </script>
 <style lang="scss" scoped>

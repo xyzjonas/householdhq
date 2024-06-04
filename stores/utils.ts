@@ -1,4 +1,4 @@
-import type { CreateUpdateTransaction, Transaction } from "./types";
+import type { CreateUpdateTransaction, Transaction } from "~/types";
 
 export function transactionToUpdateTransaction(trans: Transaction): CreateUpdateTransaction {
   let transactedAt;

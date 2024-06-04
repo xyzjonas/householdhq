@@ -1,9 +1,10 @@
 import { PrismaClient, type Transaction } from "@prisma/client";
+import type { Transaction as TransactionWithIncludes } from "~/types";
 import {
-  CreateTransactionDto,
-  TagTransactionDto,
-  TransactionMonthDto,
-  EditTransactionDto,
+  CreateTransactionDto as CreateDto,
+  TagTransactionDto as TagDto,
+  TransactionMonthDto as MonthDto,
+  EditTransactionDto as EditDto,
 } from "../validators/transactions.dto";
 import { IdDto } from "../validators/common.dto";
 
@@ -17,7 +18,7 @@ const DEFAULT_INCLUDE = {
 export interface GetTransactionsResponse {
   month: string;
   count: number;
-  data: Transaction[];
+  data: TransactionWithIncludes[];
 }
 
 function ignoreNul<T>(item: T | null | undefined): T {
@@ -27,7 +28,7 @@ function ignoreNul<T>(item: T | null | undefined): T {
 class Transactions {
   private transactions = new PrismaClient().transaction;
 
-  public async findAll(): Promise<Transaction[]> {
+  public async findAll(): Promise<TransactionWithIncludes[]> {
     const allTrans: Transaction[] = await this.transactions.findMany({
       include: DEFAULT_INCLUDE,
     });
@@ -36,10 +37,10 @@ class Transactions {
         ignoreNul(b.transactedAt).getTime() -
         ignoreNul(a.transactedAt).getTime()
     );
-    return allTrans;
+    return allTrans as any;
   }
 
-  public async findSingle(transactionData: IdDto): Promise<Transaction> {
+  public async findSingle(transactionData: IdDto): Promise<TransactionWithIncludes> {
     const transaction = await this.transactions.findUnique({
       where: { id: transactionData.id },
       include: DEFAULT_INCLUDE,
@@ -50,12 +51,10 @@ class Transactions {
         statusMessage: `No such transaction id=${transactionData.id}`,
       });
     }
-    return transaction;
+    return transaction as any;
   }
 
-  public async findRecent(
-    data: TransactionMonthDto
-  ): Promise<GetTransactionsResponse> {
+  public async findRecent(data: MonthDto): Promise<GetTransactionsResponse> {
     const now = new Date();
     let month = data.month;
     let year = data.year;
@@ -82,27 +81,26 @@ class Transactions {
     return {
       month: `${year}-${month}`,
       count: allTrans.length,
-      data: allTrans,
+      data: allTrans as any,
     };
   }
 
-  public async findInterval(from: Date, to: Date): Promise<Transaction[]> {
-    console.log(`Querying transactions from='${from}' to='${to}'`);
+  public async findInterval(from: Date, to: Date, filters?: { categoryId?: number }): Promise<TransactionWithIncludes[]> {
+    console.log(`Querying transactions from='${from}' to='${to}' (category=${filters?.categoryId})`);
     const allTrans: Transaction[] = await this.transactions.findMany({
       where: {
         transactedAt: {
           gte: from,
           lt: to,
         },
+        categoryId: filters?.categoryId,
       },
       include: DEFAULT_INCLUDE,
     });
-    return allTrans;
+    return allTrans as any;
   }
 
-  public async createTransaction(
-    transactionData: CreateTransactionDto
-  ): Promise<Transaction> {
+  public async createTransaction(transactionData: CreateDto): Promise<Transaction> {
     const now = new Date();
     let parsed_date = new Date();
 
@@ -148,9 +146,7 @@ class Transactions {
     return trans;
   }
 
-  public async editTransaction(
-    transactionData: EditTransactionDto
-  ): Promise<Transaction> {
+  public async editTransaction(transactionData: EditDto): Promise<TransactionWithIncludes> {
     let parsed_date = new Date();
     
     if (transactionData.transactedAt) {
@@ -158,7 +154,7 @@ class Transactions {
     }
 
     let tags = undefined;
-    if (transactionData.tags) {
+    if (transactionData.tags && transactionData.tags.length > 0) {
       tags = {
         connect: transactionData.tags.map((tagName) => ({ name: tagName })),
       };
@@ -204,7 +200,7 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return trans;
+    return trans as any;
   }
 
   public async deleteTransaction(transactionData: IdDto): Promise<Transaction> {
@@ -213,9 +209,7 @@ class Transactions {
     });
   }
 
-  public async tagTransaction(
-    tagsData: TagTransactionDto
-  ): Promise<Transaction> {
+  public async tagTransaction(tagsData: TagDto): Promise<TransactionWithIncludes> {
     const tags = (tagsData?.tags ?? []).map((tagName) => ({ name: tagName }));
     const trans = await this.transactions.update({
       where: {
@@ -228,12 +222,10 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return trans;
+    return trans as any;
   }
 
-  public async untagTransaction(
-    tagsData: TagTransactionDto
-  ): Promise<Transaction> {
+  public async untagTransaction(tagsData: TagDto): Promise<TransactionWithIncludes> {
     const tags = (tagsData?.tags ?? []).map((tagName) => ({ name: tagName }));
     const trans = await this.transactions.update({
       where: {
@@ -246,7 +238,7 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return trans;
+    return trans as any;
   }
 }
 

@@ -25,7 +25,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Source } from "@/stores/types";
+import type { Source } from "@/types";
 
 const props = defineProps<{
   source: Source;

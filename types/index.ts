@@ -32,7 +32,7 @@ export interface Tag {
   transactions: Transaction[];
 }
 
-export interface TagWithSum extends Tag {
+export interface CategoryWithSum extends Category {
   sum: number;
   transactions: Transaction[];
 }
@@ -49,6 +49,7 @@ export interface SourceApi {
   name: string;
   isOut: boolean;
   isDisponible: boolean;
+  isPortfolio: boolean;
   states: SourceState[];
   color: string;
 }
@@ -78,7 +79,7 @@ export interface Transaction {
   confirmed: boolean;
   recurring: number;
 
-  category?: Category;
+  category: Category;
 
   source: Source;
   target: Source;

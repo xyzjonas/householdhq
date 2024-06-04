@@ -6,29 +6,32 @@
   </div>
   <div class="center my-1">
     <div class="toggle-bar m-1">
-      <a @click="item = 0" :class="`bar-item ${item === 0 ? 'active' : ''}`">{{ $t("expenses") }}</a>
-      <a @click="item = 1" :class="`bar-item ${item === 1 ? 'active' : ''}`">{{ $t("incomes") }}</a>
+      <a @click="model = 0" :class="`bar-item ${model === 0 ? 'active' : ''}`">{{ $t("expenses") }}</a>
+      <a @click="model = 1" :class="`bar-item ${model === 1 ? 'active' : ''}`">{{ $t("incomes") }}</a>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import type { TagWithSum } from "@/stores/types";
+import type { CategoryWithSum } from "@/types";
 
 defineEmits(["filter"]);
 
+// = selected 'tab'
+const model = defineModel<number>();
+
 const props = defineProps<{
-  expenses: TagWithSum[];
-  incomes: TagWithSum[];
+  expenses: CategoryWithSum[];
+  incomes: CategoryWithSum[];
 }>();
 
-const item = ref(0);
+// const item = ref(0);
 
-const data = computed(() => (item.value === 1 ? props.incomes : topExpenses.value));
+const data = computed(() => (model.value === 1 ? props.incomes : topExpenses.value));
 
 const topExpenses = computed(() => {
   if (props.expenses.length > 5) {
     return props.expenses
-    .filter(e => e.sum > 1000)
+    .filter(e => e.sum > 100)
     .sort((a, b) => b.sum - a.sum)
   }
   return props.expenses

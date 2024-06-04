@@ -1,4 +1,4 @@
-import type { Transaction } from "@prisma/client";
+import type { Transaction } from "~/types";
 import transactions from "~~/server/controllers/transactions";
 import { IdDto } from "~~/server/validators/common.dto";
 import doValidate from "~~/server/validators/validator";
@@ -9,52 +9,62 @@ interface Summary {
   amount: number;
 }
 
+export function isExpense(transaction: Transaction) {
+  const isNormalExpense = !transaction.source.isOut && transaction.target.isOut;
+  const isInternalTransfer = !transaction.source.isOut && transaction.target.isPortfolio;
+  return isNormalExpense || isInternalTransfer;
+}
+
+export function isIncome(transaction: Transaction) {
+  // const isInternal = !transaction.source.isOut && !transaction.target.isOut;
+  return !isExpense(transaction)
+}
+
+
 export default defineEventHandler(async (event) => {
   const data = await doValidate(IdDto, event.context.params);
 
   const from = new Date();
-  from.setMonth(from.getMonth() - 6);
-  const trans = await transactions.findInterval(from, new Date());
+  from.setMonth(from.getMonth() - 12);
+  const trans = await transactions.findInterval(from, new Date(), {
+    categoryId: data.id,
+  });
 
-  const categoryId = data.id;
   const months: Summary[] = [];
-
-  for (let index = 0; index < trans.length; index++) {
-    const element: any = trans[index];
-
-    // todo: query by category
-    if (element.tags.map((t: Transaction) => t.id).indexOf(categoryId) < 0) {
-      continue;
-    }
-
-    if (!element.source.isOut && element.target.isOut) {
-      const year = element.created.getFullYear();
-      const month = element.created.getMonth();
-      const summ = months.find((summary) => summary.month === month && summary.year === year);
+  for (const transaction of trans) {
+    if (isExpense(transaction)) {
+      const year = transaction.transactedAt.getFullYear();
+      const month = transaction.transactedAt.getMonth();
+      const summ = months.find(
+        (summary) => summary.month === month && summary.year === year
+      );
 
       if (summ) {
-        summ.amount += element.amount;
+        summ.amount += transaction.amount;
       } else {
         months.push({
           month: month,
           year: year,
-          amount: element.amount,
+          amount: transaction.amount,
         });
       }
     }
 
-    if (element.source.isOut && !element.target.isOut) {
-      const year = element.created.getFullYear();
-      const month = element.created.getMonth();
-      const summ = months.find((summary) => summary.month === month && summary.year === year);
+    // if (transaction.source.isOut && !transaction.target.isOut) {
+    if (isIncome(transaction)) {
+      const year = transaction.transactedAt.getFullYear();
+      const month = transaction.transactedAt.getMonth();
+      const summ = months.find(
+        (summary) => summary.month === month && summary.year === year
+      );
 
       if (summ) {
-        summ.amount -= element.amount;
+        summ.amount -= transaction.amount;
       } else {
         months.push({
           month: month,
           year: year,
-          amount: -1 * element.amount,
+          amount: -1 * transaction.amount,
         });
       }
     }

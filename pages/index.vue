@@ -2,18 +2,19 @@
   <div class="container">
     <MonthHero @reload="monthReloaded" />
     <div>
-      <top-summary :expense="expense" :income="income" />
+      <top-summary :transactions="passed" />
 
       <HomeCarousel
+        v-model="carouselTabindex"
         :expenses="expenseCategories"
         :incomes="incomeCategories"
-        @filter="(tagId: number) => (filterTagId = tagId)"
+        @filter="(tagId: number) => (filterCategoryId = tagId)"
       />
 
       <transition name="slide" mode="out-in">
         <BalanceRow
           v-if="isCurrentMonth"
-          :sources="incomeSources"
+          :sources="sources.filter(src => src.isPortfolio)"
           :upcomming="upcommingTransactionsAmount"
           :forecast="upcommingTransactionsAmount"
           :spent="expense"
@@ -44,7 +45,7 @@
         <ui-chevron v-model="showUpcomming" />
       </h4>
       <transition name="page">
-        <section v-if="showUpcomming || filterTagId > 0">
+        <section v-if="showUpcomming || filterCategoryId > 0">
           <TransactionRow
             v-for="transaction in upcommingTransactions"
             :key="transaction.id"
@@ -93,7 +94,7 @@ import { useTokenStore } from "@/stores/tokenStore";
 import { useCategoriesStore } from "@/stores/categories";
 import { useSourcesStore } from "@/stores/sources";
 import { useTransactionStore } from "@/stores/transactions";
-import type { Tag, Transaction } from "@/stores/types";
+import type { Tag, Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
 
 const tokenStore = useTokenStore();
@@ -110,7 +111,7 @@ const isCurrentMonth = computed(() => {
 });
 
 const sourcesStore = useSourcesStore();
-const { incomeSources, expenseSources } = storeToRefs(sourcesStore);
+const { sources } = storeToRefs(sourcesStore);
 
 const categoriesStore = useCategoriesStore();
 const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
@@ -121,7 +122,7 @@ const showHidden = ref(false);
 
 const addExpense = ref(false);
 
-const filterTagId = ref<number>(-1);
+const filterCategoryId = ref<number>(-1);
 
 const notifications = useNotifications();
 
@@ -130,11 +131,12 @@ const { yearPath, monthPath } = useRoute().query;
 month.value = parseInt(monthPath as string);
 year.value = parseInt(yearPath as string);
 
-const { $pwa } = useNuxtApp();
+// const { $pwa } = useNuxtApp();
+
+const carouselTabindex = ref(0);
+const isIncomes = computed(() => carouselTabindex.value === 1)
 
 onMounted(async () => {
-  // await $pwa.install();
-
   transactionStore.fetchTransactions();
   sourcesStore.fetchAllSources();
   categoriesStore.fetchCategories();
@@ -146,16 +148,22 @@ const initialFetch = () => {
 };
 
 const transactions = computed(() => {
-  const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) <= new Date());
-  for (const t of currentMonth.value) {
-    console.info(t.transactedAt)
+  let tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) <= new Date());
+
+  if (isIncomes.value) {
+    tmp = tmp.filter(isIncome)
   }
+
   if (showHidden.value) {
     return tmp;
   }
+
+  if (filterCategoryId.value >= 0) {
+    tmp = tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
+  }
+
   return tmp
-    .filter((trans: Transaction) => isTransactionTagged(trans, filterTagId.value))
-    .filter((trans: Transaction) => !(!trans.source.isOut && !trans.target.isOut));
+  // .filter((trans: Transaction) => !(!trans.source.isOut && !trans.target.isOut));
 });
 
 const incomeTransactions = computed(() =>
@@ -177,7 +185,7 @@ const upcommingTransactions = computed(() => {
   if (showHidden.value) {
     return tmp;
   }
-  return tmp.filter((trans: Transaction) => isTransactionTagged(trans, filterTagId.value));
+  return tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
 });
 
 const upcommingTransactionsAmount = computed<number>(() => {

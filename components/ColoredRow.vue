@@ -1,20 +1,21 @@
 <template>
-    <NuxtLink :to="`/sources/${source.id}`" class="transaction">
-        <h5 class="item">{{ source.name }}</h5>
+    <NuxtLink :to="link" class="transaction">
+        <h5 class="ml-5">{{ title }}</h5>
+        <div class="ml-auto mr-2">
+            <slot />
+        </div>
     </NuxtLink>
 </template>
 
 <script lang="ts" setup>
-import type { Source } from '~/stores/types';
-
-defineProps<{ source: Source }>();
+defineProps<{ link: string, color?: string, title: string }>();
 </script>
 
 <style lang="scss" scoped>
 .transaction {
     border: 0;
     border-left: solid .3rem;
-    border-left-color: v-bind('source.color') !important;
+    border-left-color: v-bind('color') !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     transition: .2s;
