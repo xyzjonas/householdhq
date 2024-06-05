@@ -7,11 +7,15 @@
       :title="$t('no_data')"
       :subtitle="$t('no_data_will_appear')"
     />
-    <Doughnut 
-      v-else-if="!selectedCategory"
+    <div v-else-if="!selectedCategory" class="graph-wrapper">
+      <Doughnut 
       :data="data"
       :options="options"
-    />
+      />
+      <div class="graph-wrapper-center">
+        <slot></slot>
+      </div>
+    </div>
     <section v-if="selectedCategory">
       <Summary
         :category="selectedCategory"
@@ -40,7 +44,7 @@
     <div  class="legend-content">
       <div v-for="item in items" class="legend-content-item" @click="selectCategoryByName(item.name)">
         <span class="circle-sm mr-1" :style="`background-color: ${item.color};`"></span>
-        <span class="mr">{{ item.name }}</span>
+        <span class="mr-1">{{ item.name }}</span>
         <span><ui-price :amount="item.sum" size="small"/></span>
       </div>
       <ui-button
@@ -66,6 +70,7 @@ const showLegend = ref(false);
 
 const props = defineProps<{
   items: CategoryWithSum[];
+  expand?: boolean;
 }>();
 
 const selectedCategoryName = ref<string>("");
@@ -136,16 +141,22 @@ const callback = (e: any) => {
 const options = {
     responsive: true,
     onClick: callback,
+    cutout: () => props.expand ? '50%' : '80%',
     plugins: {
       datalabels: {
+          display: () => props.expand,
           // color: shouldInvert(props.category.color) ? '#333' : '#ddd',
-          backgroundColor: '#292929',
+          backgroundColor: 'black',
+          textShadowColor: (val: any) => props.items[val.dataIndex].color,
+          textShadowBlur: 10,
           color: 'white',
           borderRadius: 3,
           anchor: 'center',
+          formatter: (val: number) => val < 5000 ? null : val,
           labels: {
             title: {
-              font: {}
+              font: {
+              }
             },
           }
         },
@@ -221,4 +232,20 @@ section {
   display: flex;
   gap: .3rem;
 }
+
+.graph-wrapper {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-items: center;
+
+  &-center {
+    position: absolute;
+  }
+}
+
+
+
 </style>

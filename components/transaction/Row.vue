@@ -3,7 +3,7 @@
     <div class="wrapper">
       <div
         :class="`transaction ${isExpense(transaction) ? '' : 'income'}`"
-        :style="`width: ${details ? 60 : 100}%`"
+        :style="`flex: 1`"
         @click="
           details = !details;
           edit = false;
@@ -26,7 +26,7 @@
       </div>
 
       <!-- BUTTONS -->
-      <div class="panel y" :style="`width: ${details ? 40 : 0}%`">
+      <div class="panel y" :style="`flex: ${details ? '1' : '0'}; max-width: 8rem`">
         <ui-button v-for="btn in [leftBtn, rightBtn]"
           :color="btn?.color as any ?? 'secondary'"
           :icon="btn?.icon"
@@ -153,7 +153,7 @@ const buttons: {[key: string]: Button} = {
     icon: 'i-ic-round-delete-forever',
     onClick: () => (emit('delete', { id: props.transaction.id })),
     loading: loading,
-    color: 'success',
+    color: 'danger',
   },
   deleteCancel: {
     icon: 'i-ic-baseline-close',

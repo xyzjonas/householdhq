@@ -9,11 +9,24 @@
         :expenses="expenseCategories"
         :incomes="incomeCategories"
         @filter="(tagId: number) => (filterCategoryId = tagId)"
-      />
+        :expand-graph="!isCurrentMonth"
+      >
+        <div v-if="isCurrentMonth" class="text-center font-thin uppercase">
+          <div>
+            <ui-price
+              :amount="balance"
+              :currency="currency"
+              size="3rem"
+            />
+          </div>
+          <h4>{{ $t("balance") }}</h4>
+        </div>
+      </HomeCarousel>
 
       <transition name="slide" mode="out-in">
         <BalanceRow
           v-if="isCurrentMonth"
+          v-model="balance"
           :sources="sources.filter(src => src.isPortfolio)"
           :upcomming="upcommingTransactionsAmount"
           :forecast="upcommingTransactionsAmount"
@@ -100,6 +113,8 @@ import { useNotifications } from "@/composables/useNotifications";
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
 
+const balance = ref<number>(0)
+
 const transactionStore = useTransactionStore();
 const { currentMonth, passed, upcomming, currency, loading, year, month } = storeToRefs(transactionStore);
 const isCurrentMonth = computed(() => {
@@ -118,7 +133,7 @@ const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);
 
 const putLoading = ref(false);
 const showUpcomming = ref(false);
-const showHidden = ref(false);
+// const showHidden = ref(false);
 
 const addExpense = ref(false);
 
@@ -154,9 +169,9 @@ const transactions = computed(() => {
     tmp = tmp.filter(isIncome)
   }
 
-  if (showHidden.value) {
-    return tmp;
-  }
+  // if (showHidden.value) {
+  //   return tmp;
+  // }
 
   if (filterCategoryId.value >= 0) {
     tmp = tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
@@ -182,10 +197,11 @@ const expense = computed(() =>
 
 const upcommingTransactions = computed(() => {
   const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) > new Date());
-  if (showHidden.value) {
-    return tmp;
+  if (filterCategoryId.value >= 0) {
+    return tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
   }
-  return tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
+
+  return tmp;
 });
 
 const upcommingTransactionsAmount = computed<number>(() => {

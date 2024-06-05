@@ -1,6 +1,6 @@
 <template>
   <section>
-    <div>
+    <div class="hidden">
       <div class="row-simple center">
         <ui-price
           :amount="totalBalance"
@@ -38,6 +38,7 @@ const props = defineProps<{
   totalIncome: number;
 }>();
 
+const modelValue = defineModel<number>()
 const balanceSums = ref<number[]>([]);
 const totalBalance = computed(() => {
   let total = 0;
@@ -46,6 +47,7 @@ const totalBalance = computed(() => {
       total += balanceSums.value[index];
     }
   }
+  modelValue.value = total;
   return total;
 })
 

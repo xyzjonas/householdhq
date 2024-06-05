@@ -4,6 +4,7 @@
 @mixin background {
     background-color: var(--bg-200);
     border-radius: 5px;
+    box-shadow: 2px 2px 5px var(--bg-200) -2px -2px 5px var(--bg-200);
 }
 
 .background {

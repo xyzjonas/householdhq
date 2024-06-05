@@ -1,7 +1,9 @@
 <template>
   <div class="carousel">
     <!-- EXPENSES & INCOMES -->
-    <BarGraph :items="data" @filter="(tagId: number) => $emit('filter', tagId)" />
+    <BarGraph :items="data" @filter="(tagId: number) => $emit('filter', tagId)" :expand="expandGraph">
+      <slot></slot>
+    </BarGraph>
     <!-- <BarGraph v-else :items="topExpenses" @filter="(tagId: number) => $emit('filter', tagId)" /> -->
   </div>
   <div class="center my-1">
@@ -22,6 +24,7 @@ const model = defineModel<number>();
 const props = defineProps<{
   expenses: CategoryWithSum[];
   incomes: CategoryWithSum[];
+  expandGraph?: boolean;
 }>();
 
 // const item = ref(0);
