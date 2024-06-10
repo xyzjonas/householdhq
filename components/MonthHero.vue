@@ -66,12 +66,13 @@ const formatMMYYYY = computed(() => {
   display: flex;
   flex-direction: row;
   gap: 1.5em;
+  color: var(--text-200);
 
   padding: 16px 12px;
 
   p {
     font-size: x-large;
-    font-weight: 600;
+    font-weight: 400;
   }
 }
 

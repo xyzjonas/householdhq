@@ -1,16 +1,14 @@
 <template>
-  <div class="card my center">
+  <div class="card center">
     <section class="hdr" v-if="!loading">
-      <p class="in">
-        <i class="fa-solid fa-arrow-trend-up"></i>
-        {{ new Intl.NumberFormat().format(income) ?? "N/A" }}
-        {{ income ? currency : "" }}
+      <p class="flex flex-1 items-center justify-center in">
+        <i class="i-ic-outline-trending-up"></i>
+        <ui-price :amount="income" size="1.3rem" color="var(--text-200)"></ui-price>
       </p>
       <p class="separator"></p>
-      <p class="out">
-        <i class="fa-solid fa-arrow-trend-down"></i>
-        {{ new Intl.NumberFormat().format(expense) ?? "N/A" }}
-        {{ expense ? currency : "" }}
+      <p class="flex flex-1 items-center justify-center out">
+        <i class="i-ic-outline-trending-down"></i>
+        <ui-price :amount="expense" size="1.3rem" color="var(--text-200)"></ui-price>
       </p>
     </section>
     <Spinner v-else />
@@ -36,12 +34,8 @@ const expense = computed(() => getExpenseSum(props.transactions));
 }
 .separator {
   height: 2em;
-  border-left: 1px solid var(--color-border-dark);
+  border-left: 1px solid var(--border-100);
   flex: 0;
-}
-
-p {
-  font-weight: 1000;
 }
 
 i {
@@ -50,14 +44,10 @@ i {
 
 .in {
   color: var(--color-success);
-  text-align: center;
-  flex: 1;
 }
 
 .out {
   color: var(--color-danger);
-  text-align: center;
-  flex: 1;
 }
 
 .hdr {
@@ -66,5 +56,9 @@ i {
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
+}
+
+p {
+  color: var(--text-200);
 }
 </style>

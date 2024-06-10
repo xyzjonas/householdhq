@@ -1,27 +1,27 @@
 <template>
-  <div :style="transparent && !details ? transparentStyle : ''">
+  <div :style="transparent && !details ? transparentStyle : ''" class="my-2">
     <div class="wrapper">
       <div
-        :class="`transaction ${isExpense(transaction) ? '' : 'income'}`"
-        :style="`flex: 1`"
+        class="transaction-card flex-1"
         @click="
           details = !details;
           edit = false;
           buttons.deleteCancel.onClick();
         "
       >
-        <div class="item">
-          <DateTile :date="date" />
+        <!-- <span class="color-flag"></span> -->
+        <DateTile :date="date" />
+        <div class="flex flex-col">
+          <span>{{ transaction.description }}</span>
+          <span style="font-size: .7rem;" class="mb-2">{{ transaction.source.name }} ⤍ {{ transaction.target.name }}</span>
+          <ui-pin :text="transaction.category.name" :color="transaction.category.color" size="small"/>
         </div>
-        <div class="item">
-          {{ transaction.description }}
-          <br />
-          <small style="font-size: xx-small"
-            >{{ transaction.source.name }} ⤍ {{ transaction.target.name }}</small
-          >
-        </div>
-        <p class="item">
-          <ui-price :amount="transaction.amount" :currency="transaction.currency" />
+        <p class="ml-auto">
+          <ui-price :amount="transaction.amount" :currency="transaction.currency" :color="isTransactionIncome ? 'var(--primary-100)' : undefined" />
+          <p v-if="isTransactionIncome" class="flex items-center gap-1 justify-end" style="color: var(--primary-100);">
+            <span class="text-xs">{{ $t('income') }}</span>
+            <i class="i-ic-outline-trending-up"></i>
+          </p>
         </p>
       </div>
 
@@ -75,6 +75,8 @@ const details = ref(false);
 const edit = ref(false);
 const patching = ref(false);
 const patchingError = ref("");
+
+const isTransactionIncome = computed(() => isIncome(props.transaction))
 
 const transparentStyle = ref("");
 if (props.transparent) {
@@ -184,21 +186,17 @@ rightBtn.value = buttons.edit;
 </script>
 <style lang="scss" scoped>
 .transaction {
-  border: none;
-  border-right: solid 10px;
-  border-right-color: v-bind("tagColor") !important;
+  position: relative;
+  // border: none;
+  // border-right: solid 10px;
+  // border-right-color: v-bind("tagColor") !important;
   transition: 250ms;
   cursor: pointer;
+  transition: background-color .2s ease-in-out;
   
-  border-radius: 0;
-  border-bottom-left-radius: .3rem;
-  border-top-left-radius: .3rem;
-
-  &:hover {
-    transition: 250ms;
-    border-right-color: v-bind("tagColor");
-    filter: brightness(1.05);
-  }
+  // border-radius: 0;
+  // border-bottom-left-radius: .3rem;
+  // border-top-left-radius: .3rem;
 }
 
 .wrapper {
@@ -208,10 +206,9 @@ rightBtn.value = buttons.edit;
   .panel {
     overflow: hidden;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    transition: 250ms;
-    padding-top: 0.25em;
-    padding-bottom: 0.25em;
+    transition: .4s ease-in-out;
 
     .y {
       flex-direction: column;
@@ -226,13 +223,31 @@ rightBtn.value = buttons.edit;
   }
 }
 
-.income {
-  // border-top: 1px solid;
-  // border-bottom: 1px solid;
-  // border-left: 1px solid;
-  // border-top-color: var(--color-success) !important;
-  // border-bottom-color: var(--color-success) !important;
-  // border-left-color: var(--color-success) !important;
-  background-color: #4b77584b;
+.transaction-card {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  transition: 250ms;
+  transition: .2s ease-in-out;
+  cursor: pointer;
+  overflow: hidden;
+
+  border-radius: .5rem;
+  background-color: var(--bg-200);
+  padding: 1rem .5rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+  transition: background-color border .2s ease-in-out;
+  border: 1px solid var(--border-100);
+}
+
+.color-flag {
+  width: 5rem;
+  height: 2rem;
+  background-color: v-bind('transaction.category.color');
+  position: absolute;
+  transform: rotate(-50deg) translateY(-3.8rem);
+  left: 0;
 }
 </style>

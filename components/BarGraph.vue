@@ -49,7 +49,7 @@
       </div>
       <ui-button
         @click="navigateTo('/categories')"
-        icon="i-ic-baseline-format-list-bulleted"
+        icon="i-ic-round-read-more"
         link
       />
     </div>
@@ -141,7 +141,7 @@ const callback = (e: any) => {
 const options = {
     responsive: true,
     onClick: callback,
-    cutout: () => props.expand ? '50%' : '80%',
+    cutout: () => props.expand ? '70%' : '80%',
     plugins: {
       datalabels: {
           display: () => props.expand,
@@ -190,8 +190,8 @@ section {
       align-items: center;
       gap: .2rem;
       font-size: small;
-      border: 1px solid var(--bg-300);
-      background-color: var(--bg-300);
+      border: 1px solid var(--border-100);
+      background-color: var(--bg-200);
       padding: .1rem .3rem;
       border-radius: 2rem;
       cursor: pointer;

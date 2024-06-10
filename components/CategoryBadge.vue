@@ -14,7 +14,7 @@ const props = defineProps<{ category: Category }>();
 
 const textColor = computed(() => {
     if (props.category.color) {
-        return shouldInvert(props.category.color) ? 'var(--bg-200)' : 'var(--text-200)';
+        return shouldInvert(props.category.color) ? 'black' : 'white';
     }
 
     return;
@@ -23,20 +23,12 @@ const textColor = computed(() => {
 </script>
 <style lang="scss" scoped>
 .badge {
-    border: 1px solid;
     border-radius: 5px;
-    border-color: var(--color-primary-dark-3);
-    // aspect-ratio: 1.5;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    align-content: center;
     cursor: pointer;
-    border-color: v-bind('category.color');
     background-color: v-bind('category.color');
-    backdrop-filter: opacity(.1);
-
-    max-height: 7rem;
+    overflow: hidden;
 
     transition: filter .2s ease-in-out;
     &:hover {

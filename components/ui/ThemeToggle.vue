@@ -8,6 +8,9 @@
 </template>
 <script setup lang="ts">
 const modelValue = defineModel<boolean>();
+
+const color = computed(() => modelValue.value ? 'black' : 'white')
+const bgcolor = computed(() => modelValue.value ? 'white' : 'black')
 // {
 //   props: ['value', 'keyName', 'disabled'],
 
@@ -39,5 +42,16 @@ const modelValue = defineModel<boolean>();
 <style lang="scss" scoped>
 button {
   margin-left: 3px;
+}
+
+.slideOne label {
+  background-color: v-bind('color') !important;
+  // transform: translateY(-8px) translateX(2px);
+}
+
+.slideOne {
+  cursor: pointer;
+  background-color: v-bind('bgcolor');
+  border-color: transparent;
 }
 </style>

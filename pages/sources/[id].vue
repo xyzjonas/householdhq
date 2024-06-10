@@ -86,9 +86,9 @@
             <ui-button
               @click="deleteSource"
               icon="i-ic-baseline-delete"
-              height="2rem"
               :loading="sourceLoading"
-              color="danger"
+              squared
+              outlined
             />
           </div>
         </div>

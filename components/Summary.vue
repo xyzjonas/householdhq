@@ -1,6 +1,6 @@
 <template>
   <div class="text-center" v-if="loaded">
-    <h1 class="font-extralight">{{ category.name }}</h1>
+    <h1 class="font-light">{{ category.name }}</h1>
     <Bar :data="chartData" :options="options" :style="charStyles" />
   </div>
   <spinner name="roller" class="center" v-else />
@@ -127,6 +127,6 @@ h1 {
   // color: v-bind('category.color');
   // font-weight: 300;
   filter: opacity(0.7);
-  text-shadow: 2px 2px 3px black;
+  // text-shadow: 2px 2px 3px black;
 }
 </style>

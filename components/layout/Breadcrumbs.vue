@@ -34,8 +34,10 @@ const pathSegments = computed(() => {
     display: flex;
     flex-direction: row;
     margin-bottom: 1.5em;
-    color: var(--bg-300);
+    color: var(--text-100);
     align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--bg-300);
 
     span {
         display: flex;
@@ -45,10 +47,11 @@ const pathSegments = computed(() => {
 }
 
 a {
-    color: var(--bg-300);
+    color: var(--text-100);
+    transition: .3s ease-in-out;
 
     &:hover {
-        color: var(--text-100)
+        filter: opacity(.8);
     }
 }
 
@@ -62,9 +65,5 @@ a {
     margin-left: 0.3em;
     margin-right: 0.3em;
     transition: 0.2s color;
-
-    &:hover {
-        color: white;
-    }
 }
 </style>

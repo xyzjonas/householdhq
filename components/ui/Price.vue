@@ -18,6 +18,10 @@ const props = defineProps({
     type: String,
     default: "x-large",
   },
+  color: {
+    type: String,
+    default: "var(--text-100)"
+  }
 });
 
 const { currency } = storeToRefs(useTransactionStore());
@@ -58,6 +62,7 @@ const currSize = computed(() => {
   display: flex;
   align-items: center;
   gap: .1rem;
+  color: v-bind('color')
 }
 
 .currency {

@@ -10,7 +10,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--text-100);
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
   }
   .lds-ellipsis div:nth-child(1) {
@@ -72,7 +72,7 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--text-100);
     margin: -4px 0 0 -4px;
   }
   .lds-roller div:nth-child(1) {

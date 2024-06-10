@@ -8,6 +8,27 @@
 <script setup lang="ts">
 import { useNotifications } from "@/composables/useNotifications";
 const { notifications } = useNotifications();
+
+useHead({
+  script: [
+    {
+      textContent: `
+      let myTheme = localStorage.getItem("theme");
+      if (!myTheme) {
+        const isDarkSchemePreferred = window?.matchMedia?.('(prefers-color-scheme:dark)')?.matches ?? false;
+        myTheme = isDarkSchemePreferred ? 'dark' : 'light';
+        localStorage.setItem('theme', myTheme);
+      }
+
+      document.documentElement.setAttribute('data-theme', myTheme)
+      `,
+      tagPosition: "head",
+      type: "text/javascript",
+      defer: "false",
+    },
+  ],
+});
+
 </script>
 <style>
 .page-enter-active,

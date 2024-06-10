@@ -23,7 +23,7 @@ const props = defineProps<{
 }>();
 
 const clazz = computed(() => {
-  let cls = props.outlined ? "ui-btn-outlined" : "ui-btn";
+  let cls = "ui-btn";
   if (props.rounded) {
     cls += " rounded";
   } else if (props.squared) {
@@ -38,6 +38,10 @@ const clazz = computed(() => {
 
   if (props.link) {
     cls += " link";
+  }
+
+  if (props.outlined) {
+    cls += " outlined"
   }
 
   return cls;
@@ -80,13 +84,13 @@ i {
 
 button:hover {
   cursor: pointer;
-  filter: brightness(1.2);
+  filter: brightness(1.1);
 }
 
 .primary {
   background-color: var(--primary-100);
   border: 1px solid var(--primary-100);
-  color: var(--text-100);
+  color: var(--text-over-primary);
 }
 
 .light {
@@ -96,20 +100,21 @@ button:hover {
 }
 
 .secondary {
-  background-color: var(--bg-300);
-  border: 1px solid var(--bg-300);
-  color: var(--text-100);
+  background-color: var(--secondary-100);
+  border: 1px solid var(--secondary-100);
+  color: var(--text-over-secondary);
 }
 
 .danger {
   background-color: var(--color-danger);
-  color: var(--text-100);
+  color: var(--text-over-danger);
   border-color: var(--color-danger);
 }
 
 .link {
   background-color: transparent;
   border-color: transparent;
+  color: var(--text-100);
   &:hover {
     background-color: var(--bg-300);
   }
@@ -132,23 +137,29 @@ button:hover {
   padding-block: 0 !important;
 }
 
+.outlined {
+  background-color: transparent;
+  border: 1px solid var(--border-100) !important;
+  color: var(--text-100);
+}
+
 .ui-btn {
   @include common();
 }
 
-.ui-btn-outlined {
-  @include common();
-  background-color: var(--bg-200);
-  color: var(--text-100);
+// .ui-btn-outlined {
+//   @include common();
+//   background-color: var(--bg-200);
+//   color: var(--text-100);
 
-  i {
-    color: var(--text-100) !important;
-  }
+//   i {
+//     color: var(--text-100) !important;
+//   }
 
-  &:hover {
-    background-color: var(--bg-300);
-  }
-}
+//   &:hover {
+//     background-color: var(--bg-300);
+//   }
+// }
 
 button[disabled] {
   background-color: var(--bg-300);

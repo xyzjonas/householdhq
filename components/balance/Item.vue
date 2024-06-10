@@ -1,13 +1,14 @@
 <template>
-  <div class="bal-wrapper">
+  <div class="bal-wrapper card">
     <div class="row">
+      <span class="color-flag"></span>
       <ui-button
         @click="navigateTo(`/sources/${source.id}`)"
         :outlined="true"
         icon="i-ic-baseline-mode-edit"
         width="2rem"
         squared
-        class="mr-1"
+        class="mr-3"
         link
       />
       <span class="label">{{ source.name }}</span>
@@ -86,24 +87,19 @@ const lastEntryNotThisMonth = computed(() => {
   return false;
 });
 
-const opacity = computed(() => {
-  if (lastEntry.value && lastEntryNotThisMonth.value) {
-    return "opacity(1)";
-  }
-  return "opacity(0)";
-});
+// const opacity = computed(() => {
+//   if (lastEntry.value && lastEntryNotThisMonth.value) {
+//     return "opacity(1)";
+//   }
+//   return "opacity(0)";
+// });
 
 const emit = defineEmits(["autoupdated", "update:modelValue"]);
-const autoUpdate = () => {
-  updating.value = true;
-  const url = "/sources/update";
-  $fetch(url, { method: "POST", body: { id: props.source.id } })
-    .then((res: any) => emit("autoupdated", res.data))
-    .finally(() => (updating.value = false));
-};
+
 </script>
 <style lang="scss" scoped>
 .bal-wrapper {
+  position: relative;
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -116,7 +112,9 @@ const autoUpdate = () => {
   padding: 0.5rem 1rem;
   border-top-right-radius: 0.3rem;
   border-bottom-right-radius: 0.3rem;
-  border-left: 0.5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
+  // border-left: 0.5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
+
+  transition: background-color .2s ease-in-out;
 
   .text {
     display: inline-flex;
@@ -152,5 +150,14 @@ const autoUpdate = () => {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.color-flag {
+  width: 5rem;
+  height: 1rem;
+  background-color: v-bind('source.color');
+  position: absolute;
+  transform: rotate(-45deg) translateY(-2.5rem);
+  left: 0;
 }
 </style>

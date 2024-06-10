@@ -1,9 +1,12 @@
 <template>
   <main>
     <header >
-      <div class="header page">
+      <div class="page flex p-2 items-center">
         <span>Household HQ</span>
-        <span class="version">{{ VERSION }}</span>
+        <span class="ml-auto text-xs">{{ VERSION }}</span>
+        <div class="ml-5 flex gap-2 items-center">
+          <ui-theme-toggle v-model="themeBool" />
+        </div>
       </div>
     </header>
 
@@ -25,7 +28,14 @@
 <script lang="ts" setup>
 import { VERSION } from '@/_version';
 import { useNotifications } from "@/composables/useNotifications";
+
 const { notifications } = useNotifications();
+
+const { theme, isDark, toggle } = useTheme()
+const themeBool = ref(isDark.value)
+
+watch(themeBool, ((_) => toggle()))
+
 </script>
 
 <style scoped lang="css">
@@ -43,35 +53,27 @@ main {
 }
 
 header {
-  background-color: rgba(0, 0, 0, 0.452);
-  color: var(--text-200);
-  box-shadow: 0px 0px 10px #1f1d1d;
-}
-
-.header {
-  font-size: x-small;
-  padding: .3rem .5rem;
-  display: flex;
-  align-items: center;
+  background-color: var(--primary-100);
+  color: var(--text-over-primary);
+  /* box-shadow: 0px 5px 5px var(--shadow-100); */
 }
 
 footer {
   width: 100%;
   margin-top: auto;
-  background-color: rgba(0, 0, 0, 0.452);
+  background-color: var(--bg-300);
   color: var(--text-200);
   font-style: italic;
   font-size: x-small;
   padding: 2rem .5rem;
   display: flex;
   align-items: center;
-  box-shadow: 0px 0px 10px #1f1d1d;
 }
 
 .version {
   font-style: italic;
   margin-left: auto;
-  filter: brightness(0.5);
+  /* filter: brightness(0.5); */
 }
 
 main {

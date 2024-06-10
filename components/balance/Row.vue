@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <div>
     <div class="hidden">
       <div class="row-simple center">
         <ui-price
@@ -20,8 +20,10 @@
         :max="max"
       />
     </div>
-    <NuxtLink to="/sources">. . .</NuxtLink>
-  </section>
+    <div class="flex w-full justify-end items-center">
+      <ui-button outlined icon="i-ic-round-read-more" icon-size="1.5rem" @click="navigateTo('/sources')">{{ $t('s_more') }}</ui-button>
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";

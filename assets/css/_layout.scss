@@ -53,11 +53,12 @@
 }
 
 .card {
-  border-radius: 6px;
-  border: 1px solid rgba(var(--color-border-dark), 1);
+  border-radius: .5rem;
   background-color: var(--bg-200);
   padding: 16px;
   box-sizing: border-box;
+  transition: background-color border .2s ease-in-out;
+  border: 1px solid var(--border-100);
 }
 
 .space {

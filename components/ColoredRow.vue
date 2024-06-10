@@ -58,5 +58,10 @@ h5 {
     font-size: 1.1em;
 }
 
+.transaction {
+    border: 1px solid var(--border-100);
+    border-radius: .3rem;
+}
+
 </style>
     

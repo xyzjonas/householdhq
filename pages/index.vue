@@ -1,62 +1,62 @@
 <template>
   <div class="container">
     <MonthHero @reload="monthReloaded" />
-    <div>
-      <top-summary :transactions="passed" />
+    <top-summary :transactions="passed" />
 
-      <HomeCarousel
-        v-model="carouselTabindex"
-        :expenses="expenseCategories"
-        :incomes="incomeCategories"
-        @filter="(tagId: number) => (filterCategoryId = tagId)"
-        :expand-graph="!isCurrentMonth"
-      >
-        <div v-if="isCurrentMonth" class="text-center font-thin uppercase">
-          <div>
-            <ui-price
-              :amount="balance"
-              :currency="currency"
-              size="3rem"
-            />
-          </div>
-          <h4>{{ $t("balance") }}</h4>
-        </div>
-      </HomeCarousel>
-
-      <transition name="slide" mode="out-in">
-        <BalanceRow
-          v-if="isCurrentMonth"
-          v-model="balance"
-          :sources="sources.filter(src => src.isPortfolio)"
-          :upcomming="upcommingTransactionsAmount"
-          :forecast="upcommingTransactionsAmount"
-          :spent="expense"
-          :total-income="income"
-          class="mb-1"
-        />
-      </transition>
-
-      <transition name="page">
-        <section v-if="addExpense" class="mt-1">
-          <transaction-form
-            v-if="addExpense"
-            @cancel="addExpense = false"
-            @send="putTransaction"
-            @close="addExpense = false"
-            :processing="putLoading"
+    <HomeCarousel
+      v-model="carouselTabindex"
+      :expenses="expenseCategories"
+      :incomes="incomeCategories"
+      @filter="(tagId: number) => (filterCategoryId = tagId)"
+      :expand-graph="!isCurrentMonth"
+    >
+      <div v-if="isCurrentMonth" class="text-center font-thin uppercase">
+        <div>
+          <ui-price
+            :amount="balance"
+            :currency="currency"
+            size="2.5rem"
           />
-        </section>
-      </transition>
+        </div>
+        <h4>{{ $t("balance") }}</h4>
+      </div>
+    </HomeCarousel>
 
+    <transition name="slide" mode="out-in">
+      <BalanceRow
+        v-if="isCurrentMonth"
+        v-model="balance"
+        :sources="sources.filter(src => src.isPortfolio)"
+        :upcomming="upcommingTransactionsAmount"
+        :forecast="upcommingTransactionsAmount"
+        :spent="expense"
+        :total-income="income"
+      />
+    </transition>
+
+    <transition name="page">
+      <section v-if="addExpense" class="mt-1">
+        <transaction-form
+          v-if="addExpense"
+          @cancel="addExpense = false"
+          @send="putTransaction"
+          @close="addExpense = false"
+          :processing="putLoading"
+        />
+      </section>
+    </transition>
+
+    <div>
       <!-- SHOW UPCOMMING -->
-      <h4 v-if="isCurrentMonth && currentMonth.length > 0" id="remaining-bills" class="title row-simple">
-        <i class="i-ic-baseline-calendar-today"></i>
+      <div v-if="isCurrentMonth && currentMonth.length > 0" id="remaining-bills" class="flex items-center gap-2 card">
+        <i class="i-ic-baseline-calendar-today" style="font-size: large;"></i>
         <span @click="showUpcomming = !showUpcomming">
-          {{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}:
+          {{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}
         </span>
-        <ui-price @click="showUpcomming = !showUpcomming" :amount="upcommingTransactionsAmount" :currency="currency" style="margin-left: 1rem;"/>
+        <ui-price @click="showUpcomming = !showUpcomming" :amount="upcommingTransactionsAmount" :currency="currency" size="1.5rem"/>
         <ui-chevron v-model="showUpcomming" />
-      </h4>
+      </div>
+
       <transition name="page">
         <section v-if="showUpcomming || filterCategoryId > 0">
           <TransactionRow
@@ -276,10 +276,14 @@ const monthReloaded = (newDate: Date) => {
 </script>
 
 <style scoped lang="scss">
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 #remaining-bills {
   padding-inline: 1rem;
-  margin-top: 2rem;
-  margin-bottom: 8px;
 
   button:last-child {
     margin-left: auto;
@@ -314,10 +318,9 @@ h3 {
 
 #floating {
   position: fixed;
-  bottom: 1rem;
-  right: 1rem;
+  bottom: .5rem;
+  right: .5rem;
   border-radius: 50%;
-  box-shadow: 1px 1px 20px var(--bg-100);
   transition: transform .1s ease-in-out;
   opacity: .95;
   

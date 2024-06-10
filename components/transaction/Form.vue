@@ -4,9 +4,9 @@
       <ui-button
         v-if="stage === 2"
         icon="i-ic-baseline-new-label"
-        icon-size="1.5rem"
-        width="2rem"
+        icon-size="1rem"
         squared
+        outlined
         @click="showNewCategory = !showNewCategory"
       />
       <ui-button
@@ -89,11 +89,13 @@
             />
             <label for="slideOne"></label>
           </div>
-          <transition name="slide" mode="out-in">
-            <input
+          <transition name="page" mode="out-in">
+            <ui-input
               v-if="isRecurring"
+              :label="$t('recurring')"
               v-model="transaction.recurring"
               type="number"
+              class="w-20 text-center ml-auto"
             />
           </transition>
         </div>
@@ -109,23 +111,18 @@
       </div>
 
       <!-- CATEGORY SELECTION -->
-      <div v-else-if="stage === 2" class="flex-col">
-        <div class="categories">
-          <CategoryBadge
-            v-for="category in categories"
-            :category="category"
-            @selected="categorySelected(category)"
-          />
-        </div>
-        <transition name="slide">
+      <div v-else-if="stage === 2">
+        <transition name="slide" mode="out-in">
           <div class="new-category" v-if="showNewCategory">
+            <h3 class="mb-3 text-xl uppercase">{{ $t('c_new') }}</h3>
             <ui-input :label="$t('c_name')" v-model="newCategoryName" />
-            <div class="row-simple">
+            <div class="flex gap-1">
               <ui-button
                 @click="createCategory()"
-                height="3rem"
                 :loading="categoryLoading"
                 :disabled="!newCategoryName"
+                color="primary"
+                class="flex-1"
                 >{{ $t("confirm") }}</ui-button
               >
               <ui-button @click="showNewCategory = false" height="3rem">{{
@@ -133,7 +130,15 @@
               }}</ui-button>
             </div>
           </div>
+          <div v-else class="categories">
+            <CategoryBadge
+              v-for="category in categories"
+              :category="category"
+              @selected="categorySelected(category)"
+            />
+          </div>
         </transition>
+        
       </div>
 
       <!-- NUMPAD  -->
@@ -348,13 +353,13 @@ const createCategory = () => {
   &-stage {
     width: 12px;
     height: 12px;
-    border: 1px solid var(--color-font-light);
+    border: 1px solid var(--text-100);
     border-radius: 50%;
   }
 }
 
 .active {
-  background-color: var(--color-font-light);
+  background-color: var(--text-100);
 }
 
 .button-sm {
@@ -381,10 +386,6 @@ const createCategory = () => {
     width: 70%;
     margin-left: auto;
   }
-}
-
-input[type="number"] {
-  width: 128px;
 }
 
 .save-btn {
@@ -416,6 +417,7 @@ input[type="number"] {
 
 .categories {
   height: 100%;
+  overflow: auto;
 }
 
 .new-category {
@@ -423,8 +425,6 @@ input[type="number"] {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  border: 1px solid #eeeeee33;
-  border-radius: 0.3rem;
   max-height: 7rem;
   padding: 0.5rem;
 }

@@ -56,31 +56,32 @@
     --h: 1.5em;
     width: calc(2* var(--h));
     height: var(--h);
-    background: var(--color-primary-dark-3);
+    // background: var(--color-primary-dark-3);
+    border: 1px solid var(--border-100);
     position: relative;
     border-radius: calc(var(--h) / 2);
-    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px var(--color-background-dark);
+    // box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px var(--color-background-dark);
     label {
         --gap: 5%;
         display: block;
         cursor: pointer;
-        width: calc(var(--h) - 2* var(--gap));
+        width: calc(var(--h) - 2.5* var(--gap));
         // height: calc(var(--h) - 2* var(--gap));
         aspect-ratio: 1;
         position: absolute;
-        top: calc(var(--h) / 2);
+        top: calc(var(--h) / 2.2);
         left: 5%;
         transform: translateY(-50%);
         background: var(--color-danger);
         border-radius: 50%;
-        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+        // box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
         transition: all 0.2s ease;
     }
     input[type=checkbox] {
       visibility: hidden;
       &:checked + label {
         left: calc(2 * var(--h) - (var(--h) - 10%) - 5%);
-        background: var(--color-success);
+        background: var(--text-100);
       }  
     }
   }
@@ -103,6 +104,9 @@
         -webkit-text-fill-color: var(--color-font-light);
     }
 
+    input:focus {
+        border: 1px solid var(--primary-100);
+    }
 
     label {
       
@@ -121,15 +125,12 @@
         color: var(--color-font-light);
         font-size: $font-top;
         background-color: var(--bg-200);
-        // background-color: transparent;
-        // backdrop-filter: blur(0.1);
-
-        // color: red;
       }
       
     }
     input, select {
       padding: $padd;
+      transition: .3s ease-in-out;
     }
 }
 
@@ -199,7 +200,8 @@
     display: flex;
     border-radius: var(--h);
     padding-left: 3px;
-    padding-right: 3px;  
+    padding-right: 3px;
+    user-select: none;
 
     .bar-item {
       cursor: pointer;
@@ -218,13 +220,14 @@
   }
   
   .bar-item.active {
-    background-color: #fff;
-    color: #22272c;
+    background-color: var(--text-100);
+    color: var(--bg-100);
   }
 
 
 .categories {
     display: grid;
+    grid-auto-rows: 1fr;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 5px;
 
