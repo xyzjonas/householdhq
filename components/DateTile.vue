@@ -46,7 +46,6 @@ export default {
     border-right: 1px solid gray;
     flex-direction: column;
     align-items:center;
-    padding: .5rem 1rem;
 
     .day-number {
         font-size: xx-large;

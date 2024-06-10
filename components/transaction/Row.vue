@@ -10,7 +10,7 @@
         "
       >
         <!-- <span class="color-flag"></span> -->
-        <DateTile :date="date" />
+        <DateTile :date="date" class="min-w-20 w-20" />
         <div class="flex flex-col">
           <span>{{ transaction.description }}</span>
           <span style="font-size: .7rem;" class="mb-2">{{ transaction.source.name }} ⤍ {{ transaction.target.name }}</span>
@@ -237,6 +237,7 @@ rightBtn.value = buttons.edit;
   background-color: var(--bg-200);
   padding: 1rem .5rem;
   padding-right: 1rem;
+  padding-left: 0;
   box-sizing: border-box;
   transition: background-color border .2s ease-in-out;
   border: 1px solid var(--border-100);

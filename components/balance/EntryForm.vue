@@ -7,8 +7,8 @@
             <small class="error">{{ $t(error.statusMessage) }}</small>
         </div>
         <div class="row-simple">
-            <ui-button @click="$emit('close')" width="100%" height="32px" icon="fa-solid fa-xmark">{{ $t('close') }}</ui-button>
-            <ui-button @click="send" :loading="processing" width="100%" height="32px" icon="fa-regular fa-calendar-check">{{ $t('t_send') }}</ui-button>
+            <ui-button @click="send" :loading="processing" color="primary">{{ $t('t_send') }}</ui-button>
+            <ui-button @click="$emit('close')" outlined>{{ $t('cancel') }}</ui-button>
         </div>
     </div>
 </template>
@@ -79,12 +79,9 @@ button {
     text-transform: lowercase;
 }
 .form-wrapper {
-    border-top: 1px solid var(--color-border-dark);
-    padding-top: 16px;
     display: flex;
     flex-direction: column;
-    // justify-content: center;
-    gap: 8px;
+    gap: .5rem;
 
     input {
         width: 100%;

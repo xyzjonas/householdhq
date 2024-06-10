@@ -89,9 +89,6 @@
   
   
 @mixin input-group($padd, $font, $font-top) {
-    // $padd: 30px;
-    // $font: 2em;
-    // $font-top: 1.5em;
     position: relative;
     box-sizing: border-box;
 
@@ -102,6 +99,10 @@
     input:-webkit-autofill:active{
         -webkit-box-shadow: 0 0 0 30px var(--bg-200) inset !important;
         -webkit-text-fill-color: var(--color-font-light);
+    }
+
+    input, select {
+        border: 1px solid var(--border-100);
     }
 
     input:focus {

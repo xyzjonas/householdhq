@@ -6,7 +6,7 @@
       </div>
       <div v-else-if="currentSource" class="flex-col">
         <section class="row title">
-          <h1 class="item">{{ currentSource.name }}</h1>
+          <h1 class="uppercase text-3xl">{{ currentSource.name }}</h1>
           <Transition name="page" mode="out-in">
             <spinner v-show="sourceLoading" class="item" />
           </Transition>
@@ -88,13 +88,13 @@
               icon="i-ic-baseline-delete"
               :loading="sourceLoading"
               squared
-              outlined
+              color="danger"
             />
           </div>
         </div>
 
+        <h3 class="uppercase text-2xl font-300 mt-5">{{ $t("s_states") }}</h3>
         <section class="card states flex-col">
-          <h3 class="title">{{ $t("s_states") }}</h3>
 
           <Transition name="page" mode="out-in" class="my-2">
             <balance-entry-form
@@ -108,7 +108,6 @@
               color="primary"
               @click="edit = !edit"
               icon="i-ic-baseline-add"
-              width="100%"
               >{{ $t("s_add_state") }}</ui-button
             >
           </Transition>
@@ -127,22 +126,23 @@
               icon="i-ic-baseline-delete"
               width="2rem"
               squared
-              color="danger"
+              outlined
             />
           </div>
-          <ui-button
-            link
-            v-if="
-              !showMore &&
-              currentSource &&
-              currentSource.states.length > MAX_ITEMS
-            "
-            class="mt-5"
-            icon="i-ic-baseline-expand-more"
-            @click="showMore = true"
-            width="100%"
-            >{{ $t("show_more") }}</ui-button
-          >
+          <div class="flex items-center justify-center">
+            <ui-button
+              link
+              v-if="
+                !showMore &&
+                currentSource &&
+                currentSource.states.length > MAX_ITEMS
+                "
+              class="mt-5"
+              icon="i-ic-baseline-expand-more"
+              @click="showMore = true"
+              >{{ $t("show_more") }}</ui-button
+            >
+        </div>
         </section>
       </div>
       <error-banner v-else status="404" message="not found" :is-login="false" />
@@ -208,10 +208,6 @@ const sourceStates = computed(() => {
 <style lang="scss" scoped>
 .flex-col {
   gap: 0.3rem;
-}
-.title {
-  text-transform: uppercase;
-  font-weight: 100;
 }
 
 .row-label {

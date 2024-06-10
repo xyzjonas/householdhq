@@ -63,7 +63,7 @@ const cs = {
   s_state: "záznam",
   s_states: "záznamy",
   s_state_autocomplete: "spočítat",
-  s_more: "všechny",
+  s_more: "všechny účty",
   log_in: "Přihlásit",
   access_denied: "Nepovolaným vstup zakázán!",
   sign_in_keep_logged_in: "Zapamatovat přihlášení",
