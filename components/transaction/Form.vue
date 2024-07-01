@@ -93,7 +93,7 @@
             <ui-input
               v-if="isRecurring"
               :label="$t('recurring')"
-              v-model="transaction.recurring"
+              v-model.number="transaction.recurring"
               type="number"
               class="w-20 text-center ml-auto"
             />

@@ -2,6 +2,7 @@ import type { Tag } from "@prisma/client";
 import transactions from "../controllers/transactions";
 import { EditTransactionDto } from "../validators/transactions.dto";
 import doValidate from "../validators/validator";
+import type { Transaction } from "~/types";
 
 export default defineEventHandler(async (event) => {
   const data: EditTransactionDto = await doValidate(EditTransactionDto, await readBody(event));
@@ -15,11 +16,11 @@ export default defineEventHandler(async (event) => {
       const newData: any = { ...updatedTransaction };
       delete newData.id;
       delete newData.source;
-      newData.created = new Date(newData.created);
+      newData.transactedAt = new Date(newData.transactedAt);
       newData.tags = newData.tags.map((t: Tag) => t.name);
-      newData.created = newData.created.setMonth(newData.created.getMonth() + newData.recurring);
+      newData.transactedAt = newData.transactedAt.setMonth(newData.transactedAt.getMonth() + newData.recurring);
       const createdTrans = await transactions.createTransaction(newData);
-      console.info(`Created a new transaction: id=${createdTrans.id} date=${createdTrans.created}`);
+      console.info(`Created a new transaction: id=${createdTrans.id} date=${createdTrans.transactedAt}`);
     }
   }
   setResponseStatus(event, 200);
