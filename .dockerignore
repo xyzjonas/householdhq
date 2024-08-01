@@ -1,6 +1,10 @@
 .output/
 .nuxt/
 .vscode/
+.github/
 .env
 node_modules/
 scripts/
+
+Dockerfile
+docker-compose.yml
