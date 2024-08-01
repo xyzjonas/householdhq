@@ -1,252 +1,243 @@
 @import "layout";
 
-
 @mixin background {
-    background-color: var(--bg-200);
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px var(--bg-200) -2px -2px 5px var(--bg-200);
+  border-radius: 5px;
+  background-color: var(--bg-200);
+  box-shadow: 2px 2px 5px var(--bg-200) -2px -2px 5px var(--bg-200);
 }
 
 .background {
-    @include background();
+  @include background;
 }
 
-
 .transaction {
-    @include left-center-right();
-    @include background();
+  border: solid;
+  border-width: 1px;
+  border-color: transparent;
 
-    border: solid;
-    border-width: 1px;
-    border-color: transparent;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  padding-left: 0.2em;
+  padding-right: 0.5em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    padding-top: 1em;
-    padding-bottom: 1em;
-    padding-left: 0.2em;
-    padding-right: 0.5em;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
+  overflow: hidden;
 
+  .item:first-child {
+    min-width: 4em;
+    margin-right: 0.8em;
+  }
 
-    overflow: hidden;
-
-    .item:first-child {
-        min-width: 4em;
-        margin-right: 0.8em;
-    }
-
+  @include left-center-right();
+  @include background();
 }
 
 .transaction:hover {
-    border-color: #aaaaaa33;
+  border-color: #aaaaaa33;
 }
 
 .tag {
-    border-radius: 4px;
-    padding: 0.3em 0.8em 0.3em 0.8em;
-    background-color: var(--color-primary-dark-1);
+  border-radius: 4px;
+  padding: 0.3em 0.8em 0.3em 0.8em;
+  background-color: var(--color-primary-dark-1);
 }
 
 /* .slideOne */
 .slideOne {
-    --h: 1.5em;
-    width: calc(2* var(--h));
-    height: var(--h);
-    // background: var(--color-primary-dark-3);
-    border: 1px solid var(--border-100);
-    position: relative;
-    border-radius: calc(var(--h) / 2);
-    // box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px var(--color-background-dark);
-    label {
-        --gap: 5%;
-        display: block;
-        cursor: pointer;
-        width: calc(var(--h) - 2.5* var(--gap));
-        // height: calc(var(--h) - 2* var(--gap));
-        aspect-ratio: 1;
-        position: absolute;
-        top: calc(var(--h) / 2.2);
-        left: 5%;
-        transform: translateY(-50%);
-        background: var(--color-danger);
-        border-radius: 50%;
-        // box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
-        transition: all 0.2s ease;
-    }
-    input[type=checkbox] {
-      visibility: hidden;
-      &:checked + label {
-        left: calc(2 * var(--h) - (var(--h) - 10%) - 5%);
-        background: var(--text-100);
-      }  
+  --h: 1.5em;
+  width: calc(2 * var(--h));
+  height: var(--h);
+  border: 1px solid var(--border-100);
+  position: relative;
+  border-radius: calc(var(--h) / 2);
+  label {
+    --gap: 5%;
+    display: block;
+    cursor: pointer;
+    width: calc(var(--h) - 2.5 * var(--gap));
+    aspect-ratio: 1;
+    position: absolute;
+    top: calc(var(--h) / 2.2);
+    left: 5%;
+    transform: translateY(-50%);
+    background: var(--color-danger);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+  input[type="checkbox"] {
+    visibility: hidden;
+    &:checked + label {
+      left: calc(2 * var(--h) - (var(--h) - 10%) - 5%);
+      background: var(--text-100);
     }
   }
-  /* end .slideOne */
-  
-  
+}
+/* end .slideOne */
+
 @mixin input-group($padd, $font, $font-top) {
-    position: relative;
-    box-sizing: border-box;
+  position: relative;
+  box-sizing: border-box;
 
-    /* Change the white to any color */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active{
-        -webkit-box-shadow: 0 0 0 30px var(--bg-200) inset !important;
-        -webkit-text-fill-color: var(--color-font-light);
-    }
+  /* Change the white to any color */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-200) inset !important;
+    -webkit-text-fill-color: var(--color-font-light);
+  }
 
-    input, select {
-        border: 1px solid var(--border-100);
-    }
+  input,
+  select {
+    border: 1px solid var(--border-100);
+  }
 
-    input:focus {
-        border: 1px solid var(--primary-100);
-    }
+  input:focus {
+    border: 1px solid var(--primary-100);
+  }
 
-    label {
-      
-      position: absolute;
-      left: calc(#{$padd}/2);
-      padding: 0px 8px;
-      top: calc(#{$padd} - #{$font}/4 + #{$font}/3);
-      font-size: $font;
-      transition: 0.1s ease-in-out;
-      color: #777;
-      white-space: nowrap;
-      text-transform: lowercase;
-      
-      &.active {
-        top: calc(0px - #{$font-top}/1.5);
-        color: var(--color-font-light);
-        font-size: $font-top;
-        background-color: var(--bg-200);
-      }
-      
+  label {
+    position: absolute;
+    left: calc(#{$padd}/ 2);
+    padding: 0px 8px;
+    top: calc(#{$padd} - #{$font}/ 4 + #{$font}/ 3);
+    font-size: $font;
+    transition: 0.1s ease-in-out;
+    color: #777;
+    white-space: nowrap;
+    text-transform: lowercase;
+
+    &.active {
+      top: calc(0px - #{$font-top}/ 1.5);
+      color: var(--color-font-light);
+      font-size: $font-top;
+      background-color: var(--bg-200);
     }
-    input, select {
-      padding: $padd;
-      transition: .3s ease-in-out;
-    }
+  }
+  input,
+  select {
+    padding: $padd;
+    transition: 0.3s ease-in-out;
+  }
 }
 
 .graph {
+  .row-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border: 1px solid;
+    border-color: #aaaaaa00;
 
-    .row-wrapper {
-        display: flex;
-        flex-direction: row;
-        margin-top: 3px;
-        margin-bottom: 3px;
-        border: 1px solid;
-        border-color: #aaaaaa00;
-
-        &:hover {
-            border-color: var(--color-primary-light-1);
-        }
-    
-        * {
-            flex: auto;
-        }
-    
-        .label {
-            padding: 3px;
-            padding-right: 0.3em;
-            margin-right: 5px;
-            text-align: end;
-            background-color: var(--color-primary-dark-2);
-            border-radius: 1px;
-            text-transform: uppercase;
-            overflow: hidden;
-            white-space: nowrap;
-            max-width: 6em;
-            border-top-left-radius: 2px;
-            border-bottom-left-radius: 2px;
-        }
-
-    }
-    
-    .bar {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-items: flex-end;
-        background-color: var(--color-primary-light);
-        background: linear-gradient(to right, var(--color-primary-dark-2) 80%, var(--color-primary-dark-1));
+    &:hover {
+      border-color: var(--color-primary-light-1);
     }
 
-    .carousel-circle {
-        display: block;
-        height: 15px;
-        width: 15px;
-        border: 1px solid red;
-        border-color: var(--color-border-dark);
+    * {
+      flex: auto;
     }
 
-    .carousel-circle.selected {
-        background-color: var(--color-font-light);
+    .label {
+      padding: 3px;
+      padding-right: 0.3em;
+      margin-right: 5px;
+      text-align: end;
+      background-color: var(--color-primary-dark-2);
+      border-radius: 1px;
+      text-transform: uppercase;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 6em;
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
     }
+  }
 
+  .bar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-items: flex-end;
+    background-color: var(--color-primary-light);
+    background: linear-gradient(
+      to right,
+      var(--color-primary-dark-2) 80%,
+      var(--color-primary-dark-1)
+    );
+  }
+
+  .carousel-circle {
+    display: block;
+    height: 15px;
+    width: 15px;
+    border: 1px solid red;
+    border-color: var(--color-border-dark);
+  }
+
+  .carousel-circle.selected {
+    background-color: var(--color-font-light);
+  }
 }
 
 .toggle-bar {
-    --h: 2.5em;
-    height: var(--h);
-    width: fit-content;
-    border: 1px solid var(--border-100);
-    display: flex;
-    border-radius: var(--h);
-    padding-left: 3px;
-    padding-right: 3px;
-    user-select: none;
+  --h: 2.5em;
+  height: var(--h);
+  width: fit-content;
+  border: 1px solid var(--border-100);
+  display: flex;
+  border-radius: var(--h);
+  padding-left: 3px;
+  padding-right: 3px;
+  user-select: none;
 
-    .bar-item {
-      cursor: pointer;
-      text-transform: capitalize;
-      display: grid;
-      height: calc(var(--h) - 2* 3px);
-      width: calc(var(--h) * 3);
-      border-radius: calc(0.9 * var(--h));
-      align-self: center;
-      justify-items: center;
-      align-items: center;
-      padding-left: 1em;
-      padding-right: 1em;
-      transition: background-color 0.3s;
-    }
+  .bar-item {
+    cursor: pointer;
+    text-transform: capitalize;
+    display: grid;
+    height: calc(var(--h) - 2 * 3px);
+    width: calc(var(--h) * 3);
+    border-radius: calc(0.9 * var(--h));
+    align-self: center;
+    justify-items: center;
+    align-items: center;
+    padding-left: 1em;
+    padding-right: 1em;
+    transition: background-color 0.3s;
   }
-  
-  .bar-item.active {
-    background-color: var(--text-100);
-    color: var(--bg-100);
-  }
+}
 
+.bar-item.active {
+  background-color: var(--text-100);
+  color: var(--bg-100);
+}
 
 .categories {
-    display: grid;
-    grid-auto-rows: 1fr;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 5px;
+  display: grid;
+  grid-auto-rows: 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 5px;
 
-    @media only screen and (max-width: $bp-small) {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
+  @media only screen and (max-width: $bp-small) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 
 .circle-sm {
-    width: .8rem;
-    aspect-ratio: 1;
-    border-radius: 100%;
-    opacity: .7;
+  width: 0.8rem;
+  aspect-ratio: 1;
+  border-radius: 100%;
+  opacity: 0.7;
 }
 
 .circle {
-    width: 1rem;
-    aspect-ratio: 1;
-    border-radius: 100%;
-    opacity: .7;
+  width: 1rem;
+  aspect-ratio: 1;
+  border-radius: 100%;
+  opacity: 0.7;
 }
