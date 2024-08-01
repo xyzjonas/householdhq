@@ -8,10 +8,7 @@
       :subtitle="$t('no_data_will_appear')"
     />
     <div v-else-if="!selectedCategory" class="graph-wrapper">
-      <Doughnut 
-      :data="data"
-      :options="options"
-      />
+      <Doughnut :data="data" :options="options" />
       <div class="graph-wrapper-center">
         <slot></slot>
       </div>
@@ -37,29 +34,36 @@
         />
       </div>
     </section>
-    <ui-chevron id="show-legend" v-model="showLegend" />
+    <client-only>
+      <ui-chevron id="show-legend" v-model="showLegend" />
+    </client-only>
   </div>
   <transition name="slide-top">
-  <section v-if="showLegend" class="center card legend">
-    <div  class="legend-content">
-      <div v-for="item in items" class="legend-content-item" @click="selectCategoryByName(item.name)">
-        <span class="circle-sm mr-1" :style="`background-color: ${item.color};`"></span>
-        <span class="mr-1">{{ item.name }}</span>
-        <span><ui-price :amount="item.sum" size="small"/></span>
+    <section v-if="showLegend" class="center card legend">
+      <div class="legend-content">
+        <div
+          v-for="item in items"
+          class="legend-content-item"
+          @click="selectCategoryByName(item.name)"
+        >
+          <span
+            class="circle-sm mr-1"
+            :style="`background-color: ${item.color};`"
+          ></span>
+          <span class="mr-1">{{ item.name }}</span>
+          <span><ui-price :amount="item.sum" size="small" /></span>
+        </div>
+        <ui-button
+          @click="navigateTo('/categories')"
+          icon="i-ic-round-read-more"
+          link
+        />
       </div>
-      <ui-button
-        @click="navigateTo('/categories')"
-        icon="i-ic-round-read-more"
-        link
-      />
-    </div>
-    
-  </section>
+    </section>
   </transition>
-
 </template>
 <script setup lang="ts">
-import { Bar, Doughnut } from 'vue-chartjs'
+import { Doughnut } from "vue-chartjs";
 import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "@/types";
 
@@ -75,7 +79,9 @@ const props = defineProps<{
 
 const selectedCategoryName = ref<string>("");
 const selectedCategory = computed(() => {
-  return props.items.find((it) => it.name && it.name === selectedCategoryName.value);
+  return props.items.find(
+    (it) => it.name && it.name === selectedCategoryName.value
+  );
 });
 
 const { summary, summaryLoading } = storeToRefs(useCategoriesStore());
@@ -84,7 +90,6 @@ const { currency, loading } = storeToRefs(useTransactionStore());
 
 const emit = defineEmits(["filter"]);
 watch(selectedCategory, (value) => {
-  console.info(`Selected: ${value?.id}`)
   emit("filter", value?.id ?? -1);
 });
 
@@ -101,78 +106,73 @@ const areThereTransactions = computed(() => {
 
 const borderColor = (item: CategoryWithSum) => {
   if (item.name === selectedCategoryName.value) {
-    return 'white'
+    return "white";
   }
-  return item.color ?? 'var(--bg-300)'
-}
+  return item.color ?? "var(--bg-300)";
+};
 
 const data = computed(() => {
-    return {
-        labels: showedItems.value.map(it => it.name),
-        datasets: [
-            {
-                data: showedItems.value.map(it => it.sum),
-                backgroundColor: showedItems.value.map(it => it.color ?? 'white'),
-                borderColor: showedItems.value.map(borderColor),
-            }
-        ],
-        borderColor: "red",
-        defaults: {
-            borderColor: "red"
-        }
-    }
+  return {
+    labels: showedItems.value.map((it) => it.name),
+    datasets: [
+      {
+        data: showedItems.value.map((it) => it.sum),
+        backgroundColor: showedItems.value.map((it) => it.color ?? "white"),
+        borderColor: showedItems.value.map(borderColor),
+      },
+    ],
+    borderColor: "red",
+    defaults: {
+      borderColor: "red",
+    },
+  };
 });
 
 const selectCategoryByName = (name: string) => {
-    if (selectedCategoryName.value === name) {
-        selectedCategoryName.value = '';
-    } else {
-        selectedCategoryName.value = name;
-    }
-}
-
+  if (selectedCategoryName.value === name) {
+    selectedCategoryName.value = "";
+  } else {
+    selectedCategoryName.value = name;
+  }
+};
 
 const callback = (e: any) => {
-    // OnClick emit filter by category
-    const label = e.chart.tooltip.title[0];
-    selectCategoryByName(label)
-}
+  // OnClick emit filter by category
+  const label = e.chart.tooltip.title[0];
+  selectCategoryByName(label);
+};
 
 const options = {
-    responsive: true,
-    onClick: callback,
-    cutout: () => props.expand ? '70%' : '80%',
-    plugins: {
-      datalabels: {
-          display: () => props.expand,
-          // color: shouldInvert(props.category.color) ? '#333' : '#ddd',
-          backgroundColor: 'black',
-          textShadowColor: (val: any) => props.items[val.dataIndex].color,
-          textShadowBlur: 10,
-          color: 'white',
-          borderRadius: 3,
-          anchor: 'center',
-          formatter: (val: number) => val < 5000 ? null : val,
-          labels: {
-            title: {
-              font: {
-              }
-            },
-          }
+  responsive: true,
+  onClick: callback,
+  cutout: () => (props.expand ? "70%" : "80%"),
+  plugins: {
+    datalabels: {
+      display: () => props.expand,
+      // color: shouldInvert(props.category.color) ? '#333' : '#ddd',
+      backgroundColor: "black",
+      textShadowColor: (val: any) => props.items[val.dataIndex].color,
+      textShadowBlur: 10,
+      color: "white",
+      borderRadius: 3,
+      anchor: "center",
+      formatter: (val: number) => (val < 5000 ? null : val),
+      labels: {
+        title: {
+          font: {},
         },
-    }
+      },
+    },
+  },
 } as any;
-
 </script>
 <style lang="scss" scoped>
 section {
   width: 100%;
 }
 
-
 .legend {
-
-  margin-top: .2rem;
+  margin-top: 0.2rem;
 
   display: flex;
   flex-direction: column;
@@ -188,14 +188,14 @@ section {
     &-item {
       display: flex;
       align-items: center;
-      gap: .2rem;
+      gap: 0.2rem;
       font-size: small;
       border: 1px solid var(--border-100);
       background-color: var(--bg-200);
-      padding: .1rem .3rem;
+      padding: 0.1rem 0.3rem;
       border-radius: 2rem;
       cursor: pointer;
-      transition: filter .1s ease-in-out;
+      transition: filter 0.1s ease-in-out;
 
       &:hover {
         filter: brightness(1.2);
@@ -203,7 +203,6 @@ section {
     }
   }
 }
-
 
 .graph-card {
   position: relative;
@@ -213,7 +212,7 @@ section {
   height: 320px;
 }
 
-@media (min-width: 992px){
+@media (min-width: 992px) {
   .graph-card {
     height: 560px;
   }
@@ -230,7 +229,7 @@ section {
   bottom: 1rem;
   left: 1rem;
   display: flex;
-  gap: .3rem;
+  gap: 0.3rem;
 }
 
 .graph-wrapper {
@@ -245,7 +244,4 @@ section {
     position: absolute;
   }
 }
-
-
-
 </style>

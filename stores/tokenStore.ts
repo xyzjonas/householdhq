@@ -3,18 +3,19 @@ import { useNotifications } from "@/composables/useNotifications";
 
 export class ServerError extends Error {}
 
+
 export const useTokenStore = defineStore("token", () => {
   const n = useNotifications();
   const { t } = useI18n();
-
+  
   const token = useCookie("token", {
     // maxAge: new Date(2147483647 * 1000).getTime() / 1000,
     expires: new Date(2147483647 * 1000),
   });
+  const loggedUser  = useCookie("logged-user", undefined);
 
   const loginLoading = ref(false);
   const loginError = ref<string>();
-  // const loggedUser  = ref<string>();
 
   const login = async (username: string, password: string) => {
     const url = "/api/login";
@@ -26,9 +27,16 @@ export const useTokenStore = defineStore("token", () => {
         password: password,
       });
       token.value = result.token;
+      loggedUser.value = username;
     } finally {
       loginLoading.value = false;
     }
+  };
+
+  const logout = async () => {
+    token.value = undefined;
+    loggedUser.value = undefined;
+    await navigateTo("/login");
   };
 
   const postprocess = async (response: Response): Promise<Response> => {
@@ -110,7 +118,7 @@ export const useTokenStore = defineStore("token", () => {
     return await (await postprocess(response)).json();
   };
 
-  return { token, loginLoading, loginError, login, get, post, put, patch, del };
+  return { token, loggedUser, loginLoading, loginError, login, logout, get, post, put, patch, del };
 });
 
 if (import.meta.hot) {

@@ -1,7 +1,10 @@
 <template>
   <div class="container">
-    <MonthHero @reload="monthReloaded" />
-    <top-summary :transactions="passed" />
+    <MonthHero />
+
+    <client-only>
+      <top-summary :transactions="passed" />
+    </client-only>
 
     <HomeCarousel
       v-model="carouselTabindex"
@@ -12,11 +15,7 @@
     >
       <div v-if="isCurrentMonth" class="text-center font-thin uppercase">
         <div>
-          <ui-price
-            :amount="balance"
-            :currency="currency"
-            size="2.5rem"
-          />
+          <ui-price :amount="balance" :currency="currency" size="2.5rem" />
         </div>
         <h4>{{ $t("balance") }}</h4>
       </div>
@@ -26,7 +25,7 @@
       <BalanceRow
         v-if="isCurrentMonth"
         v-model="balance"
-        :sources="sources.filter(src => src.isPortfolio)"
+        :sources="sources.filter((src) => src.isPortfolio)"
         :upcomming="upcommingTransactionsAmount"
         :forecast="upcommingTransactionsAmount"
         :spent="expense"
@@ -46,14 +45,25 @@
       </section>
     </transition>
 
-    <div>
+    <ui-empty v-if="transactionsLoading" title="" loading class="card min-h-sm" />
+    <div v-else>
       <!-- SHOW UPCOMMING -->
-      <div v-if="isCurrentMonth && currentMonth.length > 0" id="remaining-bills" class="flex items-center gap-2 card">
-        <i class="i-ic-baseline-calendar-today" style="font-size: large;"></i>
+      <div
+        v-if="isCurrentMonth && currentMonth.length > 0"
+        id="remaining-bills"
+        class="flex items-center gap-2 card"
+      >
+        <i class="i-ic-baseline-calendar-today" style="font-size: large"></i>
         <span @click="showUpcomming = !showUpcomming">
-          {{ upcommingTransactions.length }} {{ mapTransactionDeclention(upcommingTransactions.length) }}
+          {{ upcommingTransactions.length }}
+          {{ mapTransactionDeclention(upcommingTransactions.length) }}
         </span>
-        <ui-price @click="showUpcomming = !showUpcomming" :amount="upcommingTransactionsAmount" :currency="currency" size="1.5rem"/>
+        <ui-price
+          @click="showUpcomming = !showUpcomming"
+          :amount="upcommingTransactionsAmount"
+          :currency="currency"
+          size="1.5rem"
+        />
         <ui-chevron v-model="showUpcomming" />
       </div>
 
@@ -77,7 +87,7 @@
           icon="fa-solid fa-list"
           :title="$t('no_transactions')"
           :subtitle="$t('no_transactions_will_appear')"
-          class="no-transactions"
+          class="no-transactions mt-2"
         />
         <TransactionRow
           v-for="transaction in transactions"
@@ -107,23 +117,25 @@ import { useTokenStore } from "@/stores/tokenStore";
 import { useCategoriesStore } from "@/stores/categories";
 import { useSourcesStore } from "@/stores/sources";
 import { useTransactionStore } from "@/stores/transactions";
-import type { Tag, Transaction } from "@/types";
+import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
+
+const { isCurrent: isCurrentMonth, month, year } = useCurrentMonth()
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
 
-const balance = ref<number>(0)
+const balance = ref<number>(0);
 
 const transactionStore = useTransactionStore();
-const { currentMonth, passed, upcomming, currency, loading, year, month } = storeToRefs(transactionStore);
-const isCurrentMonth = computed(() => {
-  if (!month.value && !year.value) {
-    return true;
-  }
-  const now = new Date();
-  return year.value === now.getFullYear() && month.value === now.getMonth() + 1;
-});
+const { currentMonth, passed, upcomming, currency, loading } = storeToRefs(transactionStore);
+
+const transactionsLoading = ref(false);
+watch(month, async (to, from) => {
+  transactionsLoading.value = true;
+  await initialFetch();
+  transactionsLoading.value = false;
+})
 
 const sourcesStore = useSourcesStore();
 const { sources } = storeToRefs(sourcesStore);
@@ -141,15 +153,8 @@ const filterCategoryId = ref<number>(-1);
 
 const notifications = useNotifications();
 
-const { yearPath, monthPath } = useRoute().query;
-
-month.value = parseInt(monthPath as string);
-year.value = parseInt(yearPath as string);
-
-// const { $pwa } = useNuxtApp();
-
 const carouselTabindex = ref(0);
-const isIncomes = computed(() => carouselTabindex.value === 1)
+const isIncomes = computed(() => carouselTabindex.value === 1);
 
 onMounted(async () => {
   transactionStore.fetchTransactions();
@@ -157,48 +162,61 @@ onMounted(async () => {
   categoriesStore.fetchCategories();
 });
 
-const initialFetch = () => {
-  transactionStore.fetchTransactions();
-  sourcesStore.fetchAllSources();
+const initialFetch = async () => {
+  await Promise.all([
+    transactionStore.fetchTransactions(),
+    sourcesStore.fetchAllSources(),
+  ])
 };
 
 const transactions = computed(() => {
-  let tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) <= new Date());
+  let tmp = currentMonth.value.filter(
+    (trans: Transaction) => new Date(trans.transactedAt) <= new Date()
+  );
 
   if (isIncomes.value) {
-    tmp = tmp.filter(isIncome)
+    tmp = tmp.filter(isIncome);
   }
-
-  // if (showHidden.value) {
-  //   return tmp;
-  // }
 
   if (filterCategoryId.value >= 0) {
-    tmp = tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
+    tmp = tmp.filter(
+      (trans: Transaction) => trans.category.id === filterCategoryId.value
+    );
   }
 
-  return tmp
-  // .filter((trans: Transaction) => !(!trans.source.isOut && !trans.target.isOut));
+  return tmp;
 });
 
 const incomeTransactions = computed(() =>
-  transactions.value.filter((tr: Transaction) => !tr.target.isOut && tr.source.isOut)
+  transactions.value.filter(
+    (tr: Transaction) => !tr.target.isOut && tr.source.isOut
+  )
 );
 const expenseTransactions = computed(() =>
-  transactions.value.filter((tr: Transaction) => tr.target.isOut && !tr.source.isOut)
+  transactions.value.filter(
+    (tr: Transaction) => tr.target.isOut && !tr.source.isOut
+  )
 );
 
 const income = computed(() =>
-  incomeTransactions.value.map((tr: Transaction) => tr.amount).reduce((a: number, b: number) => a + b, 0)
+  incomeTransactions.value
+    .map((tr: Transaction) => tr.amount)
+    .reduce((a: number, b: number) => a + b, 0)
 );
 const expense = computed(() =>
-  expenseTransactions.value.map((tr: Transaction) => tr.amount).reduce((a: number, b: number) => a + b, 0)
+  expenseTransactions.value
+    .map((tr: Transaction) => tr.amount)
+    .reduce((a: number, b: number) => a + b, 0)
 );
 
 const upcommingTransactions = computed(() => {
-  const tmp = currentMonth.value.filter((trans: Transaction) => new Date(trans.transactedAt) > new Date());
+  const tmp = currentMonth.value.filter(
+    (trans: Transaction) => new Date(trans.transactedAt) > new Date()
+  );
   if (filterCategoryId.value >= 0) {
-    return tmp.filter((trans: Transaction) => trans.category.id === filterCategoryId.value)
+    return tmp.filter(
+      (trans: Transaction) => trans.category.id === filterCategoryId.value
+    );
   }
 
   return tmp;
@@ -218,8 +236,8 @@ const putTransaction = (transactionData: Transaction) => {
     notifications.addNotification({
       text: t("t_added"),
       level: "success",
-    })
-  })
+    });
+  });
 };
 
 const deleteTransaction = (transactionData: Transaction) => {
@@ -233,7 +251,9 @@ const deleteTransaction = (transactionData: Transaction) => {
     body: transactionData,
   })
     .then((res) => {
-      currentMonth.value = currentMonth.value.filter((t: Transaction) => t.id != transactionData.id);
+      currentMonth.value = currentMonth.value.filter(
+        (t: Transaction) => t.id != transactionData.id
+      );
     })
     .finally(() => (loading.value = false));
 };
@@ -259,19 +279,6 @@ const mapTransactionDeclention = (count: number) => {
   } else {
     return t("t_upcomming_5");
   }
-};
-
-const isTransactionTagged = (transaction: any, tagId: number) => {
-  if (tagId < 0) {
-    return true;
-  }
-  return transaction.tags.filter((t: Tag) => t.id === tagId).length > 0;
-};
-
-const monthReloaded = (newDate: Date) => {
-  year.value = newDate.getFullYear();
-  month.value = newDate.getMonth() + 1;
-  initialFetch();
 };
 </script>
 
@@ -301,7 +308,6 @@ h3 {
   border-radius: 8px;
 }
 
-
 .btn-collapsible {
   flex: 1;
 
@@ -318,12 +324,12 @@ h3 {
 
 #floating {
   position: fixed;
-  bottom: .5rem;
-  right: .5rem;
+  bottom: 0.5rem;
+  right: 0.5rem;
   border-radius: 50%;
-  transition: transform .1s ease-in-out;
-  opacity: .95;
-  
+  transition: transform 0.1s ease-in-out;
+  opacity: 0.95;
+
   &.active {
     transform: rotate(45deg);
   }

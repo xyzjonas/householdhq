@@ -26,7 +26,7 @@ const icon = computed(() => {
     case 'error':
       return 'i-ic-round-error-outline'
     case 'success':
-      return 'i-ic-baseline-check-circle-outline'
+      return 'i-ic-baseline-check'
     case 'warning':
       return 'i-ic-round-warning-amber'
   }
@@ -38,14 +38,13 @@ const icon = computed(() => {
 <style lang="css" scoped>
 .notification {
   padding: .8rem;
-  border-radius: .3rem;
 }
 
 .notification-row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: .3rem;
+  gap: .5rem;
 }
 
 
@@ -55,13 +54,13 @@ const icon = computed(() => {
 }
 
 .success {
-  color: var(--bg-200);
+  color: var(--text-over-primary);
   background-color: var(--success-100);
 }
 
 .error {
   background-color: var(--error-100);
-  color: var(--text-100);
+  color: var(--text-over-danger);
 }
 
 .warning {
@@ -70,6 +69,6 @@ const icon = computed(() => {
 }
 
 i {
-  font-size: 2rem;
+  font-size: 1.2rem;
 }
 </style>

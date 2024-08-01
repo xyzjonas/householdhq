@@ -1,20 +1,12 @@
 <template>
   <div :style="transparent && !details ? transparentStyle : ''" class="my-2">
-    <div class="wrapper">
-      <div
-        class="transaction-card flex-1"
-        @click="
-          details = !details;
-          edit = false;
-          buttons.deleteCancel.onClick();
-        "
-      >
-        <!-- <span class="color-flag"></span> -->
+    <div class="wrapper gap-1">
+      <div class="transaction-card flex-1" @click="() => onRowClick()">
         <DateTile :date="date" class="min-w-20 w-20" />
         <div class="flex flex-col">
           <span>{{ transaction.description }}</span>
           <span style="font-size: .7rem;" class="mb-2">{{ transaction.source.name }} ⤍ {{ transaction.target.name }}</span>
-          <ui-pin :text="transaction.category.name" :color="transaction.category.color" size="small"/>
+          <ui-pin v-if="transaction.category?.name" :text="transaction.category.name" :color="transaction?.category?.color" size="small"/>
         </div>
         <p class="ml-auto">
           <ui-price :amount="transaction.amount" :currency="transaction.currency" :color="isTransactionIncome ? 'var(--primary-100)' : undefined" />
@@ -24,10 +16,10 @@
           </p>
         </p>
       </div>
-
       <!-- BUTTONS -->
-      <div class="panel y" :style="`flex: ${details ? '1' : '0'}; max-width: 8rem`">
-        <ui-button v-for="btn in [leftBtn, rightBtn]"
+      <div class="panel y max-w-md" :style="editButtonsStyle">
+        <ui-button
+          v-for="btn in [leftBtn, rightBtn]"
           :color="btn?.color as any ?? 'secondary'"
           :icon="btn?.icon"
           :loading="btn?.loading as any ?? false"
@@ -36,19 +28,19 @@
         />
       </div>
 
-      <div class="panel y" :style="`width: ${confirmable ? 20 : 0}%`">
-        <ui-button
-          color="success"
-          :loading="loading"
-          :icon="transaction.recurring ? 'i-ic-baseline-content-copy' : 'i-ic-baseline-check-circle'"
-          @click="confirmPendingTransaction(transaction)"
-        >
-          <small v-if="transaction.recurring > 0">{{ transaction.recurring }}m</small>
-        </ui-button>
-      </div>
+      <ui-button
+        v-if="confirmable"
+        color="success"
+        :loading="loading"
+        width="5rem"
+        :icon="transaction.recurring ? 'i-ic-baseline-content-copy' : 'i-ic-baseline-check-circle'"
+        @click="confirmPendingTransaction(transaction)"
+      >
+        <small v-if="transaction.recurring > 0">{{ transaction.recurring }}m</small>
+      </ui-button>
     </div>
     <transition name="page" mode="in-out">
-      <div v-if="edit && details">
+      <div v-if="edit && details" class="mt-2">
         <TransactionForm
           :transactionIn="transaction"
           :startStage="3"
@@ -120,17 +112,6 @@ const date = computed(() => {
   return new Date(props.transaction.transactedAt);
 });
 
-// const firstTag = computed(() => {
-//   if (props.transaction.tags.length > 0) {
-//     return props.transaction.tags[0];
-//   }
-//   return undefined;
-// });
-
-const tagColor = computed(() => {
-  return props.transaction.category?.color ?? "#00000000";
-});
-
 const confirmable = computed(() => {
   return !props.transaction.confirmed && date.value <= new Date();
 });
@@ -155,7 +136,7 @@ const buttons: {[key: string]: Button} = {
     icon: 'i-ic-round-delete-forever',
     onClick: () => (emit('delete', { id: props.transaction.id })),
     loading: loading,
-    color: 'danger',
+    color: 'primary',
   },
   deleteCancel: {
     icon: 'i-ic-baseline-close',
@@ -183,32 +164,51 @@ const buttons: {[key: string]: Button} = {
 leftBtn.value = buttons.delete;
 rightBtn.value = buttons.edit;
 
+const onRowClick = () => {
+  details.value = !details.value;
+  edit.value = false;
+  buttons.deleteCancel.onClick();
+}
+
+const editButtonsStyle = computed(() => {
+  if (details.value && confirmable.value) {
+    return ''
+  }
+
+  if (details.value) {
+    return 'right: 0.5rem'
+  }
+
+  return 'right: -15rem'
+})
+
 </script>
 <style lang="scss" scoped>
 .transaction {
   position: relative;
-  // border: none;
-  // border-right: solid 10px;
-  // border-right-color: v-bind("tagColor") !important;
   transition: 250ms;
   cursor: pointer;
   transition: background-color .2s ease-in-out;
-  
-  // border-radius: 0;
-  // border-bottom-left-radius: .3rem;
-  // border-top-left-radius: .3rem;
 }
 
 .wrapper {
   display: flex;
   flex-direction: row;
+  position: relative;
+  overflow: hidden;
 
   .panel {
+    position: absolute;
+    top: 0.5rem;
+    right: calc(5rem + .5rem + .5rem);
+    height: calc(100% - 2*.5rem);
     overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
-    transition: .4s ease-in-out;
+    transition: .3s ease-in-out;
+    backdrop-filter: blur(2px);
+    // background-color: var(--bg-200);
 
     .y {
       flex-direction: column;
@@ -246,7 +246,7 @@ rightBtn.value = buttons.edit;
 .color-flag {
   width: 5rem;
   height: 2rem;
-  background-color: v-bind('transaction.category.color');
+  background-color: v-bind('transaction.category?.color');
   position: absolute;
   transform: rotate(-50deg) translateY(-3.8rem);
   left: 0;

@@ -4,9 +4,12 @@
       <div class="page flex p-2 items-center">
         <span>Household HQ</span>
         <span class="ml-auto text-xs">{{ VERSION }}</span>
-        <div class="ml-5 flex gap-2 items-center">
-          <ui-theme-toggle v-model="themeBool" />
-        </div>
+        <ClientOnly>
+          <div class="ml-5 flex items-center">
+            <ui-theme-toggle v-model="themeBool" />
+            <ui-login-toggle />
+          </div>
+        </ClientOnly>
       </div>
     </header>
 
@@ -14,7 +17,7 @@
       <slot />
     </div>
    
-    <footer></footer>
+    <!-- <footer></footer> -->
     <div class="notification-drawer">
       <TransitionGroup name="slide">
         <div v-for="notif in notifications" :key="notif.created.toISOString()">
@@ -88,9 +91,8 @@ main {
   display: flex;
   flex-direction: column;
   gap: .5rem;
-  top: .5rem;
-  right: .5rem;
-  max-width: 70%;
+  bottom: 0;
+  width: 100%;
 }
 
 .page-wrapper {

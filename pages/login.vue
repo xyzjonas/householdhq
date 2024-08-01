@@ -1,16 +1,33 @@
 <template>
   <form class="form-wrapper-form card" @submit.prevent="useLogin">
-    <img src="/favicon.ico" alt="">
+    <img src="/favicon.ico" alt="" />
     <h1 class="title mb-10">Household HQ</h1>
-    <div class="form-wrapper-form-inputs mb-10">
-      <ui-input label="Username" v-model="username" type="text" :required="true" />
-      <ui-input label="Password" v-model="password" type="password" :required="true" />
-      <span class="flex items-center mt-3">
-        <input type="checkbox" checked disabled>
-        <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
-      </span>
-    </div>
-    <ui-button :loading="loginLoading" width="100%" icon="i-ic-baseline-key">{{ $t("sign_in") }}</ui-button>
+    <client-only>
+      <div class="form-wrapper-form-inputs mb-10">
+        <ui-input
+          label="Username"
+          v-model="username"
+          type="text"
+          :required="true"
+        />
+        <ui-input
+          label="Password"
+          v-model="password"
+          type="password"
+          :required="true"
+        />
+        <span class="flex items-center mt-3">
+          <input type="checkbox" checked disabled />
+          <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
+        </span>
+      </div>
+      <ui-button
+        :loading="loginLoading"
+        width="100%"
+        icon="i-ic-baseline-key"
+        >{{ $t("sign_in") }}</ui-button
+      >
+    </client-only>
   </form>
 </template>
 <script setup lang="ts">
@@ -37,12 +54,16 @@ const useLogin = async () => {
 onMounted(() => {
   [usernameInput, passwordInput].forEach((_ref) => {
     _ref.value?.addEventListener("focus", () => {
-      document.querySelector(`[for='${_ref.value?.id}']`)?.classList?.add("active");
+      document
+        .querySelector(`[for='${_ref.value?.id}']`)
+        ?.classList?.add("active");
     });
 
     _ref.value?.addEventListener("focusout", () => {
       if (!_ref.value?.value) {
-        document.querySelector(`[for='${_ref.value?.id}']`)?.classList?.remove("active");
+        document
+          .querySelector(`[for='${_ref.value?.id}']`)
+          ?.classList?.remove("active");
       }
     });
   });
@@ -74,7 +95,7 @@ onMounted(() => {
 }
 
 img {
-  filter: grayscale(1) opacity(.4);
-  margin-bottom: .5rem;
+  filter: grayscale(1) opacity(0.4);
+  margin-bottom: 0.5rem;
 }
 </style>

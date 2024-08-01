@@ -1,14 +1,16 @@
 <template>
   <div ref="focusDiv" class="card">
-    <div class="row-simple">
-      <ui-button
-        v-if="stage === 2"
-        icon="i-ic-baseline-new-label"
-        icon-size="1rem"
-        squared
-        outlined
-        @click="showNewCategory = !showNewCategory"
-      />
+    <div class="row-simple min-h-10">
+      <transition name="slide" mode="out-in">
+        <ui-button
+          v-if="stage === 2"
+          icon="i-ic-baseline-new-label"
+          icon-size="1rem"
+          squared
+          outlined
+          @click="showNewCategory = !showNewCategory"
+        />
+      </transition>
       <ui-button
         v-if="!hideClose"
         id="close-t-form"
@@ -114,7 +116,7 @@
       <div v-else-if="stage === 2">
         <transition name="slide" mode="out-in">
           <div class="new-category" v-if="showNewCategory">
-            <h3 class="mb-3 text-xl uppercase">{{ $t('c_new') }}</h3>
+            <h3 class="mb-3 text-xl uppercase">{{ $t("c_new") }}</h3>
             <ui-input :label="$t('c_name')" v-model="newCategoryName" />
             <div class="flex gap-1">
               <ui-button
@@ -138,7 +140,6 @@
             />
           </div>
         </transition>
-        
       </div>
 
       <!-- NUMPAD  -->
@@ -175,10 +176,9 @@
       <ui-button
         @click="stage = stage - 1"
         :disabled="stage <= 0"
-        width="3rem"
-        squared
-        icon="i-ic-baseline-arrow-left"
-        icon-size="2rem"
+        rounded
+        color="primary"
+        icon="i-ic-baseline-arrow-back"
       />
       <a
         v-for="index in stages"
@@ -190,9 +190,9 @@
       <ui-button
         @click="stage = stage + 1"
         :disabled="stage >= stages - 1"
-        squared
-        icon="i-ic-baseline-arrow-right"
-        icon-size="1.5rem"
+        rounded
+        color="primary"
+        icon="i-ic-baseline-arrow-forward"
       />
     </div>
     <p class="error" style="text-align: right">{{ error }}</p>
@@ -245,8 +245,12 @@ onMounted(() => {
       .map((t) => t.name)
       .join(",");
     delete transaction.value.confirmed; // discard explicit confirmed property - only for confirm action
-    date.value = formatDate(new Date(transaction.value.transactedAt ?? new Date()));
-    time.value = formatTime(new Date(transaction.value.transactedAt ?? new Date()));
+    date.value = formatDate(
+      new Date(transaction.value.transactedAt ?? new Date())
+    );
+    time.value = formatTime(
+      new Date(transaction.value.transactedAt ?? new Date())
+    );
   }
 
   if (props.startStage) {
@@ -311,7 +315,7 @@ const formatDate = (date: Date) => {
 const formatTime = (date: Date) => {
   const hours = date.getHours().toString().padStart(2, "0");
   const minutes = date.getMinutes().toString().padStart(2, "0");
-  return hours + ":" + minutes
+  return hours + ":" + minutes;
 };
 
 const categorySelected = (category: Category) => {
@@ -351,15 +355,21 @@ const createCategory = () => {
   margin-bottom: 16px;
 
   &-stage {
-    width: 12px;
-    height: 12px;
-    border: 1px solid var(--text-100);
+    width: 1rem;
+    aspect-ratio: 1;
+    border: 1px solid var(--secondary-100);
     border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--secondary-100);
+    }
   }
 }
 
 .active {
-  background-color: var(--text-100);
+  border-color: var(--primary-100);
+  background-color: var(--primary-100);
 }
 
 .button-sm {

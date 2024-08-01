@@ -1,63 +1,52 @@
 <template>
   <section class="title">
     <p>{{ formatMMYYYY }}</p>
-    <NuxtLink
-      :to="`/?year=${prev.getFullYear()}&month=${prev.getMonth() + 1}`"
-      @click="$emit('reload', prev)"
-      class="left"
-    >
-      <i class="i-ic-chevron-left"></i>
-    </NuxtLink>
-    <NuxtLink
-      :to="`/?year=${next.getFullYear()}&month=${next.getMonth() + 1}`"
-      @click="$emit('reload', next)"
-      class="right"
-    >
-      <i class="i-ic-chevron-right"></i>
-    </NuxtLink>
+    <div class="ml-auto flex gap-3 items-center">
+      <NuxtLink
+        :to="`/?year=${previous.getFullYear()}&month=${
+          previous.getMonth() + 1
+        }`"
+        @click="$emit('reload', previous)"
+        :class="{ left: true }"
+      >
+        <i class="i-ic-chevron-left"></i>
+      </NuxtLink>
+      <div class="min-w-6">
+        <transition name="page" mode="out-in">
+          <NuxtLink
+            v-if="!isCurrent"
+            to="/"
+            @click="$emit('reload', new Date())"
+            :class="{ left: true }"
+          >
+            <i class="i-ic-baseline-home"></i>
+          </NuxtLink>
+        </transition>
+      </div>
+      <NuxtLink
+        :to="`/?year=${next.getFullYear()}&month=${next.getMonth() + 1}`"
+        @click="$emit('reload', next)"
+        :class="{ right: true }"
+      >
+        <i class="i-ic-chevron-right"></i>
+      </NuxtLink>
+    </div>
   </section>
 </template>
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { useTransactionStore } from "@/stores/transactions";
 import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
-// const date = ref<Date>(new Date());
-
-const route = useRoute();
-const { month, year } = useCurrentMonth();
+const { month, year, next, previous, isCurrent } = useCurrentMonth();
 
 defineEmits(["reload"]);
 
-const date = computed<Date>(() => {
-  const now = new Date();
-  if (year.value) {
-    now.setFullYear(year.value);
-  }
-  if (month.value) {
-    now.setMonth(month.value - 1);
-  }
-  return now;
-});
-
-const prev = computed<Date>(() => {
-  // PREVIOUS month URL path
-  const d = new Date(date.value);
-  d.setMonth(d.getMonth() - 1);
-  return d;
-});
-
-const next = computed<Date>(() => {
-  // NEXT month URL path
-  const d = new Date(date.value);
-  d.setMonth(d.getMonth() + 1);
-
-  return d;
-});
+const date = computed<Date>(() => new Date(year.value, month.value - 1));
 
 const i18n = useI18n();
 const formatMMYYYY = computed(() => {
-  const monthName = date.value.toLocaleDateString(i18n.locale.value, { month: "long" }).toUpperCase();
+  const monthName = date.value
+    .toLocaleDateString(i18n.locale.value, { month: "long" })
+    .toUpperCase();
   return `${monthName} ${date.value.getFullYear()}`;
 });
 </script>
@@ -93,10 +82,6 @@ a:hover {
 .right {
   font-size: x-large;
   color: var(--color-primary-light-1);
-}
-
-.left {
-  margin-left: auto;
 }
 
 .left:hover {

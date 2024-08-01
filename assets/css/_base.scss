@@ -18,17 +18,17 @@
     --color-primary: var(--primary-100);
     
     // OBSOLETE
-    --color-background-dark: #242635;    
-    --color-foreground-dark: #323548;
-    --color-border-dark: #565857;
+    // --color-background-dark: #242635;    
+    // --color-foreground-dark: #323548;
+    // --color-border-dark: #565857;
   
-    --color-grey-light-1: #bec5ce;
-    --color-grey-light-2: var(--color-primary-dark-2);
+    // --color-grey-light-1: #bec5ce;
+    // --color-grey-light-2: var(--color-primary-dark-2);
 
-    --shadow-dark: 0 2rem 6rem rgba(0,0,0,.3);
-    --shadow-light: 0 2rem 5rem rgba(0,0,0,.06);
+    // --shadow-dark: 0 2rem 6rem rgba(0,0,0,.3);
+    // --shadow-light: 0 2rem 5rem rgba(0,0,0,.06);
 
-    --line: 1px solid var(--color-grey-light-2);
+    // --line: 1px solid var(--color-grey-light-2);
 
 
     --input-border: var(--color-grey-dark-1);
@@ -62,7 +62,7 @@ body {
 
     --shadow-100: #141414;
 
-    --secondary-100: #0f172a;
+    --secondary-100: var(--bg-300);
 }
 
 html[data-theme="dark"] {
@@ -80,14 +80,6 @@ html[data-theme="dark"] {
 
     --secondary-100: #404040;
 }
-
-// @media (prefers-color-scheme: dark) {
-//     :root {
-//         --bg-100: #000000;
-//         --bg-200:#141414;
-//         --bg-300:#404040;
-//     }
-// }
 
 // OBSOLETE
 $bp-largest: 75em;     // 1200px

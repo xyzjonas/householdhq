@@ -11,7 +11,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   const loading = ref(false);
 
-  const { month, year } = useCurrentMonth();
+  const { month, year, isCurrent } = useCurrentMonth();
 
   const currentMonth = ref<Transaction[]>([]);
 
@@ -84,8 +84,8 @@ export const useTransactionStore = defineStore("transaction", () => {
     loading,
     currency,
     currentMonth,
-    year,
-    month,
+    // year,
+    // month,
     passed,
     upcomming,
     fetchTransactions,

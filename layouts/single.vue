@@ -1,8 +1,6 @@
 <template>
     <layout-base>
-        <div class="main">
-            <slot />
-        </div>
+        <slot />
     </layout-base>
 </template>
 <style lang="scss" scoped>

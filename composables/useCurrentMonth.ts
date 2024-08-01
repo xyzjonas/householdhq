@@ -1,24 +1,46 @@
 
-const month = ref<number>(new Date().getMonth() + 1);
-const year = ref<number>(new Date().getFullYear());
-
-
 export const useCurrentMonth = () => {
 
-  const next = () => {
-    month.value = month.value === 11 ? 1 : month.value + 2;
-    year.value =  month.value === 11 ? year.value + 1 : year.value;
-  }
+  // const route = useRoute()
+  const router = useRouter()
 
-  const previous = () => {
-    month.value = month.value === 0 ? 12 : month.value -1;
-    year.value =  month.value === 0 ? year.value - 1 : year.value;
-  }
+  const query = computed(() => {
+    return router.currentRoute.value.query;
+  })
 
-  const fromDate = (date: Date) => {
-    year.value = date.getFullYear();
-    month.value = date.getMonth();
-  } 
+  const month = computed(() => {
+    if (query.value.month) {
+      return parseInt(query.value.month as string);
+    }
+    return new Date().getMonth() + 1;
+  })
+  
+  const year = computed(() => {
+    if (query.value.year) {
+      return parseInt(query.value.year as string);  
+    }
+    return new Date().getFullYear();
+  });
+
+  const next = computed(() => {
+    if (month.value === 11) {
+      return new Date(year.value + 1, 0)
+    }
+
+    return new Date(year.value, month.value)
+  })
+
+  const previous = computed(() => {
+    if (month.value === 1) {
+      return new Date(year.value - 1, 11)
+    }
+
+    return new Date(year.value, month.value - 2)
+  })
+
+  const isCurrent = computed(() => {
+    return (new Date().getMonth() + 1) === month.value && new Date().getFullYear() === year.value;
+  })
 
   const date = computed((): Date => {
     return new Date();
@@ -29,7 +51,6 @@ export const useCurrentMonth = () => {
     year,
     next,
     previous,
-    fromDate,
-    date,
+    isCurrent,
   }
 }
