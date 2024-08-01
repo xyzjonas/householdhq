@@ -6,6 +6,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "docker-build": "docker build -t scotch3840/householdhq .",
+    "docker-push": "docker push scotch3840/householdhq",
     "data-migration:transactedat": "tsx ./prisma/migrations/20240529085252_transacted_at/data-migration.ts"
   },
   "prisma": {
