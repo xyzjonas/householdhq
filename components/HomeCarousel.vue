@@ -1,7 +1,7 @@
 <template>
   <div class="carousel">
     <!-- EXPENSES & INCOMES -->
-    <BarGraph :items="data" :expand="expandGraph">
+    <BarGraph :items="data" :expand="expandGraph" @filter="(id) => $emit('filter', id)">
       <slot></slot>
     </BarGraph>
   </div>
@@ -17,7 +17,6 @@ import type { CategoryWithSum } from "@/types";
 
 defineEmits(["filter"]);
 
-// = selected 'tab'
 const modelValue = defineModel<number>();
 
 const props = defineProps<{
@@ -25,8 +24,6 @@ const props = defineProps<{
   incomes: CategoryWithSum[];
   expandGraph?: boolean;
 }>();
-
-// const item = ref(0);
 
 const data = computed(() => (modelValue.value === 1 ? props.incomes : topExpenses.value));
 

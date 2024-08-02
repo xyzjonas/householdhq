@@ -68,7 +68,6 @@ import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "@/types";
 
 import { useTransactionStore } from "@/stores/transactions";
-import { useCategoriesStore } from "@/stores/categories";
 
 const showLegend = ref(false);
 
@@ -84,12 +83,10 @@ const selectedCategory = computed(() => {
   );
 });
 
-const { summary, summaryLoading } = storeToRefs(useCategoriesStore());
-
-const { currency, loading } = storeToRefs(useTransactionStore());
+const { loading } = storeToRefs(useTransactionStore());
 
 const emit = defineEmits(["filter"]);
-watch(selectedCategory, (value) => {
+watch(selectedCategory, (value, _) => {
   emit("filter", value?.id ?? -1);
 });
 
