@@ -328,7 +328,8 @@ h3 {
   right: 0.5rem;
   border-radius: 50%;
   transition: transform 0.1s ease-in-out;
-  opacity: 0.95;
+  z-index: 900;
+  box-shadow: 1px 1px 5px var(--shadow-100);
 
   &.active {
     transform: rotate(45deg);

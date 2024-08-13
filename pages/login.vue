@@ -1,7 +1,7 @@
 <template>
   <form class="form-wrapper-form card" @submit.prevent="useLogin">
-    <img src="/favicon.ico" alt="" />
-    <h1 class="title mb-10">Household HQ</h1>
+    <img src="/logo.svg" alt="logo" width="128" class="mb-5" />
+    <h1 class="title mb-10 upp">Household HQ</h1>
     <client-only>
       <div class="form-wrapper-form-inputs mb-10">
         <ui-input
@@ -92,10 +92,5 @@ onMounted(() => {
     flex-direction: column;
     gap: 1rem;
   }
-}
-
-img {
-  filter: grayscale(1) opacity(0.4);
-  margin-bottom: 0.5rem;
 }
 </style>
