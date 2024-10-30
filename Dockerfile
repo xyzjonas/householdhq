@@ -19,6 +19,7 @@ RUN npm config set ignore-scripts true
 RUN npm install --omit=dev
 
 COPY --from=build-stage /build/.output ./.output
+COPY ./prisma ./prisma
 
 EXPOSE 3000
 CMD [ "node", ".output/server/index.mjs" ]

@@ -9,7 +9,9 @@
     "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg",
     "docker-build": "docker build -t scotch3840/householdhq .",
     "docker-push": "docker push scotch3840/householdhq",
-    "data-migration:transactedat": "tsx ./prisma/migrations/20240529085252_transacted_at/data-migration.ts"
+    "data-migration:transactedat": "tsx ./prisma/migrations/20240529085252_transacted_at/data-migration.ts",
+    "db": "docker compose up -d db adminer db-migrate",
+    "db-migrate": "npx prisma migrate deploy"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma"
