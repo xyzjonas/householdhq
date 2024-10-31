@@ -1,5 +1,5 @@
 <template>
-  <div class="row-simple">
+  <div class="flex">
       <div class="slideOne" @click="modelValue = !modelValue">
           <input disabled v-model="modelValue" type="checkbox" id="slideOne" name="check"/>
           <label disabled for="slideOne"></label>

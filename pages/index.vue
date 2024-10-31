@@ -45,14 +45,58 @@
       </section>
     </transition>
 
-    <ui-empty v-if="transactionsLoading" title="" loading class="card min-h-sm" />
+    <ui-empty
+      v-if="transactionsLoading"
+      title=""
+      loading
+      class="card min-h-sm"
+    />
     <div v-else>
+      <div v-if="importantTransactions.length > 0">
+        <div class="flex">
+          <div
+            class="border-r-amber border-r-4 border-r-solid mr-2 pos-relative my-3"
+          ></div>
+          <div class="flex-1">
+            <TransactionRow
+              v-for="transaction in importantTransactions"
+              :key="transaction.id"
+              :transaction="transaction"
+              class="upcomming"
+              @patched="updateTransaction"
+              @delete="deleteTransaction"
+            />
+          </div>
+        </div>
+        <div class="flex w-full justify-end items-center">
+          <ui-button
+            link
+            icon="i-ic-round-warning"
+            icon-size="1rem"
+            @click="navigateTo('/important')"
+            >{{ $t("to_important") }}</ui-button
+          >
+        </div>
+      </div>
+
       <!-- SHOW UPCOMMING -->
       <div
         v-if="isCurrentMonth && currentMonth.length > 0"
-        id="remaining-bills"
-        class="flex items-center gap-2 card"
+        class="flex items-center gap-2 mb-3 px-3"
       >
+        <ui-button
+          v-if="importantTransactions.length === 0"
+          link
+          squared
+          icon="i-ic-baseline-check-circle-outline"
+          icon-size="1.2rem"
+          @click="navigateTo('/important')"
+        ></ui-button>
+
+        <div
+          v-if="importantTransactions.length === 0"
+          class="b-1 border-r-solid h-[1.5rem] border-gray mr-2"
+        ></div>
         <i class="i-ic-baseline-calendar-today" style="font-size: large"></i>
         <span @click="showUpcomming = !showUpcomming">
           {{ upcommingTransactions.length }}
@@ -63,8 +107,9 @@
           :amount="upcommingTransactionsAmount"
           :currency="currency"
           size="1.5rem"
+          class="ml-3 border-1 border-solid p-1 px-2 border-rounded-md border-[#777]"
         />
-        <ui-chevron v-model="showUpcomming" />
+        <ui-chevron v-model="showUpcomming" class="ml-auto" />
       </div>
 
       <transition name="page">
@@ -120,7 +165,7 @@ import { useTransactionStore } from "@/stores/transactions";
 import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
 
-const { isCurrent: isCurrentMonth, month, year } = useCurrentMonth()
+const { isCurrent: isCurrentMonth, month, year } = useCurrentMonth();
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
@@ -128,14 +173,15 @@ const { token } = storeToRefs(tokenStore);
 const balance = ref<number>(0);
 
 const transactionStore = useTransactionStore();
-const { currentMonth, passed, upcomming, currency, loading } = storeToRefs(transactionStore);
+const { currentMonth, passed, upcomming, currency, loading } =
+  storeToRefs(transactionStore);
 
 const transactionsLoading = ref(false);
 watch(month, async (to, from) => {
   transactionsLoading.value = true;
   await initialFetch();
   transactionsLoading.value = false;
-})
+});
 
 const sourcesStore = useSourcesStore();
 const { sources } = storeToRefs(sourcesStore);
@@ -166,13 +212,13 @@ const initialFetch = async () => {
   await Promise.all([
     transactionStore.fetchTransactions(),
     sourcesStore.fetchAllSources(),
-  ])
+  ]);
 };
 
 const transactions = computed(() => {
-  let tmp = currentMonth.value.filter(
-    (trans: Transaction) => new Date(trans.transactedAt) <= new Date()
-  );
+  let tmp = currentMonth.value
+    .filter((trans) => new Date(trans.transactedAt) <= new Date())
+    .filter((trans) => !trans.isImportant);
 
   if (isIncomes.value) {
     tmp = tmp.filter(isIncome);
@@ -211,7 +257,7 @@ const expense = computed(() =>
 
 const upcommingTransactions = computed(() => {
   const tmp = currentMonth.value.filter(
-    (trans: Transaction) => new Date(trans.transactedAt) > new Date()
+    (trans) => new Date(trans.transactedAt) > new Date()
   );
   if (filterCategoryId.value >= 0) {
     return tmp.filter(
@@ -220,6 +266,10 @@ const upcommingTransactions = computed(() => {
   }
 
   return tmp;
+});
+
+const importantTransactions = computed(() => {
+  return currentMonth.value.filter((t) => t.isImportant);
 });
 
 const upcommingTransactionsAmount = computed<number>(() => {
@@ -286,7 +336,7 @@ const mapTransactionDeclention = (count: number) => {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 8px;
 }
 
 #remaining-bills {

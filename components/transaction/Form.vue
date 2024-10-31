@@ -79,28 +79,25 @@
           </option>
         </ui-select>
 
-        <div class="row" style="padding-top: 3px; padding-bottom: 3px">
-          <p>{{ $t("recurring") }}</p>
-          <div class="slideOne" @click="isRecurring = !isRecurring">
-            <input
-              v-model="isRecurring"
-              type="checkbox"
-              id="slideOne"
-              name="check"
-              disabled
-            />
-            <label for="slideOne"></label>
-          </div>
-          <transition name="page" mode="out-in">
-            <ui-input
-              v-if="isRecurring"
-              :label="$t('recurring')"
-              v-model.number="transaction.recurring"
-              type="number"
-              class="w-20 text-center ml-auto"
-            />
-          </transition>
+        <div class="flex items-center gap-4 min-h-[3rem]">
+          <ui-toggle v-model="isRecurring"></ui-toggle>
+          <ui-input
+            v-if="isRecurring"
+            :label="$t('t_recurring_label')"
+            v-model.number="transaction.recurring"
+            type="number"
+            class="w-20 text-center ml-auto flex-1"
+          />
+          <p v-else>{{ $t("t_recurring_desc") }}</p>
+          <i class="i-ic-baseline-rotate-right ml-auto"></i>
         </div>
+
+        <div class="flex items-center gap-4 min-h-[3rem]w">
+          <ui-toggle v-model="transaction.isImportant"></ui-toggle>
+          <p>{{ $t("t_important") }}</p>
+          <i class="i-ic-round-warning text-amber ml-auto"></i>
+        </div>
+
         <ui-button
           @click="send"
           :loading="loading"
@@ -224,6 +221,7 @@ const transaction = ref<CreateUpdateTransaction>({
   sourceId: 1,
   targetId: 2,
   recurring: 0,
+  isImportant: false,
 });
 const date = ref<string>();
 const time = ref<string>();
@@ -279,6 +277,13 @@ const makeExpense = () => {
 };
 
 const isRecurring = ref(false);
+watch(isRecurring, (value) => {
+  if (value) {
+    transaction.value.recurring = 1
+  } else {
+    transaction.value.recurring = 0
+  }
+})
 
 const categoriesStore = useCategoriesStore();
 const { categories, categoryLoading } = storeToRefs(categoriesStore);
@@ -303,6 +308,7 @@ const send = () => {
     datetime.setHours(hour, minute);
   }
   transaction.value.transactedAt = datetime.toUTCString();
+
   emit("send", transaction.value);
 };
 
@@ -334,7 +340,7 @@ const createCategory = () => {
 
 <style lang="scss" scoped>
 .navigation-container {
-  height: 510px;
+  height: 580px;
   // overflow: scroll;
 }
 

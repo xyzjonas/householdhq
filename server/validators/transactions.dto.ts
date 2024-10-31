@@ -48,6 +48,10 @@ export class CreateTransactionDto {
   @Validate(ValidArray)
   @Transform(({value}) => value.split(','))
   public tags?: string[];
+
+  @IsBoolean()
+  @IsOptional()
+  public isImportant?: boolean
 }
 
 export class EditTransactionDto {
@@ -99,6 +103,10 @@ export class EditTransactionDto {
   @Validate(ValidArray)
   @Transform(({value}) => value.split(','))
   public tags?: string[];
+
+  @IsBoolean()
+  @IsOptional()
+  public isImportant?: boolean
 }
 
 export class TagTransactionDto {

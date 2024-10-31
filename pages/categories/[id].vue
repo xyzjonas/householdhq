@@ -8,10 +8,12 @@
           <spinner v-show="categoryLoading" class="item" />
         </Transition>
       </section>
+
       <div class="row card">
         <div class="item">{{ $t("name") }}</div>
         <form-editable-field :value="category.name" keyName="name" @send="patchCategory" class="item" />
       </div>
+
       <div class="row card">
         <div class="item">{{ $t("description") }}</div>
         <form-editable-field
@@ -21,10 +23,12 @@
           class="item"
         />
       </div>
+
       <div class="row card">
         <div class="item">{{ $t("icon") }}</div>
         <form-editable-field keyName="icon" :value="category.icon" @send="patchCategory" class="item" />
       </div>
+
       <div class="row card">
         <div class="item">{{ $t("color") }}</div>
         <div class="item">

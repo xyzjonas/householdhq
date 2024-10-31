@@ -19,6 +19,7 @@ export function transactionToUpdateTransaction(trans: Transaction): CreateUpdate
     categoryId: trans.category?.id,
     sourceId: trans.source.id,
     targetId: trans.target.id,
+    isImportant: trans.isImportant,
     tags: trans.tags.map((tag) => tag.name).join(","),
   };
 }

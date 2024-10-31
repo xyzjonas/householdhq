@@ -10,7 +10,7 @@ export interface Category {
   description?: string;
   icon?: string;
   color?: string;
-  parentId?: number;
+  // parentId?: number;
 }
 
 export interface CreateCategory {
@@ -78,7 +78,7 @@ export interface Transaction {
   cancelled: boolean;
   confirmed: boolean;
   recurring: number;
-
+  isImportant: boolean;
   category: Category;
 
   source: Source;
@@ -97,6 +97,7 @@ export interface CreateUpdateTransaction {
   cancelled?: boolean;
   confirmed?: boolean;
   recurring: number;
+  isImportant: boolean;
 
   categoryId?: number;
 

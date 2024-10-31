@@ -11,7 +11,7 @@
       <div></div>
     </div>
     <div v-else-if="name === 'spinner'" class="spinner"></div>
-    <div v-else="name === 'ellipsis'" class="lds-ellipsis">
+    <div v-else class="lds-ellipsis">
       <div></div>
       <div></div>
       <div></div>

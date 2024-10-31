@@ -82,6 +82,8 @@ model Transaction {
   cancelled       Boolean     @default(false)
   confirmed       Boolean     @default(true)
   recurring       Int         @default(0)  // recurring each n months
+
+  isImportant     Boolean @default(false)  // mark as an important reminder/tracker
   
   categoryId      Int?
   category        Category?   @relation(fields: [categoryId], references: [id])

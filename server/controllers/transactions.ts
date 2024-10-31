@@ -126,6 +126,7 @@ class Transactions {
         description: transactionData.description ?? "N/A",
         amount: transactionData.amount ?? 0,
         recurring: transactionData.recurring,
+        isImportant: transactionData.isImportant,
         tags: {
           connect: tags,
         },
@@ -193,6 +194,7 @@ class Transactions {
         currency: transactionData.currency,
         description: transactionData.description,
         amount: transactionData.amount,
+        isImportant: transactionData.isImportant,
         tags: tags,
         category: category,
         source: source,

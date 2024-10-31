@@ -1,6 +1,6 @@
 <template>
   <section class="title">
-    <p>{{ formatMMYYYY }}</p>
+    <p>{{ dateFormatted }}</p>
     <div class="ml-auto flex gap-3 items-center">
       <NuxtLink
         :to="`/?year=${previous.getFullYear()}&month=${
@@ -43,12 +43,7 @@ defineEmits(["reload"]);
 const date = computed<Date>(() => new Date(year.value, month.value - 1));
 
 const i18n = useI18n();
-const formatMMYYYY = computed(() => {
-  const monthName = date.value
-    .toLocaleDateString(i18n.locale.value, { month: "long" })
-    .toUpperCase();
-  return `${monthName} ${date.value.getFullYear()}`;
-});
+const dateFormatted = computed(() => formatMMYYYY(date.value, i18n.locale.value))
 </script>
 <style lang="scss" scoped>
 .title {

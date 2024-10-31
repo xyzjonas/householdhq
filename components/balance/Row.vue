@@ -20,7 +20,7 @@
         :max="max"
       />
     </div>
-    <div class="flex w-full justify-end items-center">
+    <div class="flex w-full justify-end items-center px-3">
       <ui-button link icon="i-ic-round-read-more" icon-size="1.5rem" @click="navigateTo('/sources')">{{ $t('s_more') }}</ui-button>
     </div>
   </div>

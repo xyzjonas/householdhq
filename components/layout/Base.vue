@@ -1,6 +1,6 @@
 <template>
   <main>
-    <header >
+    <header>
       <div class="page flex p-2 items-center">
         <span>Household HQ</span>
         <span class="ml-auto text-xs">{{ VERSION }}</span>
@@ -8,15 +8,23 @@
           <div class="ml-5 flex items-center">
             <ui-theme-toggle v-model="themeBool" />
             <ui-login-toggle />
+            <!-- <ui-button
+              :icon="drawer ? 'i-ic-baseline-close' : 'i-ic-outline-menu'"
+              squared
+              color="primary"
+              @click="drawer = !drawer"
+            /> -->
           </div>
         </ClientOnly>
       </div>
     </header>
 
+    <ui-drawer v-model="drawer" />
+
     <div class="page page-wrapper">
       <slot />
     </div>
-   
+
     <!-- <footer></footer> -->
     <div class="notification-drawer">
       <TransitionGroup name="slide">
@@ -29,22 +37,22 @@
 </template>
 
 <script lang="ts" setup>
-import { VERSION } from '@/_version';
+import { VERSION } from "@/_version";
 import { useNotifications } from "@/composables/useNotifications";
 
 const { notifications } = useNotifications();
 
-const { theme, isDark, toggle } = useTheme()
-const themeBool = ref(isDark.value)
+const { theme, isDark, toggle } = useTheme();
+const themeBool = ref(isDark.value);
 
-watch(themeBool, ((_) => toggle()))
+watch(themeBool, (_) => toggle());
 
+const drawer = ref(false);
 </script>
 
 <style scoped lang="css">
-
 .page {
-  width: min(100% - .7rem, 960px);
+  width: min(100% - 0.7rem, 960px);
   margin-inline: auto;
 }
 
@@ -68,7 +76,7 @@ footer {
   color: var(--text-200);
   font-style: italic;
   font-size: x-small;
-  padding: 2rem .5rem;
+  padding: 2rem 0.5rem;
   display: flex;
   align-items: center;
 }
@@ -90,7 +98,7 @@ main {
   position: fixed;
   display: flex;
   flex-direction: column;
-  gap: .5rem;
+  gap: 0.5rem;
   bottom: 0;
   width: 100%;
 }

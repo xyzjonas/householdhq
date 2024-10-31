@@ -1,6 +1,6 @@
 <template>
   <button :class="clazz" :disabled="disabled || loading">
-    <spinner name="spinner" v-if="loading" />
+    <spinner name="ellipsis" v-if="loading" />
     <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
   </button>

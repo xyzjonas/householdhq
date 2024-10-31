@@ -6,7 +6,11 @@
         <div class="flex flex-col">
           <span>{{ transaction.description }}</span>
           <span style="font-size: .7rem;" class="mb-2">{{ transaction.source.name }} ⤍ {{ transaction.target.name }}</span>
-          <ui-pin v-if="transaction.category?.name" :text="transaction.category.name" :color="transaction?.category?.color" size="small"/>
+          <div class="flex items-center gap-2">
+            <ui-pin v-if="transaction.category?.name" :text="transaction.category.name" :color="transaction?.category?.color" size="small"/>
+            <i v-if="transaction.recurring" class="i-ic-baseline-rotate-right"></i>
+            <i v-if="transaction.isImportant" class="i-ic-round-warning text-amber"></i>
+          </div>
         </div>
         <p class="ml-auto">
           <ui-price :amount="transaction.amount" :currency="transaction.currency" :color="isTransactionIncome ? 'var(--primary-100)' : undefined" />
