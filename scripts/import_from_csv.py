@@ -1,51 +1,159 @@
 import sys
+from datetime import datetime
+
 import requests
 import re
 import os
+from pathlib import Path
+
+import editor
 
 
-API_URL = os.getenv('API_URL') or (print('API_URL variable missing') or sys.exit(1))
+# API_URL = os.getenv('API_URL') or (print('API_URL variable missing') or sys.exit(1))
+API_URL = "https://home.bohunky.xyz/api"
 
 
-def main():
-    file = sys.argv[1]
+TAGS = dict()
 
+
+def parse_amount(amount_str) -> float:
+    cleaned = (
+        amount_str
+        .replace(",", ".")
+        .replace(" Kč", "")
+        .replace(" ", "")
+        .replace("\xa0", "")
+    )
+    if cleaned == "-":
+        return 0
+
+    return float(cleaned)
+
+
+def process_file(file_path: Path) -> list[dict]:
     entries = []
-    tags = set()
-    with open(file, "r") as csv_file:
-        for index, line in enumerate(csv_file.readlines()):
-            try:
-                print(f"line {index}: {line}")
-                if not line.strip():
+    with open(file_path, "r") as csv_file:
+
+        handle_incomes = False
+        handle_items = False
+        lines = csv_file.readlines()
+
+    matches = re.findall(r".*(\d{1,2}.\d{1,2}.\d{4}).*", "\n".join(lines))
+    if not matches:
+        raise ValueError("can't deduce sheet's year and month")
+    date_match = matches[-1]
+    _, month, year = date_match.split(".")
+    first_of_month = datetime(year=int(year), month=int(month), day=1)
+
+    for index, line in enumerate(lines):
+        try:
+            line = line.strip()
+            if "VÝPLATA" in line:
+                handle_incomes = True
+                continue
+
+            if handle_incomes:
+                if "jonynecek" in line or "marianecka" in line:
+                    total = parse_amount(line.split("\t")[-1])
+                    cat = f"Výplata {'J' if 'jonynecek' in line else 'M'}"
+                    entries.append({
+                        "transactedAt": first_of_month.isoformat(),
+                        "sourceId": 2,
+                        "targetId": 1,
+                        "description": cat,
+                        "amount": float(total),
+                        "currency": "CZK",
+                        "isImportant": False,
+                        "categoryId": TAGS[cat]
+                    })
+                if "marianecka" in line:
+                    handle_incomes = False
+
+                continue
+
+            if "date" in line and "item" in line:
+                handle_items = True
+                continue
+
+            if handle_items:
+                splits = line.split("\t")
+                if len(splits) <= 1:
                     continue
-                line = re.sub(r"(\d),(\d)", r"\1.\2", line)
-                _, date, desc, cat, amount, _, _, _ = line.split("\t")
-                if date:
-                    dd, mm, yyy = date.split(".")
-                    date = f"{yyy}-{mm}-{dd}"
-                tags.add(cat)
-                # match = re.findall(r"(\d+\.\d+)", amount)
-                # amount = float(match[0]) if match else 0
-                amount = float(amount)
+
+                date, desc, cat, amount, _ = splits
+                date_splits = date.split(".")
+                if len(date_splits) == 2:
+                    date = f"{date}.{year}"
+
+                dd, mm, yyy = date.split(".")
+                transaction_date = datetime(year=int(yyy), month=int(mm), day=int(dd))
+
+                amount = parse_amount(amount)
+                if amount == 0:
+                    continue
+
+                if not cat in TAGS:
+                    raise ValueError(f"Missing category: {cat}")
+
                 entries.append({
-                    "created": date,
+                    "transactedAt": transaction_date.isoformat(),
                     "sourceId": 1,
+                    "targetId": 2,
                     "description": desc,
                     "amount": amount,
                     "currency": "CZK",
-                    "tags": cat
+                    "isImportant": False,
+                    "categoryId": TAGS[cat]
                 })
-            except Exception as e:
-                print(f"ERROR on line {index}")
-                raise
+        except Exception:
+            print(f"ERROR: {file_path}, on line {index}")
+            raise
 
-    print(os.path.join(API_URL, "tags"))
-    # for tag in tags:
-    #     print(f'putting trans: {tag}')
-    #     requests.put(os.path.join(API_URL, "tags"), json={"name": tag})
+    return entries
 
+
+def process_files(dir_path: Path) -> list[dict]:
+    if not dir_path.is_dir():
+        raise ValueError(f"not a directory: {dir_path}")
+
+    entries = []
+    for file in dir_path.glob("*"):
+        if file.is_file():
+            entries.extend(process_file(file))
+
+    print(f"Found {len(entries)} items to be imported.")
+
+    return entries
+
+
+def load_categories():
+    categories_url = os.path.join(API_URL, "categories")
+    print(categories_url)
+    result = requests.get(categories_url)
+    categories = result.json()["data"]
+    for cat in categories:
+        TAGS[cat["name"]] = cat["id"]
+
+
+def upload(entries: list[dict]):
     for entry in entries:
         print(f'putting trans: {entry}')
+        r = requests.put(os.path.join(API_URL, "transactions"), json=entry)
+        r.raise_for_status()
+
+
+def main():
+    load_categories()
+    items = process_files(Path("/home/jonas/Downloads/home"))
+
+    text = "\n".join([
+        f"{item['transactedAt']} :: {item['categoryId']} :: {item['amount']} :: {item['description']}"
+        for item in items
+    ])
+    # editor.editor(text)
+
+    for index, entry in enumerate(items):
+        print(f'{index + 1}/{len(items)}: saving {entry['description']}')
         r = requests.put(os.path.join(API_URL, "transactions"), json=entry)
         r.raise_for_status()
 
