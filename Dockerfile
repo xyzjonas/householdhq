@@ -1,4 +1,8 @@
-FROM node:20-alpine AS build-stage
+FROM node:20-alpine AS base
+RUN apk update && apk upgrade
+RUN apk add --no-cache openssl
+
+FROM base AS build-stage
 
 WORKDIR /build
 
@@ -9,11 +13,8 @@ COPY . .
 RUN npm run build
 
 
-FROM node:20-alpine
+FROM base
 ENV NODE_ENV=production
-
-RUN apk update && apk upgrade
-RUN apk add --no-cache openssl
 
 WORKDIR /app
 
