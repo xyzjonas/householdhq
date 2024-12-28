@@ -79,7 +79,7 @@
           </option>
         </ui-select>
 
-        <div class="flex items-center gap-4 min-h-[3rem]">
+        <div class="flex items-center gap-4">
           <ui-toggle v-model="isRecurring"></ui-toggle>
           <ui-input
             v-if="isRecurring"
@@ -92,7 +92,13 @@
           <i class="i-ic-baseline-rotate-right ml-auto"></i>
         </div>
 
-        <div class="flex items-center gap-4 min-h-[3rem]w">
+        <div class="flex items-center gap-4">
+          <ui-toggle v-model="transaction.isHidden"></ui-toggle>
+          <p>{{ $t("t_hidden") }}</p>
+          <i class="i-ic-baseline-disabled-visible ml-auto"></i>
+        </div>
+
+        <div class="flex items-center gap-4">
           <ui-toggle v-model="transaction.isImportant"></ui-toggle>
           <p>{{ $t("t_important") }}</p>
           <i class="i-ic-round-warning text-amber ml-auto"></i>
@@ -146,27 +152,40 @@
         @confirm="stage = stage + 1"
       />
 
-      <div v-else class="income-expense">
-        <ui-button
-          color="success"
-          icon="fa-solid fa-arrow-trend-up"
-          @click="makeIncome"
-          width="8rem"
-          height="8rem"
-          rounded
-        >
-          {{ $t("t_add_in") }}
-        </ui-button>
-        <ui-button
-          color="danger"
-          icon="fa-solid fa-arrow-trend-down"
-          rounded
-          width="8rem"
-          height="8rem"
-          @click="makeExpense"
-        >
-          {{ $t("t_add_out") }}
-        </ui-button>
+      <div v-else class="income-expense flex flex-col gap-10 justify-center">
+        <div class="flex items-center justify-center gap-10">
+          <ui-button
+            color="success"
+            icon="fa-solid fa-arrow-trend-up"
+            @click="makeIncome"
+            width="8rem"
+            height="8rem"
+            rounded
+          >
+            {{ $t("t_add_in") }}
+          </ui-button>
+          <ui-button
+            color="danger"
+            icon="fa-solid fa-arrow-trend-down"
+            rounded
+            width="8rem"
+            height="8rem"
+            @click="makeExpense"
+          >
+            {{ $t("t_add_out") }}
+          </ui-button>
+        </div>
+        <div class="flex items-center justify-center gap-10">
+          <ui-button
+            icon="fa-solid fa-arrow-trend-up"
+            @click="makeHidden"
+            width="6rem"
+            height="6rem"
+            rounded
+          >
+            {{ $t("t_add_hidden") }}
+          </ui-button>
+        </div>
       </div>
     </transition>
     <div class="navigation">
@@ -222,6 +241,7 @@ const transaction = ref<CreateUpdateTransaction>({
   targetId: 2,
   recurring: 0,
   isImportant: false,
+  isHidden: false,
 });
 const date = ref<string>();
 const time = ref<string>();
@@ -276,14 +296,20 @@ const makeExpense = () => {
   stage.value++;
 };
 
+const makeHidden = () => {
+  transaction.value.isHidden = true;
+  stage.value++;
+};
+
 const isRecurring = ref(false);
 watch(isRecurring, (value) => {
-  if (value) {
-    transaction.value.recurring = 1
+  if (value && transaction.value.recurring <= 0) {
+    transaction.value.recurring = 1;
+  } else if (transaction.value.recurring > 0) {
   } else {
-    transaction.value.recurring = 0
+    transaction.value.recurring = 0;
   }
-})
+});
 
 const categoriesStore = useCategoriesStore();
 const { categories, categoryLoading } = storeToRefs(categoriesStore);
@@ -334,7 +360,8 @@ const newCategoryName = ref();
 const createCategory = () => {
   categoriesStore
     .createCategory({ name: newCategoryName.value })
-    .then(() => (newCategoryName.value = undefined));
+    .then(() => (newCategoryName.value = undefined))
+    .then(() => (showNewCategory.value = false));
 };
 </script>
 
@@ -414,12 +441,6 @@ const createCategory = () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.income-expense {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
 }
 
 #close-t-form {

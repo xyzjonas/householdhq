@@ -14,12 +14,12 @@ export const useSourcesStore = defineStore("source", () => {
 
   const sources = computed<Source[]>(() => {
     return allSources.value.map((src) => {
-      const in_ = currentMonth.value.filter(
-        (trans) => trans.target.id === src.id
-      );
-      const out_ = currentMonth.value.filter(
-        (trans) => trans.source.id === src.id
-      );
+      const in_ = currentMonth.value
+        .filter((trans) => trans.confirmed)
+        .filter((trans) => trans.target.id === src.id);
+      const out_ = currentMonth.value
+        .filter((trans) => trans.confirmed)
+        .filter((trans) => trans.source.id === src.id);
       return {
         ...src,
         transactionsIn: in_,
@@ -91,7 +91,8 @@ export const useSourcesStore = defineStore("source", () => {
     sourceLoading.value = true;
     const url = "/api/sources";
     try {
-      const newSource = await tokenStore.put(url, sourceData);
+      const response = await tokenStore.put(url, sourceData);
+      const newSource = response.data;
       allSources.value.push(newSource);
       return newSource;
     } finally {

@@ -34,9 +34,8 @@ export const useTransactionStore = defineStore("transaction", () => {
 
     try {
       const response = await tokenStore.get(url);
-      currentMonth.value = (response.data as Transaction[]).filter((trans) => {
-        return trans.target.isDisponible || trans.source.isDisponible;
-      });
+      currentMonth.value = response.data
+      // currentMonth.value = (response.data as Transaction[]).filter((trans) => !trans.isHidden)
     } finally {
       loading.value = false;
     }

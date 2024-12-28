@@ -79,6 +79,7 @@ export interface Transaction {
   confirmed: boolean;
   recurring: number;
   isImportant: boolean;
+  isHidden: boolean;
   category: Category;
 
   source: Source;
@@ -98,6 +99,7 @@ export interface CreateUpdateTransaction {
   confirmed?: boolean;
   recurring: number;
   isImportant: boolean;
+  isHidden: boolean;
 
   categoryId?: number;
 

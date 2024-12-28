@@ -134,8 +134,7 @@
               link
               v-if="
                 !showMore &&
-                currentSource &&
-                currentSource.states.length > MAX_ITEMS
+                currentSource?.states?.length > MAX_ITEMS
                 "
               class="mt-5"
               icon="i-ic-baseline-expand-more"
@@ -189,8 +188,8 @@ const deleteSource = async () => {
 const MAX_ITEMS = 5;
 const showMore = ref(false);
 const sourceStates = computed(() => {
-  if (!currentSource.value) {
-    return;
+  if (!currentSource.value || !currentSource.value.states) {
+    return [];
   }
 
   const states = currentSource.value.states.toSorted(

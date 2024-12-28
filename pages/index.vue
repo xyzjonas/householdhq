@@ -200,7 +200,7 @@ const filterCategoryId = ref<number>(-1);
 const notifications = useNotifications();
 
 const carouselTabindex = ref(0);
-const isIncomes = computed(() => carouselTabindex.value === 1);
+const incomesDisplayed = computed(() => carouselTabindex.value === 1);
 
 onMounted(async () => {
   transactionStore.fetchTransactions();
@@ -218,9 +218,10 @@ const initialFetch = async () => {
 const transactions = computed(() => {
   let tmp = currentMonth.value
     .filter((trans) => new Date(trans.transactedAt) <= new Date())
-    .filter((trans) => !trans.isImportant);
+    .filter((trans) => !(trans.isImportant && !trans.confirmed))
+    .filter(trans => !trans.isHidden)
 
-  if (isIncomes.value) {
+  if (incomesDisplayed.value) {
     tmp = tmp.filter(isIncome);
   }
 
@@ -269,7 +270,7 @@ const upcommingTransactions = computed(() => {
 });
 
 const importantTransactions = computed(() => {
-  return currentMonth.value.filter((t) => t.isImportant);
+  return currentMonth.value.filter((t) => t.isImportant && !t.confirmed);
 });
 
 const upcommingTransactionsAmount = computed<number>(() => {

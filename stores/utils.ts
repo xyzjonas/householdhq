@@ -20,6 +20,7 @@ export function transactionToUpdateTransaction(trans: Transaction): CreateUpdate
     sourceId: trans.source.id,
     targetId: trans.target.id,
     isImportant: trans.isImportant,
+    isHidden: trans.isHidden,
     tags: trans.tags.map((tag) => tag.name).join(","),
   };
 }

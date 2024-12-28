@@ -1,14 +1,14 @@
 <template>
     <div class="row-simple">
-        <div v-if="editting" class="input row-simple">
-            <textarea
+        <div v-if="editting" class="flex">
+            <ui-input
                 v-model="valueCopy"
                 cols="20"
                 :rows="rowCount"
                 :placeholder="$t('undefined')"
-            ></textarea>
-            <ui-button @click="send" color="success" height="2rem" width="2rem">{{ $t('ok') }}</ui-button>
-            <ui-button @click="editting = false" color="secondary"  height="2rem" width="3rem">{{ $t('cancel') }}</ui-button>
+            />
+            <ui-button @click="send" color="success">{{ $t('ok') }}</ui-button>
+            <ui-button @click="editting = false" color="secondary">{{ $t('cancel') }}</ui-button>
         </div>
         <p v-else @click="editting = true" style="text-align: end;">{{ value || $t('undefined')}}</p>
     </div>

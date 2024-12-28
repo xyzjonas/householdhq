@@ -84,6 +84,7 @@ model Transaction {
   recurring       Int         @default(0)  // recurring each n months
 
   isImportant     Boolean @default(false)  // mark as an important reminder/tracker
+  isHidden        Boolean @default(false)  // hide (e.g. internal) transactions
   
   categoryId      Int?
   category        Category?   @relation(fields: [categoryId], references: [id])

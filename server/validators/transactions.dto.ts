@@ -52,6 +52,10 @@ export class CreateTransactionDto {
   @IsBoolean()
   @IsOptional()
   public isImportant?: boolean
+
+  @IsBoolean()
+  @IsOptional()
+  public isHidden?: boolean
 }
 
 export class EditTransactionDto {
@@ -107,6 +111,10 @@ export class EditTransactionDto {
   @IsBoolean()
   @IsOptional()
   public isImportant?: boolean
+
+  @IsBoolean()
+  @IsOptional()
+  public isHidden?: boolean
 }
 
 export class TagTransactionDto {

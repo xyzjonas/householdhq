@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-if="!error && !pending && category" class="flex-col">
+    <div v-if="!error && category" class="flex-col">
       <section class="row title">
         <Icon :iconName="category.icon" class="mr" />
         <h1 class="item">{{ category.name }}</h1>
@@ -9,31 +9,32 @@
         </Transition>
       </section>
 
-      <div class="row card">
-        <div class="item">{{ $t("name") }}</div>
-        <form-editable-field :value="category.name" keyName="name" @send="patchCategory" class="item" />
-      </div>
-
-      <div class="row card">
-        <div class="item">{{ $t("description") }}</div>
+      <div class="card flex gap-5 justify-between items-center">
+        <div class="text-gray-5 capitalize">{{ $t("name") }}</div>
         <form-editable-field
-          keyName="description"
-          :value="category.description"
+          :value="category.name"
+          keyName="name"
           @send="patchCategory"
           class="item"
         />
       </div>
 
-      <div class="row card">
-        <div class="item">{{ $t("icon") }}</div>
-        <form-editable-field keyName="icon" :value="category.icon" @send="patchCategory" class="item" />
+      <div class="card flex gap-5 justify-between items-center">
+        <div class="text-gray-5 capitalize">{{ $t("description") }}</div>
+        <form-editable-field
+          keyName="description"
+          :value="category.description"
+          @send="patchCategory"
+        />
       </div>
 
-      <div class="row card">
-        <div class="item">{{ $t("color") }}</div>
-        <div class="item">
-          <form-editable-color keyName="color" :value="category.color || '#ffffffff'" @send="patchCategory" />
-        </div>
+      <div class="card flex gap-5 justify-between items-center">
+        <div class="text-gray-5 capitalize">{{ $t("color") }}</div>
+        <form-editable-color
+          keyName="color"
+          :value="category.color || '#ffffffff'"
+          @send="patchCategory"
+        />
       </div>
     </div>
   </div>
@@ -44,9 +45,11 @@ import type { Category } from "~/types";
 
 const route = useRoute();
 const categoryId = parseInt(route.params.id as string);
-const { data, pending, error, refresh } = await useFetch<{ data: Category }>(`/api/categories/${categoryId}`)
+const { data, error, refresh } = await useFetch<{ data: Category }>(
+  `/api/categories/${categoryId}`
+);
 
-const category = computed(() => data.value?.data ?? undefined)
+const category = computed(() => data.value?.data ?? undefined);
 
 const categoriesStore = useCategoriesStore();
 const { categoryLoading } = storeToRefs(categoriesStore);
@@ -58,7 +61,7 @@ const patchCategory = async (tagData: any) => {
 </script>
 <style lang="scss" scoped>
 .flex-col {
-  gap: .3rem !important;
+  gap: 0.3rem !important;
 }
 
 .row {

@@ -1,5 +1,12 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import type { Category, CreateCategory, Summary, Tag, CategoryWithSum, Transaction } from "~/types";
+import type {
+  Category,
+  CreateCategory,
+  Summary,
+  Tag,
+  CategoryWithSum,
+  Transaction,
+} from "~/types";
 import { useTokenStore } from "./tokenStore";
 import { useTransactionStore } from "./transactions";
 
@@ -72,30 +79,35 @@ export const useCategoriesStore = defineStore("category", () => {
 
   const incomeCategories = computed<CategoryWithSum[]>(() => {
     return categories.value
-    .map((cat) => {
-      const transactions: Transaction[] = currentMonth.value
-      .filter((transaction) => transaction.category?.id === cat.id)
-      .filter(isIncome)
+      .map((cat) => {
+        const transactions: Transaction[] = currentMonth.value
+          .filter((transaction) => transaction.category?.id === cat.id)
+          .filter(isIncome)
+          .filter((trans) => trans.confirmed)
+          .filter((trans) => !trans.isHidden);
 
-      if (transactions.length === 0) {
-        return null;
-      }
-      
-      const mapped: CategoryWithSum = {
-        ...cat,
-        transactions: transactions,
-        sum: transactions.map((tr) => tr.amount).reduce((a, b) => a + b, 0),
-      };
-      return mapped;
-    })
-    .filter(Boolean) as CategoryWithSum[]
+        if (transactions.length === 0) {
+          return null;
+        }
+
+        const mapped: CategoryWithSum = {
+          ...cat,
+          transactions: transactions,
+          sum: transactions.map((tr) => tr.amount).reduce((a, b) => a + b, 0),
+        };
+        return mapped;
+      })
+      .filter(Boolean) as CategoryWithSum[];
   });
 
   const expenseCategories = computed<CategoryWithSum[]>(() => {
     return categories.value.map((cat) => {
       const transactions: Transaction[] = currentMonth.value
         .filter((transaction) => transaction.category?.id === cat.id)
-        .filter(isExpense);
+        .filter(isExpense)
+        .filter((trans) => trans.confirmed)
+        .filter((trans) => !trans.isHidden);
+
       const mapped: CategoryWithSum = {
         ...cat,
         transactions: transactions,
@@ -111,7 +123,9 @@ export const useCategoriesStore = defineStore("category", () => {
     try {
       const response = await tokenStore.get(url);
       console.info(response);
-      categories.value = categories.value.filter((cat) => cat.id !== categoryId);
+      categories.value = categories.value.filter(
+        (cat) => cat.id !== categoryId
+      );
       categories.value.push(response.data);
     } finally {
       categoryLoading.value = false;
@@ -125,7 +139,9 @@ export const useCategoriesStore = defineStore("category", () => {
     categoryData.id = categoryId;
     try {
       const newCategory = await tokenStore.patch(url, categoryData);
-      categories.value = categories.value.filter((cat) => cat.id !== categoryId);
+      categories.value = categories.value.filter(
+        (cat) => cat.id !== categoryId
+      );
       categories.value.push(newCategory.data);
     } finally {
       categoryLoading.value = false;

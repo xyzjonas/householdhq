@@ -10,6 +10,7 @@
             <ui-pin v-if="transaction.category?.name" :text="transaction.category.name" :color="transaction?.category?.color" size="small"/>
             <i v-if="transaction.recurring" class="i-ic-baseline-rotate-right"></i>
             <i v-if="transaction.isImportant" class="i-ic-round-warning text-amber"></i>
+            <i v-if="transaction.isHidden" class="i-ic-baseline-disabled-visible"></i>
           </div>
         </div>
         <p class="ml-auto">
