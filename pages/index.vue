@@ -143,7 +143,7 @@
         />
       </section>
     </div>
-    <div id="floating" :class="{ active: addExpense }">
+    <div id="floating" :class="`${ addExpense ? 'active':'' }`">
       <ui-button
         :color="addExpense ? 'secondary' : 'primary'"
         icon="i-ic-baseline-plus"
@@ -338,6 +338,7 @@ const mapTransactionDeclention = (count: number) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-bottom: 3rem;
 }
 
 #remaining-bills {
@@ -380,7 +381,7 @@ h3 {
   border-radius: 50%;
   transition: transform 0.1s ease-in-out;
   z-index: 900;
-  box-shadow: 1px 1px 5px var(--shadow-100);
+  box-shadow: 2px 2px 5px var(--shadow-100);
 
   &.active {
     transform: rotate(45deg);

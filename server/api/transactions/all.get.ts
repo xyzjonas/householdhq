@@ -1,15 +1,18 @@
 import transactions from "../../controllers/transactions";
-import { TransactionMonthDto } from "../../validators/transactions.dto";
+import { TransactionFiltersDto } from "../../validators/transactions.dto";
 import doValidate from "../../validators/validator";
 
 
 export default defineEventHandler(async (event) => {
-    const start = new Date();
+    const query = getQuery(event);
+    console.table(query)
+    let filters = {};
+    if (query && Object.keys(query).length <= 2) {
+        filters = await doValidate(TransactionFiltersDto, query);
+    }
 
-    const data = await transactions.findAll()
-    const end = new Date();
+    const data = await transactions.findAll(filters)
 
-    console.info(`Request took ${ (end.getTime() - start.getTime()) / 1000 }s`)
     return {
         data: data,
         count: data.length

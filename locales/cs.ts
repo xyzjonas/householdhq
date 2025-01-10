@@ -8,7 +8,7 @@ const cs = {
   description: "popis",
   color: "barva",
   icon: "ikona",
-  undefined: "nevyplňeno",
+  undefined: "-",
   cancel: "zrušit",
   close: "zavřít",
   back: "zpět",

@@ -1,35 +1,63 @@
-import { Transform } from 'class-transformer';
-import { IsInt, IsNumber, IsOptional, IsString, IsDate, Validate, IsBoolean } from 'class-validator';
-import { ValidArray, ValidDate } from './validator';
+import { Transform } from "class-transformer";
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsDate,
+  Validate,
+  IsBoolean,
+} from "class-validator";
+import { ValidArray, ValidDate } from "./validator";
 
+
+function parseBool(val: string) {
+  if (val === "true" || val === "1" || val === "True") {
+    return true
+  }
+  return false
+}
 
 export class TransactionMonthDto {
   @IsInt()
   @IsOptional()
-  @Transform(({value}) => parseInt(value))
-  public month?: number
+  @Transform(({ value }) => parseInt(value))
+  public month?: number;
+  
   @IsInt()
   @IsOptional()
-  @Transform(({value}) => parseInt(value))
-  public year?: number
+  @Transform(({ value }) => parseInt(value))
+  public year?: number;
+}
+
+export class TransactionFiltersDto {
+  @IsInt()
+  @IsOptional()
+  @Transform(({ value }) => parseInt(value))
+  public categoryId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => parseBool(value))
+  public important?: boolean;
 }
 
 export class CreateTransactionDto {
   @IsOptional()
   @Validate(ValidDate)
-  @Transform(({value}) => new Date(value))
+  @Transform(({ value }) => new Date(value))
   public transactedAt?: Date;
-  
+
   @IsString()
   public description?: string;
-  
+
   @IsNumber()
   public amount?: number;
 
   @IsOptional()
   @IsNumber()
   public recurring?: number;
-  
+
   @IsOptional()
   @IsNumber()
   public categoryId?: number;
@@ -39,23 +67,23 @@ export class CreateTransactionDto {
 
   @IsNumber()
   public targetId?: number;
-  
+
   @IsString()
   @IsOptional()
   public currency?: string;
 
   @IsOptional()
   @Validate(ValidArray)
-  @Transform(({value}) => value.split(','))
+  @Transform(({ value }) => value.split(","))
   public tags?: string[];
 
   @IsBoolean()
   @IsOptional()
-  public isImportant?: boolean
+  public isImportant?: boolean;
 
   @IsBoolean()
   @IsOptional()
-  public isHidden?: boolean
+  public isHidden?: boolean;
 }
 
 export class EditTransactionDto {
@@ -64,9 +92,9 @@ export class EditTransactionDto {
 
   @IsOptional()
   @Validate(ValidDate)
-  @Transform(({value}) => new Date(value))
+  @Transform(({ value }) => new Date(value))
   public transactedAt?: Date;
-  
+
   @IsOptional()
   @IsBoolean()
   public cancelled?: boolean;
@@ -78,7 +106,7 @@ export class EditTransactionDto {
   @IsOptional()
   @IsString()
   public description?: string;
-  
+
   @IsOptional()
   @IsNumber()
   public amount?: number;
@@ -86,7 +114,7 @@ export class EditTransactionDto {
   @IsOptional()
   @IsNumber()
   public recurring?: number;
-  
+
   @IsOptional()
   @IsNumber()
   public categoryId?: number;
@@ -98,23 +126,23 @@ export class EditTransactionDto {
   @IsOptional()
   @IsNumber()
   public targetId?: number;
-  
+
   @IsString()
   @IsOptional()
   public currency?: string;
 
   @IsOptional()
   @Validate(ValidArray)
-  @Transform(({value}) => value.split(','))
+  @Transform(({ value }) => value.split(","))
   public tags?: string[];
 
   @IsBoolean()
   @IsOptional()
-  public isImportant?: boolean
+  public isImportant?: boolean;
 
   @IsBoolean()
   @IsOptional()
-  public isHidden?: boolean
+  public isHidden?: boolean;
 }
 
 export class TagTransactionDto {
@@ -122,7 +150,6 @@ export class TagTransactionDto {
   public transactionId?: number;
 
   @Validate(ValidArray)
-  @Transform(({value}) => value.split(','))
+  @Transform(({ value }) => value.split(","))
   public tags?: string[];
 }
-  

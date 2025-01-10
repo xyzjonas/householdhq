@@ -5,7 +5,7 @@
             <i class="i-ic-baseline-chevron-right"></i>
             <NuxtLink
                 :to="`/${pathSegments.slice(0, index + 1).join('/')}`"
-                class="segment">{{ segment }}
+                class="segment capitalize">{{ segment }}
             </NuxtLink>
         </span>
     </div>
@@ -28,6 +28,7 @@ const pathSegments = computed(() => {
 <style scoped lang="scss">
 #home {
     font-size: larger;
+    transform: translateY(-1px);
 }
 
 .crumbs {
@@ -62,8 +63,8 @@ a {
 }
 
 .segment {
-    margin-left: 0.3em;
-    margin-right: 0.3em;
+    margin-inline: 8px;
     transition: 0.2s color;
 }
+
 </style>

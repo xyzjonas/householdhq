@@ -5,6 +5,7 @@ import {
   TagTransactionDto as TagDto,
   TransactionMonthDto as MonthDto,
   EditTransactionDto as EditDto,
+  TransactionFiltersDto,
 } from "../validators/transactions.dto";
 import { IdDto } from "../validators/common.dto";
 
@@ -28,9 +29,24 @@ function ignoreNul<T>(item: T | null | undefined): T {
 class Transactions {
   private transactions = new PrismaClient().transaction;
 
-  public async findAll(): Promise<TransactionWithIncludes[]> {
+  public async findAll(filters?: TransactionFiltersDto): Promise<TransactionWithIncludes[]> {
+
+    const where: any = {}
+    if (filters?.important !== undefined) {
+      where.isImportant = filters.important
+    }
+
+    console.table(filters)
+    if (filters?.categoryId) {
+      where.categoryId = filters.categoryId
+    }
+
+    console.table(where)
     const allTrans: Transaction[] = await this.transactions.findMany({
       include: DEFAULT_INCLUDE,
+      where: {
+        ...where
+      }
     });
     allTrans.sort(
       (a, b) =>

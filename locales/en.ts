@@ -8,7 +8,7 @@ const en = {
   description: "description",
   color: "color",
   icon: "icon",
-  undefined: "undefined",
+  undefined: "-",
   cancel: "cancel",
   close: "close",
   back: "back",

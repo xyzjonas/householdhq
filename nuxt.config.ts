@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
   },
+
   nitro: {
     esbuild: {
       options: {
@@ -14,6 +15,7 @@ export default defineNuxtConfig({
       },
     },
   },
+
   app: {
     pageTransition: { name: "page", mode: "out-in" },
     head: {
@@ -25,19 +27,23 @@ export default defineNuxtConfig({
       ],
     },
   },
+
   css: ["@/assets/css/main.scss"],
+
   modules: [
     "@nuxtjs/i18n",
     "@pinia/nuxt",
     "@vite-pwa/nuxt",
     '@unocss/nuxt',
   ],
+
   i18n: {
     locales: ["en", "fr", "es", "cs"],
     defaultLocale: "en",
     vueI18n: "./i18n.config.ts",
     strategy: "no_prefix",
   },
+
   pwa: {
     registerType: "autoUpdate",
     manifest: {
@@ -68,6 +74,7 @@ export default defineNuxtConfig({
       enabled: false,
     },
   },
+
   vite: {
     css: {
       preprocessorOptions: {
@@ -77,8 +84,11 @@ export default defineNuxtConfig({
       },
     },
   },
+
   alias: {
     "@server": "../server",
     "@/stores": "../stores",
-  }
+  },
+
+  compatibilityDate: "2025-01-10"
 });

@@ -1,18 +1,20 @@
 <template>
-  <h1 class="title container mb-5">{{ transactions.length }} Transactions</h1>
-  <div class="flex flex-col gap-10">
-    <div v-for="(trans, key) in transactionsByMonth">
-      <div class="border-b-solid border-1 border-b-[#777]">
-        {{ formatDateKey(key as string) }}
+  <main>
+    <h1 class="title container mb-5">{{ transactions.length }} Transactions</h1>
+    <div class="flex flex-col gap-10">
+      <div v-for="(trans, key) in transactionsByMonth">
+        <div class="border-b-solid border-1 border-b-[#777]">
+          {{ formatDateKey(key as string) }}
+        </div>
+        <TransactionRow
+          v-for="transaction in trans"
+          :key="transaction.id"
+          :transaction="transaction"
+          class="upcomming"
+        />
       </div>
-      <TransactionRow
-        v-for="transaction in trans"
-        :key="transaction.id"
-        :transaction="transaction"
-        class="upcomming"
-      />
     </div>
-  </div>
+  </main>
 </template>
 <script setup lang="ts">
 import type { Transaction } from "~/types";
@@ -22,7 +24,7 @@ type Response = {
   count: number;
 };
 
-const { data } = await useFetch<Response>("/api/transactions/all");
+const { data } = await useFetch<Response>("/api/transactions/all?important=true");
 
 const transactions = computed(() => {
   if (!data.value) {
