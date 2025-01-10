@@ -1,7 +1,7 @@
 <template>
   <main>
     <header>
-      <div class="page flex p-2 items-center">
+      <div class="page flex p-2 items-center h-[3rem]">
         <span>Household HQ</span>
         <span class="ml-auto text-xs">{{ VERSION }}</span>
         <ClientOnly>

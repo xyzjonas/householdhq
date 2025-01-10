@@ -28,9 +28,23 @@ useHead({
     },
   ],
 });
-
 </script>
 <style>
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-100);
+  min-height: 3rem;
+}
+
 .page-enter-active,
 .page-leave-active {
   transition: all 0.3s;
@@ -86,6 +100,6 @@ body {
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 </style>
