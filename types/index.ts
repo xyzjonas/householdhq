@@ -52,6 +52,7 @@ export interface SourceApi {
   isPortfolio: boolean;
   states: SourceState[];
   color: string;
+  position: number;
 }
 
 export interface Source extends SourceApi {

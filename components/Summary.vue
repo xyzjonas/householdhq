@@ -12,16 +12,13 @@
         </div>
       </div>
   </div>
-  <spinner name="roller" class="center" v-else />
+  <spinner name="roller" class="center h-full" v-else />
 </template>
 <script lang="ts" setup>
 import { Bar } from 'vue-chartjs'
 import { useCategoriesStore } from "../stores/categories";
 import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "../types";
-import { useWindowSize } from '@vueuse/core';
-
-const { width, height } = useWindowSize()
 
 const { t } = useI18n()
 
@@ -33,11 +30,10 @@ const props = defineProps<{
 }>();
 
 const dataSelection = ref(6)
-const cropDataset = ref(false)
 
 const loaded = ref(false);
 onMounted(() => {
-  categoriesStore.fetchSummary(props.category.id).finally(() => loaded.value = true);
+  categoriesStore.fetchSummary(props.category.id).finally(() => setTimeout(() => loaded.value = true, 200));
 });
 
 const data = computed(() => {
@@ -74,15 +70,12 @@ const chartData = computed<any>(() => {
             {
                 label: props.category.name,
                 borderColor: props.category.color,
-                // borderWidth: 2,
-                // borderRadius: 5,
                 backgroundColor: `${props.category.color}99`,
                 data: data.value.map(s => s.amount),
                 cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 pointStyle: false,
-                borderRadius: 5,
-                barThickness: width.value < 992 ? 6 : 20,
+                borderRadius: 4,
             }
         ]
     }

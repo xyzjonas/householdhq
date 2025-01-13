@@ -45,6 +45,11 @@ export class EditSourceDto {
     @IsOptional()
     @IsString()
     public color?: string;
+
+    @IsInt()
+    @IsOptional()
+    @Transform(({value}) => parseInt(value))
+    public position?: number
   }
 
 export class UpdateSourceStateDto {

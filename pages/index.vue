@@ -25,7 +25,7 @@
       <BalanceRow
         v-if="isCurrentMonth"
         v-model="balance"
-        :sources="sources.filter((src) => src.isPortfolio)"
+        :sources="sources.filter((src) => src.isPortfolio).sort((a, b) => a.position - b.position)"
         :upcomming="upcommingTransactionsAmount"
         :forecast="upcommingTransactionsAmount"
         :spent="expense"

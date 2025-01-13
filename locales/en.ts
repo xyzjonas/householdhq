@@ -72,6 +72,8 @@ const en = {
   s_states: "entries",
   s_state_autocomplete: "autofill",
   s_more: "All accounts",
+  s_position: "position",
+  s_position_desc: "position in the summary listing",
   sign_in_keep_logged_in: "Keep logged in",
   sign_in: "Sign In",
   login_failed: "Invalid username or password",

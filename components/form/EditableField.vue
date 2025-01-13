@@ -6,6 +6,8 @@
                 cols="20"
                 :rows="rowCount"
                 :placeholder="$t('undefined')"
+                :type="type ?? 'text'"
+                :inputmode="inputmode"
             />
             <ui-button @click="send" color="success">{{ $t('ok') }}</ui-button>
             <ui-button @click="editting = false" color="secondary">{{ $t('cancel') }}</ui-button>
@@ -13,41 +15,37 @@
         <p v-else @click="editting = true" style="text-align: end;">{{ value || $t('undefined')}}</p>
     </div>
 </template>
-<script>
-export default {
+<script lang="ts" setup>
+import type { HTMLAttributes } from 'vue';
 
-    props: ['value', 'keyName'],
+const props = defineProps<{
+    value: any,
+    keyName: string,
+    type?: "text" | "number" | "email"
+    inputmode?: HTMLAttributes["inputmode"]
+}>()
 
-    data() {
-        return {
-            editting: false,
-            valueCopy: undefined,
-            columns: 15,
-        }
-    },
+const editting = ref(false)
+const columns = ref(15)
 
-    computed: {
-        rowCount() {
-            if (this.valueCopy) {
-                return Math.round(this.valueCopy.length / this.columns) || 1;
-            }
-            return 1;
-        }
-    },
+const valueCopy = ref<string>()
+valueCopy.value = props.value;
 
-    created() {
-        this.valueCopy = this.value;
-    },
+const rowCount = computed(() => {
+    if (valueCopy.value) {
+        return Math.round(valueCopy.value.length / columns.value) || 1;
+    }
+    return 1;
+})
 
-    methods: {
-        send() {
-            const data = {};
-            data[this.keyName] = this.valueCopy;
-            this.$emit('send', data);
-            this.editting = false;
-        }
-    },
+
+const emit = defineEmits(['send'])
     
+function send() {
+    const data: {[key: string]: any} = {};
+    data[props.keyName] = valueCopy.value;
+    emit('send', data);
+    editting.value = false;
 }
 </script>
 <style lang="scss" scoped>

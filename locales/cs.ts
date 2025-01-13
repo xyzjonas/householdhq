@@ -70,6 +70,8 @@ const cs = {
   s_states: "záznamy",
   s_state_autocomplete: "spočítat",
   s_more: "Všechny účty",
+  s_position: "pořadí",
+  s_position_desc: "pořadí ve výpisu",
   log_in: "Přihlásit",
   access_denied: "Nepovolaným vstup zakázán!",
   sign_in_keep_logged_in: "Zapamatovat přihlášení",

@@ -79,6 +79,25 @@
 
         <div class="row card">
           <div class="row-label">
+            <p class="item">{{ $t("s_position") }}</p>
+            <p class="desc">{{ $t("s_position_desc") }}</p>
+          </div>
+          <div class="item">
+            <form-editable-field
+              keyName="position"
+              :value="currentSource.position"
+              @send="(data: string) => sourceStore.patchSource(sourceId, data)"
+              type="number"
+              inputmode="numeric"
+            />
+          </div>
+        </div>
+
+        <input  >
+
+
+        <div class="row card">
+          <div class="row-label">
             <p class="item">{{ $t("delete") }}</p>
             <p class="desc">{{ $t("delete_desc") }}</p>
           </div>

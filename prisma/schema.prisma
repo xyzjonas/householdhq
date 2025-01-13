@@ -69,6 +69,7 @@ model Source {
   isPortfolio       Boolean       @default(false)  // mark 'source' as a part of the portfolio
   states            SourceState[]
   color             String?
+  position          Int           @default(999)  // position in the listing
 }
   
   

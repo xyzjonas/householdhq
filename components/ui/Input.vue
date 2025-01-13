@@ -1,6 +1,6 @@
 <template>
   <div :class="clazz">
-    <label :for="uniqueId">{{ label }}</label>
+    <label v-if=label :for="uniqueId">{{ label }}</label>
     <input
       ref="inputRef"
       :id="uniqueId"
@@ -9,14 +9,18 @@
       :type="type"
       :name="label"
       :required="required"
+      :inputmode="inputmode ?? 'text'"
     />
   </div>
 </template>
 <script lang="ts" setup>
+import type { HTMLAttributes } from 'vue';
+
 const props = defineProps<{
   modelValue: any;
-  label: string;
+  label?: string;
   type?: string;
+  inputmode?: HTMLAttributes["inputmode"];
   required?: boolean;
   size?: ["md", "lg"];
 }>();

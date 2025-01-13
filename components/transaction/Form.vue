@@ -29,6 +29,7 @@
           :label="$t('t_amount')"
           v-model.number="transaction.amount"
           type="number"
+          inputmode="numeric"
           :required="true"
         />
         <ui-input
