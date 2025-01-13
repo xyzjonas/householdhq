@@ -36,12 +36,10 @@ class Transactions {
       where.isImportant = filters.important
     }
 
-    console.table(filters)
     if (filters?.categoryId) {
       where.categoryId = filters.categoryId
     }
 
-    console.table(where)
     const allTrans: Transaction[] = await this.transactions.findMany({
       include: DEFAULT_INCLUDE,
       where: {

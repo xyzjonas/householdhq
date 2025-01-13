@@ -26,9 +26,12 @@ export default defineEventHandler(async (event) => {
 
   const from = new Date();
   from.setMonth(from.getMonth() - 12);
-  const trans = await transactions.findInterval(from, new Date(), {
-    categoryId: data.id,
-  });
+  // const trans = await transactions.findInterval(from, new Date(), {
+  //   categoryId: data.id,
+  // });
+
+  const trans = await transactions.findAll({ categoryId: data.id });
+
 
   const months: Summary[] = [];
   for (const transaction of trans) {

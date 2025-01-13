@@ -8,7 +8,7 @@ const en = {
   description: "description",
   color: "color",
   icon: "icon",
-  undefined: "-",
+  undefined: "N/A",
   cancel: "cancel",
   close: "close",
   back: "back",
@@ -80,6 +80,9 @@ const en = {
   no_transactions_will_appear: "Transactions will appear once entered",
   server_error_500: "Something wrong happened, try again later...",
   server_error_wrong_login: "Login failed. Wrong username or password.",
+  summary_recent: "Recent",
+  summary_year: "Year",
+  summary_all: "All",
 }
 
 export { en }

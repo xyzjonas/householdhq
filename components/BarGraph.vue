@@ -1,19 +1,14 @@
 <template>
-  <div class="center graph-card card">
+  <div class="card relative flex flex-col h-md">
     <ui-empty
       v-if="!areThereTransactions || loading"
       :loading="loading"
-      icon="fa-solid fa-money-bill-trend-up"
+      icon="i-ic-baseline-bar-chart"
       :title="$t('no_data')"
       :subtitle="$t('no_data_will_appear')"
+      class="my-auto"
     />
-    <div v-else-if="!selectedCategory" class="graph-wrapper">
-      <Doughnut :data="data" :options="options" />
-      <div class="graph-wrapper-center">
-        <slot></slot>
-      </div>
-    </div>
-    <section v-if="selectedCategory">
+    <section v-else-if="selectedCategory" class="h-full">
       <Summary
         :category="selectedCategory"
         @edit="navigateTo(`/tags/${selectedCategory.id}`)"
@@ -23,18 +18,27 @@
         <ui-button
           width="48px"
           height="36px"
+          outlined
           icon="i-ic-baseline-mode-edit"
           @click="navigateTo(`/categories/${selectedCategory.id}`)"
         />
         <ui-button
           width="48px"
           height="36px"
+          outlined
           icon="i-ic-baseline-close"
           @click="selectedCategoryName = ''"
         />
       </div>
     </section>
-    <client-only>
+    <div v-else class="graph-wrapper">
+      <Doughnut :data="data" :options="options" />
+      <div class="graph-wrapper-center">
+        <slot></slot>
+      </div>
+    </div>
+
+    <client-only v-if="!selectedCategory">
       <ui-chevron id="show-legend" v-model="showLegend" />
     </client-only>
   </div>
@@ -223,8 +227,8 @@ section {
 
 #actions {
   position: absolute;
-  bottom: 1rem;
-  left: 1rem;
+  top:  8px;
+  right: 8px;
   display: flex;
   gap: 0.3rem;
 }

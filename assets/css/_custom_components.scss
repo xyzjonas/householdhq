@@ -201,13 +201,13 @@
     text-transform: capitalize;
     display: grid;
     height: calc(var(--h) - 2 * 3px);
-    width: calc(var(--h) * 3);
+    width: fit-content;
     border-radius: calc(0.9 * var(--h));
     align-self: center;
     justify-items: center;
     align-items: center;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 16px;
+    padding-right: 16px;
     transition: background-color 0.3s;
   }
 }

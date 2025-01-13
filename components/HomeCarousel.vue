@@ -61,4 +61,8 @@ h3 {
   padding-right: 1em;
   border-right: 1px solid var(--color-grey-dark-2);
 }
+
+.bar-item {
+  width: 8rem;
+}
 </style>

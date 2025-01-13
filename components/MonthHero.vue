@@ -19,7 +19,7 @@
             @click="$emit('reload', new Date())"
             :class="{ left: true }"
           >
-            <i class="i-ic-baseline-home"></i>
+            <i class="i-ic-baseline-calendar-month"></i>
           </NuxtLink>
         </transition>
       </div>

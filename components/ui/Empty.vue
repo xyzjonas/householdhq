@@ -1,10 +1,10 @@
 <template>
     <section class="empty">
         <spinner v-if="loading" name="roller"/>
-        <section v-else>
-            <h1 v-show="icon"><i :class="icon"></i></h1>
+        <section v-else class="flex flex-col items-center">
+            <i class="text-3xl font-light" :class="icon"></i>
             <h1>{{ title }}</h1>
-            <h2 v-show="subtitle">{{ subtitle }}</h2>
+            <h2 class="text-gray-5" v-show="subtitle">{{ subtitle }}</h2>
         </section>
     </section>
 </template>

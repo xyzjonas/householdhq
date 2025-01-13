@@ -8,7 +8,7 @@ const cs = {
   description: "popis",
   color: "barva",
   icon: "ikona",
-  undefined: "-",
+  undefined: "N/A",
   cancel: "zrušit",
   close: "zavřít",
   back: "zpět",
@@ -78,7 +78,10 @@ const cs = {
   no_transactions: "Žádné transakce",
   no_transactions_will_appear: "Transakce se zobrazí po zaúčtování",
   server_error_500: "Něco se někde pořádně vysralo, zkus to pozdeji...",
-  server_error_wrong_login: "Špatné přihlašovací jméno nebo heslo."
+  server_error_wrong_login: "Špatné přihlašovací jméno nebo heslo.",
+  summary_recent: "Nedávné",
+  summary_year: "Rok",
+  summary_all: "Vše",
 }
 
 export { cs }
