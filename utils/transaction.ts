@@ -5,14 +5,10 @@ export function isSummary(source: Source) {
 }
 
 export function isExpense(transaction: Transaction) {
-  const isNormalExpense = !transaction.source.isOut && transaction.target.isOut;
-  const isInternalTransfer =
-    !transaction.source.isOut && transaction.target.isPortfolio;
-  return isNormalExpense || isInternalTransfer;
+  return !transaction.source.isOut
 }
 
 export function isIncome(transaction: Transaction) {
-  // const isInternal = !transaction.source.isOut && !transaction.target.isOut;
   return !isExpense(transaction);
 }
 
