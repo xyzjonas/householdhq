@@ -90,12 +90,23 @@ const newOperand = (newOperand: string) => {
 };
 </script>
 <style lang="scss" scoped>
+
+html[data-theme="dark"] .calculator-display {
+  background-color: rgba(165, 165, 165, 0.103);
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.514) inset;
+}
+
+html[data-theme="light"] .calculator-display {
+  background-color: rgba(165, 165, 165, 0.103);
+  box-shadow: 1px 2px 6px rgba(94, 94, 94, 0.267) inset;
+}
+
 .calculator {
   &-display {
     position: relative;
     font-size: xx-large;
     padding: 0.5em;
-    background-color: #00000035;
+    // background-color: #00000035;
     border-radius: 8px;
     margin-bottom: 16px;
     overflow: hidden;

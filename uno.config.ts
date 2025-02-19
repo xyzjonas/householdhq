@@ -11,6 +11,11 @@ export default defineConfig({
         'vertical-align': 'middle',
       }
     }),
-    presetUno(),
+    presetUno({
+      dark: {
+        dark: '[data-theme="dark"]',
+        light: '[data-theme="light"]',
+      }
+    }),
   ]
 })

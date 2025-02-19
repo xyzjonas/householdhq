@@ -18,6 +18,7 @@ const props = defineProps<{
   rounded?: boolean;
   squared?: boolean;
   link?: boolean;
+  flat?: boolean;
   breakLine?: boolean;
   color?: "primary" | "secondary" | "light" | "success" | "danger";
 }>();
@@ -38,16 +39,20 @@ const clazz = computed(() => {
 
   if (props.link) {
     cls += " link";
+  } 
+  
+  if (!props.flat) {
+    cls += " shadow hover:shadow-md transition"
   }
 
   if (props.outlined) {
-    cls += " outlined"
+    cls += " outlined";
   }
 
   return cls;
 });
 
-const w = computed(() => props.width ?? 'fit-content')
+const w = computed(() => props.width ?? "fit-content");
 const h = computed(() => {
   if (props.rounded || props.squared) {
     return w.value;
@@ -56,14 +61,14 @@ const h = computed(() => {
   if (props.height) {
     return props.height;
   }
-})
+});
 
-const iSize = computed(() => props.iconSize)
+const iSize = computed(() => props.iconSize);
 </script>
 
 <style lang="scss" scoped>
 i {
-  font-size: v-bind('iSize');  
+  font-size: v-bind("iSize");
 }
 
 @mixin common() {
@@ -72,14 +77,14 @@ i {
   align-items: center;
   outline: none;
   border-radius: 0.3rem;
-  gap: .3rem;
+  gap: 0.3rem;
   width: v-bind("w");
   height: v-bind("h");
   border: 1px solid transparent;
   user-select: none;
-  padding: .3rem .6rem;
+  padding: 0.3rem 0.6rem;
 
-  transition: 0.2s ease-in-out;
+  transition: 0.1s ease-in-out;
 }
 
 button:hover {
@@ -100,9 +105,17 @@ button:hover {
 }
 
 .secondary {
-  background-color: var(--secondary-100);
-  border: 1px solid var(--secondary-100);
-  color: var(--text-over-secondary);
+  background-color: white;
+  color: var(--text-100);
+}
+
+html[data-theme="dark"] {
+  .secondary {
+    background-color: black;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  }
 }
 
 .danger {
@@ -165,7 +178,7 @@ button[disabled] {
   background-color: var(--bg-300);
   color: #777;
   border: 1px solid transparent;
-  filter: opacity(.5);
+  filter: opacity(0.5);
   pointer-events: none;
   i {
     color: #777 !important;

@@ -18,6 +18,15 @@
           <ui-price :amount="balance" :currency="currency" size="2.5rem" />
         </div>
         <h4>{{ $t("balance") }}</h4>
+        <div class="flex justify-center mt-3">
+          (
+          <ui-price
+            :amount="balance - upcomming.reduce((a, b) => a + b.amount, 0)"
+            :currency="currency"
+            size="1rem"
+          />
+          )
+        </div>
       </div>
     </HomeCarousel>
 
@@ -25,7 +34,11 @@
       <BalanceRow
         v-if="isCurrentMonth"
         v-model="balance"
-        :sources="sources.filter((src) => src.isPortfolio).sort((a, b) => a.position - b.position)"
+        :sources="
+          sources
+            .filter((src) => src.isPortfolio)
+            .sort((a, b) => a.position - b.position)
+        "
         :upcomming="upcommingTransactionsAmount"
         :forecast="upcommingTransactionsAmount"
         :spent="expense"
@@ -143,7 +156,7 @@
         />
       </section>
     </div>
-    <div id="floating" :class="`${ addExpense ? 'active':'' }`">
+    <div id="floating" :class="`${addExpense ? 'active' : ''}`">
       <ui-button
         :color="addExpense ? 'secondary' : 'primary'"
         icon="i-ic-baseline-plus"
@@ -219,7 +232,7 @@ const transactions = computed(() => {
   let tmp = currentMonth.value
     .filter((trans) => new Date(trans.transactedAt) <= new Date())
     .filter((trans) => !(trans.isImportant && !trans.confirmed))
-    .filter(trans => !trans.isHidden)
+    .filter((trans) => !trans.isHidden);
 
   if (incomesDisplayed.value) {
     tmp = tmp.filter(isIncome);

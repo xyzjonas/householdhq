@@ -1,6 +1,7 @@
 <template>
   <ui-button
     :icon="icon"
+    flat
     squared
     color="primary"
     @click="modelValue = !modelValue"

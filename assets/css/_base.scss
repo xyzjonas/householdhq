@@ -48,7 +48,8 @@ body {
 
     --shadow-100: #141414;
 
-    --secondary-100: var(--bg-300);
+    --secondary-100: #292929;
+    --secondary-100: #666666;
 }
 
 html[data-theme="dark"] {
@@ -64,7 +65,7 @@ html[data-theme="dark"] {
 
     --shadow-100: #585858;
 
-    --secondary-100: #404040;
+    // --secondary-100: #334155;
 }
 
 // OBSOLETE
