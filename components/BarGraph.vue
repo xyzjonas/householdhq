@@ -35,13 +35,14 @@
     >
       <div
         v-for="item in items.filter(it => it.sum > 0)"
-        class="legend-content-item"
+        class="legend-content-item relative overflow-hidden"
         @click="selectCategoryByName(item.name)"
       >
         <span
           class="circle-sm mr-1"
           :style="`background-color: ${item.color};`"
         ></span>
+        <span class="absolute inset-0 opacity-[0.1] left-[2]" :style="`background-color: ${item.color}; right: ${percentage(item.sum)}%`"></span>
         <span class="mr-1">{{ item.name }}</span>
         <ui-price :amount="item.sum" size="small" class="ml-auto mr-2" />
       </div>
@@ -80,8 +81,9 @@ import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "@/types";
 
 import { useTransactionStore } from "@/stores/transactions";
+import { useLocalStorage } from "@vueuse/core";
 
-const showLegend = ref(false);
+const showLegend = useLocalStorage<boolean>('display-list-view', false);
 
 const props = defineProps<{
   items: CategoryWithSum[];
@@ -94,6 +96,9 @@ const selectedCategory = computed(() => {
     (it) => it.name && it.name === selectedCategoryName.value
   );
 });
+
+const sum = computed(() => props.items.reduce((a, b) => a + b.sum, 0))
+const percentage = (value: number) => round(value / sum.value * 100, 0)
 
 const { loading } = storeToRefs(useTransactionStore());
 
@@ -209,7 +214,7 @@ section {
       transition: filter 0.1s ease-in-out;
 
       &:hover {
-        filter: brightness(1.2);
+        font-weight: 500;
       }
     }
   }
@@ -252,5 +257,9 @@ section {
   &-center {
     position: absolute;
   }
+}
+
+.progress-background {
+  inset: 0;
 }
 </style>
