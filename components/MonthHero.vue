@@ -36,14 +36,9 @@
 <script setup lang="ts">
 import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
-const { month, year, next, previous, isCurrent } = useCurrentMonth();
+const { month, year, next, previous, isCurrent, dateFormatted } = useCurrentMonth();
 
 defineEmits(["reload"]);
-
-const date = computed<Date>(() => new Date(year.value, month.value - 1));
-
-const i18n = useI18n();
-const dateFormatted = computed(() => formatMMYYYY(date.value, i18n.locale.value))
 </script>
 <style lang="scss" scoped>
 .title {

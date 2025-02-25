@@ -6,45 +6,49 @@
       <top-summary :transactions="passed" />
     </client-only>
 
-    <HomeCarousel
-      v-model="carouselTabindex"
-      :expenses="expenseCategories"
-      :incomes="incomeCategories"
-      @filter="(tagId: number) => (filterCategoryId = tagId)"
-      :expand-graph="!isCurrentMonth"
-    >
-      <div v-if="isCurrentMonth" class="text-center font-thin uppercase">
-        <div>
+    <div class="flex gap-1 flex-wrap">
+      <HomeCarousel
+        v-model="carouselTabindex"
+        :expenses="expenseCategories"
+        :incomes="incomeCategories"
+        @filter="(tagId: number) => (filterCategoryId = tagId)"
+        :expand-graph="!isCurrentMonth"
+        class="flex-[2]"
+      >
+        <div v-if="isCurrentMonth" class="text-center font-thin uppercase flex flex-col justify-center items-center">
           <ui-price :amount="balance" :currency="currency" size="2.5rem" />
+          <h4>{{ $t("balance") }}</h4>
+          <div class="flex justify-center mt-3">
+            (
+            <ui-price
+              :amount="balance - upcomming.reduce((a, b) => a + b.amount, 0)"
+              :currency="currency"
+              size="1rem"
+            />
+            )
+          </div>
         </div>
-        <h4>{{ $t("balance") }}</h4>
-        <div class="flex justify-center mt-3">
-          (
-          <ui-price
-            :amount="balance - upcomming.reduce((a, b) => a + b.amount, 0)"
-            :currency="currency"
-            size="1rem"
-          />
-          )
+        <div v-else>
+          {{ dateFormatted }}
         </div>
-      </div>
-    </HomeCarousel>
-
-    <transition name="slide" mode="out-in">
-      <BalanceRow
-        v-if="isCurrentMonth"
-        v-model="balance"
-        :sources="
-          sources
-            .filter((src) => src.isPortfolio)
-            .sort((a, b) => a.position - b.position)
-        "
-        :upcomming="upcommingTransactionsAmount"
-        :forecast="upcommingTransactionsAmount"
-        :spent="expense"
-        :total-income="income"
-      />
-    </transition>
+      </HomeCarousel>
+      <transition name="slide" mode="out-in">
+        <BalanceRow
+          class="flex-1"
+          v-if="isCurrentMonth"
+          v-model="balance"
+          :sources="
+            sources
+              .filter((src) => src.isPortfolio)
+              .sort((a, b) => a.position - b.position)
+          "
+          :upcomming="upcommingTransactionsAmount"
+          :forecast="upcommingTransactionsAmount"
+          :spent="expense"
+          :total-income="income"
+        />
+      </transition>
+    </div>
 
     <transition name="page">
       <section v-if="addExpense" class="mt-1">
@@ -58,12 +62,13 @@
       </section>
     </transition>
 
+    <hr>
     <ui-empty
       v-if="transactionsLoading"
       title=""
       loading
       class="card min-h-sm"
-    />
+    />    
     <div v-else>
       <div v-if="importantTransactions.length > 0">
         <div class="flex">
@@ -120,7 +125,7 @@
           :amount="upcommingTransactionsAmount"
           :currency="currency"
           size="1.5rem"
-          class="ml-3 border-1 border-solid p-1 px-2 border-rounded-md border-[#777]"
+          class="card py-2 px-3 ml-1"
         />
         <ui-chevron v-model="showUpcomming" class="ml-auto" />
       </div>
@@ -163,6 +168,7 @@
         iconSize="1.5rem"
         width="4rem"
         rounded
+        outlined
         @click="addExpense = !addExpense"
       />
     </div>
@@ -178,7 +184,7 @@ import { useTransactionStore } from "@/stores/transactions";
 import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
 
-const { isCurrent: isCurrentMonth, month, year } = useCurrentMonth();
+const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
@@ -394,7 +400,7 @@ h3 {
   border-radius: 50%;
   transition: transform 0.1s ease-in-out;
   z-index: 900;
-  box-shadow: 2px 2px 5px var(--shadow-100);
+  // box-shadow: 2px 2px 5px var(--shadow-100);
 
   &.active {
     transform: rotate(45deg);

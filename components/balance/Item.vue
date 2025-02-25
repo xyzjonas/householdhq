@@ -4,22 +4,22 @@
       <span class="color-flag"></span>
       <ui-button
         @click="navigateTo(`/sources/${source.id}`)"
-        :outlined="true"
         icon="i-ic-baseline-mode-edit"
         width="2rem"
         squared
         class="mr-3"
         link
+        flat
       />
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
       <ui-button
-      v-if="lastEntryNotThisMonth"
-      @click="onAutoUpdate"
-      :loading="updating"
-      icon="i-ic-baseline-auto-fix-high"
-      >{{ $t("s_state_autocomplete") }}</ui-button
+        v-if="lastEntryNotThisMonth"
+        @click="onAutoUpdate"
+        :loading="updating"
+        icon="i-ic-baseline-auto-fix-high"
+        >{{ $t("s_state_autocomplete") }}</ui-button
       >
       <ui-price v-else size="large" :amount="balance" />
     </div>
@@ -56,13 +56,15 @@ const balance = computed<string | number>(() => {
   props.source.transactionsIn
     .filter(
       (tr) =>
-        new Date(tr.transactedAt) < new Date() && new Date(tr.transactedAt) > lastDate
+        new Date(tr.transactedAt) < new Date() &&
+        new Date(tr.transactedAt) > lastDate
     )
     .forEach((tr) => (sum += tr.amount));
   props.source.transactionsOut
     .filter(
       (tr) =>
-        new Date(tr.transactedAt) < new Date() && new Date(tr.transactedAt) > lastDate
+        new Date(tr.transactedAt) < new Date() &&
+        new Date(tr.transactedAt) > lastDate
     )
     .forEach((tr) => (sum -= tr.amount));
   emit("update:modelValue", sum);
@@ -95,7 +97,6 @@ const lastEntryNotThisMonth = computed(() => {
 // });
 
 const emit = defineEmits(["autoupdated", "update:modelValue"]);
-
 </script>
 <style lang="scss" scoped>
 .bal-wrapper {
@@ -103,18 +104,18 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
   align-items: center;
   justify-content: space-between;
 
   background-color: var(--bg-200);
-  padding: 0.5rem 1rem;
+  padding-block: 0.5rem;
+  padding-left: 8px;
+  padding-right: 16px;
   border-top-right-radius: 0.3rem;
   border-bottom-right-radius: 0.3rem;
   // border-left: 0.5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
 
-  transition: background-color .2s ease-in-out;
+  transition: background-color 0.2s ease-in-out;
 
   .text {
     display: inline-flex;
@@ -155,9 +156,9 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
 .color-flag {
   width: 5rem;
   height: 1rem;
-  background-color: v-bind('source.color');
+  background-color: v-bind("source.color");
   position: absolute;
-  transform: rotate(-45deg) translateY(-2.5rem);
-  left: 0;
+  transform: rotate(-90deg) translateY(45px);
+  right: 0;
 }
 </style>

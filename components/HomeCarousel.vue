@@ -1,14 +1,26 @@
 <template>
-  <div class="carousel">
+  <div class="carousel card">
     <!-- EXPENSES & INCOMES -->
-    <BarGraph :items="data" :expand="expandGraph" @filter="(id) => $emit('filter', id)">
+    <BarGraph
+      :items="data"
+      :expand="expandGraph"
+      @filter="(id) => $emit('filter', id)"
+    >
       <slot></slot>
     </BarGraph>
-  </div>
-  <div class="center my-1">
-    <div class="toggle-bar m-1">
-      <a @click="modelValue = 0" :class="`bar-item ${modelValue === 0 ? 'active' : ''}`">{{ $t("expenses") }}</a>
-      <a @click="modelValue = 1" :class="`bar-item ${modelValue === 1 ? 'active' : ''}`">{{ $t("incomes") }}</a>
+    <div class="center mt-3">
+      <div class="toggle-bar m-1">
+        <a
+          @click="modelValue = 0"
+          :class="`bar-item ${modelValue === 0 ? 'active' : ''}`"
+          >{{ $t("expenses") }}</a
+        >
+        <a
+          @click="modelValue = 1"
+          :class="`bar-item ${modelValue === 1 ? 'active' : ''}`"
+          >{{ $t("incomes") }}</a
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -25,17 +37,18 @@ const props = defineProps<{
   expandGraph?: boolean;
 }>();
 
-const data = computed(() => (modelValue.value === 1 ? props.incomes : topExpenses.value));
+const data = computed(() =>
+  modelValue.value === 1 ? props.incomes : topExpenses.value
+);
 
 const topExpenses = computed(() => {
   if (props.expenses.length > 5) {
     return props.expenses
-    .filter(e => e.sum > 100)
-    .sort((a, b) => b.sum - a.sum)
+      .filter((e) => e.sum > 100)
+      .sort((a, b) => b.sum - a.sum);
   }
-  return props.expenses
-})
-
+  return props.expenses;
+});
 </script>
 <style lang="scss" scoped>
 h3 {

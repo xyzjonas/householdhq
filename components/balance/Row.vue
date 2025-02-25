@@ -1,18 +1,6 @@
 <template>
-  <div>
-    <div class="hidden">
-      <div class="row-simple center">
-        <ui-price
-          :amount="totalBalance"
-          :currency="currency"
-          size="3rem"
-        />
-      </div>
-      <h4>{{ $t("balance") }}</h4>
-    </div>
-    <!-- <BalanceIndicator :forecast="forecast" :spent="spent" :total-income="totalIncome" /> -->
-
-    <div>
+  <div class="flex flex-col justify-between">
+    <div class="flex flex-col gap-1">
       <BalanceItem
         v-for="(bal, index) in sources"
         :source="bal"
@@ -20,8 +8,15 @@
         :max="max"
       />
     </div>
-    <div class="flex w-full justify-end items-center px-3">
-      <ui-button link icon="i-ic-round-read-more" icon-size="1.5rem" @click="navigateTo('/sources')">{{ $t('s_more') }}</ui-button>
+    <div class="flex w-full justify-end items-center h-[2rem]">
+      <ui-button
+        link
+        flat
+        icon="i-ic-round-read-more"
+        icon-size="1.5rem"
+        @click="navigateTo('/sources')"
+        >{{ $t("s_more") }}</ui-button
+      >
     </div>
   </div>
 </template>
@@ -40,9 +35,10 @@ const props = defineProps<{
   totalIncome: number;
 }>();
 
-const modelValue = defineModel<number>()
+const modelValue = defineModel<number>();
 const balanceSums = ref<number[]>([]);
-const totalBalance = computed(() => {
+
+watch(balanceSums.value, () => {
   let total = 0;
   for (let index = 0; index < balanceSums.value.length; index++) {
     if (props.sources[index].isDisponible) {
@@ -51,7 +47,7 @@ const totalBalance = computed(() => {
   }
   modelValue.value = total;
   return total;
-})
+});
 
 const max = computed(() => {
   let max = 0;
@@ -73,22 +69,3 @@ const total = computed(() => {
   return sum;
 });
 </script>
-<style lang="scss" scoped>
-section {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-h4 {
-  font-weight: 100;
-  text-transform: uppercase;
-}
-
-h1 {
-  text-transform: uppercase;
-  font-size: x-large;
-  font-weight: 300;
-}
-</style>

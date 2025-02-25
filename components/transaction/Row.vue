@@ -238,7 +238,7 @@ const editButtonsStyle = computed(() => {
   cursor: pointer;
   overflow: hidden;
 
-  border-radius: .5rem;
+  border-radius: 4px;
   background-color: var(--bg-200);
   padding: 1rem .5rem;
   padding-right: 1rem;

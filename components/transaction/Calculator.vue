@@ -92,8 +92,8 @@ const newOperand = (newOperand: string) => {
 <style lang="scss" scoped>
 
 html[data-theme="dark"] .calculator-display {
-  background-color: rgba(165, 165, 165, 0.103);
-  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.514) inset;
+  background-color: rgba(228, 228, 228, 0.103);
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.856) inset;
 }
 
 html[data-theme="light"] .calculator-display {

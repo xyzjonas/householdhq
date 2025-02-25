@@ -39,10 +39,12 @@ const clazz = computed(() => {
 
   if (props.link) {
     cls += " link";
-  } 
+  }
   
   if (!props.flat) {
     cls += " shadow hover:shadow-md transition"
+  } else {
+    cls += " flat"
   }
 
   if (props.outlined) {
@@ -83,6 +85,7 @@ i {
   border: 1px solid transparent;
   user-select: none;
   padding: 0.3rem 0.6rem;
+  text-transform: capitalize;
 
   transition: 0.1s ease-in-out;
 }
@@ -128,9 +131,22 @@ html[data-theme="dark"] {
   background-color: transparent;
   border-color: transparent;
   color: var(--text-100);
-  &:hover {
-    background-color: var(--bg-300);
-  }
+}
+
+html[data-theme="dark"] {
+  .link:hover {
+      background-color: rgb(20, 20, 20);
+    }
+}
+
+html[data-theme="light"] {
+  .link:hover {
+      background-color: rgba(219, 219, 219, 0.76);
+    }
+}
+
+
+.flat {
 }
 
 .success {
@@ -151,9 +167,7 @@ html[data-theme="dark"] {
 }
 
 .outlined {
-  background-color: transparent;
   border: 1px solid var(--border-100) !important;
-  color: var(--text-100);
 }
 
 .ui-btn {

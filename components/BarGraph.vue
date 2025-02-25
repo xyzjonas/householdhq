@@ -1,5 +1,5 @@
 <template>
-  <div class="card relative flex flex-col h-md">
+  <div class="relative flex flex-col h-md">
     <ui-empty
       v-if="!areThereTransactions || loading"
       :loading="loading"
@@ -31,6 +31,23 @@
         />
       </div>
     </section>
+    <section
+      v-else-if="showLegend"
+      class="h-full flex flex-col justify-start p-"
+    >
+      <div
+        v-for="item in items.filter(it => it.sum > 0)"
+        class="legend-content-item"
+        @click="selectCategoryByName(item.name)"
+      >
+        <span
+          class="circle-sm mr-1"
+          :style="`background-color: ${item.color};`"
+        ></span>
+        <span class="mr-1">{{ item.name }}</span>
+        <ui-price :amount="item.sum" size="small" class="ml-auto mr-2" />
+      </div>
+    </section>
     <div v-else class="graph-wrapper">
       <Doughnut :data="data" :options="options" />
       <div class="graph-wrapper-center">
@@ -39,32 +56,26 @@
     </div>
 
     <client-only v-if="!selectedCategory">
-      <ui-chevron id="show-legend" v-model="showLegend" />
-    </client-only>
-  </div>
-  <transition name="slide-top">
-    <section v-if="showLegend" class="center card legend">
-      <div class="legend-content">
-        <div
-          v-for="item in items"
-          class="legend-content-item"
-          @click="selectCategoryByName(item.name)"
-        >
-          <span
-            class="circle-sm mr-1"
-            :style="`background-color: ${item.color};`"
-          ></span>
-          <span class="mr-1">{{ item.name }}</span>
-          <span><ui-price :amount="item.sum" size="small" /></span>
-        </div>
+      <div id="show-legend" class="flex gap-1">
         <ui-button
           @click="navigateTo('/categories')"
-          icon="i-ic-round-read-more"
+          icon="i-ic-baseline-category"
+          icon-size="1.3rem"
           link
+          class="mt-auto"
+        />
+        <ui-button
+          :icon="
+            showLegend
+              ? 'i-ic-baseline-pie-chart'
+              : 'i-ic-round-format-list-bulleted'
+          "
+          icon-size="1.3rem"
+          @click="showLegend = !showLegend"
         />
       </div>
-    </section>
-  </transition>
+    </client-only>
+  </div>
 </template>
 <script setup lang="ts">
 import { Doughnut } from "vue-chartjs";
@@ -146,16 +157,18 @@ const callback = (e: any) => {
 const options = {
   responsive: true,
   onClick: callback,
-  cutout: () => (props.expand ? "70%" : "80%"),
+  cutout: () => (props.expand ? "90%" : "90%"),
+  offset: 0,
+  spacing: 7,
   plugins: {
     datalabels: {
-      display: () => props.expand,
+      display: () => false,
       // color: shouldInvert(props.category.color) ? '#333' : '#ddd',
       backgroundColor: "black",
       textShadowColor: (val: any) => props.items[val.dataIndex].color,
       textShadowBlur: 10,
       color: "white",
-      borderRadius: 3,
+      borderRadius: 5,
       anchor: "center",
       formatter: (val: number) => (val < 5000 ? null : val),
       labels: {
@@ -173,7 +186,7 @@ section {
 }
 
 .legend {
-  margin-top: 0.2rem;
+  margin-top: 12px;
 
   display: flex;
   flex-direction: column;
@@ -193,7 +206,7 @@ section {
       font-size: small;
       border: 1px solid var(--border-100);
       background-color: var(--bg-200);
-      padding: 0.1rem 0.3rem;
+      padding: 2px 5px;
       border-radius: 2rem;
       cursor: pointer;
       transition: filter 0.1s ease-in-out;
@@ -208,8 +221,6 @@ section {
 .graph-card {
   position: relative;
   height: 100%;
-  // max-height: 30rem;
-  // min-height: 20rem;
   height: 320px;
 }
 
@@ -221,13 +232,13 @@ section {
 
 #show-legend {
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
+  bottom: 4px;
+  right: 4px;
 }
 
 #actions {
   position: absolute;
-  top:  8px;
+  top: 8px;
   right: 8px;
   display: flex;
   gap: 0.3rem;

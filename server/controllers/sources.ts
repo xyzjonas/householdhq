@@ -77,7 +77,12 @@ class Sources {
     })
     
     if (!lastState) {
-      return false
+      return {
+        id: "-1",
+        sourceId,
+        amount: 0,
+        created: new Date(),
+      }
     }
 
     const transactions = await this.transactions.findMany({
