@@ -91,6 +91,7 @@
             link
             icon="i-ic-round-warning"
             icon-size="1rem"
+            flat
             @click="navigateTo('/important')"
             >{{ $t("to_important") }}</ui-button
           >

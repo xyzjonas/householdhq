@@ -1,6 +1,6 @@
 <template>
   <button :class="clazz" :disabled="disabled || loading">
-    <spinner name="ellipsis" v-if="loading" />
+    <spinner name="ellipsis" v-if="loading"/>
     <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
   </button>
@@ -24,7 +24,7 @@ const props = defineProps<{
 }>();
 
 const clazz = computed(() => {
-  let cls = "ui-btn";
+  let cls = "ui-btn transition-all";
   if (props.rounded) {
     cls += " rounded";
   } else if (props.squared) {
@@ -128,25 +128,21 @@ html[data-theme="dark"] {
 }
 
 .link {
-  background-color: transparent;
+  background-color: transparent !important;
   border-color: transparent;
   color: var(--text-100);
 }
 
 html[data-theme="dark"] {
   .link:hover {
-      background-color: rgb(20, 20, 20);
+      background-color: rgba(0, 0, 0, 0.3) !important;
     }
 }
 
 html[data-theme="light"] {
   .link:hover {
-      background-color: rgba(219, 219, 219, 0.76);
+      background-color: rgba(207, 207, 207, 0.5) !important;
     }
-}
-
-
-.flat {
 }
 
 .success {

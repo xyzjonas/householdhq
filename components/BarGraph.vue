@@ -18,14 +18,12 @@
         <ui-button
           width="48px"
           height="36px"
-          outlined
           icon="i-ic-baseline-mode-edit"
           @click="navigateTo(`/categories/${selectedCategory.id}`)"
         />
         <ui-button
           width="48px"
           height="36px"
-          outlined
           icon="i-ic-baseline-close"
           @click="selectedCategoryName = ''"
         />
@@ -61,7 +59,6 @@
           @click="navigateTo('/categories')"
           icon="i-ic-baseline-category"
           icon-size="1.3rem"
-          link
           class="mt-auto"
         />
         <ui-button

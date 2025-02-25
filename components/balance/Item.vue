@@ -1,16 +1,7 @@
 <template>
-  <div class="bal-wrapper card">
-    <div class="row">
+  <div class="bal-wrapper" @click="navigateTo(`/sources/${source.id}`)">
+    <div class="flex items-center gap-3">
       <span class="color-flag"></span>
-      <ui-button
-        @click="navigateTo(`/sources/${source.id}`)"
-        icon="i-ic-baseline-mode-edit"
-        width="2rem"
-        squared
-        class="mr-3"
-        link
-        flat
-      />
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
@@ -100,10 +91,7 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
 </script>
 <style lang="scss" scoped>
 .bal-wrapper {
-  position: relative;
   display: flex;
-  flex-direction: row;
-  overflow: hidden;
   align-items: center;
   justify-content: space-between;
 
@@ -111,9 +99,7 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
   padding-block: 0.5rem;
   padding-left: 8px;
   padding-right: 16px;
-  border-top-right-radius: 0.3rem;
-  border-bottom-right-radius: 0.3rem;
-  // border-left: 0.5rem solid v-bind("source.color ?? 'var(--bg-300)' ");
+  border-bottom: 1px solid var(--bg-300);
 
   transition: background-color 0.2s ease-in-out;
 
@@ -154,11 +140,9 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
 }
 
 .color-flag {
-  width: 5rem;
-  height: 1rem;
-  background-color: v-bind("source.color");
-  position: absolute;
-  transform: rotate(-90deg) translateY(45px);
-  right: 0;
+  width: 16px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: v-bind("source.color ?? 'gray'");
 }
 </style>

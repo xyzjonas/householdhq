@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col justify-between">
+  <div class="flex flex-col justify-between card">
     <div class="flex flex-col gap-1">
       <BalanceItem
         v-for="(bal, index) in sources"
@@ -8,7 +8,7 @@
         :max="max"
       />
     </div>
-    <div class="flex w-full justify-end items-center h-[2rem]">
+    <div class="flex w-full justify-end items-center h-[2rem] mt-5">
       <ui-button
         link
         flat
