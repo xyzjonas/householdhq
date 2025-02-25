@@ -42,7 +42,7 @@
           class="circle-sm mr-1"
           :style="`background-color: ${item.color};`"
         ></span>
-        <span class="absolute inset-0 opacity-[0.1] left-[2]" :style="`background-color: ${item.color}; right: ${percentage(item.sum)}%`"></span>
+        <span class="absolute inset-0 opacity-[0.1] left-[2]" :style="`background-color: ${item.color}; right: ${100 - percentage(item.sum)}%`"></span>
         <span class="mr-1">{{ item.name }}</span>
         <ui-price :amount="item.sum" size="small" class="ml-auto mr-2" />
       </div>
