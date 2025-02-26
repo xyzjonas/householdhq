@@ -6,7 +6,7 @@
       <top-summary :transactions="passed" />
     </client-only>
 
-    <div class="flex gap-1 flex-wrap">
+    <div class="flex gap-2 flex-wrap">
       <HomeCarousel
         v-model="carouselTabindex"
         :expenses="expenseCategories"
