@@ -85,9 +85,10 @@ class Sources {
       }
     }
 
+    console.info(`Autoset from: ${lastState.created}`)
     const transactions = await this.transactions.findMany({
       where: {
-        created: {
+        transactedAt: {
           gte: lastState.created,
           lte: new Date(),
         },
@@ -99,11 +100,23 @@ class Sources {
     console.info(`${from.length} from, ${to.length} to`)
 
     let result = lastState.amount;
+    console.info(`Last amount: ${result}`)
 
-    if (from.length > 0 || to.length > 0) {
-      result = to.reduce((a, b) => (a + b.amount), result)
-      result = from.reduce((a, b) => (a - b.amount), result)
+    if (to.length > 0) {
+      result = to.reduce((a, b) => {
+        return a + b.amount
+      }, result)
+      console.info(`After incomes amount: ${result}`)
     }
+
+    if (from.length > 0) {
+      result = from.reduce((a, b) => {
+        console.info(`Expense: ${b.amount}`)
+        return a - b.amount
+      }, result)
+      console.info(`After expenses amount: ${result}`)
+    }
+
     
     const sourceState: SourceState = await this.sourceStates.create({
       data: {

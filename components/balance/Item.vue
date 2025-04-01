@@ -1,17 +1,17 @@
 <template>
-  <div class="bal-wrapper" @click="navigateTo(`/sources/${source.id}`)">
-    <div class="flex items-center gap-3">
+  <div class="bal-wrapper">
+    <div
+      class="flex items-center gap-3 hover:cursor-pointer hover:underline"
+      @click="navigateTo(`/sources/${source.id}`)"
+    >
       <span class="color-flag"></span>
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
-      <ui-button
+      <balance-autofill-button
         v-if="lastEntryNotThisMonth"
-        @click="onAutoUpdate"
-        :loading="updating"
-        icon="i-ic-baseline-auto-fix-high"
-        >{{ $t("s_state_autocomplete") }}</ui-button
-      >
+        :source-id="source.id"
+      />
       <ui-price v-else size="large" :amount="balance" />
     </div>
   </div>
@@ -24,13 +24,6 @@ const props = defineProps<{
   max: number;
   modelValue: number | undefined;
 }>();
-
-const { autoCompleteSourceState } = useSourcesStore();
-
-const updating = ref(false);
-const onAutoUpdate = () => {
-  autoCompleteSourceState(props.source.id, updating);
-};
 
 const lastEntry = computed(() => {
   if (props.source.states && props.source.states.length > 0) {
@@ -98,7 +91,7 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
   background-color: var(--bg-200);
   padding-block: 0.5rem;
   padding-left: 8px;
-  padding-right: 16px;
+  padding-right: 8px;
   border-bottom: 1px solid var(--bg-300);
 
   transition: background-color 0.2s ease-in-out;

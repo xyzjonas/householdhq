@@ -93,8 +93,7 @@
           </div>
         </div>
 
-        <input  >
-
+        <input />
 
         <div class="row card">
           <div class="row-label">
@@ -114,7 +113,6 @@
 
         <h3 class="uppercase text-2xl font-300 mt-5">{{ $t("s_states") }}</h3>
         <section class="card states flex-col">
-
           <Transition name="page" mode="out-in" class="my-2">
             <balance-entry-form
               v-if="edit"
@@ -122,13 +120,15 @@
               @created="newEntry"
               :sourceId="currentSource.id"
             />
-            <ui-button
-              v-else
-              color="primary"
-              @click="edit = !edit"
-              icon="i-ic-baseline-add"
-              >{{ $t("s_add_state") }}</ui-button
-            >
+            <div v-else class="flex items-center justify-between">
+              <ui-button
+                color="primary"
+                @click="edit = !edit"
+                icon="i-ic-baseline-add"
+                >{{ $t("s_add_state") }}</ui-button
+              >
+              <balance-autofill-button :source-id="sourceId" />
+            </div>
           </Transition>
 
           <div v-for="state in sourceStates" class="state-row">
@@ -151,16 +151,13 @@
           <div class="flex items-center justify-center">
             <ui-button
               link
-              v-if="
-                !showMore &&
-                currentSource?.states?.length > MAX_ITEMS
-                "
+              v-if="!showMore && currentSource?.states?.length > MAX_ITEMS"
               class="mt-5"
               icon="i-ic-baseline-expand-more"
               @click="showMore = true"
               >{{ $t("show_more") }}</ui-button
             >
-        </div>
+          </div>
         </section>
       </div>
       <error-banner v-else status="404" message="not found" :is-login="false" />
@@ -238,7 +235,7 @@ const sourceStates = computed(() => {
   .desc {
     font-size: small;
     line-height: 100%;
-    filter: contrast(0.3) opacity(.5);
+    filter: contrast(0.3) opacity(0.5);
     text-transform: none;
   }
 }
