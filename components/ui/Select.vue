@@ -56,10 +56,10 @@ onMounted(() => {
 });
 </script>
 <style lang="scss" scoped>
-@import "@/assets/css/base";
-@import "@/assets/css/custom_components";
+@use "@/assets/css/custom_components";
+
 .input-group {
-  @include input-group(10px, 16px, 10px);
+  @include custom_components.input-group(10px, 16px, 10px);
 }
 
 select {

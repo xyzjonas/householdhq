@@ -1,4 +1,5 @@
-@import "layout";
+@use "layout";
+@use "base";
 
 @mixin background {
   border-radius: 5px;
@@ -33,7 +34,7 @@
     margin-right: 0.8em;
   }
 
-  @include left-center-right();
+  @include layout.left-center-right();
   @include background();
 }
 
@@ -223,7 +224,7 @@
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 5px;
 
-  @media only screen and (max-width: $bp-small) {
+  @media only screen and (max-width: base.$bp-small) {
     grid-template-columns: 1fr 1fr 1fr;
   }
 }

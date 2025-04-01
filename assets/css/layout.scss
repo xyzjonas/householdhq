@@ -1,3 +1,5 @@
+@use "base";
+
 #__nuxt {
   position: absolute;
   inset: 0;
@@ -30,7 +32,7 @@
   height: 480px;
   overflow: hidden;
 
-  @media only screen and (max-width: $bp-medium) {
+  @media only screen and (max-width: base.$bp-medium) {
     height: 360px;
   }
 }
@@ -42,7 +44,7 @@
 }
 
 .container.more-p {
-  @media only screen and (max-width: $bp-small) {
+  @media only screen and (max-width: base.$bp-small) {
     padding: 1em;
   }
 }
@@ -85,7 +87,7 @@
   align-items: center;
   @include left-center-right();
 
-  @media only screen and (max-width: $bp-small) {
+  @media only screen and (max-width: base.$bp-small) {
     .item {
       align-self: flex-start;
     }
@@ -99,7 +101,7 @@
 .row-to-column {
   display: flex;
   flex-direction: row;
-  @media only screen and (max-width: $bp-medium) {
+  @media only screen and (max-width: base.$bp-medium) {
     flex-direction: column;
   }
 }
@@ -107,7 +109,7 @@
 .column-to-row {
   display: flex;
   flex-direction: column;
-  @media only screen and (max-width: $bp-medium) {
+  @media only screen and (max-width: base.$bp-medium) {
     flex-direction: row;
   }
 }
@@ -121,7 +123,7 @@
     flex: 1;
   }
 
-  @media only screen and (max-width: $bp-small) {
+  @media only screen and (max-width: base.$bp-small) {
     flex-direction: column;
   }
 }
@@ -131,11 +133,11 @@
   grid: auto-flow dense / 1fr 1fr 1fr 1fr;
   // padding: 4px;
 
-  @media only screen and (max-width: $bp-medium) {
+  @media only screen and (max-width: base.$bp-medium) {
     grid: auto-flow dense / 1fr 1fr 1fr;
   }
 
-  @media only screen and (max-width: $bp-small) {
+  @media only screen and (max-width: base.$bp-small) {
     grid: auto-flow dense / 1fr 1fr;
   }
 }

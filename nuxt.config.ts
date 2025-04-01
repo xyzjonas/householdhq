@@ -28,7 +28,14 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ["@/assets/css/main.scss"],
+  css: [
+    "@/assets/css/base.scss",
+    "@/assets/css/base_components.scss",
+    "@/assets/css/layout.scss",
+    "@/assets/css/custom_components.scss",
+    "@/assets/css/spinners.scss",
+    "@/assets/css/typography.scss"
+  ],
 
   modules: [
     "@nuxtjs/i18n",

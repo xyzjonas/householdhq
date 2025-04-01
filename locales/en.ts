@@ -1,4 +1,5 @@
 const en = {
+  "not found": "Not found",
   message: "Hello!",
   loading: "Loading...",
   ok: "ok",

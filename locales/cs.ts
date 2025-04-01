@@ -1,4 +1,5 @@
 const cs = {
+  "not found": "Nenalezeno",
   message: "Ahoj!",
   loading: "Načítám...",
   ok: "ok",
