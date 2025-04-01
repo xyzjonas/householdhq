@@ -15,13 +15,16 @@
         :expand-graph="!isCurrentMonth"
         class="flex-[2]"
       >
-        <div v-if="isCurrentMonth" class="text-center font-thin uppercase flex flex-col justify-center items-center">
+        <div
+          v-if="isCurrentMonth"
+          class="text-center font-thin uppercase flex flex-col justify-center items-center"
+        >
           <ui-price :amount="balance" :currency="currency" size="2.5rem" />
           <h4>{{ $t("balance") }}</h4>
           <div class="flex justify-center mt-3">
             (
             <ui-price
-              :amount="balance - upcomming.reduce((a, b) => a + b.amount, 0)"
+              :amount="balance + transactionsTotal(upcomming)"
               :currency="currency"
               size="1rem"
             />
@@ -42,8 +45,6 @@
               .filter((src) => src.isPortfolio)
               .sort((a, b) => a.position - b.position)
           "
-          :upcomming="upcommingTransactionsAmount"
-          :forecast="upcommingTransactionsAmount"
           :spent="expense"
           :total-income="income"
         />
@@ -62,13 +63,13 @@
       </section>
     </transition>
 
-    <hr>
+    <hr />
     <ui-empty
       v-if="transactionsLoading"
       title=""
       loading
       class="card min-h-sm"
-    />    
+    />
     <div v-else>
       <div v-if="importantTransactions.length > 0">
         <div class="flex">
@@ -123,7 +124,7 @@
         </span>
         <ui-price
           @click="showUpcomming = !showUpcomming"
-          :amount="upcommingTransactionsAmount"
+          :amount="totalExpenses(upcomming)"
           :currency="currency"
           size="1.5rem"
           class="card py-2 px-3 ml-1"
@@ -184,6 +185,7 @@ import { useSourcesStore } from "@/stores/sources";
 import { useTransactionStore } from "@/stores/transactions";
 import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
+import { totalExpenses, transactionsTotal } from "~/utils/transaction";
 
 const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 
@@ -291,13 +293,6 @@ const upcommingTransactions = computed(() => {
 
 const importantTransactions = computed(() => {
   return currentMonth.value.filter((t) => t.isImportant && !t.confirmed);
-});
-
-const upcommingTransactionsAmount = computed<number>(() => {
-  return upcommingTransactions.value
-    .filter((trans: Transaction) => trans.target.isOut)
-    .map((trans: Transaction) => trans.amount)
-    .reduce((a: number, b: number) => a + b, 0);
 });
 
 const putTransaction = (transactionData: Transaction) => {

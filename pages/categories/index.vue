@@ -2,12 +2,10 @@
   <div
     class="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
   >
-    <colored-row
+    <category-card
+      :category="category"
       v-for="category in categories"
-      :link="`/categories/${category.id}`"
-      :title="category.name"
-      :color="category.color"
-      class="aspect-ratio-[1.5]"
+      class="min-h-[5rem]"
     />
   </div>
 </template>

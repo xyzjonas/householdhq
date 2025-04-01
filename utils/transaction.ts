@@ -27,3 +27,21 @@ export function getExpenseSum(transactions: Transaction[]) {
     .map((t) => t.amount)
     .reduce((a, b) => a + b, 0);
 }
+
+export function totalExpenses(transactions: Transaction[]) {
+  return transactions.reduce((a, b) => {
+    if (isExpense(b)) {
+      return a + b.amount
+    }
+    return a
+  }, 0)
+}
+
+export function transactionsTotal(transactions: Transaction[]) {
+  return transactions.reduce((a, b) => {
+    if (isExpense(b)) {
+      return a - b.amount
+    }
+    return a + b.amount
+  }, 0)
+}

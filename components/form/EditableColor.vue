@@ -2,7 +2,7 @@
   <div>
     <div class="flex">
       <transition name="slide">
-        <div v-if="value !== valueCopy" class="flex gap-2 mr-2">
+        <div v-if="value !== valueCopy" class="flex gap-1 mr-1">
           <ui-button @click="send" color="success">
             {{ $t("ok").toUpperCase() }}
           </ui-button>
@@ -56,8 +56,8 @@ export default {
   width: 2.5rem;
   aspect-ratio: 1;
   border-radius: 50%;
-  // border: 1px solid;
-  // border-color: var(--color-grey-dark-3);
+  border: 1px solid;
+  border-color: #00000050;
   margin-right: 0;
 
   input[type="color"] {

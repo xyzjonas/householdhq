@@ -1,6 +1,6 @@
 <template>
   <div class="row-simple">
-    <div v-if="editting" class="flex gap-2">
+    <div v-if="editting" class="flex gap-1">
       <ui-button @click="send" color="success">{{
         $t("ok").toUpperCase()
       }}</ui-button>
@@ -53,8 +53,3 @@ function send() {
   editting.value = false;
 }
 </script>
-<style lang="scss" scoped>
-button {
-  margin-left: 3px;
-}
-</style>

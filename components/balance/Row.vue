@@ -31,8 +31,6 @@ const props = defineProps<{
   upcomming?: number;
   sources: Source[];
   spent: number;
-  forecast: number;
-  totalIncome: number;
 }>();
 
 const modelValue = defineModel<number>();

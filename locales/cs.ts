@@ -87,6 +87,7 @@ const cs = {
   summary_recent: "Nedávné",
   summary_year: "Rok",
   summary_all: "Vše",
+  show_more: "Zobrazit více",
 }
 
 export { cs }

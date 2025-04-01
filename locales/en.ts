@@ -88,6 +88,7 @@ const en = {
   summary_recent: "Recent",
   summary_year: "Year",
   summary_all: "All",
+  show_more: "Show more",
 }
 
 export { en }
