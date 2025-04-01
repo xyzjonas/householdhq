@@ -70,8 +70,17 @@ model Source {
   states            SourceState[]
   color             String?
   position          Int           @default(999)  // position in the listing
+  type              SourceType    @default(ACCOUNT)
 }
-  
+
+enum SourceType {
+  OUT
+  ACCOUNT
+  CASH
+  SAVINGS
+  INVESTMENT
+  DEBT
+}
   
 model Transaction {
   id              Int         @id @default(autoincrement())

@@ -1,6 +1,14 @@
 <template>
-  <div class="container">
-    <div v-if="sources" v-for="source in sources">
+  <div
+    class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"
+  >
+    <balance-card
+      :source="source"
+      v-for="source in sources"
+      class="aspect-ratio-[2]"
+    />
+    <!-- <div v-if="sources" v-for="source in sources">
+      <balance-card :source="source" />
       <colored-row
         :link="`/sources/${source.id}`"
         :title="source.name"
@@ -12,7 +20,7 @@
           style="background-color: var(--color-success)"
         ></div>
       </colored-row>
-    </div>
+    </div> -->
     <div class="new-source-card card">
       <h2>new source</h2>
       <div class="new-source">

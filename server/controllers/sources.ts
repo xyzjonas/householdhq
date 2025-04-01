@@ -1,7 +1,6 @@
 import { PrismaClient, type Source, type SourceState } from "@prisma/client";
 import { CreateSourceDto, EditSourceDto, UpdateSourceStateDto } from "../validators/sources.dto";
 import { IdDto } from "../validators/common.dto";
-import transactions from "./transactions";
 
 class Sources {
   private sources = new PrismaClient().source;
@@ -37,7 +36,10 @@ class Sources {
     delete data.id;
     const source: Source = await this.sources.update({
       where: { id: sourceData.id },
-      data: data,
+      data: {
+        ...data,
+        type: data.type as any,
+      },
       include: { states: true },
     });
     return source;
@@ -85,7 +87,6 @@ class Sources {
       }
     }
 
-    console.info(`Autoset from: ${lastState.created}`)
     const transactions = await this.transactions.findMany({
       where: {
         transactedAt: {
@@ -97,24 +98,18 @@ class Sources {
 
     const from = transactions.filter(t => t.sourceId === id)
     const to = transactions.filter(t => t.targetId === id)
-    console.info(`${from.length} from, ${to.length} to`)
 
     let result = lastState.amount;
-    console.info(`Last amount: ${result}`)
-
     if (to.length > 0) {
       result = to.reduce((a, b) => {
         return a + b.amount
       }, result)
-      console.info(`After incomes amount: ${result}`)
     }
 
     if (from.length > 0) {
       result = from.reduce((a, b) => {
-        console.info(`Expense: ${b.amount}`)
         return a - b.amount
       }, result)
-      console.info(`After expenses amount: ${result}`)
     }
 
     

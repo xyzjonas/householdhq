@@ -1,6 +1,6 @@
 <template>
   <button :class="clazz" :disabled="disabled || loading">
-    <spinner name="ellipsis" v-if="loading"/>
+    <spinner name="ellipsis" v-if="loading" />
     <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
   </button>
@@ -40,11 +40,11 @@ const clazz = computed(() => {
   if (props.link) {
     cls += " link";
   }
-  
+
   if (!props.flat) {
-    cls += " shadow hover:shadow-md transition"
+    cls += " shadow hover:shadow-md transition";
   } else {
-    cls += " flat"
+    cls += " flat";
   }
 
   if (props.outlined) {
@@ -135,14 +135,14 @@ html[data-theme="dark"] {
 
 html[data-theme="dark"] {
   .link:hover {
-      background-color: rgba(0, 0, 0, 0.3) !important;
-    }
+    background-color: rgba(0, 0, 0, 0.3) !important;
+  }
 }
 
 html[data-theme="light"] {
   .link:hover {
-      background-color: rgba(207, 207, 207, 0.5) !important;
-    }
+    background-color: rgba(207, 207, 207, 0.5) !important;
+  }
 }
 
 .success {

@@ -72,6 +72,8 @@ const cs = {
   s_more: "Všechny účty",
   s_position: "pořadí",
   s_position_desc: "pořadí ve výpisu",
+  s_type: "Typ účtu",
+  s_type_desc: "O jaký účet se jedná?",
   log_in: "Přihlásit",
   access_denied: "Nepovolaným vstup zakázán!",
   sign_in_keep_logged_in: "Zapamatovat přihlášení",

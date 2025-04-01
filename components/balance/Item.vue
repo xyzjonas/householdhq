@@ -5,6 +5,7 @@
       @click="navigateTo(`/sources/${source.id}`)"
     >
       <span class="color-flag"></span>
+      <i :class="sourceIcons[source.type]"></i>
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
@@ -17,7 +18,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Source } from "@/types";
+import { sourceIcons, type Source } from "@/types";
 
 const props = defineProps<{
   source: Source;
@@ -83,6 +84,10 @@ const lastEntryNotThisMonth = computed(() => {
 const emit = defineEmits(["autoupdated", "update:modelValue"]);
 </script>
 <style lang="scss" scoped>
+// i {
+//   // background-color: v-bind("source.color ?? 'gray'");
+// }
+
 .bal-wrapper {
   display: flex;
   align-items: center;

@@ -1,6 +1,16 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useNotifications } from "@/composables/useNotifications";
 
+interface ErrorResponse {
+  url: string
+  statusMessage: string
+  message: string
+  statusCode: number
+  stack: string
+}
+
+
+
 export class ServerError extends Error {}
 
 
@@ -59,16 +69,15 @@ export const useTokenStore = defineStore("token", () => {
         text: t("server_error_500"),
         level: "error",
       });
-      console.error(response);
       throw new Error("Internal server Error");
     }
 
     if (response.status >= 400) {
+      const res = await response.json() as ErrorResponse
       n.addNotification({
-        text: t("server_error_500"),
+        text: res.message,
         level: "error",
       });
-      console.error(response);
       throw new Error("Bad Request");
     }
 

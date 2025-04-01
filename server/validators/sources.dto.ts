@@ -1,6 +1,18 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Validate } from 'class-validator';
+import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Validate, ValidatorConstraint, type ValidationArguments, type ValidatorConstraintInterface } from 'class-validator';
 import { ValidDate } from './validator';
+
+
+@ValidatorConstraint({ name: 'sourceType', async: false })
+export class SourceTypeValidation implements ValidatorConstraintInterface {
+  validate(value: string, args: ValidationArguments) {
+    return ["ACCOUNT", "OUT", "CASH", "SAVINGS", "INVESTMENT", "DEBT"].includes(value)
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return 'Type $value is not a valid source type!';
+  }
+}
 
 
 export class CreateSourceDto {
@@ -50,6 +62,11 @@ export class EditSourceDto {
     @IsOptional()
     @Transform(({value}) => parseInt(value))
     public position?: number
+
+
+    @IsOptional()
+    @Validate(SourceTypeValidation)
+    public type?: string
   }
 
 export class UpdateSourceStateDto {

@@ -74,6 +74,8 @@ const en = {
   s_more: "All accounts",
   s_position: "position",
   s_position_desc: "position in the summary listing",
+  s_type: "Account type",
+  s_type_desc: "What's the account type?",
   sign_in_keep_logged_in: "Keep logged in",
   sign_in: "Sign In",
   login_failed: "Invalid username or password",

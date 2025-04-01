@@ -93,6 +93,23 @@
           </div>
         </div>
 
+        <div class="row card">
+          <div class="row-label">
+            <p class="item">{{ $t("s_type") }}</p>
+            <p class="desc">{{ $t("s_type_desc") }}</p>
+          </div>
+          <div class="item">
+            <form-editable-select
+              :value="currentSource.type"
+              :options="SourceTypes"
+              keyName="type"
+              @send="(data: string) => sourceStore.patchSource(sourceId, data)"
+              type="number"
+              inputmode="numeric"
+            />
+          </div>
+        </div>
+
         <input />
 
         <div class="row card">
@@ -169,6 +186,8 @@
 import { useSourcesStore } from "@/stores/sources";
 import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
+import { SourceType } from "@prisma/client";
+import { SourceTypes } from "~/types";
 
 const sourceStore = useSourcesStore();
 const { sourceLoading, currentSourceId, currentSource } =
@@ -223,6 +242,11 @@ const sourceStates = computed(() => {
 <style lang="scss" scoped>
 .flex-col {
   gap: 0.3rem;
+}
+
+.row,
+.card {
+  min-height: 5rem;
 }
 
 .row-label {

@@ -1,3 +1,5 @@
+/* @unocss-include */
+
 export interface User {
   id: number;
   email: string;
@@ -44,6 +46,17 @@ export interface SourceState {
   source: Source;
 }
 
+export type SourceType = "ACCOUNT" | "OUT" | "CASH" | "SAVINGS" | "INVESTMENT" | "DEBT"
+export const SourceTypes = ["ACCOUNT", "OUT", "CASH", "SAVINGS", "INVESTMENT", "DEBT"]
+export const sourceIcons: { [key in SourceType]: string } = {
+  ACCOUNT: "i-ic-baseline-account-balance",
+  CASH: "i-ic-baseline-wallet",
+  DEBT: "i-ic-baseline-money-off",
+  INVESTMENT: "i-ic-baseline-ssid-chart",
+  OUT: "i-ic-baseline-exit-to-app",
+  SAVINGS: "i-ic-outline-savings",
+};
+
 export interface SourceApi {
   id: number;
   name: string;
@@ -53,6 +66,7 @@ export interface SourceApi {
   states: SourceState[];
   color: string;
   position: number;
+  type: SourceType;
 }
 
 export interface Source extends SourceApi {

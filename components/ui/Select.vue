@@ -5,7 +5,9 @@
       ref="inputRef"
       :id="uniqueId"
       :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+      @input="
+        $emit('update:modelValue', ($event.target as HTMLSelectElement).value)
+      "
       :required="required"
     >
       <slot />
@@ -22,7 +24,7 @@
 <script lang="ts" setup>
 const props = defineProps<{
   modelValue: any;
-  label: string;
+  label?: string;
   required?: boolean;
 }>();
 
@@ -33,16 +35,22 @@ const inputRef = ref<HTMLInputElement | null>(null);
 
 onMounted(() => {
   if (props.modelValue) {
-    document.querySelector(`[for='${inputRef.value?.id}']`)?.classList?.add("active");
+    document
+      .querySelector(`[for='${inputRef.value?.id}']`)
+      ?.classList?.add("active");
   }
 
   inputRef.value?.addEventListener("focus", () => {
-    document.querySelector(`[for='${inputRef.value?.id}']`)?.classList?.add("active");
+    document
+      .querySelector(`[for='${inputRef.value?.id}']`)
+      ?.classList?.add("active");
   });
 
   inputRef.value?.addEventListener("focusout", () => {
     if (!inputRef.value?.value) {
-      document.querySelector(`[for='${inputRef.value?.id}']`)?.classList?.remove("active");
+      document
+        .querySelector(`[for='${inputRef.value?.id}']`)
+        ?.classList?.remove("active");
     }
   });
 });

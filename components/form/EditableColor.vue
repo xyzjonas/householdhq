@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="flex items-center">
+    <div class="flex">
       <transition name="slide">
-        <div v-if="value !== valueCopy" class="flex gap-1 mr-3">
+        <div v-if="value !== valueCopy" class="flex gap-2 mr-2">
           <ui-button @click="send" color="success">
-            {{ $t("ok") }}
+            {{ $t("ok").toUpperCase() }}
           </ui-button>
-          <ui-button @click="valueCopy = value">
+          <ui-button @click="valueCopy = value" outlined>
             {{ $t("cancel") }}
           </ui-button>
         </div>
@@ -53,9 +53,9 @@ export default {
 <style lang="scss" scoped>
 .color-circle {
   display: block;
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
+  width: 2.5rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
   // border: 1px solid;
   // border-color: var(--color-grey-dark-3);
   margin-right: 0;
