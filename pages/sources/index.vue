@@ -4,23 +4,9 @@
   >
     <balance-card
       :source="source"
-      v-for="source in sources"
+      v-for="source in sortedSources"
       class="aspect-ratio-[2]"
     />
-    <!-- <div v-if="sources" v-for="source in sources">
-      <balance-card :source="source" />
-      <colored-row
-        :link="`/sources/${source.id}`"
-        :title="source.name"
-        :color="source.color"
-      >
-        <div
-          v-if="source.isPortfolio"
-          class="circle-sm"
-          style="background-color: var(--color-success)"
-        ></div>
-      </colored-row>
-    </div> -->
     <div class="new-source-card card">
       <h2>new source</h2>
       <div class="new-source">
@@ -49,6 +35,10 @@ const createSource = () => {
     .createSource({ name: newSourceName.value })
     .then(() => (newSourceName.value = undefined));
 };
+
+const sortedSources = computed(() =>
+  sources.value.sort((a, b) => a.position - b.position)
+);
 </script>
 
 <style lang="css" scoped>
