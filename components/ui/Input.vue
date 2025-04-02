@@ -5,9 +5,7 @@
       ref="inputRef"
       :id="uniqueId"
       :value="modelValue"
-      @input="
-        $emit('update:modelValue', ($event.target as HTMLInputElement).value)
-      "
+      @input="emitValue(($event.target as HTMLInputElement).value)"
       :type="type"
       :name="label"
       :required="required"
@@ -32,6 +30,13 @@ const clazz = computed(() => {
 });
 
 const emit = defineEmits(["update:modelValue"]);
+function emitValue(value: any) {
+  if (props.type === "number") {
+    emit("update:modelValue", parseFloat(value));
+  } else {
+    emit("update:modelValue", value);
+  }
+}
 
 const uniqueId = Math.random().toString(16).substring(2);
 const inputRef = ref<HTMLInputElement | null>(null);

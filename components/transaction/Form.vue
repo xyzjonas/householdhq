@@ -6,10 +6,10 @@
           v-if="stage === 2"
           icon="i-ic-baseline-new-label"
           icon-size="1rem"
-          squared
           outlined
           @click="showNewCategory = !showNewCategory"
-        />
+          >{{ $t("c_new") }}</ui-button
+        >
       </transition>
       <ui-button
         v-if="!hideClose"
@@ -118,32 +118,13 @@
 
       <!-- CATEGORY SELECTION -->
       <div v-else-if="stage === 2">
-        <transition name="slide" mode="out-in">
-          <div class="new-category" v-if="showNewCategory">
-            <h3 class="mb-3 text-xl uppercase">{{ $t("c_new") }}</h3>
-            <ui-input :label="$t('c_name')" v-model="newCategoryName" />
-            <div class="flex gap-1">
-              <ui-button
-                @click="createCategory()"
-                :loading="categoryLoading"
-                :disabled="!newCategoryName"
-                color="primary"
-                class="flex-1"
-                >{{ $t("confirm") }}</ui-button
-              >
-              <ui-button @click="showNewCategory = false" height="3rem">{{
-                $t("cancel")
-              }}</ui-button>
-            </div>
-          </div>
-          <div v-else class="categories">
-            <CategoryBadge
-              v-for="category in categories"
-              :category="category"
-              @selected="categorySelected(category)"
-            />
-          </div>
-        </transition>
+        <div class="categories">
+          <CategoryBadge
+            v-for="category in categories"
+            :category="category"
+            @selected="categorySelected(category)"
+          />
+        </div>
       </div>
 
       <!-- NUMPAD  -->
@@ -213,6 +194,24 @@
       />
     </div>
     <p class="error" style="text-align: right">{{ error }}</p>
+    <teleport to="body">
+      <ui-modal v-model="showNewCategory">
+        <form class="card w-sm" @submit.prevent="createCategory">
+          <h3 class="mb-5 text-xl uppercase">{{ $t("c_new") }}</h3>
+          <ui-input :label="$t('c_name')" v-model="newCategoryName" />
+          <ui-button
+            :loading="categoryLoading"
+            :disabled="!newCategoryName"
+            color="primary"
+            width="100%"
+            height="3rem"
+            class="mt-2"
+            type="submit"
+            >{{ $t("confirm") }}</ui-button
+          >
+        </form>
+      </ui-modal>
+    </teleport>
   </div>
 </template>
 <script setup lang="ts">

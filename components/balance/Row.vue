@@ -17,6 +17,14 @@
         @click="navigateTo('/sources')"
         >{{ $t("s_more") }}</ui-button
       >
+      <ui-button
+        link
+        flat
+        icon="i-ic-round-read-more"
+        icon-size="1.5rem"
+        @click="navigateTo('/projects')"
+        >projects</ui-button
+      >
     </div>
   </div>
 </template>

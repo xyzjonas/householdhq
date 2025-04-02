@@ -11,7 +11,8 @@
     "docker-push": "docker push scotch3840/householdhq",
     "data-migration:transactedat": "tsx ./prisma/migrations/20240529085252_transacted_at/data-migration.ts",
     "db": "docker compose up -d db adminer db-migrate",
-    "db-migrate": "npx prisma migrate deploy"
+    "db-migrate": "npx prisma migrate deploy",
+    "db-dev": "npx prisma migrate dev"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma"

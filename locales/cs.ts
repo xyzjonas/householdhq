@@ -60,6 +60,7 @@ const cs = {
   balance_entry_missing: "Chybí záznam",
   balance: "zůstatek",
   balance_auto_update: "dopočítat",
+  s_name: "název účtu",
   s_isout: "výdaje",
   s_isout_desc: "poznačit tento účet jako 'výdajový'",
   s_isdisp: "zahrnout do zůstatku",
@@ -75,6 +76,7 @@ const cs = {
   s_position_desc: "pořadí ve výpisu",
   s_type: "Typ účtu",
   s_type_desc: "O jaký účet se jedná?",
+  s_new: "Přidat nový účet",
   log_in: "Přihlásit",
   access_denied: "Nepovolaným vstup zakázán!",
   sign_in_keep_logged_in: "Zapamatovat přihlášení",
@@ -88,6 +90,10 @@ const cs = {
   summary_year: "Rok",
   summary_all: "Vše",
   show_more: "Zobrazit více",
+  route_sources: "Účty",
+  route_projects: "Projekty",
+  route_categories: "Kategorie",
+  route_important: "Veledůležité",
 }
 
 export { cs }

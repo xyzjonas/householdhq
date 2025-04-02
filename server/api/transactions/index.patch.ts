@@ -1,7 +1,7 @@
 import type { Tag } from "@prisma/client";
-import transactions from "../controllers/transactions";
-import { EditTransactionDto } from "../validators/transactions.dto";
-import doValidate from "../validators/validator";
+import transactions from "../../controllers/transactions";
+import { EditTransactionDto } from "../../validators/transactions.dto";
+import doValidate from "../../validators/validator";
 import type { Transaction } from "~/types";
 
 export default defineEventHandler(async (event) => {

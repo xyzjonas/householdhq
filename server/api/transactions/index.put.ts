@@ -1,6 +1,6 @@
-import transactions from "../controllers/transactions";
-import { CreateTransactionDto } from "../validators/transactions.dto";
-import doValidate from "../validators/validator";
+import transactions from "../../controllers/transactions";
+import { CreateTransactionDto } from "../../validators/transactions.dto";
+import doValidate from "../../validators/validator";
 
 
 export default defineEventHandler(async (event) => {

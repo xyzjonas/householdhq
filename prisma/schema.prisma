@@ -93,14 +93,17 @@ model Transaction {
   confirmed       Boolean     @default(true)
   recurring       Int         @default(0)  // recurring each n months
 
-  isImportant     Boolean @default(false)  // mark as an important reminder/tracker
-  isHidden        Boolean @default(false)  // hide (e.g. internal) transactions
+  isImportant     Boolean     @default(false)  // mark as an important reminder/tracker
+  isHidden        Boolean     @default(false)  // hide (e.g. internal) transactions
   
   categoryId      Int?
   category        Category?   @relation(fields: [categoryId], references: [id])
 
   sourceId        Int
   source          Source      @relation(name: "source", fields: [sourceId], references: [id])
+
+  projectId       Int?
+  project         Project?     @relation(name: "project", fields: [projectId], references: [id])
 
   targetId        Int         @default(2)
   target          Source      @relation(name: "target", fields: [targetId], references: [id])
@@ -111,4 +114,18 @@ model Transaction {
   @@index([sourceId])
   @@index([targetId])
   @@index([categoryId])
+  @@index([projectId])
+}
+
+
+model Project {
+  id              Int             @id @default(autoincrement())
+  name            String
+  created         DateTime        @updatedAt
+  description     String?
+  estimate        Float
+  
+  color           String?
+  isCompleted     Boolean         @default(false)
+  transactions    Transaction[]   @relation(name: "project")
 }

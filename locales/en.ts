@@ -62,6 +62,7 @@ const en = {
   balance_entry_missing: "Missing entry",
   balance: "balance",
   balance_auto_update: "auto update",
+  s_name: "account name",
   s_isout: "expenses",
   s_isout_desc: "mark this account as an expense one",
   s_isdisp: "Disponible income",
@@ -77,6 +78,7 @@ const en = {
   s_position_desc: "position in the summary listing",
   s_type: "Account type",
   s_type_desc: "What's the account type?",
+  s_new: "Add a new account",
   sign_in_keep_logged_in: "Keep logged in",
   sign_in: "Sign In",
   login_failed: "Invalid username or password",
@@ -89,6 +91,10 @@ const en = {
   summary_year: "Year",
   summary_all: "All",
   show_more: "Show more",
+  route_sources: "Accounts",
+  route_projects: "Projects",
+  route_categories: "Categories",
+  route_important: "Important Reminders",
 }
 
 export { en }

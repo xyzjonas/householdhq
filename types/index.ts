@@ -129,3 +129,21 @@ export interface Summary {
   year: number;
   amount: number;
 }
+
+
+export interface ProjectApi {
+  id: number;
+  name: string;
+  description: string;
+  created: Date;
+  isComplete: boolean;
+  transactions: Transaction[];
+  estimate: number;
+  color?: string;
+}
+
+export interface Project extends ProjectApi {}
+
+export interface CreateProject extends Omit<ProjectApi, "id" | "created" | "transactions" | "isComplete"> {
+
+}
