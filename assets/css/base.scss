@@ -26,6 +26,7 @@
     // --bg-100: red;
     --text-over-primary: #ffffff;
     --text-over-danger: #ffffff;
+
 }
 
 body {
@@ -33,7 +34,7 @@ body {
 }
 
 :root, html[data-theme="light"] {
-    --bg-100: white;
+    --bg-100: #f7f7f7;
     --bg-200: #f8fafc;
     --bg-300:#adadad;
 
