@@ -6,9 +6,8 @@
     >
       <span class="flex items-center gap-2">
         <i
-          :class="`i-ic-chevron-left rotate-[-${
-            collapsed ? 180 : 90
-          }deg] transition`"
+          class="i-ic-chevron-left transition"
+          :style="`transform: rotate(-${collapsed ? 180 : 90}deg)`"
         ></i>
         <i :class="sourceIcons[type as SourceType]"></i>
         <h3>{{ $t(type as string) }}</h3>
