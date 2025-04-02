@@ -39,7 +39,6 @@
         <BalanceRow
           class="flex-1"
           v-if="isCurrentMonth"
-          v-model="balance"
           :sources="
             sources
               .filter((src) => src.isPortfolio)
@@ -192,8 +191,6 @@ const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
 
-const balance = ref<number>(0);
-
 const transactionStore = useTransactionStore();
 const { currentMonth, passed, upcomming, currency, loading } =
   storeToRefs(transactionStore);
@@ -207,6 +204,12 @@ watch(month, async (to, from) => {
 
 const sourcesStore = useSourcesStore();
 const { sources } = storeToRefs(sourcesStore);
+
+const balance = computed(() => {
+  return sources.value
+    .filter((src) => src.isDisponible)
+    .reduce((sum, src) => sum + src.sum, 0);
+});
 
 const categoriesStore = useCategoriesStore();
 const { incomeCategories, expenseCategories } = storeToRefs(categoriesStore);

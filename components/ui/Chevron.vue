@@ -1,6 +1,5 @@
 <template>
   <ui-button
-    id="show-legend"
     icon="i-ic-chevron-left"
     rounded
     link

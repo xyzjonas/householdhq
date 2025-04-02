@@ -12,6 +12,30 @@ export const useSourcesStore = defineStore("source", () => {
   const allSources = ref<SourceApi[]>([]);
   const currentSourceId = ref<number>();
 
+
+  function getLastEntry(source: SourceApi) {
+    if (source.states && source.states.length > 0) {
+      return source.states.reduce((_, b) => b);
+    }
+
+    return undefined
+  }
+
+  function isThisMonth(date: Date) {
+    if (date) {
+      const now = new Date();
+      const d = new Date(date);
+      if (
+        now.getFullYear() === d.getFullYear() &&
+        now.getMonth() === d.getMonth()
+      ) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
   const sources = computed<Source[]>(() => {
     return allSources.value.map((src) => {
       const in_ = currentMonth.value
@@ -20,13 +44,38 @@ export const useSourcesStore = defineStore("source", () => {
       const out_ = currentMonth.value
         .filter((trans) => trans.confirmed)
         .filter((trans) => trans.source.id === src.id);
+      
+      const lastEntry = getLastEntry(src);
+      
+      let sum = 0
+      let lastDate = new Date();
+      if (!lastEntry || !isThisMonth(new Date(lastEntry.created))) {
+        sum = 0;
+      } else {
+        lastDate = new Date(lastEntry.created);
+        sum = lastEntry.amount;
+      }
+      
+      in_
+        .filter(
+          (tr) =>
+            new Date(tr.transactedAt) < new Date() &&
+            new Date(tr.transactedAt) > lastDate
+        )
+        .forEach((tr) => (sum += tr.amount));
+      out_
+        .filter(
+          (tr) =>
+            new Date(tr.transactedAt) < new Date() &&
+            new Date(tr.transactedAt) > lastDate
+        )
+        .forEach((tr) => (sum -= tr.amount));
+
       return {
         ...src,
         transactionsIn: in_,
         transactionsOut: out_,
-        sum:
-          in_.map((tr) => tr.amount).reduce((a, b) => a + b, 0) -
-          out_.map((tr) => tr.amount).reduce((a, b) => a + b, 0),
+        sum: sum
       };
     });
   });

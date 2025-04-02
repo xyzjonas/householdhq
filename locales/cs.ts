@@ -94,6 +94,12 @@ const cs = {
   route_projects: "Projekty",
   route_categories: "Kategorie",
   route_important: "Veledůležité",
+  ACCOUNT: "Účet",
+  CASH: "Hotovost",
+  DEBT: "Dluhy",
+  INVESTMENT: "Investice",
+  OUT: "Výdaj",
+  SAVINGS: "Spoření",
 }
 
 export { cs }

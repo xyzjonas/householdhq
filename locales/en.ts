@@ -95,6 +95,12 @@ const en = {
   route_projects: "Projects",
   route_categories: "Categories",
   route_important: "Important Reminders",
+  ACCOUNT: "Account",
+  CASH: "Cash",
+  DEBT: "Debt",
+  INVESTMENT: "Investement",
+  OUT: "Outgoing",
+  SAVINGS: "Savings",
 }
 
 export { en }

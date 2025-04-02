@@ -5,7 +5,7 @@
       @click="navigateTo(`/sources/${source.id}`)"
     >
       <span class="color-flag"></span>
-      <i :class="sourceIcons[source.type]"></i>
+      <!-- <i :class="sourceIcons[source.type]"></i> -->
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
@@ -13,7 +13,7 @@
         v-if="lastEntryNotThisMonth"
         :source-id="source.id"
       />
-      <ui-price v-else size="large" :amount="balance" />
+      <ui-price v-else size="large" :amount="source.sum" />
     </div>
   </div>
 </template>
@@ -22,38 +22,12 @@ import { sourceIcons, type Source } from "@/types";
 
 const props = defineProps<{
   source: Source;
-  max: number;
-  modelValue: number | undefined;
 }>();
 
 const lastEntry = computed(() => {
   if (props.source.states && props.source.states.length > 0) {
     return props.source.states.reduce((_, b) => b);
   }
-});
-
-const balance = computed<string | number>(() => {
-  if (!lastEntry.value || lastEntryNotThisMonth.value) {
-    return "N/A";
-  }
-  const lastDate = new Date(lastEntry.value.created);
-  let sum = lastEntry.value.amount;
-  props.source.transactionsIn
-    .filter(
-      (tr) =>
-        new Date(tr.transactedAt) < new Date() &&
-        new Date(tr.transactedAt) > lastDate
-    )
-    .forEach((tr) => (sum += tr.amount));
-  props.source.transactionsOut
-    .filter(
-      (tr) =>
-        new Date(tr.transactedAt) < new Date() &&
-        new Date(tr.transactedAt) > lastDate
-    )
-    .forEach((tr) => (sum -= tr.amount));
-  emit("update:modelValue", sum);
-  return sum;
 });
 
 const lastEntryNotThisMonth = computed(() => {
@@ -74,14 +48,7 @@ const lastEntryNotThisMonth = computed(() => {
   return false;
 });
 
-// const opacity = computed(() => {
-//   if (lastEntry.value && lastEntryNotThisMonth.value) {
-//     return "opacity(1)";
-//   }
-//   return "opacity(0)";
-// });
-
-const emit = defineEmits(["autoupdated", "update:modelValue"]);
+const emit = defineEmits(["autoupdated"]);
 </script>
 <style lang="scss" scoped>
 // i {
@@ -97,7 +64,7 @@ const emit = defineEmits(["autoupdated", "update:modelValue"]);
   padding-block: 0.5rem;
   padding-left: 8px;
   padding-right: 8px;
-  border-bottom: 1px solid var(--bg-300);
+  // border-bottom: 1px solid var(--bg-300);
 
   transition: background-color 0.2s ease-in-out;
 
