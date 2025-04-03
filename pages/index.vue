@@ -240,6 +240,7 @@ const initialFetch = async () => {
   await Promise.all([
     transactionStore.fetchTransactions(),
     sourcesStore.fetchAllSources(),
+    categoriesStore.fetchCategories(),
     projectsStore.fetchAllProjects(),
   ]);
 };

@@ -109,6 +109,9 @@ const en = {
   p_completed: "Completed",
   p_completed_desc: "Is the project completed and all invoices paid?",
   p_out_of: "out of",
+  p_new: "Add a new project",
+  p_name: "Name",
+  p_description: "Description",
 }
 
 export { en }

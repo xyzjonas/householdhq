@@ -108,6 +108,9 @@ const cs = {
   p_completed: "Uzavřeno",
   p_completed_desc: "Je projekt uzavřený a vše uhrazeno?",
   p_out_of: "zbývá z",
+  p_new: "Přidat nový projekt",
+  p_name: "Název",
+  p_description: "Popis",
 }
 
 export { cs }
