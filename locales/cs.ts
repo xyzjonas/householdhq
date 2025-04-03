@@ -50,6 +50,7 @@ const cs = {
   t_recurring_label: "Transakce se opakuje každých x měsíců",
   t_important: "Veledůležitá transakce!",
   t_hidden: "Skrýt transakci ve výpisu",
+  t_project: "Přiřadit k projektu",
   months: "měsíců",
   tag_name: "Název kategorie",
   tag_parent: "Nadkategorie",
@@ -77,6 +78,7 @@ const cs = {
   s_type: "Typ účtu",
   s_type_desc: "O jaký účet se jedná?",
   s_new: "Přidat nový účet",
+  s_navigate_to: "Účty",
   log_in: "Přihlásit",
   access_denied: "Nepovolaným vstup zakázán!",
   sign_in_keep_logged_in: "Zapamatovat přihlášení",
@@ -100,6 +102,12 @@ const cs = {
   INVESTMENT: "Investice",
   OUT: "Výdaj",
   SAVINGS: "Spoření",
+  p_none: "Žádné rozběhnuté projekty",
+  p_navigate_to: "Projekty",
+  p_estimate: "Celková částka",
+  p_completed: "Uzavřeno",
+  p_completed_desc: "Je projekt uzavřený a vše uhrazeno?",
+  p_out_of: "zbývá z",
 }
 
 export { cs }

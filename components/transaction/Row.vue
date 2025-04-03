@@ -1,5 +1,8 @@
 <template>
-  <div :style="transparent && !details ? transparentStyle : ''" class="my-2">
+  <div :style="transparent && !details ? transparentStyle : ''" class="my-2 relative">
+    <div v-if="transaction?.project?.name" class="absolute right-0 top-[-9px] z-5">
+      <ui-pin clickable @click="navigateTo(`/projects/${transaction.project.id}`)" :text="transaction.project.name" :color="transaction.project.color" size="small" />
+    </div>
     <div class="wrapper gap-1">
       <div class="transaction-card flex-1" @click="() => onRowClick()">
         <DateTile :date="date" class="min-w-20 w-20" />

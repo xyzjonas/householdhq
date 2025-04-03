@@ -20,8 +20,8 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: "var(--text-100)"
-  }
+    default: "var(--text-100)",
+  },
 });
 
 const { currency } = storeToRefs(useTransactionStore());
@@ -49,24 +49,33 @@ const displayedAmount = computed(() => {
 });
 
 const currSize = computed(() => {
-  return {
-    'x-large': 'medium',
-    small: 'x-small'
-  }[props.size] ?? 'small'
-})
-  
+  if (!props.size) {
+    return "small";
+  }
+  const mapped = {
+    "x-large": "medium",
+    small: "x-small",
+  }[props.size];
+
+  if (mapped) {
+    return mapped;
+  }
+
+  return props.size;
+});
 </script>
 <style lang="scss" scoped>
 .amount {
   font-weight: 200;
   display: flex;
   align-items: center;
-  gap: .1rem;
-  color: v-bind('color')
+  gap: 0.1rem;
+  color: v-bind("color");
 }
 
 .currency {
-  font-size: v-bind('currSize');
+  --size: v-bind("currSize");
+  font-size: calc(0.7 * var(--size));
   font-weight: 400;
   font-family: "Roboto Slab", serif;
 }

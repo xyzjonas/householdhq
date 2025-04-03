@@ -37,6 +37,6 @@ watch(modelValue, (modalOpened) => {
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.7);
-  z-index: 99999;
+  z-index: 10;
 }
 </style>

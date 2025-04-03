@@ -101,6 +101,7 @@ main {
   gap: 0.5rem;
   bottom: 0;
   width: 100%;
+  z-index: 11;
 }
 
 .page-wrapper {

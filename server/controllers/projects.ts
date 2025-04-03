@@ -1,20 +1,24 @@
-import { Prisma, PrismaClient, type Project } from "@prisma/client";
+import { Prisma, PrismaClient, type Project, type Transaction } from "@prisma/client";
 import { IdDto } from "../validators/common.dto";
 import type { CreateProjectDto, EditProjectDto } from "../validators/projects.dto";
+
+const DEFAULT_INCLUDE = { transactions: { include: { source: true, target: true } } }
 
 class Projects {
   private projects = new PrismaClient().project;
 
   public async findAll(): Promise<Project[]> {
-    return await this.projects.findMany();
+    return await this.projects.findMany({ include: DEFAULT_INCLUDE });
   }
 
   public async findSingle(data: IdDto): Promise<Project> {
-    const category = await this.projects.findUnique({ where: { id: data.id } });
-    if (!category) {
+    const project = await this.projects.findUnique({ where: { id: data.id }, include: DEFAULT_INCLUDE });
+
+    if (!project) {
       throw createError({ statusCode: 404, statusMessage: `Project '${data.id}' nof found.` });
     }
-    return category;
+
+    return project;
   }
 
   public async deleteProject(data: IdDto): Promise<Project> {

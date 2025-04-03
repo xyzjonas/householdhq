@@ -19,6 +19,7 @@ export function transactionToUpdateTransaction(trans: Transaction): CreateUpdate
     categoryId: trans.category?.id,
     sourceId: trans.source.id,
     targetId: trans.target.id,
+    projectId: trans.projectId,
     isImportant: trans.isImportant,
     isHidden: trans.isHidden,
     tags: trans.tags.map((tag) => tag.name).join(","),

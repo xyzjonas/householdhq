@@ -68,6 +68,10 @@ export class CreateTransactionDto {
   @IsNumber()
   public targetId?: number;
 
+  @IsOptional()
+  @IsNumber()
+  public projectId?: number;
+
   @IsString()
   @IsOptional()
   public currency?: string;
@@ -126,6 +130,10 @@ export class EditTransactionDto {
   @IsOptional()
   @IsNumber()
   public targetId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  public projectId?: number;
 
   @IsString()
   @IsOptional()

@@ -52,6 +52,7 @@ const en = {
   t_recurring_label: "Transaction occurs periodically after n months",
   t_important: "Important transaction!",
   t_hidden: "Hidden transaction",
+  t_project: "Assign to a project",
   months: "months",
   tag_name: "Category name",
   tag_parent: "Parent category",
@@ -78,6 +79,7 @@ const en = {
   s_position_desc: "position in the summary listing",
   s_type: "Account type",
   s_type_desc: "What's the account type?",
+  s_navigate_to: "To Accounts",
   s_new: "Add a new account",
   sign_in_keep_logged_in: "Keep logged in",
   sign_in: "Sign In",
@@ -101,6 +103,12 @@ const en = {
   INVESTMENT: "Investement",
   OUT: "Outgoing",
   SAVINGS: "Savings",
+  p_none: "No Projects in progress",
+  p_navigate_to: "To projects",
+  p_estimate: "Estimated Total",
+  p_completed: "Completed",
+  p_completed_desc: "Is the project completed and all invoices paid?",
+  p_out_of: "out of",
 }
 
 export { en }

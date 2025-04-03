@@ -41,18 +41,18 @@ export const useProjectsStore = defineStore("project", () => {
   //   }
   // };
 
-  // const patchProject = async (projId: number, projectData: any) => {
-  //   loading.value = true;
-  //   const url = "/api/projects";
-  //   projectData.id = projId;
-  //   try {
-  //     const newProject = await tokenStore.patch(url, projectData);
-  //     allProjects.value = allProjects.value.filter((proj) => proj.id !== projId);
-  //     allProjects.value.push(newProject.data);
-  //   } finally {
-  //     loading.value = false;
-  //   }
-  // };
+  const patchProject = async (projId: number, projectData: any) => {
+    loading.value = true;
+    const url = "/api/projects";
+    projectData.id = projId;
+    try {
+      const newProject = await tokenStore.patch(url, projectData);
+      allProjects.value = allProjects.value.filter((proj) => proj.id !== projId);
+      allProjects.value.push(newProject.data);
+    } finally {
+      loading.value = false;
+    }
+  };
 
   const createProject = async (projectdata: CreateProject) => {
     loading.value = true;
@@ -84,6 +84,7 @@ export const useProjectsStore = defineStore("project", () => {
     projects,
     fetchAllProjects,
     createProject,
+    patchProject,
     currentProjectId,
     currentProject,
     loading,

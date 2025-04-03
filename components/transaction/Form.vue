@@ -1,26 +1,13 @@
 <template>
   <div ref="focusDiv" class="card">
-    <div class="row-simple min-h-10">
-      <transition name="slide" mode="out-in">
-        <ui-button
-          v-if="stage === 2"
-          icon="i-ic-baseline-new-label"
-          icon-size="1rem"
-          outlined
-          @click="showNewCategory = !showNewCategory"
-          >{{ $t("c_new") }}</ui-button
-        >
-      </transition>
+    <div v-if="stage === 2" class="row-simple min-h-10">
       <ui-button
-        v-if="!hideClose"
-        id="close-t-form"
-        width="2rem"
-        color="light"
-        link
-        squared
-        icon="i-ic-baseline-close"
-        @click="$emit('close')"
-      />
+        icon="i-ic-baseline-new-label"
+        icon-size="1rem"
+        outlined
+        @click="showNewCategory = !showNewCategory"
+        >{{ $t("c_new") }}</ui-button
+      >
     </div>
     <transition name="slide" mode="out-in" class="navigation-container">
       <!-- ENTIRE FORM -->
@@ -32,18 +19,22 @@
           inputmode="numeric"
           :required="true"
         />
-        <ui-input
-          :label="$t('t_date')"
-          v-model="date"
-          type="date"
-          :required="true"
-        />
-        <ui-input
-          :label="$t('t_time')"
-          v-model="time"
-          type="time"
-          :required="true"
-        />
+        <div class="row-simple">
+          <ui-input
+            :label="$t('t_date')"
+            v-model="date"
+            type="date"
+            :required="true"
+            class="flex-1"
+          />
+          <ui-input
+            :label="$t('t_time')"
+            v-model="time"
+            type="time"
+            :required="true"
+            class="flex-1"
+          />
+        </div>
         <ui-input
           :label="$t('t_desc')"
           v-model="transaction.description"
@@ -77,6 +68,19 @@
             :value="category.id"
           >
             {{ category.name }}
+          </option>
+        </ui-select>
+
+        <ui-select
+          v-model.number="transaction.projectId"
+          :label="$t('t_project')"
+        >
+          <option
+            v-for="project in projects"
+            :key="project.id + '-event'"
+            :value="project.id"
+          >
+            {{ project.name }}
           </option>
         </ui-select>
 
@@ -252,6 +256,7 @@ const borderColor = ref<string>();
 onMounted(() => {
   sourcesStore.fetchAllSources();
   categoriesStore.fetchCategories();
+  projectsStore.fetchAllProjects();
 
   date.value = formatDate(new Date());
   time.value = formatTime(new Date());
@@ -319,6 +324,9 @@ const { allSources } = storeToRefs(sourcesStore);
 
 const transactionStore = useTransactionStore();
 const { loading } = storeToRefs(transactionStore);
+
+const projectsStore = useProjectsStore();
+const { projects } = storeToRefs(projectsStore);
 
 const { t } = useI18n();
 const emit = defineEmits(["send", "close"]);

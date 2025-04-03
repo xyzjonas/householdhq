@@ -3,6 +3,7 @@
     <spinner name="ellipsis" v-if="loading" />
     <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
+    <i v-if="!loading && iconLeft" :class="iconLeft"></i>
   </button>
 </template>
 
@@ -10,6 +11,7 @@
 const props = defineProps<{
   loading?: boolean;
   icon?: string;
+  iconLeft?: string;
   iconSize?: string;
   outlined?: boolean;
   width?: string;

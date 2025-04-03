@@ -36,17 +36,20 @@
         </div>
       </HomeCarousel>
       <transition name="slide" mode="out-in">
-        <BalanceRow
-          class="flex-1"
-          v-if="isCurrentMonth"
-          :sources="
-            sources
-              .filter((src) => src.isPortfolio)
-              .sort((a, b) => a.position - b.position)
-          "
-          :spent="expense"
-          :total-income="income"
-        />
+        <div class="flex flex-col flex-1 gap-2">
+          <BalanceRow
+            class="flex-1"
+            v-if="isCurrentMonth"
+            :sources="
+              sources
+                .filter((src) => src.isPortfolio)
+                .sort((a, b) => a.position - b.position)
+            "
+            :spent="expense"
+            :total-income="income"
+          />
+          <project-dashboard />
+        </div>
       </transition>
     </div>
 
@@ -191,6 +194,8 @@ const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
 
+const projectsStore = useProjectsStore();
+
 const transactionStore = useTransactionStore();
 const { currentMonth, passed, upcomming, currency, loading } =
   storeToRefs(transactionStore);
@@ -228,15 +233,14 @@ const carouselTabindex = ref(0);
 const incomesDisplayed = computed(() => carouselTabindex.value === 1);
 
 onMounted(async () => {
-  transactionStore.fetchTransactions();
-  sourcesStore.fetchAllSources();
-  categoriesStore.fetchCategories();
+  await initialFetch();
 });
 
 const initialFetch = async () => {
   await Promise.all([
     transactionStore.fetchTransactions(),
     sourcesStore.fetchAllSources(),
+    projectsStore.fetchAllProjects(),
   ]);
 };
 

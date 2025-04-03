@@ -96,6 +96,8 @@ export interface Transaction {
   isImportant: boolean;
   isHidden: boolean;
   category: Category;
+  projectId: number;
+  project: Project;
 
   source: Source;
   target: Source;
@@ -120,6 +122,7 @@ export interface CreateUpdateTransaction {
 
   sourceId: number;
   targetId: number;
+  projectId?: number;
 
   tags?: string;
 }
@@ -136,7 +139,7 @@ export interface ProjectApi {
   name: string;
   description: string;
   created: Date;
-  isComplete: boolean;
+  isCompleted: boolean;
   transactions: Transaction[];
   estimate: number;
   color?: string;

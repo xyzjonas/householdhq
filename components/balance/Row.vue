@@ -7,22 +7,14 @@
         :type="key"
       />
     </div>
-    <div class="flex w-full justify-end items-center h-[2rem] mt-5">
+    <hr class="mt-auto" />
+    <div class="flex w-full justify-end items-center h-[2rem]">
       <ui-button
         link
         flat
-        icon="i-ic-round-read-more"
-        icon-size="1.5rem"
+        icon-left="i-ic-baseline-arrow-forward"
         @click="navigateTo('/sources')"
-        >{{ $t("s_more") }}</ui-button
-      >
-      <ui-button
-        link
-        flat
-        icon="i-ic-round-read-more"
-        icon-size="1.5rem"
-        @click="navigateTo('/projects')"
-        >projects</ui-button
+        >{{ $t("s_navigate_to") }}</ui-button
       >
     </div>
   </div>

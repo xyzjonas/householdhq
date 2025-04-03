@@ -8,12 +8,14 @@ import {
   TransactionFiltersDto,
 } from "../validators/transactions.dto";
 import { IdDto } from "../validators/common.dto";
+import { connect } from "http2";
 
 const DEFAULT_INCLUDE = {
   category: true,
   source: true,
   target: true,
   tags: true,
+  project: true,
 };
 
 export interface GetTransactionsResponse {
@@ -156,6 +158,11 @@ class Transactions {
             id: transactionData.targetId,
           },
         },
+        project: {
+          connect: {
+            id: transactionData.projectId,
+          }
+        }
       },
       include: DEFAULT_INCLUDE,
     });
@@ -188,6 +195,11 @@ class Transactions {
       target = { connect: { id: transactionData.targetId } };
     }
 
+    let project = undefined;
+    if (transactionData.projectId) {
+      project = { connect: { id: transactionData.projectId } }
+    }
+
     // disconnect all other tags...
     if (tags) {
       await this.transactions.update({
@@ -215,6 +227,7 @@ class Transactions {
         category: category,
         source: source,
         target: target,
+        project: project,
       },
       include: DEFAULT_INCLUDE,
     });

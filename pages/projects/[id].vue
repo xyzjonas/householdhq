@@ -1,118 +1,91 @@
 <template>
   <div>
-    <Transition name="page" mode="out-in">
-      <div v-if="!currentSource && sourceLoading" class="center">
-        <MosaicLoader />
+    <div v-if="project" class="flex-col">
+      <section class="row title">
+        <div class="flex flex-col">
+          <h1 class="uppercase text-3xl">{{ project.name }}</h1>
+          <div class="flex gap-2 ml-1">
+            <ui-price :amount="paidSoFar" size="1rem" />
+            <span class="text-xl">/</span>
+            <ui-price :amount="total" size="1rem" />
+          </div>
+        </div>
+        <Transition name="page" mode="out-in">
+          <spinner v-show="loading" class="item" />
+        </Transition>
+      </section>
+
+      <div class="row card">
+        <div class="row-label">
+          <p class="item">{{ $t("name") }}</p>
+          <small></small>
+        </div>
+        <form-editable-field
+          :value="project.name"
+          keyName="name"
+          @send="(data: string) => patchProject(data)"
+          class="item"
+        />
       </div>
-      <div v-else-if="currentSource" class="flex-col">
-        <section class="row title">
-          <h1 class="uppercase text-3xl">{{ currentSource.name }}</h1>
-          <Transition name="page" mode="out-in">
-            <spinner v-show="sourceLoading" class="item" />
-          </Transition>
-        </section>
 
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("name") }}</p>
-            <small></small>
-          </div>
-          <form-editable-field
-            :value="currentSource.name"
-            keyName="name"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-            class="item"
-          />
+      <div class="row card">
+        <div class="row-label">
+          <p class="item">{{ $t("description") }}</p>
+          <small></small>
         </div>
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("s_isout") }}</p>
-            <p class="desc">{{ $t("s_isout_desc") }}</p>
-          </div>
-          <form-editable-boolean
-            keyName="isOut"
-            :value="currentSource.isOut"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-            class="item"
-          />
+        <form-editable-field
+          :value="project.description"
+          keyName="description"
+          @send="(data: string) => patchProject(data)"
+          class="item"
+        />
+      </div>
+
+      <div class="row card">
+        <div class="row-label">
+          <p class="item">{{ $t("p_estimate") }}</p>
+          <small></small>
         </div>
+        <form-editable-field
+          :value="project.estimate"
+          keyName="estimate"
+          @send="(data: string) => patchProject(data)"
+          type="number"
+          inputmode="numeric"
+          class="item"
+        />
+      </div>
 
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("s_isdisp") }}</p>
-            <p class="desc">{{ $t("s_isdisp_desc") }}</p>
-          </div>
-          <form-editable-boolean
-            keyName="isDisponible"
-            :value="currentSource.isDisponible"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-            class="item"
-          />
+      <div class="card flex gap-5 justify-between items-center">
+        <div class="text-gray-5 capitalize">{{ $t("color") }}</div>
+        <form-editable-color
+          keyName="color"
+          :value="project.color || '#ffffffff'"
+          @send="(data: string) => patchProject(data)"
+        />
+      </div>
+
+      <div class="row card">
+        <div class="row-label">
+          <p class="item">{{ $t("p_completed") }}</p>
+          <p class="desc">{{ $t("p_completed_desc") }}</p>
         </div>
+        <form-editable-boolean
+          keyName="isCompleted"
+          :value="project.isCompleted"
+          @send="(data: string) => patchProject(data)"
+          class="item"
+        />
+      </div>
 
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("s_isport") }}</p>
-            <p class="desc">{{ $t("s_isport_desc") }}</p>
-          </div>
-          <form-editable-boolean
-            keyName="isPortfolio"
-            :value="currentSource.isPortfolio"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-            class="item"
-          />
-        </div>
+      <h1 class="title container mb-2 mt-3">
+        {{ project.transactions.length }} Transactions
+      </h1>
+      <div class="flex flex-col gap-10">
+        <transaction-monthly-listing :transactions="project.transactions" />
+      </div>
 
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("color") }}</p>
-            <small></small>
-          </div>
-          <div class="item">
-            <form-editable-color
-              keyName="color"
-              :value="currentSource.color || '#ffffffff'"
-              @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-            />
-          </div>
-        </div>
-
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("s_position") }}</p>
-            <p class="desc">{{ $t("s_position_desc") }}</p>
-          </div>
-          <div class="item">
-            <form-editable-field
-              keyName="position"
-              :value="currentSource.position"
-              @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-              type="number"
-              inputmode="numeric"
-            />
-          </div>
-        </div>
-
-        <div class="row card">
-          <div class="row-label">
-            <p class="item">{{ $t("s_type") }}</p>
-            <p class="desc">{{ $t("s_type_desc") }}</p>
-          </div>
-          <div class="item">
-            <form-editable-select
-              :value="currentSource.type"
-              :options="SourceTypes"
-              keyName="type"
-              @send="(data: string) => sourceStore.patchSource(sourceId, data)"
-              type="number"
-              inputmode="numeric"
-            />
-          </div>
-        </div>
-
-        <input />
-
-        <div class="row card">
+      <!-- <div class="row card">
           <div class="row-label">
             <p class="item">{{ $t("delete") }}</p>
             <p class="desc">{{ $t("delete_desc") }}</p>
@@ -126,117 +99,32 @@
               color="danger"
             />
           </div>
-        </div>
-
-        <h3 class="uppercase text-2xl font-300 mt-5">{{ $t("s_states") }}</h3>
-        <section class="card states flex-col">
-          <Transition name="page" mode="out-in" class="my-2">
-            <balance-entry-form
-              v-if="edit"
-              @close="edit = !edit"
-              @created="newEntry"
-              :sourceId="currentSource.id"
-            />
-            <div v-else class="flex items-center justify-between">
-              <ui-button
-                color="primary"
-                @click="edit = !edit"
-                icon="i-ic-baseline-add"
-                >{{ $t("s_add_state") }}</ui-button
-              >
-              <balance-autofill-button :source-id="sourceId" />
-            </div>
-          </Transition>
-
-          <div v-for="state in sourceStates" class="state-row">
-            <div>
-              <span>{{ new Date(state.created).toLocaleString() }}</span>
-            </div>
-            <ui-price
-              class="item"
-              :amount="state.amount"
-              :currency="currency"
-            />
-            <ui-button
-              @click="sourceStore.deleteEntry(sourceId, state.id)"
-              icon="i-ic-baseline-delete"
-              width="2rem"
-              squared
-              outlined
-            />
-          </div>
-          <div class="flex items-center justify-center">
-            <ui-button
-              link
-              v-if="!showMore && currentSource?.states?.length > MAX_ITEMS"
-              class="mt-5"
-              icon="i-ic-baseline-expand-more"
-              @click="showMore = true"
-              >{{ $t("show_more") }}</ui-button
-            >
-          </div>
-        </section>
-      </div>
-      <error-banner v-else status="404" message="not found" :is-login="false" />
-    </Transition>
+        </div> -->
+    </div>
+    <error-banner v-else status="404" message="not found" :is-login="false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useSourcesStore } from "@/stores/sources";
-import { storeToRefs } from "pinia";
-import { useTransactionStore } from "@/stores/transactions";
-import { SourceType } from "@prisma/client";
-import { SourceTypes } from "~/types";
-
-const sourceStore = useSourcesStore();
-const { sourceLoading, currentSourceId, currentSource } =
-  storeToRefs(sourceStore);
-
-const transactionStore = useTransactionStore();
-const { currency } = storeToRefs(transactionStore);
+import type { Project } from "~/types";
 
 const route = useRoute();
-const sourceId = parseInt(route.params.id as string);
+const id = parseInt(route.params.id as string);
+const { data, error, refresh } = await useFetch<{ data: Project }>(
+  `/api/projects/${id}`
+);
 
-const edit = ref<boolean>();
+const projectsStore = useProjectsStore();
+const { loading } = storeToRefs(projectsStore);
 
-currentSourceId.value = sourceId;
+const project = computed(() => data.value?.data as Project);
 
-onMounted(() => {
-  if (!currentSource.value) {
-    sourceStore.fetchSingleSource(sourceId);
-  }
-});
-
-const newEntry = () => {
-  edit.value = false;
-  sourceStore.fetchSingleSource(sourceId);
+const patchProject = async (data: any) => {
+  await projectsStore.patchProject(project.value?.id, data);
+  await refresh();
 };
 
-const router = useRouter();
-const deleteSource = async () => {
-  await sourceStore.deleteSource({ id: sourceId });
-  navigateTo("/sources");
-};
-
-const MAX_ITEMS = 5;
-const showMore = ref(false);
-const sourceStates = computed(() => {
-  if (!currentSource.value || !currentSource.value.states) {
-    return [];
-  }
-
-  const states = currentSource.value.states.toSorted(
-    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-  );
-
-  if (!showMore.value && states.length > MAX_ITEMS) {
-    states.length = MAX_ITEMS;
-  }
-
-  return states;
-});
+const { total, paidSoFar } = useProject(project);
 </script>
 
 <style lang="scss" scoped>
