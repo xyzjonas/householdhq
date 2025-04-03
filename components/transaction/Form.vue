@@ -75,6 +75,7 @@
           v-model.number="transaction.projectId"
           :label="$t('t_project')"
         >
+          <option default value="-1">-</option>
           <option
             v-for="project in projects"
             :key="project.id + '-event'"
@@ -335,6 +336,7 @@ const send = () => {
   if (!transaction.value.description) {
     transaction.value.description = t("t_placeholder");
   }
+
   const datetime = date.value ? new Date(date.value) : new Date();
   if (time.value) {
     const hour = parseInt(time.value.split(":")[0]);

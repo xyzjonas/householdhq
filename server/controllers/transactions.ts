@@ -133,6 +133,11 @@ class Transactions {
       category = { connect: { id: transactionData.categoryId } };
     }
 
+    let project = undefined;
+    if (transactionData.projectId && transactionData.projectId !== -1) {
+      project = { connect: { id: transactionData.projectId } }
+    }
+
     transactionData.currency ??= "CZK";
     const trans: Transaction = await this.transactions.create({
       data: {
@@ -147,7 +152,6 @@ class Transactions {
         tags: {
           connect: tags,
         },
-        category: category,
         source: {
           connect: {
             id: transactionData.sourceId,
@@ -158,11 +162,8 @@ class Transactions {
             id: transactionData.targetId,
           },
         },
-        project: {
-          connect: {
-            id: transactionData.projectId,
-          }
-        }
+        category,
+        project
       },
       include: DEFAULT_INCLUDE,
     });
@@ -196,7 +197,9 @@ class Transactions {
     }
 
     let project = undefined;
-    if (transactionData.projectId) {
+    if (transactionData.projectId === -1) {
+      project = { disconnect: true }
+    } else if (transactionData.projectId) {
       project = { connect: { id: transactionData.projectId } }
     }
 
