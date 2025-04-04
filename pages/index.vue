@@ -36,10 +36,9 @@
         </div>
       </HomeCarousel>
       <transition name="slide" mode="out-in">
-        <div class="flex flex-col flex-1 gap-2">
+        <div class="flex flex-col flex-1 gap-2" v-if="isCurrentMonth">
           <BalanceRow
             class="flex-1"
-            v-if="isCurrentMonth"
             :sources="
               sources
                 .filter((src) => src.isPortfolio)
