@@ -4,14 +4,14 @@ import {
   CategorySchema,
   type CreateCategory,
   CreateCategorySchema,
+  type EditCategory,
 } from "./category";
 
-export {
-  type Category,
-  CategorySchema,
-  type CreateCategory,
-  CreateCategorySchema,
-};
+import { type IDBase, IdSchema } from "./base";
+
+export type { Category, CreateCategory, EditCategory, IDBase };
+
+export { CategorySchema, CreateCategorySchema, IdSchema };
 
 export interface User {
   id: number;
