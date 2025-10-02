@@ -186,7 +186,6 @@
 import { useSourcesStore } from "@/stores/sources";
 import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
-import { SourceType } from "@prisma/client";
 import { SourceTypes } from "~/types";
 
 const sourceStore = useSourcesStore();

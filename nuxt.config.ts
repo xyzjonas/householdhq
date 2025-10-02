@@ -23,7 +23,11 @@ export default defineNuxtConfig({
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { id: "description", name: "description", content: "Personal finance helper." },
+        {
+          id: "description",
+          name: "description",
+          content: "Personal finance helper.",
+        },
       ],
     },
   },
@@ -34,35 +38,33 @@ export default defineNuxtConfig({
     "@/assets/css/layout.scss",
     "@/assets/css/custom_components.scss",
     "@/assets/css/spinners.scss",
-    "@/assets/css/typography.scss"
+    "@/assets/css/typography.scss",
   ],
 
-  modules: [
-    "@nuxtjs/i18n",
-    "@pinia/nuxt",
-    "@vite-pwa/nuxt",
-    '@unocss/nuxt',
-  ],
+  modules: ["@nuxtjs/i18n", "@pinia/nuxt", "@vite-pwa/nuxt", "@unocss/nuxt"],
 
   i18n: {
     locales: [
       {
-        code: 'en',
-        iso: 'en-US',
-        file: 'en.json',
-        name: 'English',
+        code: "en",
+        iso: "en-US",
+        file: "en.json",
+        name: "English",
       },
       {
-        code: 'cs',
-        iso: 'cs-CZ',
-        file: 'cs.json',
-        name: 'Čeština'
-      }
+        code: "cs",
+        iso: "cs-CZ",
+        file: "cs.json",
+        name: "Čeština",
+      },
     ],
     lazy: true,
-    langDir: 'locales/',
+    langDir: "locales/",
     defaultLocale: "en",
     strategy: "prefix_except_default",
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
   },
 
   pwa: {
@@ -111,5 +113,5 @@ export default defineNuxtConfig({
     "@/stores": "../stores",
   },
 
-  compatibilityDate: "2025-01-10"
+  compatibilityDate: "2025-01-10",
 });

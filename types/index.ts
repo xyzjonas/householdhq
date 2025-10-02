@@ -1,24 +1,23 @@
 /* @unocss-include */
+import {
+  type Category,
+  CategorySchema,
+  type CreateCategory,
+  CreateCategorySchema,
+} from "./category";
+
+export {
+  type Category,
+  CategorySchema,
+  type CreateCategory,
+  CreateCategorySchema,
+};
 
 export interface User {
   id: number;
   email: string;
   password: string;
 }
-
-export interface Category {
-  id: number;
-  name: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-  // parentId?: number;
-}
-
-export interface CreateCategory {
-  name: string;
-}
-
 
 export interface Tag {
   id: number;
@@ -46,8 +45,21 @@ export interface SourceState {
   source: Source;
 }
 
-export type SourceType = "ACCOUNT" | "OUT" | "CASH" | "SAVINGS" | "INVESTMENT" | "DEBT"
-export const SourceTypes = ["ACCOUNT", "OUT", "CASH", "SAVINGS", "INVESTMENT", "DEBT"]
+export type SourceType =
+  | "ACCOUNT"
+  | "OUT"
+  | "CASH"
+  | "SAVINGS"
+  | "INVESTMENT"
+  | "DEBT";
+export const SourceTypes = [
+  "ACCOUNT",
+  "OUT",
+  "CASH",
+  "SAVINGS",
+  "INVESTMENT",
+  "DEBT",
+];
 export const sourceIcons: { [key in SourceType]: string } = {
   ACCOUNT: "i-ic-baseline-account-balance",
   CASH: "i-ic-baseline-wallet",
@@ -133,7 +145,6 @@ export interface Summary {
   amount: number;
 }
 
-
 export interface ProjectApi {
   id: number;
   name: string;
@@ -147,6 +158,5 @@ export interface ProjectApi {
 
 export interface Project extends ProjectApi {}
 
-export interface CreateProject extends Omit<ProjectApi, "id" | "created" | "transactions" | "isComplete"> {
-
-}
+export interface CreateProject
+  extends Omit<ProjectApi, "id" | "created" | "transactions" | "isComplete"> {}

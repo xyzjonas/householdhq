@@ -1,7 +1,7 @@
-import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
+import { useCurrentMonth } from "~/composables/useCurrentMonth";
 import type { Transaction } from "~/types";
 import { useTokenStore } from "./tokenStore";
-import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
 export const useTransactionStore = defineStore("transaction", () => {
   const tokenStore = useTokenStore();
@@ -16,11 +16,15 @@ export const useTransactionStore = defineStore("transaction", () => {
   const currentMonth = ref<Transaction[]>([]);
 
   const passed = computed(() => {
-    return currentMonth.value.filter((trans) => new Date(trans.transactedAt) <= new Date());
+    return currentMonth.value.filter(
+      (trans) => new Date(trans.transactedAt) <= new Date()
+    );
   });
 
   const upcomming = computed(() => {
-    return currentMonth.value.filter((trans) => new Date(trans.transactedAt) > new Date());
+    return currentMonth.value.filter(
+      (trans) => new Date(trans.transactedAt) > new Date()
+    );
   });
 
   const fetchTransactions = async () => {
@@ -34,7 +38,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
     try {
       const response = await tokenStore.get(url);
-      currentMonth.value = response.data
+      currentMonth.value = response.data;
       // currentMonth.value = (response.data as Transaction[]).filter((trans) => !trans.isHidden)
     } finally {
       loading.value = false;
@@ -45,39 +49,47 @@ export const useTransactionStore = defineStore("transaction", () => {
     loading.value = true;
     const url = "/api/transactions";
     try {
-      const response = await tokenStore.put("/api/transactions", transactionData)
-      const transaction: Transaction = response.data
+      const response = await tokenStore.put(
+        "/api/transactions",
+        transactionData
+      );
+      const transaction: Transaction = response.data;
 
       let actualMonth = month.value;
       if (!actualMonth) {
-        actualMonth = new Date().getMonth() + 1
+        actualMonth = new Date().getMonth() + 1;
       }
 
       if (new Date(transaction.transactedAt).getMonth() + 1 === actualMonth) {
         currentMonth.value.push(transaction);
-        currentMonth.value.sort(byDate)
+        currentMonth.value.sort(byDate);
       }
     } finally {
       loading.value = false;
     }
-  }
+  };
 
-  const editTransaction = async (transactionData: {[K in keyof Transaction]?: any}) => {
+  const editTransaction = async (transactionData: {
+    [K in keyof Transaction]?: any;
+  }) => {
     loading.value = true;
     try {
-      const response = await tokenStore.patch("/api/transactions", transactionData)
-      const transaction: Transaction = response.data
-      currentMonth.value = currentMonth.value.map(t => {
+      const response = await tokenStore.patch(
+        "/api/transactions",
+        transactionData
+      );
+      const transaction: Transaction = response.data;
+      currentMonth.value = currentMonth.value.map((t) => {
         if (t.id === transaction.id) {
-          return transaction
+          return transaction;
         }
-        return t
-      })
-      currentMonth.value.sort(byDate)
+        return t;
+      });
+      currentMonth.value.sort(byDate);
     } finally {
       loading.value = false;
     }
-  }
+  };
 
   return {
     loading,
