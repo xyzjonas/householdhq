@@ -167,7 +167,7 @@ const options = {
       display: () => false,
       // color: shouldInvert(props.category.color) ? '#333' : '#ddd',
       backgroundColor: "black",
-      textShadowColor: (val: any) => props.items[val.dataIndex].color,
+      textShadowColor: (val: any) => props.items[val.dataIndex]?.color,
       textShadowBlur: 10,
       color: "white",
       borderRadius: 5,

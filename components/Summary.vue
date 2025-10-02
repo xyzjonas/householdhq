@@ -116,11 +116,12 @@ const callback = (e: any) => {
 
   // Substitute the appropriate scale IDs
   const dataX = e.chart.scales.x.getValueForPixel(canvasPosition.x);
-  // const dataY = e.chart.scales.y.getValueForPixel(canvasPosition.y);
 
   const item = summary.value.slice(-1 * dataSelection.value)[dataX];
-  console.info(item.year, item.month);
-  navigateTo(`/?year=${item.year}&month=${item.month + 1}`);
+  if (item) {
+    console.info(item.year, item.month);
+    navigateTo(`/?year=${item.year}&month=${item.month + 1}`);
+  }
 };
 
 const options = {
@@ -130,23 +131,6 @@ const options = {
   maintainAspectRatio: false,
   plugins: {
     datalabels: false,
-    // tooltip: {
-    //   enabled: false,
-    // },
-    // {
-    //   backgroundColor: '#e0e0e0',
-    //   color: "#1a1a1a",
-    //   borderRadius: 3,
-    //   anchor: 'start',
-    //   offset: 0,
-    //   labels: {
-    //     title: {
-    //       font: {
-    //         // weight: 'bold'
-    //       }
-    //     },
-    //   }
-    // }
   },
   scales: {
     y: {

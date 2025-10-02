@@ -334,6 +334,9 @@ const deleteTransaction = (transactionData: Transaction) => {
 const updateTransaction = (transaction: Transaction) => {
   for (let index = 0; index < currentMonth.value.length; index++) {
     const element = currentMonth.value[index];
+    if (!element) {
+      return
+    }
     if (element.id === transaction.id)
       if (element.id === transaction.id) {
         currentMonth.value[index] = transaction;
@@ -403,7 +406,6 @@ h3 {
   border-radius: 50%;
   transition: transform 0.1s ease-in-out;
   z-index: 900;
-  // box-shadow: 2px 2px 5px var(--shadow-100);
 
   &.active {
     transform: rotate(45deg);

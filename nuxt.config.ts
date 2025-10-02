@@ -23,7 +23,7 @@ export default defineNuxtConfig({
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { hid: "description", name: "description", content: "Personal finance helper." },
+        { id: "description", name: "description", content: "Personal finance helper." },
       ],
     },
   },
@@ -45,10 +45,24 @@ export default defineNuxtConfig({
   ],
 
   i18n: {
-    locales: ["en", "cs"],
+    locales: [
+      {
+        code: 'en',
+        iso: 'en-US',
+        file: 'en.json',
+        name: 'English',
+      },
+      {
+        code: 'cs',
+        iso: 'cs-CZ',
+        file: 'cs.json',
+        name: 'Čeština'
+      }
+    ],
+    lazy: true,
+    langDir: 'locales/',
     defaultLocale: "en",
-    vueI18n: "./i18n.config.ts",
-    strategy: "no_prefix",
+    strategy: "prefix_except_default",
   },
 
   pwa: {

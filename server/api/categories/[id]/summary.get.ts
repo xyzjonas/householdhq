@@ -37,7 +37,7 @@ function generateBlanks(months: Summary[]) {
     month: new Date().getMonth(),
     year: new Date().getFullYear(),
   };
-  const first = months[0];
+  const first = months[0] as Summary;
 
   const expected = [];
   for (let y = first.year; y <= current.year; y++) {

@@ -1,3 +1,7 @@
+dev:
+  docker compose up -d db
+  npm run dev
+
 db:
   docker compose up -d db
 

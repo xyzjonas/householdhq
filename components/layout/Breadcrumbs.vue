@@ -21,7 +21,7 @@ const pathSegments = computed(() => {
     return [];
   }
 
-  const path = route.fullPath.split("?")[0];
+  const path = route.fullPath.split("?")[0] as string;
   return path.split("/").filter((s) => s);
 });
 

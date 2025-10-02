@@ -20,11 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
-// import { storeToRefs } from "pinia";
-// import { useTransactionStore } from "@/stores/transactions";
 import { type Source } from "@/types";
-
-// const { currency } = storeToRefs(useTransactionStore());
 
 const props = defineProps<{
   upcomming?: number;
@@ -32,48 +28,11 @@ const props = defineProps<{
   spent: number;
 }>();
 
-// const modelValue = defineModel<number>();
-// const balanceSums = ref<number[]>([]);
-
 const accounts = computed(() => {
-  const partitioned: { [key: string]: Source[] } = {};
+  const partitioned: Record<string, Source[]> = {};
   props.sources.forEach((source) => {
-    if (!partitioned[source.type]) {
-      partitioned[source.type] = [];
-    }
-    partitioned[source.type].push(source);
+    partitioned[source.type] = [...(partitioned[source.type] ?? []), source]
   });
   return partitioned;
 });
-
-// watch(balanceSums.value, () => {
-//   let total = 0;
-//   for (let index = 0; index < balanceSums.value.length; index++) {
-//     if (props.sources[index].isDisponible) {
-//       total += balanceSums.value[index];
-//     }
-//   }
-//   modelValue.value = total;
-//   return total;
-// });
-
-// const max = computed(() => {
-//   let max = 0;
-//   props.sources.forEach((source) => {
-//     if (source.sum && source.sum > max) {
-//       max = source.sum;
-//     }
-//   });
-//   return max;
-// });
-
-// const total = computed(() => {
-//   let sum = 0;
-//   props.sources.forEach((source) => {
-//     if (source.sum) {
-//       sum += source.sum;
-//     }
-//   });
-//   return sum;
-// });
 </script>

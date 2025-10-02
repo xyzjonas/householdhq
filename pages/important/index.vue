@@ -47,13 +47,6 @@ const transactionsByMonth = computed(() => {
   }
   return months;
 });
-
-const i18n = useI18n();
-function formatDateKey(key: string) {
-  const [year, month] = key.split("-");
-  const date = new Date(parseInt(year), parseInt(month));
-  return formatMMYYYY(date, i18n.locale.value);
-}
 </script>
 
 <style lang="css" scoped></style>

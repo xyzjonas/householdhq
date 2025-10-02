@@ -339,8 +339,8 @@ const send = () => {
 
   const datetime = date.value ? new Date(date.value) : new Date();
   if (time.value) {
-    const hour = parseInt(time.value.split(":")[0]);
-    const minute = parseInt(time.value.split(":")[1]);
+    const hour = parseInt(time.value.split(":")[0] as string);
+    const minute = parseInt(time.value.split(":")[1] as string);
     datetime.setHours(hour, minute);
   }
   transaction.value.transactedAt = datetime.toUTCString();
@@ -378,7 +378,6 @@ const createCategory = () => {
 <style lang="scss" scoped>
 .navigation-container {
   height: 580px;
-  // overflow: scroll;
 }
 
 .collapsed {
@@ -427,10 +426,7 @@ const createCategory = () => {
   min-height: 2.5em;
 
   p {
-    // margin-right: 1em;
-    // width: 30%;
     padding-right: 1em;
-    // text-align: right;
   }
 
   textarea,

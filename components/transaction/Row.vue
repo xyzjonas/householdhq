@@ -130,7 +130,7 @@ type Button = { icon: string, onClick: () => void, color?: string, loading?: Ref
 const leftBtn = ref<Button>();
 const rightBtn = ref<Button>();
 
-const buttons: {[key: string]: Button} = {
+const buttons = {
   delete: {
     icon: 'i-ic-baseline-delete',
     color: 'danger',
@@ -216,7 +216,6 @@ const editButtonsStyle = computed(() => {
     align-items: center;
     transition: .3s ease-in-out;
     backdrop-filter: blur(2px);
-    // background-color: var(--bg-200);
 
     .y {
       flex-direction: column;

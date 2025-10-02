@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         await redirectOr401(event);
         return 
       } else {
-        token = parts[1];
+        token = parts[1] as string;
       }
     }
 
