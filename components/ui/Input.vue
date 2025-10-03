@@ -10,6 +10,7 @@
       :name="label"
       :required="required"
       :inputmode="inputmode ?? 'text'"
+      :autocomplete="autocomplete"
     />
   </div>
 </template>
@@ -23,6 +24,7 @@ const props = defineProps<{
   inputmode?: HTMLAttributes["inputmode"];
   required?: boolean;
   size?: ["md", "lg"];
+  autocomplete?: string;
 }>();
 
 const clazz = computed(() => {

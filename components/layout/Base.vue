@@ -1,31 +1,37 @@
 <template>
   <main>
     <header>
-      <div class="page flex p-2 items-center h-[3rem]">
-        <span>Household HQ</span>
-        <span class="ml-auto text-xs">{{ VERSION }}</span>
+      <div class="page flex items-center justify-between overflow-hidden px-2">
+        <div class="flex items-center">
+          <span>Household HQ</span>
+          <!-- <span class="text-xs opacity-[0.8]">{{ VERSION }}</span> -->
+          <span class="h-[57px]"></span>
+        </div>
         <ClientOnly>
-          <div class="ml-5 flex items-center">
+          <div class="ml-auto flex items-center">
             <ui-theme-toggle v-model="themeBool" />
-            <ui-login-toggle />
-            <!-- <ui-button
+            <ui-button
               :icon="drawer ? 'i-ic-baseline-close' : 'i-ic-outline-menu'"
               squared
               color="primary"
+              flat
               @click="drawer = !drawer"
-            /> -->
+              class="text-xl"
+            />
           </div>
         </ClientOnly>
       </div>
     </header>
 
-    <ui-drawer v-model="drawer" />
-
-    <div class="page page-wrapper">
-      <slot />
+    <div class="flex flex-1" @click.capture="closeDrawer">
+      <client-only>
+        <ui-drawer v-model="drawer" overlay />
+      </client-only>
+      <div class="flex-1 px-2 mx-auto max-w-[1024px]">
+        <slot />
+      </div>
     </div>
 
-    <!-- <footer></footer> -->
     <div class="notification-drawer">
       <TransitionGroup name="slide">
         <div v-for="notif in notifications" :key="notif.created.toISOString()">
@@ -39,6 +45,7 @@
 <script lang="ts" setup>
 import { VERSION } from "@/_version";
 import { useNotifications } from "@/composables/useNotifications";
+import { useLocalStorage, useWindowSize } from "@vueuse/core";
 
 const { notifications } = useNotifications();
 
@@ -47,15 +54,17 @@ const themeBool = ref(isDark.value);
 
 watch(themeBool, (_) => toggle());
 
-const drawer = ref(false);
+const { width } = useWindowSize();
+const drawer = useLocalStorage("drawer-open", true);
+const closeDrawer = () => {
+  // see breakpoints in base.scss
+  if (width.value <= 900) {
+    drawer.value = false;
+  }
+};
 </script>
 
 <style scoped lang="css">
-.page {
-  width: min(100% - 0.7rem, 960px);
-  margin-inline: auto;
-}
-
 main {
   min-height: 100%;
   display: flex;
@@ -66,7 +75,7 @@ main {
 header {
   background-color: var(--primary-100);
   color: var(--text-over-primary);
-  /* box-shadow: 0px 5px 5px var(--shadow-100); */
+  z-index: 1;
 }
 
 footer {
@@ -84,14 +93,6 @@ footer {
 .version {
   font-style: italic;
   margin-left: auto;
-  /* filter: brightness(0.5); */
-}
-
-main {
-  /* position: relative; */
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .notification-drawer {
@@ -99,7 +100,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  bottom: 0;
+  top: 0;
   width: 100%;
   z-index: 11;
 }

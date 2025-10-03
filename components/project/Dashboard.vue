@@ -1,10 +1,13 @@
 <template>
-  <div class="flex flex-col card">
+  <div
+    v-if="projects.filter((proj) => !proj.isCompleted).length > 0"
+    class="flex flex-col card"
+  >
     <project-row
       v-for="proj in projects.filter((proj) => !proj.isCompleted)"
       :project="proj"
     />
-    <div
+    <!-- <div
       class="flex items-center"
       v-if="projects.filter((proj) => !proj.isCompleted).length <= 0"
     >
@@ -17,7 +20,7 @@
         class="ml-auto flex-2"
         >{{ $t("p_navigate_to") }}</ui-button
       >
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -7,16 +7,6 @@
         :type="key"
       />
     </div>
-    <hr class="mt-auto" />
-    <div class="flex w-full justify-end items-center h-[2rem]">
-      <ui-button
-        link
-        flat
-        icon-left="i-ic-baseline-arrow-forward"
-        @click="navigateTo('/sources')"
-        >{{ $t("s_navigate_to") }}</ui-button
-      >
-    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -31,7 +21,7 @@ const props = defineProps<{
 const accounts = computed(() => {
   const partitioned: Record<string, Source[]> = {};
   props.sources.forEach((source) => {
-    partitioned[source.type] = [...(partitioned[source.type] ?? []), source]
+    partitioned[source.type] = [...(partitioned[source.type] ?? []), source];
   });
   return partitioned;
 });

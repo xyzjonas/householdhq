@@ -5,7 +5,6 @@
       @click="navigateTo(`/sources/${source.id}`)"
     >
       <span class="color-flag"></span>
-      <!-- <i :class="sourceIcons[source.type]"></i> -->
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
@@ -51,10 +50,6 @@ const lastEntryNotThisMonth = computed(() => {
 const emit = defineEmits(["autoupdated"]);
 </script>
 <style lang="scss" scoped>
-// i {
-//   // background-color: v-bind("source.color ?? 'gray'");
-// }
-
 .bal-wrapper {
   display: flex;
   align-items: center;
@@ -64,7 +59,6 @@ const emit = defineEmits(["autoupdated"]);
   padding-block: 0.5rem;
   padding-left: 8px;
   padding-right: 8px;
-  // border-bottom: 1px solid var(--bg-300);
 
   transition: background-color 0.2s ease-in-out;
 
@@ -74,7 +68,6 @@ const emit = defineEmits(["autoupdated"]);
 
   .label {
     border: 0;
-    font-weight: 600;
     font-size: small;
     text-transform: uppercase;
     margin-right: 0.7em;

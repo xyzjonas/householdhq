@@ -1,5 +1,5 @@
 <template>
-  <div :style="transparent && !details ? transparentStyle : ''" class="my-2 relative">
+  <div :style="transparent && !details ? transparentStyle : ''" class="relative">
     <div v-if="transaction?.project?.name" class="absolute right-[-2px] top-[-3px] z-5">
       <ui-pin clickable @click="navigateTo(`/projects/${transaction.project.id}`)" :text="transaction.project.name" :color="transaction.project.color" size="small" />
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="containerr">
     <MonthHero />
 
     <client-only>
@@ -64,7 +64,6 @@
       </section>
     </transition>
 
-    <hr />
     <ui-empty
       v-if="transactionsLoading"
       title=""
@@ -88,49 +87,28 @@
             />
           </div>
         </div>
-        <div class="flex w-full justify-end items-center">
-          <ui-button
-            link
-            icon="i-ic-round-warning"
-            icon-size="1rem"
-            flat
-            @click="navigateTo('/important')"
-            >{{ $t("to_important") }}</ui-button
-          >
-        </div>
       </div>
 
       <!-- SHOW UPCOMMING -->
       <div
         v-if="isCurrentMonth && currentMonth.length > 0"
-        class="flex items-center gap-2 mb-3 px-3"
+        class="flex items-center gap-2 mb-2"
       >
-        <ui-button
-          v-if="importantTransactions.length === 0"
-          link
-          squared
-          icon="i-ic-baseline-check-circle-outline"
-          icon-size="1.2rem"
-          @click="navigateTo('/important')"
-        ></ui-button>
-
-        <div
-          v-if="importantTransactions.length === 0"
-          class="b-1 border-r-solid h-[1.5rem] border-gray mr-2"
-        ></div>
-        <i class="i-ic-baseline-calendar-today" style="font-size: large"></i>
-        <span @click="showUpcomming = !showUpcomming">
-          {{ upcommingTransactions.length }}
-          {{ mapTransactionDeclention(upcommingTransactions.length) }}
-        </span>
-        <ui-price
-          @click="showUpcomming = !showUpcomming"
-          :amount="totalExpenses(upcomming)"
-          :currency="currency"
-          size="1.5rem"
-          class="card py-2 px-3 ml-1"
-        />
-        <ui-chevron v-model="showUpcomming" class="ml-auto" />
+        <div class="ml-auto flex gap-3 items-center">
+          <span
+            @click="showUpcomming = !showUpcomming"
+            class="text-sm text-gray-5"
+          >
+            {{ upcommingTransactions.length }}
+            {{ mapTransactionDeclention(upcommingTransactions.length) }}
+          </span>
+          <ui-price
+            @click="showUpcomming = !showUpcomming"
+            :amount="totalExpenses(upcomming)"
+            :currency="currency"
+          />
+        </div>
+        <ui-chevron v-model="showUpcomming" />
       </div>
 
       <transition name="page">
@@ -146,7 +124,7 @@
           />
         </section>
       </transition>
-      <section>
+      <section class="flex-col gap-2">
         <ui-empty
           v-if="!transactions || transactions.length <= 0"
           :loading="loading"
@@ -335,7 +313,7 @@ const updateTransaction = (transaction: Transaction) => {
   for (let index = 0; index < currentMonth.value.length; index++) {
     const element = currentMonth.value[index];
     if (!element) {
-      return
+      return;
     }
     if (element.id === transaction.id)
       if (element.id === transaction.id) {
@@ -359,7 +337,7 @@ const mapTransactionDeclention = (count: number) => {
 </script>
 
 <style scoped lang="scss">
-.container {
+.containerr {
   display: flex;
   flex-direction: column;
   gap: 8px;

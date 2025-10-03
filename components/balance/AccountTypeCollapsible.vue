@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div
-      class="flex justify-between items-center dark:hover:bg-gray-8 light:hover:bg-gray-3 hover:cursor-pointer px-2 py-1 border-rounded transition-all"
-      @click="collapsed = !collapsed"
-    >
+    <ui-list-row @click="collapsed = !collapsed" class="flex justify-between">
       <span class="flex items-center gap-2">
         <i
           class="i-ic-chevron-left transition"
@@ -19,7 +16,7 @@
           :class="collapsed ? '' : 'opacity-[0.4]'"
         />
       </span>
-    </div>
+    </ui-list-row>
     <transition name="slide" mode="out-in">
       <div v-if="!collapsed" class="pl-2">
         <BalanceItem v-for="source in sources" :source="source" />

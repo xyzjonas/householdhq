@@ -1,8 +1,8 @@
 <template>
-  <div v-if="pathSegments.length" class="crumbs">
-    <NuxtLink id="home" to="/" class="segment i-ic-baseline-home" />
+  <div v-if="pathSegments.length" class="crumbs py-4 mb-3 text-gray-5 text-md">
+    <NuxtLink to="/" class="segment">Home</NuxtLink>
     <span v-for="(segment, index) in pathSegments">
-      <i class="i-ic-baseline-chevron-right"></i>
+      <i class="i-ic-baseline-chevron-right mx-2"></i>
       <NuxtLink
         :to="`/${pathSegments.slice(0, index + 1).join('/')}`"
         class="segment capitalize"
@@ -37,18 +37,10 @@ function localizeRouteSegment(segment: string) {
 </script>
 
 <style scoped lang="scss">
-#home {
-  font-size: larger;
-  transform: translateY(-1px);
-}
-
 .crumbs {
   display: flex;
   flex-direction: row;
-  margin-bottom: 1.5em;
-  color: var(--text-100);
   align-items: center;
-  padding-bottom: 1rem;
   border-bottom: 1px solid var(--bg-300);
 
   span {
@@ -59,22 +51,20 @@ function localizeRouteSegment(segment: string) {
 }
 
 a {
-  color: var(--text-100);
   transition: 0.3s ease-in-out;
 
   &:hover {
-    filter: opacity(0.8);
+    color: var(--text-100);
   }
-}
-
-.caret {
-  margin-left: 1em;
-  margin-right: 1em;
-  font-size: 0.8em;
 }
 
 .segment {
   margin-inline: 8px;
   transition: 0.2s color;
+}
+
+.crumbs span:last-child .segment {
+  font-weight: 600;
+  color: var(--primary-100);
 }
 </style>

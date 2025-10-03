@@ -1,7 +1,7 @@
 <template>
-  <div
-    class="flex items-center justify-between dark:hover:bg-gray-8 light:hover:bg-gray-3 hover:cursor-pointer px-2 py-1 border-rounded transition-all"
+  <ui-list-row
     @click="navigateTo(`/projects/${project.id}`)"
+    class="flex justify-between"
   >
     <div class="flex items-center gap-3">
       <span class="color-flag"></span>
@@ -14,7 +14,7 @@
         <ui-price :amount="total" size="0.8rem" />
       </div>
     </div>
-  </div>
+  </ui-list-row>
 </template>
 <script setup lang="ts">
 import { type Project } from "@/types";

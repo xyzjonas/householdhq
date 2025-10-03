@@ -1,43 +1,40 @@
 <template>
-  <teleport to="body">
-    <ui-modal>
-      <form class="card w-sm sm:w-md" @submit.prevent="useLogin">
-        <div class="p-5 flex flex-col items-center">
-          <img src="/logo.svg" alt="logo" width="128" class="mb-5" />
-          <h1 class="title mb-10 upp">Household HQ</h1>
-          <client-only>
-            <div class="form-wrapper-form-inputs mb-10">
-              <ui-input
-                label="Username"
-                v-model="username"
-                type="text"
-                :required="true"
-              />
-              <ui-input
-                label="Password"
-                v-model="password"
-                type="password"
-                :required="true"
-              />
-              <span class="flex items-center mt-3">
-                <input type="checkbox" checked disabled />
-                <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
-              </span>
-            </div>
-            <ui-button
-              :loading="loginLoading"
-              width="100%"
-              height="3rem"
-              icon="i-ic-baseline-key"
-              type="submit"
-              color="primary"
-              >{{ $t("sign_in") }}</ui-button
-            >
-          </client-only>
+  <form class="card w-sm sm:w-md" @submit.prevent="useLogin">
+    <div class="p-5 flex flex-col items-center">
+      <img src="/logo.svg" alt="logo" width="128" class="mb-5" />
+      <h1 class="title mb-10 upp">Household HQ</h1>
+      <client-only>
+        <div class="form-wrapper-form-inputs mb-10">
+          <ui-input
+            label="Username"
+            v-model="username"
+            type="text"
+            :required="true"
+          />
+          <ui-input
+            label="Password"
+            v-model="password"
+            type="password"
+            :required="true"
+            autocomplete="password"
+          />
+          <span class="flex items-center mt-3">
+            <input type="checkbox" checked disabled />
+            <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
+          </span>
         </div>
-      </form>
-    </ui-modal>
-  </teleport>
+        <ui-button
+          :loading="loginLoading"
+          width="100%"
+          height="3rem"
+          icon="i-ic-baseline-key"
+          type="submit"
+          color="primary"
+          >{{ $t("sign_in") }}</ui-button
+        >
+      </client-only>
+    </div>
+  </form>
 </template>
 <script setup lang="ts">
 import { useTokenStore } from "@/stores/tokenStore";
