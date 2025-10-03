@@ -3,7 +3,10 @@
     <header>
       <div class="page flex items-center justify-between overflow-hidden px-2">
         <div class="flex items-center">
-          <span>Household HQ</span>
+          <div class="flex-col p-2">
+            <span class="line-height-none">Household HQ</span>
+            <span class="text-xs opacity-[0.8]">{{ VERSION }}</span>
+          </div>
           <!-- <span class="text-xs opacity-[0.8]">{{ VERSION }}</span> -->
           <span class="h-[57px]"></span>
         </div>
