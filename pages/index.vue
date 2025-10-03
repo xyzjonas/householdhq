@@ -71,34 +71,30 @@
       class="card min-h-sm"
     />
     <div v-else>
-      <div v-if="importantTransactions.length > 0">
-        <div class="flex">
-          <div
-            class="border-r-amber border-r-4 border-r-solid mr-2 pos-relative my-3"
-          ></div>
-          <div class="flex-1">
-            <TransactionRow
-              v-for="transaction in importantTransactions"
-              :key="transaction.id"
-              :transaction="transaction"
-              class="upcomming"
-              @patched="updateTransaction"
-              @delete="deleteTransaction"
-            />
-          </div>
+      <div v-if="importantTransactions.length > 0" class="flex mb-2">
+        <div
+          class="border-r-amber border-r-4 border-r-solid mr-2 pos-relative"
+        ></div>
+        <div class="flex-1 flex-col gap2">
+          <TransactionRow
+            v-for="transaction in importantTransactions"
+            :key="transaction.id"
+            :transaction="transaction"
+            class="upcomming"
+            @patched="updateTransaction"
+            @delete="deleteTransaction"
+          />
         </div>
       </div>
 
       <!-- SHOW UPCOMMING -->
       <div
         v-if="isCurrentMonth && currentMonth.length > 0"
-        class="flex items-center gap-2 mb-2"
+        class="flex items-center gap-2 mb-2 card bg-transparent"
+        @click="showUpcomming = !showUpcomming"
       >
         <div class="ml-auto flex gap-3 items-center">
-          <span
-            @click="showUpcomming = !showUpcomming"
-            class="text-sm text-gray-5"
-          >
+          <span class="text-sm text-gray-5">
             {{ upcommingTransactions.length }}
             {{ mapTransactionDeclention(upcommingTransactions.length) }}
           </span>

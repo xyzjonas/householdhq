@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div v-if="!error && category" class="flex-col">
       <section class="row title">
         <Icon :iconName="category.icon" class="mr" />
@@ -37,17 +37,28 @@
         />
       </div>
     </div>
+    <div class="mt-5">
+      <transaction-monthly-listing
+        :transactions="transactions"
+      ></transaction-monthly-listing>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import { useCategoriesStore } from "@/stores/categories";
-import type { Category } from "~/types";
+import type { Category, Transaction } from "~/types";
 
 const route = useRoute();
 const categoryId = parseInt(route.params.id as string);
 const { data, error, refresh } = await useFetch<{ data: Category }>(
   `/api/categories/${categoryId}`
 );
+
+const transactionFetch = await useFetch<{ data: Transaction[] }>(
+  `/api/categories/${categoryId}/transactions`
+);
+
+const transactions = transactionFetch.data.value?.data ?? [];
 
 const category = computed(() => data.value?.data ?? undefined);
 
