@@ -7,25 +7,27 @@
       class="mb-3"
       >{{ $t("s_new") }}</ui-button
     >
-    <teleport to="body">
-      <ui-modal v-model="openModal">
-        <form class="new-source-card card w-sm">
-          <h2>{{ $t("s_new") }}</h2>
-          <ui-input :label="$t('s_name')" v-model="newSourceName" />
-          <ui-button
-            @click="createSource()"
-            :loading="sourceLoading"
-            :disabled="!newSourceName"
-            width="100%"
-            height="3rem"
-            class="mt-3"
-            type="submit"
-            color="primary"
-            >{{ $t("t_send") }}</ui-button
-          >
-        </form> </ui-modal
-      >"
-    </teleport>
+    <client-only>
+      <teleport to="body">
+        <ui-modal v-model="openModal">
+          <form class="new-source-card card w-sm">
+            <h2>{{ $t("s_new") }}</h2>
+            <ui-input :label="$t('s_name')" v-model="newSourceName" />
+            <ui-button
+              @click="createSource()"
+              :loading="sourceLoading"
+              :disabled="!newSourceName"
+              width="100%"
+              height="3rem"
+              class="mt-3"
+              type="submit"
+              color="primary"
+              >{{ $t("t_send") }}</ui-button
+            >
+          </form> </ui-modal
+        >"
+      </teleport>
+    </client-only>
     <div
       class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2"
     >

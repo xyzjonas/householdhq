@@ -14,35 +14,37 @@
         class="aspect-ratio-[3]"
       />
     </div>
-    <teleport to="body">
-      <ui-modal v-model="openModal">
-        <form class="card w-sm flex flex-col gap-2">
-          <h2 class="uppercase mb-3">{{ $t("p_new") }}</h2>
-          <ui-input :label="$t('p_name')" v-model="newProject.name" />
-          <ui-input
-            :label="$t('p_description')"
-            v-model="newProject.description"
-          />
-          <ui-input
-            :label="$t('p_estimate')"
-            type="number"
-            inputmode="numeric"
-            v-model="newProject.estimate"
-          />
-          <ui-button
-            @click="createProject()"
-            :loading="loading"
-            :disabled="Object.keys(newProject).length === 0"
-            width="100%"
-            height="3rem"
-            class="mt-3"
-            type="submit"
-            color="primary"
-            >{{ $t("t_send") }}</ui-button
-          >
-        </form> </ui-modal
-      >"
-    </teleport>
+    <client-only>
+      <teleport to="body">
+        <ui-modal v-model="openModal">
+          <form class="card w-sm flex flex-col gap-2">
+            <h2 class="uppercase mb-3">{{ $t("p_new") }}</h2>
+            <ui-input :label="$t('p_name')" v-model="newProject.name" />
+            <ui-input
+              :label="$t('p_description')"
+              v-model="newProject.description"
+            />
+            <ui-input
+              :label="$t('p_estimate')"
+              type="number"
+              inputmode="numeric"
+              v-model="newProject.estimate"
+            />
+            <ui-button
+              @click="createProject()"
+              :loading="loading"
+              :disabled="Object.keys(newProject).length === 0"
+              width="100%"
+              height="3rem"
+              class="mt-3"
+              type="submit"
+              color="primary"
+              >{{ $t("t_send") }}</ui-button
+            >
+          </form> </ui-modal
+        >"
+      </teleport>
+    </client-only>
   </div>
 </template>
 <script setup lang="ts">

@@ -199,24 +199,26 @@
       />
     </div>
     <p class="error" style="text-align: right">{{ error }}</p>
-    <teleport to="body">
-      <ui-modal v-model="showNewCategory">
-        <form class="card w-sm" @submit.prevent="createCategory">
-          <h3 class="mb-5 text-xl uppercase">{{ $t("c_new") }}</h3>
-          <ui-input :label="$t('c_name')" v-model="newCategoryName" />
-          <ui-button
-            :loading="categoryLoading"
-            :disabled="!newCategoryName"
-            color="primary"
-            width="100%"
-            height="3rem"
-            class="mt-2"
-            type="submit"
-            >{{ $t("confirm") }}</ui-button
-          >
-        </form>
-      </ui-modal>
-    </teleport>
+    <client-only>
+      <teleport to="body">
+        <ui-modal v-model="showNewCategory">
+          <form class="card w-sm" @submit.prevent="createCategory">
+            <h3 class="mb-5 text-xl uppercase">{{ $t("c_new") }}</h3>
+            <ui-input :label="$t('c_name')" v-model="newCategoryName" />
+            <ui-button
+              :loading="categoryLoading"
+              :disabled="!newCategoryName"
+              color="primary"
+              width="100%"
+              height="3rem"
+              class="mt-2"
+              type="submit"
+              >{{ $t("confirm") }}</ui-button
+            >
+          </form>
+        </ui-modal>
+      </teleport>
+    </client-only>
   </div>
 </template>
 <script setup lang="ts">
