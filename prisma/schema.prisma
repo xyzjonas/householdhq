@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -12,65 +12,62 @@ generator client {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
+  id       Int    @id @default(autoincrement())
+  email    String @unique
   password String
 }
 
-
 model Category {
-  id            Int     @id @default(autoincrement())
-  name          String  @unique
-  description   String?
-  icon          String?
-  color         String?
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  icon        String?
+  color       String?
 
-  transactions  Transaction[]
+  transactions Transaction[]
 
   @@map("category")
 }
 
-
 model Tag {
-  id            Int     @id @default(autoincrement())
-  name          String  @unique
-  description   String?
-  icon          String?
-  color         String?
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  icon        String?
+  color       String?
 
-  parentId      Int?
-  parentTag     Tag?    @relation("TagHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  childTags     Tag[]   @relation("TagHierarchy")
+  parentId  Int?
+  parentTag Tag?  @relation("TagHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  childTags Tag[] @relation("TagHierarchy")
 
-  transactions  Transaction[]
+  transactions Transaction[]
 
-  @@map("tag")
   @@index([parentId])
+  @@map("tag")
 }
 
 model SourceState {
-  id              Int           @id @default(autoincrement())
-  created         DateTime      @updatedAt
-  amount          Float
-  sourceId        Int
-  source          Source        @relation(fields: [sourceId], references: [id])
+  id       Int      @id @default(autoincrement())
+  created  DateTime @updatedAt
+  amount   Float
+  sourceId Int
+  source   Source   @relation(fields: [sourceId], references: [id])
 
   @@index([sourceId])
 }
 
-
 model Source {
-  id                Int           @id @default(autoincrement())
-  name              String
-  transactionsIn    Transaction[] @relation(name: "source")
-  transactionsOut   Transaction[] @relation(name: "target")
-  isOut             Boolean       @default(false)  // mark 'source' as output (not owned)
-  isDisponible      Boolean       @default(false)  // mark 'source' as disponible (available to spend)
-  isPortfolio       Boolean       @default(false)  // mark 'source' as a part of the portfolio
-  states            SourceState[]
-  color             String?
-  position          Int           @default(999)  // position in the listing
-  type              SourceType    @default(ACCOUNT)
+  id              Int           @id @default(autoincrement())
+  name            String
+  transactionsIn  Transaction[] @relation(name: "source")
+  transactionsOut Transaction[] @relation(name: "target")
+  isOut           Boolean       @default(false) // mark 'source' as output (not owned)
+  isDisponible    Boolean       @default(false) // mark 'source' as disponible (available to spend)
+  isPortfolio     Boolean       @default(false) // mark 'source' as a part of the portfolio
+  states          SourceState[]
+  color           String?
+  position        Int           @default(999) // position in the listing
+  type            SourceType    @default(ACCOUNT)
 }
 
 enum SourceType {
@@ -81,51 +78,71 @@ enum SourceType {
   INVESTMENT
   DEBT
 }
-  
+
 model Transaction {
-  id              Int         @id @default(autoincrement())
-  created         DateTime    @updatedAt
-  transactedAt    DateTime?
-  description     String
-  amount          Float
-  currency        String
-  cancelled       Boolean     @default(false)
-  confirmed       Boolean     @default(true)
-  recurring       Int         @default(0)  // recurring each n months
+  id           Int       @id @default(autoincrement())
+  created      DateTime  @updatedAt
+  transactedAt DateTime?
+  description  String
+  amount       Float
+  currency     String
+  cancelled    Boolean   @default(false)
+  confirmed    Boolean   @default(true)
+  recurring    Int       @default(0) // recurring each n months
 
-  isImportant     Boolean     @default(false)  // mark as an important reminder/tracker
-  isHidden        Boolean     @default(false)  // hide (e.g. internal) transactions
-  
-  categoryId      Int?
-  category        Category?   @relation(fields: [categoryId], references: [id])
+  isImportant Boolean @default(false) // mark as an important reminder/tracker
+  isHidden    Boolean @default(false) // hide (e.g. internal) transactions
 
-  sourceId        Int
-  source          Source      @relation(name: "source", fields: [sourceId], references: [id])
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
-  projectId       Int?
-  project         Project?     @relation(name: "project", fields: [projectId], references: [id])
+  sourceId Int
+  source   Source @relation(name: "source", fields: [sourceId], references: [id])
 
-  targetId        Int         @default(2)
-  target          Source      @relation(name: "target", fields: [targetId], references: [id])
+  projectId Int?
+  project   Project? @relation(name: "project", fields: [projectId], references: [id])
 
-  tags            Tag[]
+  targetId Int    @default(2)
+  target   Source @relation(name: "target", fields: [targetId], references: [id])
 
-  @@map("transaction")
+  tags Tag[]
+
   @@index([sourceId])
   @@index([targetId])
   @@index([categoryId])
   @@index([projectId])
+  @@index([isImportant])
+  @@map("transaction")
 }
 
-
 model Project {
-  id              Int             @id @default(autoincrement())
-  name            String
-  created         DateTime        @updatedAt
-  description     String?
-  estimate        Float
-  
-  color           String?
-  isCompleted     Boolean         @default(false)
-  transactions    Transaction[]   @relation(name: "project")
+  id          Int      @id @default(autoincrement())
+  name        String
+  created     DateTime @updatedAt
+  description String?
+  estimate    Float
+
+  color        String?
+  isCompleted  Boolean       @default(false)
+  transactions Transaction[] @relation(name: "project")
+}
+
+model Meter {
+  id      Int          @id @default(autoincrement())
+  name    String
+  created DateTime     @updatedAt
+  unit    String
+  icon    String?
+  states  MeterState[] @relation(name: "meter")
+}
+
+model MeterState {
+  id         Int      @id @default(autoincrement())
+  value      Float
+  meteredAt  DateTime
+  meterId    Int
+  meter      Meter    @relation(name: "meter", fields: [meterId], references: [id])
+  isComputed Boolean  @default(false)
+
+  @@index([meterId])
 }

@@ -1,7 +1,9 @@
 <template>
   <div class="amount">
     <h1>{{ displayedAmount }}</h1>
-    <span v-if="amounAsNumber != undefined" class="currency">{{ curr }}</span>
+    <span v-if="amounAsNumber != undefined" class="currency">{{
+      currencyValue
+    }}</span>
   </div>
 </template>
 <script setup lang="ts">
@@ -22,12 +24,17 @@ const props = defineProps({
     type: String,
     default: "var(--text-100)",
   },
+  currencyIn: {
+    type: String,
+    required: false,
+  },
 });
 
-const { currency } = storeToRefs(useTransactionStore());
+const { currency: currencyFromStore } = storeToRefs(useTransactionStore());
+const currency = computed(() => props.currencyIn ?? currencyFromStore.value);
 
 // num = new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(number);
-const curr = computed(() => {
+const currencyValue = computed(() => {
   if (currency.value === "CZK") {
     return "Kč";
   }

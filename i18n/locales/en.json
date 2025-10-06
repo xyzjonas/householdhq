@@ -97,6 +97,7 @@
   "route_projects": "Projects",
   "route_categories": "Categories",
   "route_important": "Important Reminders",
+  "route_energy": "Energy",
   "ACCOUNT": "Account",
   "CASH": "Cash",
   "DEBT": "Debt",
@@ -111,5 +112,13 @@
   "p_out_of": "out of",
   "p_new": "Add a new project",
   "p_name": "Name",
-  "p_description": "Description"
+  "p_description": "Description",
+  "meter_create": "new meter",
+  "meter_name": "meter name",
+  "meter_unit": "meterunit",
+  "meter_icon": "meter icon",
+  "meter_state_create": "new state",
+  "meter_state_form_time": "metered time",
+  "meter_state_form_date": "metered date",
+  "meter_state_form_value": "metered value"
 }

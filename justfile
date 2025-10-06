@@ -16,3 +16,6 @@ docker-build:
 
 docker: docker-build
   docker push scotch3840/householdhq:latest
+
+makemigrations *ARGS:
+  npx prisma migrate dev --name {{ARGS}}

@@ -9,18 +9,11 @@
       <slot></slot>
     </BarGraph>
     <div class="center mt-3">
-      <div class="toggle-bar m-1">
-        <a
-          @click="modelValue = 0"
-          :class="`bar-item ${modelValue === 0 ? 'active' : ''}`"
-          >{{ $t("expenses") }}</a
-        >
-        <a
-          @click="modelValue = 1"
-          :class="`bar-item ${modelValue === 1 ? 'active' : ''}`"
-          >{{ $t("incomes") }}</a
-        >
-      </div>
+      <ui-toggle-bar
+        v-model="modelValue"
+        :options="[$t('expenses'), $t('incomes')]"
+        item-width="8rem"
+      ></ui-toggle-bar>
     </div>
   </div>
 </template>
@@ -73,9 +66,5 @@ h3 {
   border-left: 1px solid var(--color-grey-dark-2);
   padding-right: 1em;
   border-right: 1px solid var(--color-grey-dark-2);
-}
-
-.bar-item {
-  width: 8rem;
 }
 </style>

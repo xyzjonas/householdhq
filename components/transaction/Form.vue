@@ -115,7 +115,7 @@
           :loading="loading"
           color="primary"
           width="100%"
-          height="5rem"
+          height="3rem"
         >
           {{ $t("t_send") }}
         </ui-button>
@@ -379,7 +379,7 @@ const createCategory = () => {
 
 <style lang="scss" scoped>
 .navigation-container {
-  height: 580px;
+  height: 600px;
 }
 
 .collapsed {

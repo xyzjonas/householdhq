@@ -90,21 +90,17 @@
       <!-- SHOW UPCOMMING -->
       <div
         v-if="isCurrentMonth && currentMonth.length > 0"
-        class="flex items-center gap-2 mb-2 card bg-transparent"
-        @click="showUpcomming = !showUpcomming"
+        class="flex items-center gap-2 mb-2 card bg-transparent hover:cursor-pointer"
+        @click.capture="showUpcomming = !showUpcomming"
       >
         <div class="ml-auto flex gap-3 items-center">
           <span class="text-sm text-gray-5">
             {{ upcommingTransactions.length }}
             {{ mapTransactionDeclention(upcommingTransactions.length) }}
           </span>
-          <ui-price
-            @click="showUpcomming = !showUpcomming"
-            :amount="totalExpenses(upcomming)"
-            :currency="currency"
-          />
+          <ui-price :amount="totalExpenses(upcomming)" :currency="currency" />
         </div>
-        <ui-chevron v-model="showUpcomming" />
+        <ui-chevron v-model="showUpcomming" readonly />
       </div>
 
       <transition name="page">

@@ -7,11 +7,50 @@ import {
   type EditCategory,
 } from "./category";
 
+import type {
+  Meter,
+  MeterState,
+  MeterStateCreate,
+  MeterStateUpdate,
+  MeterUpdate,
+  MeterCreate,
+} from "./energy";
+
+import {
+  MeterSchema,
+  MeterCreateSchema,
+  MeterStateCreateSchema,
+  MeterStateUpdateSchema,
+  MeterUpdateSchema,
+  MeterStateSchema,
+} from "./energy";
+
 import { type IDBase, IdSchema } from "./base";
 
-export type { Category, CreateCategory, EditCategory, IDBase };
+export type {
+  Category,
+  CreateCategory,
+  EditCategory,
+  IDBase,
+  Meter,
+  MeterState,
+  MeterStateCreate,
+  MeterStateUpdate,
+  MeterUpdate,
+  MeterCreate,
+};
 
-export { CategorySchema, CreateCategorySchema, IdSchema };
+export {
+  CategorySchema,
+  CreateCategorySchema,
+  IdSchema,
+  MeterSchema,
+  MeterCreateSchema,
+  MeterStateCreateSchema,
+  MeterStateUpdateSchema,
+  MeterUpdateSchema,
+  MeterStateSchema,
+};
 
 export interface User {
   id: number;

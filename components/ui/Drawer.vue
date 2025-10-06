@@ -65,6 +65,12 @@
           <h3>{{ $t("route_important") }}</h3>
         </span></ui-list-row
       >
+      <ui-list-row @click="navigateTo('/energy')">
+        <span class="flex items-center gap-2">
+          <i class="i-ic-baseline-electric-bolt"></i>
+          <h3>{{ $t("route_energy") }}</h3>
+        </span></ui-list-row
+      >
 
       <ui-list-row class="mt-auto" @click="session.logout()">
         <span class="flex items-center gap-2">

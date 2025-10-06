@@ -96,6 +96,7 @@
   "route_projects": "Projekty",
   "route_categories": "Kategorie",
   "route_important": "Veledůležité",
+  "route_energy": "Energie",
   "ACCOUNT": "Účet",
   "CASH": "Hotovost",
   "DEBT": "Dluhy",
@@ -110,5 +111,13 @@
   "p_out_of": "zbývá z",
   "p_new": "Přidat nový projekt",
   "p_name": "Název",
-  "p_description": "Popis"
+  "p_description": "Popis",
+  "meter_create": "Přidat nový meřič",
+  "meter_name": "název",
+  "meter_unit": "jednotka",
+  "meter_icon": "ikona",
+  "meter_state_create": "Nový stav",
+  "meter_state_form_time": "čas",
+  "meter_state_form_date": "datum",
+  "meter_state_form_value": "naměřená hodnota"
 }

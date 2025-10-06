@@ -27,9 +27,7 @@
     </header>
 
     <div class="flex flex-1" @click.capture="closeDrawer">
-      <client-only>
-        <ui-drawer v-model="drawer" overlay />
-      </client-only>
+      <ui-drawer v-model="drawer" overlay />
       <div class="flex-1 px-2 mx-auto max-w-[1024px]">
         <slot />
       </div>
