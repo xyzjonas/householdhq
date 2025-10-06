@@ -30,7 +30,7 @@ def parse_amount(amount_str) -> float:
     return float(cleaned)
 
 
-def process_file(file_path: Path) -> list[dict]:
+def process_month_file(file_path: Path) -> list[dict]:
     entries = []
     with open(file_path, "r") as csv_file:
 
@@ -112,14 +112,62 @@ def process_file(file_path: Path) -> list[dict]:
     return entries
 
 
-def process_files(dir_path: Path) -> list[dict]:
+def process_simple_file(file_path: Path) -> list[dict]:
+    entries = []
+    with open(file_path, "r") as csv_file:
+        lines = csv_file.readlines()
+        
+    print(len(lines))
+
+    for index, line in enumerate(lines):
+        try:
+            line = line.strip()
+            splits = [split for split in line.split(",") if split]
+            if len(splits) <= 1:
+                continue
+
+            if len(splits) != 4:
+                raise ValueError(f"Malformed line {index}, got {len(splits)}: {splits}")
+            date, desc, cat, amount = splits
+
+            amount = parse_amount(amount)
+            if amount == 0:
+                continue
+
+            if not cat in TAGS:
+                raise ValueError(f"Missing category: {cat}")
+
+            entries.append({
+                "transactedAt": date,
+                "sourceId": 1,
+                "targetId": 2,
+                "description": desc,
+                "projectId": 3,  # comment out
+                "amount": amount,
+                "currency": "CZK",
+                "isImportant": False,
+                "categoryId": TAGS[cat]
+            })
+        except Exception:
+            print(f"ERROR: {file_path}, on line {index}")
+            raise
+
+    return entries
+
+
+
+def process_files(dir_path: Path, use_month_func: bool = False) -> list[dict]:
     if not dir_path.is_dir():
         raise ValueError(f"not a directory: {dir_path}")
 
     entries = []
     for file in dir_path.glob("*"):
+        print(f"Processing file: {file}")
         if file.is_file():
-            entries.extend(process_file(file))
+            if use_month_func:
+                entries.extend(process_month_file(file))
+            else:
+                entries.extend(process_simple_file(file))
 
     print(f"Found {len(entries)} items to be imported.")
 
@@ -151,6 +199,10 @@ def main():
         for item in items
     ])
     # editor.editor(text)
+    x = input("continue? [y/n]:   ")
+    if x != "y":
+        import sys
+        sys.exit(1)
 
     for index, entry in enumerate(items):
         print(f'{index + 1}/{len(items)}: saving {entry['description']}')
