@@ -5,7 +5,7 @@
     <client-only>
       <top-summary :transactions="passed" />
     </client-only>
-
+    {{ transactionsLoading }}
     <div class="flex gap-2 flex-wrap">
       <HomeCarousel
         v-model="carouselTabindex"
@@ -36,7 +36,10 @@
         </div>
       </HomeCarousel>
       <transition name="slide" mode="out-in">
-        <div class="flex flex-col flex-1 gap-2" v-if="isCurrentMonth">
+        <div
+          class="flex flex-col flex-1 gap-2 min-w-xs"
+          v-if="isCurrentMonth && !transactionsLoading"
+        >
           <BalanceRow
             class="flex-1"
             :sources="

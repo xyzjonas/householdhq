@@ -26,12 +26,14 @@
       </div>
     </header>
 
-    <div class="flex flex-1" @click.capture="closeDrawer">
-      <ui-drawer v-model="drawer" overlay />
-      <div class="flex-1 px-2 mx-auto max-w-[1024px]">
-        <slot />
+    <ClientOnly>
+      <div class="flex flex-1" @click.capture="closeDrawer">
+        <ui-drawer v-model="drawer" overlay />
+        <div class="flex-1 px-2 mx-auto max-w-[1024px]">
+          <slot />
+        </div>
       </div>
-    </div>
+    </ClientOnly>
 
     <div class="notification-drawer">
       <TransitionGroup name="slide">
@@ -56,7 +58,7 @@ const themeBool = ref(isDark.value);
 watch(themeBool, (_) => toggle());
 
 const { width } = useWindowSize();
-const drawer = useLocalStorage("drawer-open", true);
+const drawer = useLocalStorage("drawer-open", false);
 const closeDrawer = () => {
   // see breakpoints in base.scss
   if (width.value <= 900) {
