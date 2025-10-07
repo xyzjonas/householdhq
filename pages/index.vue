@@ -5,7 +5,6 @@
     <client-only>
       <top-summary :transactions="passed" />
     </client-only>
-    {{ transactionsLoading }}
     <div class="flex gap-2 flex-wrap">
       <HomeCarousel
         v-model="carouselTabindex"
@@ -37,7 +36,7 @@
       </HomeCarousel>
       <transition name="slide" mode="out-in">
         <div
-          class="flex flex-col flex-1 gap-2 min-w-xs"
+          class="flex flex-col flex-1 gap-2"
           v-if="isCurrentMonth && !transactionsLoading"
         >
           <BalanceRow
@@ -93,10 +92,13 @@
       <!-- SHOW UPCOMMING -->
       <div
         v-if="isCurrentMonth && currentMonth.length > 0"
-        class="flex items-center gap-2 mb-2 card bg-transparent hover:cursor-pointer"
-        @click.capture="showUpcomming = !showUpcomming"
+        class="flex items-center gap-2 mb-2 card bg-transparent"
       >
-        <div class="ml-auto flex gap-3 items-center">
+        <!-- <ui-input label="search transactions" v-model="search"></ui-input> -->
+        <div
+          class="ml-auto flex gap-3 items-center hover:cursor-pointer"
+          @click.capture="showUpcomming = !showUpcomming"
+        >
           <span class="text-sm text-gray-5">
             {{ upcommingTransactions.length }}
             {{ mapTransactionDeclention(upcommingTransactions.length) }}
@@ -165,6 +167,8 @@ const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
+
+const search = ref("");
 
 const projectsStore = useProjectsStore();
 

@@ -8,7 +8,7 @@
     >
       <slot></slot>
     </BarGraph>
-    <div class="center mt-3">
+    <div class="center mt-3 overflow-x-auto">
       <ui-toggle-bar
         v-model="modelValue"
         :options="[$t('expenses'), $t('incomes')]"

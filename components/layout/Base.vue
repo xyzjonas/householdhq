@@ -1,13 +1,12 @@
 <template>
   <main>
     <header>
-      <div class="page flex items-center justify-between overflow-hidden px-2">
+      <div class="page flex items-center justify-between overflow-hidden px">
         <div class="flex items-center">
           <div class="flex-col p-2">
             <span class="line-height-none">Household HQ</span>
             <span class="text-xs opacity-[0.8]">{{ VERSION }}</span>
           </div>
-          <!-- <span class="text-xs opacity-[0.8]">{{ VERSION }}</span> -->
           <span class="h-[57px]"></span>
         </div>
         <ClientOnly>
@@ -27,9 +26,9 @@
     </header>
 
     <ClientOnly>
-      <div class="flex flex-1" @click.capture="closeDrawer">
+      <div class="flex flex-1 px-1 gap-2" @click.capture="onClickEverywhere">
         <ui-drawer v-model="drawer" overlay />
-        <div class="flex-1 px-2 mx-auto max-w-[1024px]">
+        <div class="flex-1 max-w-7xl mx-auto">
           <slot />
         </div>
       </div>
@@ -59,7 +58,8 @@ watch(themeBool, (_) => toggle());
 
 const { width } = useWindowSize();
 const drawer = useLocalStorage("drawer-open", false);
-const closeDrawer = () => {
+const onClickEverywhere = () => {
+  // close the drawer in case of a 'mobile' device
   // see breakpoints in base.scss
   if (width.value <= 900) {
     drawer.value = false;

@@ -1,5 +1,5 @@
 <template>
-  <div class="toggle-bar m-1">
+  <div class="toggle-bar">
     <a
       v-for="(option, index) in options"
       @click="onClick(index)"
@@ -26,6 +26,7 @@ const onClick = (index: number) => {
 
 <style lang="scss" scoped>
 .bar-item {
-  width: v-bind("itemWidth");
+  --w: v-bind("itemWidth");
+  width: calc(var(--w, 100%));
 }
 </style>

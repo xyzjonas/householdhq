@@ -1,5 +1,5 @@
 <template>
-  <form class="card w-sm sm:w-md" @submit.prevent="useLogin">
+  <form class="sm:w-md" @submit.prevent="useLogin">
     <div class="p-5 flex flex-col items-center">
       <img src="/logo.svg" alt="logo" width="128" class="mb-5" />
       <h1 class="title mb-10 upp">Household HQ</h1>

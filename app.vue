@@ -85,10 +85,12 @@ body {
   font-family: "Roboto", sans-serif;
 
   font-weight: 400;
-  line-height: 1.4;
   color: var(--text-200);
   background-color: var(--bg-100);
   touch-action: pan-x pan-y;
+
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -101,5 +103,21 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
 }
 </style>
