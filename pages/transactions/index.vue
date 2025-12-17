@@ -1,31 +1,40 @@
 <template>
   <div class="flex my-3 justify-between items-center">
-    <h1 class="text-xl">
-      {{ $t("t_up_to") }}
+    <h1 class="text-xl flex">
+      <span class="min-w-6 text-center">{{
+        displayedTransactions.length
+      }}</span>
+      <span class="w-[1px] bg-gray-5 mr-2 ml-3"></span>
+      <span class="mr-2">{{ $t("t_up_to") }}</span>
       <span class="font-bold">{{ dateFormatted }}</span>
     </h1>
     <Transition name="page">
       <Spinner v-if="loading" />
     </Transition>
   </div>
-  <!-- <div>{{ data }}</div> -->
+
+  <div class="flex my-3 gap-2">
+    <ui-input v-model="search" label="Search for transactions"></ui-input>
+    <ui-button icon="i-ic-arrow-downward" outlined flat @click="getNextBatch">{{
+      $t("show_more")
+    }}</ui-button>
+  </div>
+
   <div class="flex flex-col gap-2">
     <transaction-row
       :transaction="trans"
-      v-for="trans in transactions"
+      v-for="trans in displayedTransactions"
       :key="trans.id"
       @delete="deleteTransaction"
       @patched="updateTransaction"
     ></transaction-row>
   </div>
-  <ui-button icon="i-ic-arrow-downward" class="mt-5" @click="getNextBatch">{{
-    $t("show_more")
-  }}</ui-button>
 </template>
 <script setup lang="ts">
 import type { Spinner } from "#components";
 import type { Transaction } from "~/types";
 
+const search = ref("");
 const loading = ref(false);
 const transactions = ref<Transaction[]>([]);
 
@@ -50,6 +59,17 @@ const getNextBatch = () => {
 
 fetch();
 
+const { doesTransactionMatch } = useSearch();
+const displayedTransactions = computed(() =>
+  transactions.value.filter((trans) => {
+    if (search.value) {
+      return doesTransactionMatch(search.value, trans);
+    } else {
+      return true;
+    }
+  })
+);
+
 const { token } = useTokenStore();
 
 const deleteTransaction = (transactionData: Transaction) => {
@@ -70,7 +90,6 @@ const deleteTransaction = (transactionData: Transaction) => {
     .finally(() => (loading.value = false));
 };
 
-const transactionStore = useTransactionStore();
 const updateTransaction = (transaction: Transaction) => {
   console.info("UPDATED");
   transactions.value = transactions.value.map((trans) => {

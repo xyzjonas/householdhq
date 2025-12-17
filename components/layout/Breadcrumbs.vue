@@ -59,7 +59,7 @@ a {
 }
 
 .segment {
-  margin-inline: 8px;
+  margin-inline: 1px;
   transition: 0.2s color;
 }
 
