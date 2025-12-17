@@ -86,6 +86,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         return t;
       });
       currentMonth.value.sort(byDate);
+      return transaction;
     } finally {
       loading.value = false;
     }

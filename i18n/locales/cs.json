@@ -26,6 +26,8 @@
   "to_important": "All reminders",
   "c_new": "Přidat novou kategorii",
   "c_name": "název kategorie",
+  "t_transactions": "transakce",
+  "t_up_to": "Poslední transakce až do",
   "t_date": "datum",
   "t_time": "čas",
   "t_desc": "popis",

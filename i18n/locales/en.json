@@ -28,6 +28,8 @@
   "c_name": "Category name",
   "c_istracker": "Tracker",
   "c_istracker_desc": "Mark as an important category to be tracked",
+  "t_up_to": "Showing transactions up to",
+  "t_transactions": "transactions",
   "t_date": "date",
   "t_time": "time",
   "t_desc": "description",

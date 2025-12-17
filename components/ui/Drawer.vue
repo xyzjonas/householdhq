@@ -59,6 +59,19 @@
           <span class="text-xs">{{ allProjects.length }}</span>
         </span>
       </ui-list-row>
+
+      <ui-list-row
+        @click="navigateTo('/transactions')"
+        :class="{ active: $route.path === '/transactions' }"
+      >
+        <span class="flex justify-between items-center">
+          <span class="flex items-center gap-2">
+            <i class="i-ic-outline-manage-search"></i>
+            <h3>{{ $t("t_transactions") }}</h3>
+          </span>
+        </span>
+      </ui-list-row>
+
       <ui-list-row @click="navigateTo('/important')">
         <span class="flex items-center gap-2">
           <i class="i-ic-round-warning"></i>

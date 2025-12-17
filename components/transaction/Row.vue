@@ -106,13 +106,14 @@ const confirmPendingTransaction = (transaction: Transaction) => {
 
 const editTransaction = (transactionData: Transaction) => {
   transactions.editTransaction(transactionData)
-  .then(() => {
+  .then((newTransaction) => {
     notifications.addNotification({
       text: t('t_editted'),
       level: 'success',
     })
     details.value = false;
     edit.value =false;
+    emit("patched", newTransaction)
   })
 }
 
