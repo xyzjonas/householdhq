@@ -38,12 +38,13 @@ body {
     --bg-300:#adadad;
 
     --border-100: #e2e8f0;
+    --border-radius: 12px;
 
     --text-100: #212529;
     --text-200:#000000;
     --text-over-secondary: #ffffff;
 
-    --shadow-100: #141414;
+    --shadow-100: #2a2a2a18;
 
     --secondary-100: #292929;
     --secondary-100: #666666;
@@ -58,13 +59,13 @@ html[data-theme="dark"] {
     --bg-200:#0d0d0d;
     --bg-300:#404040;
 
-    --border-100: #363636;
+    --border-100: #202020;
 
     --text-100:#FFFFFF;
     --text-200:#e0e0e0;
     --text-over-secondary: #e0e0e0;
 
-    --shadow-100: #585858;
+    --shadow-100: transparent;
 
     // --secondary-100: #334155;
 

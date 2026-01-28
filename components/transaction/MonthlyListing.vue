@@ -1,18 +1,20 @@
 <template>
-  <div
-    v-for="(trans, key) in transactionsByMonth"
-    class="flex-col month-section mt-5 first:mt-0"
-  >
-    <div class="border-b-solid border-1 border-b-gray-5">
-      {{ formatDateKey(key as string) }}
-    </div>
-    <div class="flex-col gap-2">
-      <TransactionRow
-        v-for="transaction in trans"
-        :key="transaction.id"
-        :transaction="transaction"
-        class="upcomming"
-      />
+  <div>
+    <div v-for="(trans, key) in transactionsByMonth" class="month-section">
+      <div class="flex items-center mb-3 gap-3">
+        <span class="circle-sm bg-blue"></span>
+        <div class="text-xl font-bold light:text-dark-1 dark:text-gray-3">
+          {{ formatDateKey(key as string) }}
+        </div>
+      </div>
+      <div class="flex-col gap-2">
+        <TransactionRow
+          v-for="transaction in trans"
+          :key="transaction.id"
+          :transaction="transaction"
+          class="upcomming"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -53,3 +55,9 @@ function formatDateKey(key: string): string {
   return key;
 }
 </script>
+
+<style lang="css" scoped>
+.month-section:not(:first-child) {
+  margin-top: 2rem;
+}
+</style>

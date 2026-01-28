@@ -89,29 +89,18 @@
         </div>
       </div>
 
-      <!-- SHOW UPCOMMING -->
-      <div
+      <WidgetUpcomming
         v-if="isCurrentMonth && currentMonth.length > 0"
-        class="flex items-center gap-2 mb-2 card bg-transparent"
-      >
-        <!-- <ui-input label="search transactions" v-model="search"></ui-input> -->
-        <div
-          class="ml-auto flex gap-3 items-center hover:cursor-pointer"
-          @click.capture="showUpcomming = !showUpcomming"
-        >
-          <span class="text-sm text-gray-5">
-            {{ upcommingTransactions.length }}
-            {{ mapTransactionDeclention(upcommingTransactions.length) }}
-          </span>
-          <ui-price :amount="totalExpenses(upcomming)" :currency="currency" />
-        </div>
-        <ui-chevron v-model="showUpcomming" readonly />
-      </div>
+        v-model:show="showUpcomming"
+        :upcomming="upcomming"
+        :currency="currency"
+        class="mb-2"
+      />
 
       <transition name="page">
         <section v-if="showUpcomming || filterCategoryId > 0">
           <TransactionRow
-            v-for="transaction in upcommingTransactions"
+            v-for="transaction in upcomming"
             :key="transaction.id"
             :transaction="transaction"
             :transparent="true"
@@ -262,23 +251,11 @@ const expense = computed(() =>
     .reduce((a: number, b: number) => a + b, 0)
 );
 
-const upcommingTransactions = computed(() => {
-  const tmp = currentMonth.value.filter(
-    (trans) => new Date(trans.transactedAt) > new Date()
-  );
-  if (filterCategoryId.value >= 0) {
-    return tmp.filter(
-      (trans: Transaction) => trans.category.id === filterCategoryId.value
-    );
-  }
-
-  return tmp;
-});
-
 const importantTransactions = computed(() => {
   return currentMonth.value.filter((t) => t.isImportant && !t.confirmed);
 });
 
+const { t } = useI18n();
 const putTransaction = (transactionData: Transaction) => {
   transactionStore.createTransaction(transactionData).then(() => {
     addExpense.value = false;
@@ -320,17 +297,6 @@ const updateTransaction = (transaction: Transaction) => {
         transactionStore.fetchTransactions();
         // transactionStore.fetchgetTransactions();
       }
-  }
-};
-
-const { t } = useI18n();
-const mapTransactionDeclention = (count: number) => {
-  if (count === 1) {
-    return t("t_upcomming_1");
-  } else if (count > 1 && count < 5) {
-    return t("t_upcomming_2");
-  } else {
-    return t("t_upcomming_5");
   }
 };
 </script>

@@ -1,26 +1,25 @@
 <template>
-  <div class="flex my-3 justify-between items-center">
-    <h1 class="text-xl flex">
-      <span class="min-w-6 text-center">{{
-        displayedTransactions.length
-      }}</span>
-      <span class="w-[1px] bg-gray-5 mr-2 ml-3"></span>
-      <span class="mr-2">{{ $t("t_up_to") }}</span>
-      <span class="font-bold">{{ dateFormatted }}</span>
-    </h1>
+  <!-- <div class="flex justify-between items-center">
     <Transition name="page">
       <Spinner v-if="loading" />
     </Transition>
-  </div>
+  </div> -->
 
-  <div class="flex my-3 gap-2">
+  <main class="flex mb-5 gap-2">
     <ui-input v-model="search" label="Search for transactions"></ui-input>
-    <ui-button icon="i-ic-arrow-downward" outlined flat @click="getNextBatch">{{
-      $t("show_more")
-    }}</ui-button>
-  </div>
+    <ui-button
+      :loading
+      icon="i-ic-arrow-downward"
+      outlined
+      flat
+      @click="getNextBatch"
+      >{{ $t("show_more") }}</ui-button
+    >
+  </main>
 
-  <div class="flex flex-col gap-2">
+  <TransactionMonthlyListing :transactions="displayedTransactions" />
+
+  <!-- <div class="flex flex-col gap-2">
     <transaction-row
       :transaction="trans"
       v-for="trans in displayedTransactions"
@@ -28,7 +27,7 @@
       @delete="deleteTransaction"
       @patched="updateTransaction"
     ></transaction-row>
-  </div>
+  </div> -->
 </template>
 <script setup lang="ts">
 import type { Spinner } from "#components";

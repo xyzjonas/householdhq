@@ -4,7 +4,7 @@
       class="flex items-center gap-3 hover:cursor-pointer hover:underline"
       @click="navigateTo(`/sources/${source.id}`)"
     >
-      <span class="color-flag"></span>
+      <span class="circle-sm"></span>
       <span class="label">{{ source.name }}</span>
     </div>
     <div class="text">
@@ -97,10 +97,7 @@ const emit = defineEmits(["autoupdated"]);
   }
 }
 
-.color-flag {
-  width: 16px;
-  aspect-ratio: 1;
-  border-radius: 50%;
+.circle-sm {
   background-color: v-bind("source.color ?? 'gray'");
 }
 </style>

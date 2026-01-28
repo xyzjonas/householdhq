@@ -31,11 +31,11 @@ export const useSearch = () => {
     return isMatch(
       searchTerm,
       [
-        value.category.name,
+        value.category?.name ?? "",
         value.description,
         value.project?.name ?? "",
-        value.source.name,
-        value.target.name,
+        value.source?.name ?? "",
+        value.target?.name ?? "",
       ].join(" ")
     );
   }
