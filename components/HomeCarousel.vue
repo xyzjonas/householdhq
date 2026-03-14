@@ -1,28 +1,67 @@
 <template>
-  <div class="carousel card">
-    <!-- EXPENSES & INCOMES -->
-    <BarGraph
-      :items="data"
-      :expand="expandGraph"
-      @filter="(id) => $emit('filter', id)"
+  <div class="card">
+    <div
+      class="uppercase dark:text-gray-4 light:text-gray-6 justify-between flex"
     >
-      <slot></slot>
-    </BarGraph>
-    <div class="center mt-3 overflow-x-auto">
-      <ui-toggle-bar
-        v-model="modelValue"
-        :options="[$t('expenses'), $t('incomes')]"
-        item-width="8rem"
-      ></ui-toggle-bar>
+      <span> month summary </span>
+      <span>+4.3%</span>
+    </div>
+    <div class="p-5 flex gap-15 flex-wrap justify-center">
+      <BarGraph
+        :items="data"
+        :expand="expandGraph"
+        v-model:selected-category-id="selectedCategory"
+        :class="['min-w-xs', 'max-h-xs', selectedCategory >= 0 ? 'w-full' : '']"
+      >
+        <slot></slot>
+      </BarGraph>
+      <div
+        v-if="selectedCategory < 0"
+        class="flex flex-col flex-1 min-w-60 justify-center gap-5"
+      >
+        <span
+          class="row-hover flex items-center justify-between"
+          @click="tabIndex = 1"
+        >
+          <div class="flex items-center gap-3">
+            <i v-if="tabIndex === 1" class="i-ic-chevron-right"></i>Income
+          </div>
+          <div class="text-lg font-semibold">{{ totalIncome }}</div>
+        </span>
+        <hr class="my-0" />
+        <span
+          class="row-hover flex items-center justify-between"
+          @click="tabIndex = 2"
+        >
+          <div class="flex items-center gap-3">
+            <i v-if="tabIndex === 2" class="i-ic-chevron-right"></i>Expenses
+          </div>
+          <div class="text-lg font-semibold">{{ totalExpenses }}</div>
+        </span>
+        <hr class="my-0" />
+        <span class="flex justify-between p-2">
+          <div>Net</div>
+          <div
+            :class="[
+              netTotal.startsWith('-') ? 'text-red-500' : 'text-green-500',
+              'text-lg font-semibold',
+            ]"
+          >
+            {{ netTotal }}
+          </div>
+        </span>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import type { CategoryWithSum } from "@/types";
 
-defineEmits(["filter"]);
+const emit = defineEmits(["filter"]);
 
-const modelValue = defineModel<number>();
+const selectedCategory = defineModel<number>("category", { default: -1 });
+
+const tabIndex = defineModel<number>("tabindex", { default: 2 });
 
 const props = defineProps<{
   expenses: CategoryWithSum[];
@@ -31,7 +70,7 @@ const props = defineProps<{
 }>();
 
 const data = computed(() =>
-  modelValue.value === 1 ? props.incomes : topExpenses.value
+  tabIndex.value === 1 ? props.incomes : topExpenses.value,
 );
 
 const topExpenses = computed(() => {
@@ -41,6 +80,35 @@ const topExpenses = computed(() => {
       .sort((a, b) => b.sum - a.sum);
   }
   return props.expenses;
+});
+
+const expensesSum = computed(() =>
+  props.expenses.reduce((acc, curr) => acc + curr.sum, 0),
+);
+const totalExpenses = computed(() =>
+  new Intl.NumberFormat("cs-CZ", {
+    style: "currency",
+    currency: "CZK",
+  }).format(expensesSum.value),
+);
+
+const incomeSum = computed(() =>
+  props.incomes.reduce((acc, curr) => acc + curr.sum, 0),
+);
+const totalIncome = computed(() =>
+  new Intl.NumberFormat("cs-CZ", {
+    style: "currency",
+    currency: "CZK",
+  }).format(incomeSum.value),
+);
+
+const netTotal = computed(() => {
+  const net = incomeSum.value - expensesSum.value;
+  return new Intl.NumberFormat("cs-CZ", {
+    style: "currency",
+    currency: "CZK",
+    signDisplay: "always",
+  }).format(net);
 });
 </script>
 <style lang="scss" scoped>

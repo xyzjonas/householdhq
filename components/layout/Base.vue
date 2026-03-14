@@ -1,6 +1,6 @@
 <template>
   <main>
-    <header>
+    <header v-if="!hideHeader">
       <div class="page flex items-center justify-between overflow-hidden px">
         <div class="flex items-center">
           <div class="flex-col p-2">
@@ -48,6 +48,8 @@
 import { VERSION } from "@/_version";
 import { useNotifications } from "@/composables/useNotifications";
 import { useLocalStorage, useWindowSize } from "@vueuse/core";
+
+defineProps<{ hideHeader?: boolean }>();
 
 const { notifications } = useNotifications();
 

@@ -1,84 +1,56 @@
 <template>
-  <section class="title">
-    <p>{{ dateFormatted }}</p>
-    <div class="ml-auto flex gap-3 items-center">
-      <NuxtLink
-        :to="`/?year=${previous.getFullYear()}&month=${
-          previous.getMonth() + 1
-        }`"
-        @click="$emit('reload', previous)"
-        :class="{ left: true }"
-      >
-        <i class="i-ic-chevron-left"></i>
-      </NuxtLink>
-      <div class="min-w-6">
-        <transition name="page" mode="out-in">
-          <NuxtLink
-            v-if="!isCurrent"
-            to="/"
-            @click="$emit('reload', new Date())"
-            :class="{ left: true }"
-          >
-            <i class="i-ic-baseline-calendar-month"></i>
-          </NuxtLink>
-        </transition>
+  <div class="flex flex-col flex-1 items-center md:items-start">
+    <div class="flex justify-center md:justify-between items-center w-full">
+      <span class="hidden md:inline uppercase text-gray-5 text-xs">
+        HouseholdHQ
+      </span>
+      <ClientOnly>
+        <LayoutToggles />
+      </ClientOnly>
+    </div>
+    <h1 class="font-bold line-height-[1.5] text-nowrap">
+      {{ monthName }} Overview
+    </h1>
+    <p class="text-sm dark:text-gray-3 light:text-gray-6">
+      Household cashfow 1-30 {{ monthName }} {{ year }}
+    </p>
+    <div class="flex mt-3 gap-3 items-center h-8">
+      <div class="flex gap-3 items-center">
+        <NuxtLink
+          :to="`/?year=${previous.getFullYear()}&month=${
+            previous.getMonth() + 1
+          }`"
+          @click="$emit('reload', previous)"
+          class="left flex"
+        >
+          <i class="i-ic-baseline-arrow-back text-2xl"></i>
+        </NuxtLink>
+      </div>
+      <div class="min-w-25">
+        <NuxtLink
+          v-if="!isCurrent"
+          to="/"
+          @click="$emit('reload', new Date())"
+          class="left flex"
+        >
+          <ui-pin text="This month" clickable></ui-pin>
+        </NuxtLink>
       </div>
       <NuxtLink
         :to="`/?year=${next.getFullYear()}&month=${next.getMonth() + 1}`"
         @click="$emit('reload', next)"
-        :class="{ right: true }"
+        class="right flex"
       >
-        <i class="i-ic-chevron-right"></i>
+        <i class="i-ic-baseline-arrow-forward text-2xl"></i>
       </NuxtLink>
     </div>
-  </section>
+  </div>
 </template>
 <script setup lang="ts">
 import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
-const { month, year, next, previous, isCurrent, dateFormatted } = useCurrentMonth();
+const { monthName, year, next, previous, isCurrent, dateFormatted } =
+  useCurrentMonth();
 
 defineEmits(["reload"]);
 </script>
-<style lang="scss" scoped>
-.title {
-  display: flex;
-  flex-direction: row;
-  gap: 1.5em;
-  color: var(--text-200);
-
-  padding: 16px 12px;
-
-  p {
-    font-size: x-large;
-    font-weight: 400;
-  }
-}
-
-a {
-  display: flex;
-  align-items: center;
-  font-size: large;
-  color: var(--color-grey-light-1);
-  transition-duration: 0.3s;
-}
-
-a:hover {
-  transition-duration: 0.3s;
-  transition: linear;
-}
-
-.left,
-.right {
-  font-size: x-large;
-  color: var(--color-primary-light-1);
-}
-
-.left:hover {
-  color: var(--color-primary);
-}
-
-.right:hover {
-  color: var(--color-primary);
-}
-</style>

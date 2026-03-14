@@ -1,10 +1,17 @@
 <template>
   <div
     class="pin"
-    :class="{
-      pin: true,
-      clickable,
-      small: size === 'small',
+    :class="[
+      'pin',
+      'clickable',
+      size === 'small' ? 'small' : '',
+      clickable ? 'clickable' : '',
+      size === 'normal' ? 'normal' : '',
+    ]"
+    :style="{
+      backgroundColor: bg,
+      borderColor: border,
+      color: textColor,
     }"
   >
     <slot name="start"></slot>
@@ -14,12 +21,18 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  text: string;
-  color?: string | null;
-  clickable?: boolean;
-  size?: "small" | "normal";
-}>();
+const props = withDefaults(
+  defineProps<{
+    text: string;
+    color?: string | null;
+    clickable?: boolean;
+    size?: "small" | "normal";
+  }>(),
+  {
+    clickable: false,
+    size: "normal",
+  },
+);
 
 const bg = computed(() => props.color ?? "transparent");
 const border = computed(() => props.color ?? "var(--border-100)");
@@ -42,7 +55,6 @@ const textColor = computed(() => {
   gap: 0.2rem;
   font-size: small;
   border: 1px solid v-bind("border");
-  padding: 0.1rem 0.3rem;
   border-radius: 2rem;
   transition: filter 0.1s ease-in-out;
 
@@ -53,6 +65,12 @@ const textColor = computed(() => {
 .small {
   font-size: x-small;
   font-weight: 500;
+  padding: 1px 4px;
+}
+
+.normal {
+  font-weight: 500;
+  padding: 6px 12px;
 }
 
 .clickable {

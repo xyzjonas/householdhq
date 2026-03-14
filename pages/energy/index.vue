@@ -74,7 +74,7 @@ const panel = ref(0);
 const route = useRoute();
 const id = parseInt(route.params.id as string);
 const { data, error, refresh } = await useFetch<{ data: Meter[] }>(
-  `/api/meters`
+  `/api/meters`,
 );
 
 const allMeters = computed(() => data.value?.data ?? []);

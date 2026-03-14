@@ -1,7 +1,7 @@
 <template>
   <VitePwaManifest />
   <NuxtLoadingIndicator />
-  <NuxtLayout>
+  <NuxtLayout class="font-sora">
     <NuxtPage />
   </NuxtLayout>
 </template>
@@ -82,7 +82,7 @@ html {
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  /* font-family: "Roboto", sans-serif; */
 
   font-weight: 400;
   color: var(--text-200);

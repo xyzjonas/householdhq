@@ -31,7 +31,11 @@ export function getNextMont(date: Date | number, isCorrected: boolean = false) {
 
 export function getNextMontHumanRedeable(
   date: Date | number,
-  isCorrected: boolean = false
+  isCorrected: boolean = false,
 ) {
   return getNextMont(date, isCorrected) + 1;
+}
+
+export function getMonthName(date: Date, locale: string) {
+  return date.toLocaleDateString(locale, { month: "long" });
 }

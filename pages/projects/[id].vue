@@ -111,7 +111,7 @@ import type { Project } from "~/types";
 const route = useRoute();
 const id = parseInt(route.params.id as string);
 const { data, error, refresh } = await useFetch<{ data: Project }>(
-  `/api/projects/${id}`
+  `/api/projects/${id}`,
 );
 
 const projectsStore = useProjectsStore();

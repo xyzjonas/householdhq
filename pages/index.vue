@@ -1,25 +1,45 @@
 <template>
   <div class="containerr">
-    <MonthHero />
+    <div class="flex justify-between">
+      <MonthHero />
+      <!-- <ClientOnly>
+        <LayoutToggles />
+      </ClientOnly> -->
+    </div>
 
-    <client-only>
+    <!-- <client-only>
       <top-summary :transactions="passed" />
-    </client-only>
+    </client-only> -->
+    <hr class="mb-3" />
     <div class="flex gap-2 flex-wrap">
+      <div
+        v-if="
+          (carouselTabindex === 1
+            ? incomeCategories
+            : expenseCategories
+          ).filter((it) => it.sum > 0).length > 0
+        "
+        class="flex-1 hidden sm:visible"
+      >
+        <card-categories
+          :items="carouselTabindex === 1 ? incomeCategories : expenseCategories"
+          v-model:selected-category-id="filterCategoryId"
+        />
+      </div>
       <HomeCarousel
-        v-model="carouselTabindex"
+        v-model:tabindex="carouselTabindex"
+        v-model:category="filterCategoryId"
         :expenses="expenseCategories"
         :incomes="incomeCategories"
-        @filter="(tagId: number) => (filterCategoryId = tagId)"
         :expand-graph="!isCurrentMonth"
-        class="flex-[2]"
+        class="flex-[4] min-w-sm"
       >
         <div
           v-if="isCurrentMonth"
           class="text-center font-thin uppercase flex flex-col justify-center items-center"
         >
+          <h4 class="text-gray-5">{{ $t("balance") }}</h4>
           <ui-price :amount="balance" :currency="currency" size="2.5rem" />
-          <h4>{{ $t("balance") }}</h4>
           <div class="flex justify-center mt-3">
             (
             <ui-price
@@ -30,28 +50,37 @@
             )
           </div>
         </div>
-        <div v-else>
-          {{ dateFormatted }}
-        </div>
       </HomeCarousel>
-      <transition name="slide" mode="out-in">
-        <div
-          class="flex flex-col flex-1 gap-2"
-          v-if="isCurrentMonth && !transactionsLoading"
-        >
-          <BalanceRow
-            class="flex-1"
-            :sources="
-              sources
-                .filter((src) => src.isPortfolio)
-                .sort((a, b) => a.position - b.position)
-            "
-            :spent="expense"
-            :total-income="income"
-          />
-          <project-dashboard />
-        </div>
-      </transition>
+      <div
+        v-if="
+          (carouselTabindex === 1
+            ? incomeCategories
+            : expenseCategories
+          ).filter((it) => it.sum > 0).length > 0
+        "
+        class="flex-1 visible sm:hidden"
+      >
+        <card-categories
+          :items="carouselTabindex === 1 ? incomeCategories : expenseCategories"
+          v-model:selected-category-id="filterCategoryId"
+        />
+      </div>
+      <div
+        class="flex flex-col flex-1 gap-2 min-w-xs"
+        v-if="isCurrentMonth && !transactionsLoading"
+      >
+        <BalanceRow
+          class="flex-1"
+          :sources="
+            sources
+              .filter((src) => src.isPortfolio)
+              .sort((a, b) => a.position - b.position)
+          "
+          :spent="expense"
+          :total-income="income"
+        />
+        <project-dashboard />
+      </div>
     </div>
 
     <transition name="page">
@@ -152,6 +181,10 @@ import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
 import { totalExpenses, transactionsTotal } from "~/utils/transaction";
 
+definePageMeta({
+  layout: "noheader",
+});
+
 const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 
 const tokenStore = useTokenStore();
@@ -194,7 +227,7 @@ const filterCategoryId = ref<number>(-1);
 
 const notifications = useNotifications();
 
-const carouselTabindex = ref(0);
+const carouselTabindex = ref(2);
 const incomesDisplayed = computed(() => carouselTabindex.value === 1);
 
 onMounted(async () => {
@@ -222,7 +255,7 @@ const transactions = computed(() => {
 
   if (filterCategoryId.value >= 0) {
     tmp = tmp.filter(
-      (trans: Transaction) => trans.category.id === filterCategoryId.value
+      (trans: Transaction) => trans.category.id === filterCategoryId.value,
     );
   }
 
@@ -231,24 +264,24 @@ const transactions = computed(() => {
 
 const incomeTransactions = computed(() =>
   transactions.value.filter(
-    (tr: Transaction) => !tr.target.isOut && tr.source.isOut
-  )
+    (tr: Transaction) => !tr.target.isOut && tr.source.isOut,
+  ),
 );
 const expenseTransactions = computed(() =>
   transactions.value.filter(
-    (tr: Transaction) => tr.target.isOut && !tr.source.isOut
-  )
+    (tr: Transaction) => tr.target.isOut && !tr.source.isOut,
+  ),
 );
 
 const income = computed(() =>
   incomeTransactions.value
     .map((tr: Transaction) => tr.amount)
-    .reduce((a: number, b: number) => a + b, 0)
+    .reduce((a: number, b: number) => a + b, 0),
 );
 const expense = computed(() =>
   expenseTransactions.value
     .map((tr: Transaction) => tr.amount)
-    .reduce((a: number, b: number) => a + b, 0)
+    .reduce((a: number, b: number) => a + b, 0),
 );
 
 const importantTransactions = computed(() => {
@@ -279,7 +312,7 @@ const deleteTransaction = (transactionData: Transaction) => {
   })
     .then((res) => {
       currentMonth.value = currentMonth.value.filter(
-        (t: Transaction) => t.id != transactionData.id
+        (t: Transaction) => t.id != transactionData.id,
       );
     })
     .finally(() => (loading.value = false));

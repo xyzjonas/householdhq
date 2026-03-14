@@ -8,11 +8,11 @@
       :subtitle="$t('no_data_will_appear')"
       class="my-auto"
     />
-    <section v-else-if="selectedCategory" class="h-full">
+    <section v-else-if="selectedCategory">
       <Summary
         :category="selectedCategory"
         @edit="navigateTo(`/tags/${selectedCategory.id}`)"
-        @close="selectedCategoryName = ''"
+        @close="selectedCategoryId = -1"
       />
       <div id="actions" class="row center">
         <ui-button
@@ -25,15 +25,12 @@
           width="48px"
           height="36px"
           icon="i-ic-baseline-close"
-          @click="selectedCategoryName = ''"
+          @click="selectedCategoryId = -1"
         />
       </div>
     </section>
-    <section
-      v-else-if="showLegend"
-      class="h-full flex flex-col justify-start p-"
-    >
-      <div
+    <section v-else-if="showLegend" class="h-full flex flex-col justify-start">
+      <!-- <div
         v-for="item in items.filter((it) => it.sum > 0)"
         class="legend-content-item relative overflow-hidden"
         @click="selectCategoryByName(item.name)"
@@ -50,7 +47,7 @@
         ></span>
         <span class="mr-1">{{ item.name }}</span>
         <ui-price :amount="item.sum" size="small" class="ml-auto mr-2" />
-      </div>
+      </div> -->
     </section>
     <div v-else class="graph-wrapper">
       <Doughnut :data="data" :options="options" />
@@ -59,7 +56,7 @@
       </div>
     </div>
 
-    <client-only v-if="!selectedCategory">
+    <!-- <client-only v-if="!selectedCategory">
       <div id="show-legend" class="flex gap-1">
         <ui-button
           :icon="
@@ -71,7 +68,7 @@
           @click="showLegend = !showLegend"
         />
       </div>
-    </client-only>
+    </client-only> -->
   </div>
 </template>
 <script setup lang="ts">
@@ -89,11 +86,12 @@ const props = defineProps<{
   expand?: boolean;
 }>();
 
-const selectedCategoryName = ref<string>("");
+const selectedCategoryId = defineModel<number>("selectedCategoryId", {
+  default: -1,
+});
+
 const selectedCategory = computed(() => {
-  return props.items.find(
-    (it) => it.name && it.name === selectedCategoryName.value
-  );
+  return props.items.find((it) => it.id && it.id === selectedCategoryId.value);
 });
 
 const sum = computed(() => props.items.reduce((a, b) => a + b.sum, 0));
@@ -107,8 +105,8 @@ watch(selectedCategory, (value, _) => {
 });
 
 const showedItems = computed(() => {
-  if (selectedCategoryName.value) {
-    return props.items.filter((it) => it.name === selectedCategoryName.value);
+  if (selectedCategoryId.value >= 0) {
+    return props.items.filter((it) => it.id === selectedCategoryId.value);
   }
   return props.items;
 });
@@ -118,7 +116,7 @@ const areThereTransactions = computed(() => {
 });
 
 const borderColor = (item: CategoryWithSum) => {
-  if (item.name === selectedCategoryName.value) {
+  if (item.id === selectedCategoryId.value) {
     return "white";
   }
   return item.color ?? "var(--bg-300)";
@@ -142,10 +140,11 @@ const data = computed(() => {
 });
 
 const selectCategoryByName = (name: string) => {
-  if (selectedCategoryName.value === name) {
-    selectedCategoryName.value = "";
+  const match = props.items.find((it) => it.name && it.name === name);
+  if (match) {
+    selectedCategoryId.value = match.id ?? -1;
   } else {
-    selectedCategoryName.value = name;
+    selectedCategoryId.value = -1;
   }
 };
 
@@ -158,7 +157,7 @@ const callback = (e: any) => {
 const options = {
   responsive: true,
   onClick: callback,
-  cutout: () => (props.expand ? "90%" : "90%"),
+  cutout: () => (props.expand ? "60%" : "80%"),
   offset: 0,
   spacing: 7,
   plugins: {
@@ -239,8 +238,8 @@ section {
 
 #actions {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: -8px;
+  right: -16px;
   display: flex;
   gap: 0.3rem;
 }

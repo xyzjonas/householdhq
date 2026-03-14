@@ -47,11 +47,14 @@ export const useCurrentMonth = () => {
   const date = computed<Date>(() => new Date(year.value, month.value - 1));
 
   const dateFormatted = computed(() =>
-    formatMMYYYY(date.value, i18n.locale.value)
+    formatMMYYYY(date.value, i18n.locale.value),
   );
+
+  const monthName = computed(() => getMonthName(date.value, i18n.locale.value));
 
   return {
     month,
+    monthName,
     year,
     next,
     previous,
