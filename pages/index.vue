@@ -12,20 +12,6 @@
     </client-only> -->
     <hr class="mb-3" />
     <div class="flex gap-2 flex-wrap">
-      <div
-        v-if="
-          (carouselTabindex === 1
-            ? incomeCategories
-            : expenseCategories
-          ).filter((it) => it.sum > 0).length > 0
-        "
-        class="flex-1 hidden sm:visible"
-      >
-        <card-categories
-          :items="carouselTabindex === 1 ? incomeCategories : expenseCategories"
-          v-model:selected-category-id="filterCategoryId"
-        />
-      </div>
       <HomeCarousel
         v-model:tabindex="carouselTabindex"
         v-model:category="filterCategoryId"
@@ -34,6 +20,18 @@
         :expand-graph="!isCurrentMonth"
         class="flex-[4] min-w-sm"
       >
+        <template #header-right>
+          <ui-button
+            v-if="hasVisibleCategories"
+            link
+            flat
+            icon="i-ic-round-format-list-bulleted"
+            iconSize="1rem"
+            @click="legendModalOpen = true"
+          >
+            Breakdown
+          </ui-button>
+        </template>
         <div
           v-if="isCurrentMonth"
           class="text-center font-thin uppercase flex flex-col justify-center items-center"
@@ -51,20 +49,6 @@
           </div>
         </div>
       </HomeCarousel>
-      <div
-        v-if="
-          (carouselTabindex === 1
-            ? incomeCategories
-            : expenseCategories
-          ).filter((it) => it.sum > 0).length > 0
-        "
-        class="flex-1 visible sm:hidden"
-      >
-        <card-categories
-          :items="carouselTabindex === 1 ? incomeCategories : expenseCategories"
-          v-model:selected-category-id="filterCategoryId"
-        />
-      </div>
       <div
         class="flex flex-col flex-1 gap-2 min-w-xs"
         v-if="isCurrentMonth && !transactionsLoading"
@@ -168,6 +152,18 @@
         @click="addExpense = !addExpense"
       />
     </div>
+
+    <client-only>
+      <teleport to="body">
+        <ui-modal v-model="legendModalOpen">
+          <card-categories
+            :items="currentCategories"
+            v-model:selected-category-id="filterCategoryId"
+            class="min-w-sm"
+          />
+        </ui-modal>
+      </teleport>
+    </client-only>
   </div>
 </template>
 <script setup lang="ts">
@@ -222,6 +218,7 @@ const showUpcomming = ref(false);
 // const showHidden = ref(false);
 
 const addExpense = ref(false);
+const legendModalOpen = ref(false);
 
 const filterCategoryId = ref<number>(-1);
 
@@ -229,6 +226,18 @@ const notifications = useNotifications();
 
 const carouselTabindex = ref(2);
 const incomesDisplayed = computed(() => carouselTabindex.value === 1);
+const currentCategories = computed(() =>
+  incomesDisplayed.value ? incomeCategories.value : expenseCategories.value,
+);
+const hasVisibleCategories = computed(
+  () => currentCategories.value.filter((it) => it.sum > 0).length > 0,
+);
+
+watch(filterCategoryId, (categoryId) => {
+  if (categoryId >= 0) {
+    legendModalOpen.value = false;
+  }
+});
 
 onMounted(async () => {
   await initialFetch();

@@ -4,7 +4,7 @@
       class="uppercase dark:text-gray-4 light:text-gray-6 justify-between flex"
     >
       <span> month summary </span>
-      <span>+4.3%</span>
+      <slot name="header-right"></slot>
     </div>
     <div class="p-5 flex gap-15 flex-wrap justify-center">
       <BarGraph

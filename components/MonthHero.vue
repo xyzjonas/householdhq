@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col flex-1 items-center md:items-start">
-    <div class="flex justify-center md:justify-between items-center w-full">
+    <div class="flex justify-center md:justify-between items-baseline w-full">
       <span class="hidden md:inline uppercase text-gray-5 text-xs">
         HouseholdHQ
       </span>

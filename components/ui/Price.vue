@@ -1,6 +1,6 @@
 <template>
-  <div class="amount">
-    <h1>{{ displayedAmount }}</h1>
+  <div class="amount flex items-center gap-1" :style="`color: ${color};`">
+    <span>{{ displayedAmount }}</span>
     <span v-if="amounAsNumber != undefined" class="currency">{{
       currencyValue
     }}</span>
@@ -87,7 +87,7 @@ const currSize = computed(() => {
   font-family: "Roboto Slab", serif;
 }
 
-h1 {
+span {
   font-weight: 400;
   font-size: v-bind("size");
 }

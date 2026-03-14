@@ -1,5 +1,5 @@
 <template>
-  <div class="legend card">
+  <div class="legend card font-sans">
     <div
       v-for="item in items.filter((it) => it.sum > 10)"
       :key="item.id"
@@ -16,7 +16,7 @@
       ></span>
       <span class="absolute inset-0 opacity-[0.1] left-[2]"></span>
       <span class="mr-1">{{ item.name }}</span>
-      <ui-price :amount="item.sum" size="small" class="ml-auto mr-2" />
+      <ui-price :amount="item.sum" size="medium" class="ml-auto mr-2" />
     </div>
   </div>
 </template>
@@ -53,7 +53,7 @@ section {
       display: flex;
       align-items: center;
       gap: 0.2rem;
-      font-size: small;
+      font-size: normal;
       border: 1px solid var(--border-100);
       background-color: var(--bg-200);
       padding: 2px 5px;
