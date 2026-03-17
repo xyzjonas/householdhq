@@ -8,9 +8,10 @@ import type {
   MeterStateUpdate,
   MeterUpdate,
 } from "~/types";
+import { prisma } from "./prisma-client";
 
 class MetersService {
-  private prisma = new PrismaClient();
+  private prisma = prisma;
   private meters = this.prisma.meter;
   private meterStates = this.prisma.meterState;
 
@@ -69,13 +70,13 @@ class MetersService {
 
   public async editMeter(
     meterId: number,
-    meterData: MeterUpdate
+    meterData: MeterUpdate,
   ): Promise<Meter> {
     try {
       const cleanData = Object.fromEntries(
         Object.entries(meterData).filter(
-          ([k, v]) => k !== "id" && v !== undefined
-        )
+          ([k, v]) => k !== "id" && v !== undefined,
+        ),
       );
       const meter = await this.meters.update({
         where: { id: meterId },
@@ -124,7 +125,7 @@ class MetersService {
   }
 
   public async createMeterState(
-    stateData: MeterStateCreate
+    stateData: MeterStateCreate,
   ): Promise<MeterState> {
     try {
       // Verify meter exists
@@ -148,13 +149,13 @@ class MetersService {
 
   public async editMeterState(
     meterStateId: number,
-    stateData: MeterStateUpdate
+    stateData: MeterStateUpdate,
   ): Promise<MeterState> {
     try {
       const cleanData = Object.fromEntries(
         Object.entries(stateData).filter(
-          ([k, v]) => k !== "id" && v !== undefined
-        )
+          ([k, v]) => k !== "id" && v !== undefined,
+        ),
       );
 
       const state = await this.meterStates.update({

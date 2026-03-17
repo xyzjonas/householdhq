@@ -57,12 +57,12 @@ export default defineNuxtConfig({
         name: "Čeština",
       },
     ],
-    lazy: true,
+    // lazy: true,
     langDir: "locales/",
     defaultLocale: "en",
     strategy: "prefix_except_default",
     bundle: {
-      optimizeTranslationDirective: false,
+      // optimizeTranslationDirective: false,
     },
   },
 
@@ -104,6 +104,19 @@ export default defineNuxtConfig({
           additionalData: '@import "@/assets/css/main.scss";',
         },
       },
+    },
+    optimizeDeps: {
+      include: [
+        "@vue/devtools-core",
+        "@vue/devtools-kit",
+        "pinia",
+        "chart.js",
+        "chartjs-plugin-datalabels",
+        "@vueuse/core",
+        "vue-chartjs",
+        "zod",
+        "chart.js/helpers",
+      ],
     },
   },
 

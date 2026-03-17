@@ -1,8 +1,9 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import type { Category, CreateCategory, EditCategory, IDBase } from "~/types";
+import { prisma } from "./prisma-client";
 
 class Categories {
-  private categories = new PrismaClient().category;
+  private categories = prisma.category;
 
   public async findAllCategories(): Promise<Category[]> {
     return await this.categories.findMany();
@@ -44,7 +45,7 @@ class Categories {
   public async editTag(categoryData: EditCategory): Promise<Category> {
     try {
       const cleanData = Object.fromEntries(
-        Object.entries(categoryData).filter(([_, v]) => v !== undefined)
+        Object.entries(categoryData).filter(([_, v]) => v !== undefined),
       );
       const tag = await this.categories.update({
         where: {

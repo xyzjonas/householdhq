@@ -1,11 +1,16 @@
 import { PrismaClient, type Source, type SourceState } from "@prisma/client";
-import { CreateSourceDto, EditSourceDto, UpdateSourceStateDto } from "../validators/sources.dto";
+import {
+  CreateSourceDto,
+  EditSourceDto,
+  UpdateSourceStateDto,
+} from "../validators/sources.dto";
 import { IdDto } from "../validators/common.dto";
+import { prisma } from "./prisma-client";
 
 class Sources {
-  private sources = new PrismaClient().source;
-  private sourceStates = new PrismaClient().sourceState;
-  private transactions = new PrismaClient().transaction;
+  private sources = prisma.source;
+  private sourceStates = prisma.sourceState;
+  private transactions = prisma.transaction;
 
   public async findAll(): Promise<Source[]> {
     const allSources: Source[] = await this.sources.findMany({
@@ -20,14 +25,19 @@ class Sources {
       include: { states: true },
     });
     if (!source) {
-      throw createError({ statusCode: 400, statusMessage: `No such transaction id=${sourceData.id}` });
+      throw createError({
+        statusCode: 400,
+        statusMessage: `No such transaction id=${sourceData.id}`,
+      });
     }
     return source;
   }
 
   public async createSource(sourceData: CreateSourceDto): Promise<Source> {
     // const data = { ...sourceData };
-    const source: Source = await this.sources.create({ data: { ...sourceData } as any });
+    const source: Source = await this.sources.create({
+      data: { ...sourceData } as any,
+    });
     return source;
   }
 
@@ -75,16 +85,16 @@ class Sources {
       },
       orderBy: {
         created: "desc",
-      }
-    })
-    
+      },
+    });
+
     if (!lastState) {
       return {
         id: "-1",
         sourceId,
         amount: 0,
         created: new Date(),
-      }
+      };
     }
 
     const transactions = await this.transactions.findMany({
@@ -93,26 +103,25 @@ class Sources {
           gte: lastState.created,
           lte: new Date(),
         },
-      }
-    })
+      },
+    });
 
-    const from = transactions.filter(t => t.sourceId === id)
-    const to = transactions.filter(t => t.targetId === id)
+    const from = transactions.filter((t) => t.sourceId === id);
+    const to = transactions.filter((t) => t.targetId === id);
 
     let result = lastState.amount;
     if (to.length > 0) {
       result = to.reduce((a, b) => {
-        return a + b.amount
-      }, result)
+        return a + b.amount;
+      }, result);
     }
 
     if (from.length > 0) {
       result = from.reduce((a, b) => {
-        return a - b.amount
-      }, result)
+        return a - b.amount;
+      }, result);
     }
 
-    
     const sourceState: SourceState = await this.sourceStates.create({
       data: {
         amount: result,
@@ -129,12 +138,14 @@ class Sources {
 
   public async deleteSource(sourceData: IdDto) {
     await this.sources.delete({
-      where: { id: sourceData.id }
-    })
+      where: { id: sourceData.id },
+    });
   }
 
   public async deleteState(entryData: IdDto) {
-    const sourceState: SourceState = await this.sourceStates.delete({ where: { id: entryData.id } });
+    const sourceState: SourceState = await this.sourceStates.delete({
+      where: { id: entryData.id },
+    });
     return sourceState;
   }
 }

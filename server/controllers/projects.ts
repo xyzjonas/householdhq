@@ -1,21 +1,38 @@
-import { Prisma, PrismaClient, type Project, type Transaction } from "@prisma/client";
+import {
+  Prisma,
+  PrismaClient,
+  type Project,
+  type Transaction,
+} from "@prisma/client";
 import { IdDto } from "../validators/common.dto";
-import type { CreateProjectDto, EditProjectDto } from "../validators/projects.dto";
+import type {
+  CreateProjectDto,
+  EditProjectDto,
+} from "../validators/projects.dto";
+import { prisma } from "./prisma-client";
 
-const DEFAULT_INCLUDE = { transactions: { include: { source: true, target: true } } }
+const DEFAULT_INCLUDE = {
+  transactions: { include: { source: true, target: true } },
+};
 
 class Projects {
-  private projects = new PrismaClient().project;
+  private projects = prisma.project;
 
   public async findAll(): Promise<Project[]> {
     return await this.projects.findMany({ include: DEFAULT_INCLUDE });
   }
 
   public async findSingle(data: IdDto): Promise<Project> {
-    const project = await this.projects.findUnique({ where: { id: data.id }, include: DEFAULT_INCLUDE });
+    const project = await this.projects.findUnique({
+      where: { id: data.id },
+      include: DEFAULT_INCLUDE,
+    });
 
     if (!project) {
-      throw createError({ statusCode: 404, statusMessage: `Project '${data.id}' nof found.` });
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Project '${data.id}' nof found.`,
+      });
     }
 
     return project;
@@ -31,7 +48,10 @@ class Projects {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === "P2002") {
-          throw createError({ statusCode: 400, statusMessage: `Project '${projectData.name}' aready exists.` });
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Project '${projectData.name}' aready exists.`,
+          });
         }
       }
       throw e;
@@ -50,7 +70,10 @@ class Projects {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === "P2002") {
-          throw createError({ statusCode: 400, statusMessage: `Project '${projecData.name}' aready exists.` });
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Project '${projecData.name}' aready exists.`,
+          });
         }
       }
       throw e;

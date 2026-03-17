@@ -1,7 +1,7 @@
 <template>
   <VitePwaManifest />
   <NuxtLoadingIndicator />
-  <NuxtLayout class="font-sora">
+  <NuxtLayout class="font-outfit">
     <NuxtPage />
   </NuxtLayout>
 </template>

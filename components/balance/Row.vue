@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-between card">
     <div class="flex flex-col gap-5">
       <balance-account-type-collapsible
-        v-for="(accounts, key) in accounts"
+        v-for="(accounts, key) in allGroups"
         :sources="accounts"
         :type="key"
       />
@@ -18,7 +18,7 @@ const props = defineProps<{
   spent: number;
 }>();
 
-const accounts = computed(() => {
+const allGroups = computed(() => {
   const partitioned: Record<string, Source[]> = {};
   props.sources.forEach((source) => {
     partitioned[source.type] = [...(partitioned[source.type] ?? []), source];

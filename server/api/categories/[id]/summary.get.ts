@@ -1,4 +1,3 @@
-import { c } from "@vite-pwa/assets-generator/dist/shared/assets-generator.5e51fd40.mjs";
 import type { Transaction } from "~/types";
 import transactions from "~~/server/controllers/transactions";
 import { IdDto } from "~~/server/validators/common.dto";
@@ -29,7 +28,7 @@ function isContained(entry: Summary, months: Summary[]) {
     }
   }
 
-  return false
+  return false;
 }
 
 function generateBlanks(months: Summary[]) {
@@ -58,7 +57,7 @@ function generateBlanks(months: Summary[]) {
     }
   }
 
-  return expected.filter(entry => !isContained(entry, months));
+  return expected.filter((entry) => !isContained(entry, months));
 }
 
 export default defineEventHandler(async (event) => {
@@ -78,7 +77,7 @@ export default defineEventHandler(async (event) => {
       const year = transaction.transactedAt.getFullYear();
       const month = transaction.transactedAt.getMonth();
       const summ = months.find(
-        (summary) => summary.month === month && summary.year === year
+        (summary) => summary.month === month && summary.year === year,
       );
 
       if (summ) {
@@ -97,7 +96,7 @@ export default defineEventHandler(async (event) => {
       const year = transaction.transactedAt.getFullYear();
       const month = transaction.transactedAt.getMonth();
       const summ = months.find(
-        (summary) => summary.month === month && summary.year === year
+        (summary) => summary.month === month && summary.year === year,
       );
 
       if (summ) {

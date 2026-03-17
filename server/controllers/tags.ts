@@ -1,12 +1,15 @@
 import { PrismaClient, type Tag, Prisma } from "@prisma/client";
 import { TagDto, EditTagDto } from "../validators/tags.dto";
 import { IdDto } from "../validators/common.dto";
+import { prisma } from "./prisma-client";
 
 class Tags {
-  private tags = new PrismaClient().tag;
+  private tags = prisma.tag;
 
   public async findAllTags(): Promise<Tag[]> {
-    const tags: Tag[] = await this.tags.findMany({ include: { childTags: true } });
+    const tags: Tag[] = await this.tags.findMany({
+      include: { childTags: true },
+    });
     return tags;
   }
 
@@ -16,7 +19,10 @@ class Tags {
       include: { childTags: true },
     });
     if (!tag) {
-      throw createError({ statusCode: 404, statusMessage: `Tag '${data.id}' nof found.` });
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Tag '${data.id}' nof found.`,
+      });
     }
     return tag;
   }
@@ -41,10 +47,16 @@ class Tags {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === "P2002") {
-          throw createError({ statusCode: 400, statusMessage: `Tag '${tagData.name}' aready exists.` });
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Tag '${tagData.name}' aready exists.`,
+          });
         }
         if (e.code === "P2025") {
-          throw createError({ statusCode: 400, statusMessage: `Parent tag '${tagData.parentId}' not found.` });
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Parent tag '${tagData.parentId}' not found.`,
+          });
         }
       }
       throw e;
@@ -78,10 +90,16 @@ class Tags {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === "P2002") {
-          throw createError({ statusCode: 400, statusMessage: `Tag '${tagData.name}' aready exists.` });
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Tag '${tagData.name}' aready exists.`,
+          });
         }
         if (e.code === "P2025") {
-          throw createError({ statusCode: 400, statusMessage: `Parent tag '${tagData.parentId}' not found.` });
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Parent tag '${tagData.parentId}' not found.`,
+          });
         }
       }
       throw e;
