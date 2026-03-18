@@ -1,15 +1,20 @@
 import transactions from "../../controllers/transactions";
-import { CreateTransactionDto } from "../../validators/transactions.dto";
+import {
+  CreateTransactionSchema,
+  type CreateTransactionRequest,
+} from "~/types/transaction";
 import doValidate from "../../validators/validator";
 
-
 export default defineEventHandler(async (event) => {
-    const data: CreateTransactionDto = await doValidate(CreateTransactionDto, await readBody(event));
-    data.tags = data.tags?.filter((tag: string) => !!tag) ?? []
-    const createdTransaction = await transactions.createTransaction(data)
-    setResponseStatus(event, 201);
-    return {
-        data: createdTransaction,
-        message: 'created'
-    };
-})
+  const data: CreateTransactionRequest = await doValidate(
+    CreateTransactionSchema,
+    await readBody(event),
+  );
+  data.tags = data.tags?.filter((tag: string) => !!tag) ?? [];
+  const createdTransaction = await transactions.createTransaction(data);
+  setResponseStatus(event, 201);
+  return {
+    data: createdTransaction,
+    message: "created",
+  };
+});

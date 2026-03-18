@@ -26,6 +26,41 @@ import {
 } from "./energy";
 
 import { type IDBase, IdSchema } from "./base";
+import { LoginSchema, type LoginRequest } from "./auth";
+import {
+  CreateProjectSchema,
+  EditProjectSchema,
+  type CreateProjectRequest,
+  type EditProjectRequest,
+} from "./project";
+import {
+  CreateSourceSchema,
+  EditSourceSchema,
+  SourceTypeSchema,
+  UpdateSourceStateSchema,
+  type CreateSourceRequest,
+  type EditSourceRequest,
+  type SourceTypeRequest,
+  type UpdateSourceStateRequest,
+} from "./source";
+import {
+  CreateTagSchema,
+  EditTagSchema,
+  type CreateTagRequest,
+  type EditTagRequest,
+} from "./tag";
+import {
+  CreateTransactionSchema,
+  EditTransactionSchema,
+  TagTransactionSchema,
+  TransactionFiltersSchema,
+  TransactionMonthSchema,
+  type CreateTransactionRequest,
+  type EditTransactionRequest,
+  type TagTransactionRequest,
+  type TransactionFiltersRequest,
+  type TransactionMonthRequest,
+} from "./transaction";
 
 export type {
   Category,
@@ -38,12 +73,40 @@ export type {
   MeterStateUpdate,
   MeterUpdate,
   MeterCreate,
+  LoginRequest,
+  CreateProjectRequest,
+  EditProjectRequest,
+  CreateSourceRequest,
+  EditSourceRequest,
+  SourceTypeRequest,
+  UpdateSourceStateRequest,
+  CreateTagRequest,
+  EditTagRequest,
+  CreateTransactionRequest,
+  EditTransactionRequest,
+  TagTransactionRequest,
+  TransactionFiltersRequest,
+  TransactionMonthRequest,
 };
 
 export {
   CategorySchema,
   CreateCategorySchema,
   IdSchema,
+  LoginSchema,
+  CreateProjectSchema,
+  EditProjectSchema,
+  CreateSourceSchema,
+  EditSourceSchema,
+  SourceTypeSchema,
+  UpdateSourceStateSchema,
+  CreateTagSchema,
+  EditTagSchema,
+  TransactionMonthSchema,
+  TransactionFiltersSchema,
+  CreateTransactionSchema,
+  EditTransactionSchema,
+  TagTransactionSchema,
   MeterSchema,
   MeterCreateSchema,
   MeterStateCreateSchema,
@@ -197,5 +260,7 @@ export interface ProjectApi {
 
 export interface Project extends ProjectApi {}
 
-export interface CreateProject
-  extends Omit<ProjectApi, "id" | "created" | "transactions" | "isComplete"> {}
+export interface CreateProject extends Omit<
+  ProjectApi,
+  "id" | "created" | "transactions" | "isComplete"
+> {}

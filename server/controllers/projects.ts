@@ -4,11 +4,8 @@ import {
   type Project,
   type Transaction,
 } from "@prisma/client";
-import { IdDto } from "../validators/common.dto";
-import type {
-  CreateProjectDto,
-  EditProjectDto,
-} from "../validators/projects.dto";
+import type { CreateProjectRequest, EditProjectRequest } from "~/types/project";
+import type { IDBase } from "~/types/base";
 import { prisma } from "./prisma-client";
 
 const DEFAULT_INCLUDE = {
@@ -22,7 +19,7 @@ class Projects {
     return await this.projects.findMany({ include: DEFAULT_INCLUDE });
   }
 
-  public async findSingle(data: IdDto): Promise<Project> {
+  public async findSingle(data: IDBase): Promise<Project> {
     const project = await this.projects.findUnique({
       where: { id: data.id },
       include: DEFAULT_INCLUDE,
@@ -38,11 +35,13 @@ class Projects {
     return project;
   }
 
-  public async deleteProject(data: IdDto): Promise<Project> {
+  public async deleteProject(data: IDBase): Promise<Project> {
     return await this.projects.delete({ where: { id: data.id } });
   }
 
-  public async createProject(projectData: CreateProjectDto): Promise<Project> {
+  public async createProject(
+    projectData: CreateProjectRequest,
+  ): Promise<Project> {
     try {
       return await this.projects.create({ data: { ...projectData } as any });
     } catch (e) {
@@ -58,7 +57,7 @@ class Projects {
     }
   }
 
-  public async editProject(projecData: EditProjectDto): Promise<Project> {
+  public async editProject(projecData: EditProjectRequest): Promise<Project> {
     try {
       const project = await this.projects.update({
         where: {

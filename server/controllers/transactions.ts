@@ -1,13 +1,13 @@
 import { type Transaction } from "@prisma/client";
 import type { Transaction as TransactionWithIncludes } from "~/types";
-import { IdDto } from "../validators/common.dto";
 import {
-  CreateTransactionDto as CreateDto,
-  EditTransactionDto as EditDto,
-  TransactionMonthDto as MonthDto,
-  TagTransactionDto as TagDto,
-  TransactionFiltersDto,
-} from "../validators/transactions.dto";
+  type CreateTransactionRequest as CreateDto,
+  type EditTransactionRequest as EditDto,
+  type TagTransactionRequest as TagDto,
+  type TransactionFiltersRequest,
+  type TransactionMonthRequest as MonthDto,
+} from "~/types/transaction";
+import type { IDBase } from "~/types/base";
 import { prisma } from "./prisma-client";
 
 const DEFAULT_INCLUDE = {
@@ -32,7 +32,7 @@ class Transactions {
   private transactions = prisma.transaction;
 
   public async findAll(
-    filters?: TransactionFiltersDto,
+    filters?: TransactionFiltersRequest,
   ): Promise<TransactionWithIncludes[]> {
     const where: any = {};
     if (filters?.important !== undefined) {
@@ -58,7 +58,7 @@ class Transactions {
   }
 
   public async findSingle(
-    transactionData: IdDto,
+    transactionData: IDBase,
   ): Promise<TransactionWithIncludes> {
     const transaction = await this.transactions.findUnique({
       where: { id: transactionData.id },
@@ -252,7 +252,9 @@ class Transactions {
     return trans as any;
   }
 
-  public async deleteTransaction(transactionData: IdDto): Promise<Transaction> {
+  public async deleteTransaction(
+    transactionData: IDBase,
+  ): Promise<Transaction> {
     return await this.transactions.delete({
       where: { id: transactionData.id },
     });

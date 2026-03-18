@@ -1,6 +1,6 @@
 import { PrismaClient, type Tag, Prisma } from "@prisma/client";
-import { TagDto, EditTagDto } from "../validators/tags.dto";
-import { IdDto } from "../validators/common.dto";
+import type { IDBase } from "~/types/base";
+import type { CreateTagRequest, EditTagRequest } from "~/types/tag";
 import { prisma } from "./prisma-client";
 
 class Tags {
@@ -13,7 +13,7 @@ class Tags {
     return tags;
   }
 
-  public async findSingle(data: IdDto): Promise<Tag> {
+  public async findSingle(data: IDBase): Promise<Tag> {
     const tag = await this.tags.findUnique({
       where: { id: data.id },
       include: { childTags: true },
@@ -27,11 +27,11 @@ class Tags {
     return tag;
   }
 
-  public async deleteTag(tagData: IdDto): Promise<Tag> {
+  public async deleteTag(tagData: IDBase): Promise<Tag> {
     return await this.tags.delete({ where: { id: tagData.id } });
   }
 
-  public async createTag(tagData: TagDto): Promise<Tag> {
+  public async createTag(tagData: CreateTagRequest): Promise<Tag> {
     try {
       const data: any = {
         name: tagData.name,
@@ -63,7 +63,7 @@ class Tags {
     }
   }
 
-  public async editTag(tagData: EditTagDto): Promise<Tag> {
+  public async editTag(tagData: EditTagRequest): Promise<Tag> {
     let data = { ...tagData };
     const parentId = data.parentId;
     delete data.parentId;

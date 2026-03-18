@@ -1,12 +1,10 @@
 import { sources } from "@/server/controllers";
-import { IdDto } from "@/server/validators/common.dto";
+import { IdSchema, type IDBase } from "~/types/base";
 import doValidate from "@/server/validators/validator";
 
-
 export default defineEventHandler(async (event) => {
-    const data = await doValidate(IdDto, event.context.params);
+  const data: IDBase = await doValidate(IdSchema, event.context.params);
 
-
-    const newState = await sources.autoInsertState(data);
-    return { data: newState };
-})
+  const newState = await sources.autoInsertState(data);
+  return { data: newState };
+});

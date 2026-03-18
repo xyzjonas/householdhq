@@ -40,7 +40,13 @@ export default defineNuxtConfig({
     "@/assets/css/typography.scss",
   ],
 
-  modules: ["@nuxtjs/i18n", "@pinia/nuxt", "@vite-pwa/nuxt", "@unocss/nuxt"],
+  modules: [
+    "@nuxtjs/i18n",
+    "@pinia/nuxt",
+    "@vite-pwa/nuxt",
+    "@unocss/nuxt",
+    "@nuxt/test-utils/module",
+  ],
 
   i18n: {
     locales: [

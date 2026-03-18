@@ -1,6 +1,6 @@
 import type { Transaction } from "~/types";
 import transactions from "~~/server/controllers/transactions";
-import { IdDto } from "~~/server/validators/common.dto";
+import { IdSchema, type IDBase } from "~~/types/base";
 import doValidate from "~~/server/validators/validator";
 
 interface Summary {
@@ -61,7 +61,7 @@ function generateBlanks(months: Summary[]) {
 }
 
 export default defineEventHandler(async (event) => {
-  const data = await doValidate(IdDto, event.context.params);
+  const data: IDBase = await doValidate(IdSchema, event.context.params);
 
   // const from = new Date();
   // from.setMonth(from.getMonth() - 12);

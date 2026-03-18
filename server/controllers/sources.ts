@@ -1,10 +1,10 @@
 import { PrismaClient, type Source, type SourceState } from "@prisma/client";
-import {
-  CreateSourceDto,
-  EditSourceDto,
-  UpdateSourceStateDto,
-} from "../validators/sources.dto";
-import { IdDto } from "../validators/common.dto";
+import type { IDBase } from "~/types/base";
+import type {
+  CreateSourceRequest,
+  EditSourceRequest,
+  UpdateSourceStateRequest,
+} from "~/types/source";
 import { prisma } from "./prisma-client";
 
 class Sources {
@@ -19,7 +19,7 @@ class Sources {
     return allSources;
   }
 
-  public async findSingle(sourceData: IdDto): Promise<Source> {
+  public async findSingle(sourceData: IDBase): Promise<Source> {
     const source = await this.sources.findUnique({
       where: { id: sourceData.id },
       include: { states: true },
@@ -33,7 +33,7 @@ class Sources {
     return source;
   }
 
-  public async createSource(sourceData: CreateSourceDto): Promise<Source> {
+  public async createSource(sourceData: CreateSourceRequest): Promise<Source> {
     // const data = { ...sourceData };
     const source: Source = await this.sources.create({
       data: { ...sourceData } as any,
@@ -41,8 +41,8 @@ class Sources {
     return source;
   }
 
-  public async editSource(sourceData: EditSourceDto) {
-    const data = { ...sourceData };
+  public async editSource(sourceData: EditSourceRequest) {
+    const data: any = { ...sourceData };
     delete data.id;
     const source: Source = await this.sources.update({
       where: { id: sourceData.id },
@@ -55,8 +55,8 @@ class Sources {
     return source;
   }
 
-  public async insertState(sourceData: UpdateSourceStateDto) {
-    const data = { ...sourceData };
+  public async insertState(sourceData: UpdateSourceStateRequest) {
+    const data: any = { ...sourceData };
     delete data.sourceId;
     const sourceState: SourceState = await this.sourceStates.create({
       data: {
@@ -74,7 +74,7 @@ class Sources {
     return sourceState;
   }
 
-  public async autoInsertState(sourceId: IdDto) {
+  public async autoInsertState(sourceId: IDBase) {
     const { id } = sourceId;
 
     const lastState: SourceState | null = await this.sourceStates.findFirst({
@@ -136,13 +136,13 @@ class Sources {
     return sourceState;
   }
 
-  public async deleteSource(sourceData: IdDto) {
+  public async deleteSource(sourceData: IDBase) {
     await this.sources.delete({
       where: { id: sourceData.id },
     });
   }
 
-  public async deleteState(entryData: IdDto) {
+  public async deleteState(entryData: IDBase) {
     const sourceState: SourceState = await this.sourceStates.delete({
       where: { id: entryData.id },
     });
