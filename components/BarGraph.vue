@@ -8,47 +8,13 @@
       :subtitle="$t('no_data_will_appear')"
       class="my-auto"
     />
-    <section v-else-if="selectedCategory">
-      <Summary
-        :category="selectedCategory"
-        @edit="navigateTo(`/tags/${selectedCategory.id}`)"
-        @close="selectedCategoryId = -1"
-      />
-      <div id="actions" class="row center">
-        <ui-button
-          width="48px"
-          height="36px"
-          icon="i-ic-baseline-mode-edit"
-          @click="navigateTo(`/categories/${selectedCategory.id}`)"
-        />
-        <ui-button
-          width="48px"
-          height="36px"
-          icon="i-ic-baseline-close"
-          @click="selectedCategoryId = -1"
-        />
-      </div>
-    </section>
-    <section v-else-if="showLegend" class="h-full flex flex-col justify-start">
-      <!-- <div
-        v-for="item in items.filter((it) => it.sum > 0)"
-        class="legend-content-item relative overflow-hidden"
-        @click="selectCategoryByName(item.name)"
-      >
-        <span
-          class="circle-sm mr-1"
-          :style="`background-color: ${item.color};`"
-        ></span>
-        <span
-          class="absolute inset-0 opacity-[0.1] left-[2]"
-          :style="`background-color: ${item.color}; right: ${
-            100 - percentage(item.sum)
-          }%`"
-        ></span>
-        <span class="mr-1">{{ item.name }}</span>
-        <ui-price :amount="item.sum" size="small" class="ml-auto mr-2" />
-      </div> -->
-    </section>
+    <Summary
+      :category="selectedCategory"
+      @edit="navigateTo(`/tags/${selectedCategory.id}`)"
+      @close="selectedCategoryId = -1"
+      v-else-if="selectedCategory"
+      class="flex-1 relative"
+    />
     <div v-else class="graph-wrapper">
       <Doughnut
         ref="doughnutChart"
@@ -60,20 +26,6 @@
         <slot></slot>
       </div>
     </div>
-
-    <!-- <client-only v-if="!selectedCategory">
-      <div id="show-legend" class="flex gap-1">
-        <ui-button
-          :icon="
-            showLegend
-              ? 'i-ic-baseline-pie-chart'
-              : 'i-ic-round-format-list-bulleted'
-          "
-          icon-size="1.3rem"
-          @click="showLegend = !showLegend"
-        />
-      </div>
-    </client-only> -->
   </div>
 </template>
 <script setup lang="ts">
@@ -84,7 +36,6 @@ import type { CategoryWithSum } from "@/types";
 import { useTransactionStore } from "@/stores/transactions";
 import { useLocalStorage } from "@vueuse/core";
 
-const showLegend = useLocalStorage<boolean>("display-list-view", false);
 const theme = useLocalStorage<string>("theme", "light");
 const doughnutChart = ref<any>(null);
 

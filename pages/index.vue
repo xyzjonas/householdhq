@@ -12,7 +12,7 @@
     </client-only> -->
     <hr class="mb-3" />
     <div class="flex gap-2 flex-wrap">
-      <HomeCarousel
+      <CardMonthSummary
         v-model:tabindex="carouselTabindex"
         v-model:category="filterCategoryId"
         :expenses="expenseCategories"
@@ -21,8 +21,25 @@
         class="flex-[4] min-w-sm"
       >
         <template #header-right>
+          <div v-if="filterCategoryId >= 0" class="flex gap-2">
+            <ui-button
+              height="36px"
+              icon="i-ic-baseline-mode-edit"
+              flat
+              @click="navigateTo(`/categories/${filterCategoryId}`)"
+            >
+              {{ $t("edit") }}
+            </ui-button>
+            <ui-button
+              width="36px"
+              height="36px"
+              icon="i-ic-baseline-close"
+              flat
+              @click="filterCategoryId = -1"
+            />
+          </div>
           <ui-button
-            v-if="hasVisibleCategories"
+            v-else-if="hasVisibleCategories"
             link
             flat
             icon="i-ic-round-format-list-bulleted"
@@ -48,7 +65,7 @@
             )
           </div>
         </div>
-      </HomeCarousel>
+      </CardMonthSummary>
       <div
         class="flex flex-col flex-1 gap-2 min-w-xs"
         v-if="isCurrentMonth && !transactionsLoading"

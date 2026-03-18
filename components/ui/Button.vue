@@ -89,7 +89,7 @@ i {
   padding: 0.3rem 0.6rem;
   text-transform: capitalize;
 
-  transition: 0.1s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 
 button:hover {
@@ -168,23 +168,19 @@ html[data-theme="light"] {
   border: 1px solid var(--border-100) !important;
 }
 
+.flat {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--text-100);
+
+  &:hover {
+    background-color: var(--bg-300) !important;
+  }
+}
+
 .ui-btn {
   @include common();
 }
-
-// .ui-btn-outlined {
-//   @include common();
-//   background-color: var(--bg-200);
-//   color: var(--text-100);
-
-//   i {
-//     color: var(--text-100) !important;
-//   }
-
-//   &:hover {
-//     background-color: var(--bg-300);
-//   }
-// }
 
 button[disabled] {
   background-color: var(--bg-300);

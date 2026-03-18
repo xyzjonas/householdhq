@@ -1,27 +1,28 @@
 <template>
-  <div class="text-center flex flex-col justify-between h-full" v-if="loaded">
-    <h1 class="text-left font-light text-xl uppercase">{{ category.name }}</h1>
-    <div class="h-xs">
+  <div
+    class="text-center flex flex-col items-center justify-center gap-5"
+    v-if="loaded"
+  >
+    <!-- <h1 class="text-left font-light text-xl uppercase">{{ category.name }}</h1> -->
+    <div class="h-60 w-full">
       <Bar :data="chartData" :options="options" />
     </div>
-    <div class="center">
-      <div class="toggle-bar m-1">
-        <a
-          @click="dataSelection = 6"
-          :class="`bar-item ${dataSelection === 6 ? 'active' : ''}`"
-          >{{ t("summary_recent") }}</a
-        >
-        <a
-          @click="dataSelection = 12"
-          :class="`bar-item ${dataSelection === 12 ? 'active' : ''}`"
-          >{{ t("summary_year") }}</a
-        >
-        <a
-          @click="dataSelection = 0"
-          :class="`bar-item ${dataSelection === 0 ? 'active' : ''}`"
-          >{{ t("summary_all") }}</a
-        >
-      </div>
+    <div class="toggle-bar m-1">
+      <a
+        @click="dataSelection = 6"
+        :class="`bar-item ${dataSelection === 6 ? 'active' : ''}`"
+        >{{ t("summary_recent") }}</a
+      >
+      <a
+        @click="dataSelection = 12"
+        :class="`bar-item ${dataSelection === 12 ? 'active' : ''}`"
+        >{{ t("summary_year") }}</a
+      >
+      <a
+        @click="dataSelection = 0"
+        :class="`bar-item ${dataSelection === 0 ? 'active' : ''}`"
+        >{{ t("summary_all") }}</a
+      >
     </div>
   </div>
   <spinner name="roller" class="center h-full" v-else />

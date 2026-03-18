@@ -3,20 +3,24 @@
     <div
       class="uppercase dark:text-gray-4 light:text-gray-6 justify-between flex"
     >
-      <span> month summary </span>
+      <span> {{ selectedCategory?.name ?? "month summary" }} </span>
       <slot name="header-right"></slot>
     </div>
     <div class="p-5 flex gap-15 flex-wrap justify-center">
       <BarGraph
         :items="data"
         :expand="expandGraph"
-        v-model:selected-category-id="selectedCategory"
-        :class="['min-w-xs', 'max-h-xs', selectedCategory >= 0 ? 'w-full' : '']"
+        v-model:selected-category-id="selectedCategoryId"
+        :class="[
+          'min-w-xs',
+          'max-h-xs',
+          selectedCategoryId >= 0 ? 'w-full' : '',
+        ]"
       >
         <slot></slot>
       </BarGraph>
       <div
-        v-if="selectedCategory < 0"
+        v-if="selectedCategoryId < 0"
         class="flex flex-col flex-1 min-w-60 justify-center gap-5"
       >
         <span
@@ -57,9 +61,11 @@
 <script setup lang="ts">
 import type { CategoryWithSum } from "@/types";
 
-const emit = defineEmits(["filter"]);
+const selectedCategoryId = defineModel<number>("category", { default: -1 });
 
-const selectedCategory = defineModel<number>("category", { default: -1 });
+const selectedCategory = computed(() => {
+  return props.expenses.find((c) => c.id === selectedCategoryId.value);
+});
 
 const tabIndex = defineModel<number>("tabindex", { default: 2 });
 
