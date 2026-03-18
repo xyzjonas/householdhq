@@ -36,13 +36,17 @@ html {
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
   background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary-100);
+  background-color: var(--bg-300);
   min-height: 3rem;
+  border-radius: 5px;
+  border-top: var(--border-radius) solid transparent;
+  border-bottom: var(--border-radius) solid transparent;
+  background-clip: padding-box;
 }
 
 .page-enter-active,

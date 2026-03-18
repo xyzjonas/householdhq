@@ -36,7 +36,12 @@
           @send="patchCategory"
         />
       </div>
+
+      <div class="card min-h-sm flex flex-col gap-5 justify-center">
+        <Summary :category="category" />
+      </div>
     </div>
+
     <div class="mt-5">
       <transaction-monthly-listing
         :transactions="transactions"
@@ -51,11 +56,11 @@ import type { Category, Transaction } from "~/types";
 const route = useRoute();
 const categoryId = parseInt(route.params.id as string);
 const { data, error, refresh } = await useFetch<{ data: Category }>(
-  `/api/categories/${categoryId}`
+  `/api/categories/${categoryId}`,
 );
 
 const transactionFetch = await useFetch<{ data: Transaction[] }>(
-  `/api/categories/${categoryId}/transactions`
+  `/api/categories/${categoryId}/transactions`,
 );
 
 const transactions = transactionFetch.data.value?.data ?? [];

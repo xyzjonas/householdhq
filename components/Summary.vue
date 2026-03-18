@@ -42,10 +42,13 @@ const categoriesStore = useCategoriesStore();
 const { summary } = storeToRefs(categoriesStore);
 
 const props = defineProps<{
-  category: CategoryWithSum;
+  category: Pick<CategoryWithSum, "id" | "name" | "color">;
 }>();
 
-const dataSelection = useLocalStorage("summary-data-range", 6);
+const dataSelection = useLocalStorage(
+  `category-${props.category.id}-summary-data-range`,
+  6,
+);
 
 const loaded = ref(false);
 onMounted(() => {
