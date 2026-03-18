@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ui-list-row @click="collapsed = !collapsed" class="flex justify-between">
+    <ui-list-row
+      @click="collapsed = !collapsed"
+      class="flex justify-between gap-10"
+    >
       <span class="flex items-center gap-2">
         <i
           class="i-ic-chevron-left transition"

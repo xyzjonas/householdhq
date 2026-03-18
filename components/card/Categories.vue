@@ -5,7 +5,7 @@
         .sort((a, b) => b.sum - a.sum)
         .filter((it) => it.sum > 10)"
       :key="item.id"
-      class="legend-content-item relative overflow-hidden p-5 min-w-50"
+      class="legend-content-item relative overflow-hidden p-5"
       @click="selectedCategoryId = item.id"
     >
       <span

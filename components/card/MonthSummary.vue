@@ -12,7 +12,8 @@
         :expand="expandGraph"
         v-model:selected-category-id="selectedCategoryId"
         :class="[
-          'min-w-xs',
+          'flex-1',
+          'min-w-[280px]',
           'max-h-xs',
           selectedCategoryId >= 0 ? 'w-full' : '',
         ]"
@@ -21,10 +22,10 @@
       </BarGraph>
       <div
         v-if="selectedCategoryId < 0"
-        class="flex flex-col flex-1 min-w-60 justify-center gap-5"
+        class="flex flex-col flex-1 justify-center gap-5"
       >
         <span
-          class="row-hover flex items-center justify-between"
+          class="row-hover flex items-center justify-between gap-5"
           @click="tabIndex = 1"
         >
           <div class="flex items-center gap-3 capitalize">
@@ -35,7 +36,7 @@
         </span>
         <hr class="my-0" />
         <span
-          class="row-hover flex items-center justify-between"
+          class="row-hover flex items-center justify-between gap-5"
           @click="tabIndex = 2"
         >
           <div class="flex items-center gap-3 capitalize">
@@ -45,7 +46,7 @@
           <div class="text-lg font-semibold">{{ totalExpenses }}</div>
         </span>
         <hr class="my-0" />
-        <span class="flex justify-between p-2 capitalize">
+        <span class="flex justify-between p-2 capitalize gap-5">
           <div>{{ $t("net") }}</div>
           <div
             :class="[

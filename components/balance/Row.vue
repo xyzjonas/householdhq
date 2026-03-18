@@ -1,5 +1,5 @@
 <template>
-  <div class="card flex flex-col gap-5 max-h-md overflow-y-scroll">
+  <div class="card flex flex-col gap-2 overflow-y-scroll">
     <balance-account-type-collapsible
       v-for="(accounts, key) in allGroups"
       :sources="accounts"

@@ -18,7 +18,7 @@
         :expenses="expenseCategories"
         :incomes="incomeCategories"
         :expand-graph="!isCurrentMonth"
-        class="flex-[4] min-w-sm"
+        class="flex-[4]"
       >
         <template #header-right>
           <div v-if="filterCategoryId >= 0" class="flex gap-2">
@@ -67,10 +67,11 @@
         </div>
       </CardMonthSummary>
       <div
-        class="flex flex-col flex-1 gap-2 min-w-xs"
+        class="flex flex-col flex-1 gap-2"
         v-if="isCurrentMonth && !transactionsLoading"
       >
         <BalanceRow
+          v-if="isCurrentMonth && !transactionsLoading"
           class="flex-1"
           :sources="
             sources

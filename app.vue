@@ -35,6 +35,13 @@ html {
   overflow-x: hidden;
 }
 
+input,
+select,
+textarea {
+  min-width: 0;
+  width: 100%;
+}
+
 ::-webkit-scrollbar {
   width: 3px;
   background: transparent;
