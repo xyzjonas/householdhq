@@ -119,7 +119,7 @@
         </div>
       </div>
 
-      <WidgetUpcomming
+      <CardUpcommingTransactions
         v-if="isCurrentMonth && currentMonth.length > 0"
         v-model:show="showUpcomming"
         :upcomming="upcomming"

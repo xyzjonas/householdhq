@@ -27,8 +27,9 @@
           class="row-hover flex items-center justify-between"
           @click="tabIndex = 1"
         >
-          <div class="flex items-center gap-3">
-            <i v-if="tabIndex === 1" class="i-ic-chevron-right"></i>Income
+          <div class="flex items-center gap-3 capitalize">
+            <i v-if="tabIndex === 1" class="i-ic-chevron-right"></i
+            >{{ $t("incomes") }}
           </div>
           <div class="text-lg font-semibold">{{ totalIncome }}</div>
         </span>
@@ -37,17 +38,18 @@
           class="row-hover flex items-center justify-between"
           @click="tabIndex = 2"
         >
-          <div class="flex items-center gap-3">
-            <i v-if="tabIndex === 2" class="i-ic-chevron-right"></i>Expenses
+          <div class="flex items-center gap-3 capitalize">
+            <i v-if="tabIndex === 2" class="i-ic-chevron-right"></i>
+            {{ $t("expenses") }}
           </div>
           <div class="text-lg font-semibold">{{ totalExpenses }}</div>
         </span>
         <hr class="my-0" />
-        <span class="flex justify-between p-2">
-          <div>Net</div>
+        <span class="flex justify-between p-2 capitalize">
+          <div>{{ $t("net") }}</div>
           <div
             :class="[
-              netTotal.startsWith('-') ? 'text-red-500' : 'text-green-500',
+              netTotal.startsWith('-') ? 'text-red-500' : 'text-positive',
               'text-lg font-semibold',
             ]"
           >

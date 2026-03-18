@@ -24,4 +24,10 @@ export default defineConfig({
       },
     }),
   ],
+  theme: {
+    colors: {
+      primary: "#2cbd83",
+      positive: "#2cbd83",
+    },
+  },
 });

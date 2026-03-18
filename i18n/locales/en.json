@@ -18,6 +18,7 @@
   "expenses": "expenses",
   "incomes": "incomes",
   "income": "income",
+  "net": "net",
   "transactions": "transactions",
   "edit": "edit",
   "delete": "delete",

@@ -18,7 +18,7 @@
     </div>
     <div v-else class="flex w-full justify-between items-center text-gray-5">
       <span>{{ $t("t_upcomming_no_more") }}</span>
-      <i class="text-3xl i-ic-baseline-price-check text-green"></i>
+      <i class="text-3xl i-ic-baseline-price-check text-positive"></i>
     </div>
   </div>
 </template>
