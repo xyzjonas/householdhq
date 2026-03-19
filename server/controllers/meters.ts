@@ -31,7 +31,13 @@ class MetersService {
   public async findSingleMeter(data: IDBase): Promise<Meter> {
     const meter = await this.meters.findUnique({
       where: { id: data.id },
-      include: { states: true },
+      include: {
+        states: {
+          orderBy: {
+            meteredAt: "desc",
+          },
+        },
+      },
     });
     if (!meter) {
       throw createError({

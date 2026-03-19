@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="border-b-solid border-1 border-gray-5 flex justify-between items-center p-1"
-  >
+  <div class="flex justify-between items-center p-1">
     <span class="lowercase">{{
       formatddMMYYYY(new Date(state.meteredAt), locale)
     }}</span>

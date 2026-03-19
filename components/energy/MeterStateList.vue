@@ -1,23 +1,25 @@
 <template>
-  <div class="flex-col gap-2">
-    <energy-meter-state-row
-      v-for="state in meter.states ?? []"
-      :state="state"
-      :unit="meter.unit"
-      @delete="() => $emit('delete', state.id)"
-    ></energy-meter-state-row>
-  </div>
+  <ui-timeline :items="meter.states ?? []" item-key="id" color="#38c089">
+    <template #item="{ item }">
+      <energy-meter-state-row
+        :state="item"
+        :unit="meter.unit"
+        @delete="() => emit('delete', item.id)"
+      />
+    </template>
+  </ui-timeline>
 </template>
 
 <script setup lang="ts">
 import type { Meter } from "~/types";
 
-defineEmits(["delete"]);
-const props = defineProps<{
-  meter: Meter;
+const emit = defineEmits<{
+  delete: [stateId: number];
 }>();
 
-const states = computed(() => props.meter.states ?? []);
+defineProps<{
+  meter: Meter;
+}>();
 </script>
 
 <style lang="scss" scoped></style>

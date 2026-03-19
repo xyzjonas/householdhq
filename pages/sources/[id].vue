@@ -140,41 +140,21 @@
           </teleport>
         </client-only>
 
-        <TransitionGroup name="timeline-slide" tag="div" class="timeline">
-          <div
-            v-for="(state, index) in sourceStates"
-            :key="state.id"
-            class="timeline-item"
-          >
-            <div class="timeline-rail">
-              <span class="timeline-dot" />
-              <span
-                v-if="index < sourceStates.length - 1"
-                class="timeline-line"
-              />
-            </div>
-
-            <div class="timeline-content">
-              <div class="timeline-main">
-                <p class="timeline-date">
-                  {{ new Date(state.created).toLocaleString() }}
-                </p>
-                <ui-price
-                  class="timeline-price"
-                  :amount="state.amount"
-                  :currency="currency"
-                />
-              </div>
-
-              <ui-button
-                @click="sourceStore.deleteEntry(sourceId, state.id)"
-                icon="i-ic-baseline-delete"
-                squared
-                outlined
-              />
-            </div>
-          </div>
-        </TransitionGroup>
+        <ui-timeline
+          :items="sourceStates"
+          item-key="id"
+          :color="currentSource?.color"
+        >
+          <template #item="{ item }">
+            <ui-value-date-item
+              :value="item.amount"
+              :date="item.created"
+              :currency="currency"
+              :color="currentSource?.color"
+              @delete="sourceStore.deleteEntry(sourceId, item.id)"
+            />
+          </template>
+        </ui-timeline>
         <div class="flex items-center justify-center">
           <ui-button
             link
@@ -195,7 +175,7 @@
 import { useSourcesStore } from "@/stores/sources";
 import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
-import { SourceTypes } from "~/types";
+import { SourceTypes, type SourceState } from "~/types";
 
 const sourceStore = useSourcesStore();
 const { sourceLoading, currentSourceId, currentSource } =
@@ -248,8 +228,6 @@ const sourceStates = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-$color: v-bind("currentSource?.color || '#cccccc'");
-
 .flex-col {
   gap: 0.3rem;
 }
@@ -271,111 +249,6 @@ $color: v-bind("currentSource?.color || '#cccccc'");
     line-height: 100%;
     filter: contrast(0.3) opacity(0.5);
     text-transform: none;
-  }
-}
-
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.timeline-slide-enter-active,
-.timeline-slide-leave-active,
-.timeline-slide-move {
-  transition: all 0.22s ease;
-}
-
-.timeline-slide-enter-from,
-.timeline-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-40px);
-}
-
-.timeline-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.timeline-rail {
-  position: relative;
-  width: 1.25rem;
-  flex-shrink: 0;
-  align-self: stretch;
-}
-
-.timeline-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 9999px;
-  background: $color;
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, $color 20%, transparent);
-}
-
-.timeline-line {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: calc(100% + 0.75rem);
-  border-radius: 9999px;
-  background: linear-gradient(
-    to bottom,
-    $color,
-    color-mix(in srgb, $color 25%, transparent)
-  );
-}
-
-.timeline-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--border-100);
-  border-radius: 0.6rem;
-  background: var(--bg-200);
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.timeline-main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.timeline-date {
-  font-size: 0.83rem;
-  color: var(--text-200);
-  opacity: 0.8;
-}
-
-.timeline-price {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.timeline-content:hover {
-  transform: translateX(2px);
-  border-color: color-mix(in srgb, $color 35%, var(--border-100));
-}
-
-@media (max-width: 37.5em) {
-  .timeline-content {
-    gap: 0.6rem;
-    padding: 0.55rem 0.6rem;
   }
 }
 

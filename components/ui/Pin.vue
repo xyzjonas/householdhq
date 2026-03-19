@@ -3,7 +3,6 @@
     class="pin"
     :class="[
       'pin',
-      'clickable',
       size === 'small' ? 'small' : '',
       clickable ? 'clickable' : '',
       size === 'normal' ? 'normal' : '',
