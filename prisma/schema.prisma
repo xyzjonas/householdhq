@@ -3,7 +3,6 @@
 
 datasource db {
   provider     = "mysql"
-  // url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -112,6 +111,7 @@ model Transaction {
   @@index([categoryId])
   @@index([projectId])
   @@index([isImportant])
+  @@fulltext([description])
   @@map("transaction")
 }
 

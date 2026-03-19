@@ -25,7 +25,7 @@
         </p>
       </div>
       <!-- BUTTONS -->
-      <div class="panel y max-w-md" :style="editButtonsStyle">
+      <div class="panel y max-w-md py-2" :style="editButtonsStyle">
         <ui-button
           v-for="btn in [leftBtn, rightBtn]"
           :color="btn?.color as any ?? 'secondary'"

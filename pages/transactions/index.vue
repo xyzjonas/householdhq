@@ -1,73 +1,80 @@
 <template>
-  <!-- <div class="flex justify-between items-center">
-    <Transition name="page">
-      <Spinner v-if="loading" />
-    </Transition>
-  </div> -->
+  <main
+    :class="[
+      'flex',
+      'flex-col',
+      'gap-5',
+      'flex-1',
+      notSearchedYet ? 'mt-30' : '',
+    ]"
+  >
+    <div class="">
+      <h1 class="text-center uppercase text-xl" v-if="notSearchedYet">
+        search for transactions
+      </h1>
+      <ui-input
+        v-model="search"
+        label="search..."
+        size="lg"
+        class="my-5"
+      ></ui-input>
 
-  <main class="flex mb-5 gap-2">
-    <ui-input v-model="search" label="Search for transactions"></ui-input>
-    <ui-button
-      :loading
-      icon="i-ic-arrow-downward"
-      outlined
-      flat
-      @click="getNextBatch"
-      >{{ $t("show_more") }}</ui-button
-    >
+      <TransactionMonthlyListing :transactions="displayedTransactions" />
+      <ui-empty
+        v-if="displayedTransactions.length <= 0 && !notSearchedYet"
+        title="No results"
+        subtitle="No transactions found matching your search criteria."
+        icon="i-ic-baseline-search"
+        :loading="loading"
+      ></ui-empty>
+    </div>
   </main>
-
-  <TransactionMonthlyListing :transactions="displayedTransactions" />
-
-  <!-- <div class="flex flex-col gap-2">
-    <transaction-row
-      :transaction="trans"
-      v-for="trans in displayedTransactions"
-      :key="trans.id"
-      @delete="deleteTransaction"
-      @patched="updateTransaction"
-    ></transaction-row>
-  </div> -->
 </template>
 <script setup lang="ts">
-import type { Spinner } from "#components";
+import { useDebounceFn } from "@vueuse/core";
 import type { Transaction } from "~/types";
 
 const search = ref("");
 const loading = ref(false);
 const transactions = ref<Transaction[]>([]);
 
-const { month, year, dateFormatted, goPrevious } = useMonth();
+const { month, year } = useMonth();
+
+const notSearchedYet = ref(true);
 
 const fetch = async (query?: { year: number; month: number }) => {
+  const searchValue = search.value.trim();
+  if (!searchValue) {
+    return;
+  }
+  notSearchedYet.value = false;
   loading.value = true;
-  const { data, status } = await useFetch<{ data: Transaction[] }>(
-    `/api/transactions?year=${year.value}&month=${month.value}`
-  );
+  const params = new URLSearchParams();
+
+  params.set("search", searchValue);
+
+  const response = await $fetch<{ data: Transaction[] }>(
+    `/api/transactions?${params.toString()}`,
+  ).catch(() => ({ data: [] }));
 
   setTimeout(() => (loading.value = false), 200);
-  if (status.value === "success") {
-    transactions.value = [...transactions.value, ...(data.value?.data ?? [])];
+  if (searchValue) {
+    transactions.value = response.data ?? [];
+  } else {
+    transactions.value = [...transactions.value, ...(response.data ?? [])];
   }
 };
 
-const getNextBatch = () => {
-  goPrevious();
+const debouncedFetch = useDebounceFn(() => {
+  transactions.value = [];
   fetch();
-};
+}, 500);
 
-fetch();
+watch(search, () => {
+  debouncedFetch();
+});
 
-const { doesTransactionMatch } = useSearch();
-const displayedTransactions = computed(() =>
-  transactions.value.filter((trans) => {
-    if (search.value) {
-      return doesTransactionMatch(search.value, trans);
-    } else {
-      return true;
-    }
-  })
-);
+const displayedTransactions = computed(() => transactions.value);
 
 const { token } = useTokenStore();
 
@@ -83,7 +90,7 @@ const deleteTransaction = (transactionData: Transaction) => {
   })
     .then((res) => {
       transactions.value = transactions.value.filter(
-        (t: Transaction) => t.id != transactionData.id
+        (t: Transaction) => t.id != transactionData.id,
       );
     })
     .finally(() => (loading.value = false));

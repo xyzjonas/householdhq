@@ -11,7 +11,11 @@
       <ui-button @click="newOperand('+')" icon="i-ic-baseline-plus" />
       <ui-button @click="remove" icon="i-ic-outline-backspace" />
       <ui-button @click="clear" icon="i-ic-baseline-delete" />
-      <ui-button v-if="operand" @click="addOrSubstract" icon="i-ic-baseline-equals" />
+      <ui-button
+        v-if="operand"
+        @click="addOrSubstract"
+        icon="i-ic-baseline-equals"
+      />
       <ui-button v-else @click="$emit('confirm')">OK</ui-button>
     </div>
     <div class="numpad"></div>
@@ -25,9 +29,6 @@ const emit = defineEmits(["update:modelValue", "confirm"]);
 
 const anotherNumber = ref<number>(0);
 const operand = ref<string | undefined>(undefined);
-
-// const modelValue = ref<string>("0");
-// const result = ref(0);
 
 const addNumber = (x: number, y: number): number => {
   return parseInt(`${x}${y}`);
@@ -56,14 +57,22 @@ const clear = () => {
 const remove = () => {
   if (operand.value) {
     if (anotherNumber.value >= 10) {
-      anotherNumber.value = parseInt(`${anotherNumber.value}`.substring(0, `${anotherNumber.value}`.length - 1));
+      anotherNumber.value = parseInt(
+        `${anotherNumber.value}`.substring(
+          0,
+          `${anotherNumber.value}`.length - 1,
+        ),
+      );
     } else {
       anotherNumber.value = 0;
     }
   } else {
     if (props.modelValue >= 10) {
       const asString = `${props.modelValue}`;
-      emit("update:modelValue", parseInt(asString.substr(0, asString.length - 1)));
+      emit(
+        "update:modelValue",
+        parseInt(asString.substr(0, asString.length - 1)),
+      );
     } else {
       emit("update:modelValue", 0);
     }
@@ -88,9 +97,70 @@ const newOperand = (newOperand: string) => {
   }
   operand.value = newOperand;
 };
+
+const isEditableElement = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+  return (
+    target.isContentEditable ||
+    tagName === "input" ||
+    tagName === "textarea" ||
+    tagName === "select"
+  );
+};
+
+const onKeydown = (event: KeyboardEvent) => {
+  if (isEditableElement(event.target)) {
+    return;
+  }
+
+  const key = event.key;
+  if (/^\d$/.test(key)) {
+    event.preventDefault();
+    add(Number(key));
+    return;
+  }
+
+  if (key === "+" || key === "-") {
+    event.preventDefault();
+    newOperand(key);
+    return;
+  }
+
+  if (key === "Enter" || key === "=") {
+    event.preventDefault();
+    if (operand.value) {
+      addOrSubstract();
+    } else {
+      emit("confirm");
+    }
+    return;
+  }
+
+  if (key === "Backspace") {
+    event.preventDefault();
+    remove();
+    return;
+  }
+
+  if (key === "Delete" || key === "Escape") {
+    event.preventDefault();
+    clear();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener("keydown", onKeydown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", onKeydown);
+});
 </script>
 <style lang="scss" scoped>
-
 html[data-theme="dark"] .calculator-display {
   background-color: rgba(228, 228, 228, 0.103);
   box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.856) inset;

@@ -34,7 +34,6 @@ import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "../types";
 import { getRelativePosition } from "chart.js/helpers";
 import { useLocalStorage } from "@vueuse/core";
-// import { enabled } from "virtual:nuxt-pwa-configuration";
 
 const { t } = useI18n();
 
@@ -47,7 +46,7 @@ const props = defineProps<{
 
 const dataSelection = useLocalStorage(
   `category-${props.category.id}-summary-data-range`,
-  6,
+  12,
 );
 
 const loaded = ref(false);

@@ -23,7 +23,7 @@ const props = defineProps<{
   type?: string;
   inputmode?: HTMLAttributes["inputmode"];
   required?: boolean;
-  size?: ["md", "lg"];
+  size?: "md" | "lg";
   autocomplete?: string;
 }>();
 
@@ -68,16 +68,16 @@ onMounted(() => {
 <style lang="scss" scoped>
 @use "@/assets/css/custom_components";
 
+input {
+  width: 100%;
+  font-size: medium;
+}
+
 .input-group-md {
   @include custom_components.input-group(10px, 16px, 10px);
 }
 
 .input-group-lg {
-  @include custom_components.input-group(16px, 16px, 10px);
-}
-
-input {
-  width: 100%;
-  font-size: medium;
+  @include custom_components.input-group(18px, 18px, 15px);
 }
 </style>

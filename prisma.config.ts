@@ -3,12 +3,9 @@ import { defineConfig, env } from "prisma/config";
 export default defineConfig({
   schema: "./prisma/schema.prisma",
   migrations: {
-    path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
+    path: "./prisma/migrations",
   },
   datasource: {
-    url:
-      process.env.DATABASE_URL ??
-      "mysql://rubbish@just/so-that-the#build-passes",
+    url: env("DATABASE_URL") ?? "mysql://rubbish@just/so-that-the#build-passes",
   },
 });

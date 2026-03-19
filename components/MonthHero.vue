@@ -1,13 +1,5 @@
 <template>
   <div class="flex flex-col flex-1 items-center md:items-start">
-    <div class="flex justify-center md:justify-between items-baseline w-full">
-      <span class="hidden md:inline uppercase text-gray-5 text-xs">
-        HouseholdHQ
-      </span>
-      <ClientOnly>
-        <LayoutToggles />
-      </ClientOnly>
-    </div>
     <h1 class="font-bold line-height-[1.5] text-nowrap">
       {{ monthName }} Overview
     </h1>

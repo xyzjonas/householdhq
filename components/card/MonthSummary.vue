@@ -1,9 +1,12 @@
 <template>
   <div class="card">
     <div
-      class="uppercase dark:text-gray-4 light:text-gray-6 justify-between flex"
+      class="uppercase dark:text-gray-4 light:text-gray-6 justify-between flex line-height-snug"
     >
-      <span> {{ selectedCategory?.name ?? "month summary" }} </span>
+      <div class="flex flex-col">
+        <span> {{ selectedCategory?.name ?? "month summary" }} </span>
+        <span class="text-xs">{{ selectedCategory?.description }}</span>
+      </div>
       <slot name="header-right"></slot>
     </div>
     <div class="p-5 flex gap-15 flex-wrap justify-center">

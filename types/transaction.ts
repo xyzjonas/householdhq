@@ -35,6 +35,10 @@ export const TransactionMonthSchema = z.object({
   year: z.coerce.number().int().optional(),
 });
 
+export const TransactionRecentQuerySchema = TransactionMonthSchema.extend({
+  search: z.string().trim().min(1).optional(),
+});
+
 export const TransactionFiltersSchema = z.object({
   categoryId: z.coerce.number().int().optional(),
   important: z.preprocess(coerceBoolean, z.boolean()).optional(),
@@ -78,6 +82,9 @@ export const TagTransactionSchema = z.object({
 });
 
 export type TransactionMonthRequest = z.infer<typeof TransactionMonthSchema>;
+export type TransactionRecentQueryRequest = z.infer<
+  typeof TransactionRecentQuerySchema
+>;
 export type TransactionFiltersRequest = z.infer<
   typeof TransactionFiltersSchema
 >;

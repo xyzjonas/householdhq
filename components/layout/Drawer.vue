@@ -1,7 +1,7 @@
 <template>
   <div class="sidenav" :style="model ? 'width: 240px' : ''">
-    <div class="pseudo-header flex">
-      <div class="flex-col p-2">
+    <div class="pseudo-header flex min-w-[240px]">
+      <div class="flex-col p-2 text-white">
         <span class="line-height-none">Household HQ</span>
         <span class="text-xs opacity-[0.8]">{{ VERSION }}</span>
       </div>
@@ -26,7 +26,7 @@
         :class="{ active: $route.path === '/sources' }"
       >
         <span class="flex justify-between items-center">
-          <span class="flex items-center gap-2">
+          <span class="flex items-center gap-2 flex-nowrap">
             <i class="i-ic-baseline-account-balance"></i>
             <h3>{{ $t("route_sources") }}</h3>
           </span>
@@ -39,7 +39,7 @@
         :class="{ active: $route.path === '/categories' }"
       >
         <span class="flex justify-between items-center">
-          <span class="flex items-center gap-2">
+          <span class="flex items-center gap-2 flex-nowrap">
             <i class="i-ic-baseline-category"></i>
             <h3>{{ $t("route_categories") }}</h3>
           </span>
@@ -52,7 +52,7 @@
         :class="{ active: $route.path === '/projects' }"
       >
         <span class="flex justify-between items-center">
-          <span class="flex items-center gap-2">
+          <span class="flex items-center gap-2 flex-nowrap">
             <i class="i-ic-baseline-folder"></i>
             <h3>{{ $t("route_projects") }}</h3>
           </span>
@@ -65,7 +65,7 @@
         :class="{ active: $route.path === '/transactions' }"
       >
         <span class="flex justify-between items-center">
-          <span class="flex items-center gap-2">
+          <span class="flex items-center gap-2 flex-nowrap">
             <i class="i-ic-outline-manage-search"></i>
             <h3>{{ $t("t_transactions") }}</h3>
           </span>
@@ -73,27 +73,27 @@
       </ui-list-row>
 
       <ui-list-row @click="navigateTo('/important')">
-        <span class="flex items-center gap-2">
+        <span class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-round-warning"></i>
           <h3>{{ $t("route_important") }}</h3>
         </span></ui-list-row
       >
       <ui-list-row @click="navigateTo('/energy')">
-        <span class="flex items-center gap-2">
+        <span class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-baseline-electric-bolt"></i>
           <h3>{{ $t("route_energy") }}</h3>
         </span></ui-list-row
       >
 
       <ui-list-row class="mt-auto" @click="session.logout()">
-        <span class="flex items-center gap-2">
+        <span class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-baseline-logout"></i>
           <h3>Log Out</h3>
         </span></ui-list-row
       >
       <hr />
       <client-only class="my-2">
-        <span v-if="loggedUser" class="flex items-center gap-2">
+        <span v-if="loggedUser" class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-baseline-person text-lg"></i>
           <h3 class="capitalize">{{ loggedUser }}</h3>
           <ui-pin text="administrator" size="small" class="ml-auto" />
@@ -111,9 +111,6 @@
 import { VERSION } from "~/_version";
 
 const model = defineModel<boolean>();
-// const props = defineProps<{
-//   overlay?: boolean;
-// }>();
 
 const session = useTokenStore();
 const { loggedUser } = storeToRefs(session);
@@ -151,7 +148,7 @@ h3 {
 
   background-color: var(--bg-100); /* Black*/
   overflow-x: hidden; /* Disable horizontal scroll */
-  transition: 0.1s ease-in-out; /* 0.5 second transition effect to slide in the sidenav */
+  transition: 0.2s ease-in-out; /* 0.5 second transition effect to slide in the sidenav */
   overflow: hidden;
   align-self: stretch;
 
@@ -175,11 +172,7 @@ h3 {
 .pseudo-header {
   height: 57px;
   background-color: var(--primary-100);
-
-  display: none;
-  @media only screen and (max-width: base.$bp-medium) {
-    display: block;
-  }
+  z-index: 10;
 }
 
 .drawer-body {

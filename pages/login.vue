@@ -18,8 +18,8 @@
             :required="true"
             autocomplete="password"
           />
-          <span class="flex items-center mt-3">
-            <input type="checkbox" checked disabled />
+          <span class="flex mt-2 gap-3">
+            <ui-toggle label="Keep me logged in" :model-value="true" disabled />
             <span class="ml-2">{{ $t("sign_in_keep_logged_in") }}</span>
           </span>
         </div>

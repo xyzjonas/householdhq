@@ -1,4 +1,4 @@
-import { type Transaction } from "@prisma/client";
+import { Prisma, type Transaction } from "@prisma/client";
 import type { Transaction as TransactionWithIncludes } from "~/types";
 import {
   type CreateTransactionRequest as CreateDto,
@@ -24,6 +24,8 @@ export interface GetTransactionsResponse {
   data: TransactionWithIncludes[];
 }
 
+const DEFAULT_FULLTEXT_LIMIT = 50;
+
 function ignoreNul<T>(item: T | null | undefined): T {
   return item as T;
 }
@@ -31,10 +33,11 @@ function ignoreNul<T>(item: T | null | undefined): T {
 class Transactions {
   private transactions = prisma.transaction;
 
-  public async findAll(
+  private buildFiltersWhere(
     filters?: TransactionFiltersRequest,
-  ): Promise<TransactionWithIncludes[]> {
-    const where: any = {};
+  ): Prisma.TransactionWhereInput {
+    const where: Prisma.TransactionWhereInput = {};
+
     if (filters?.important !== undefined) {
       where.isImportant = filters.important;
     }
@@ -43,11 +46,25 @@ class Transactions {
       where.categoryId = filters.categoryId;
     }
 
+    return where;
+  }
+
+  private buildBooleanFulltextQuery(query: string): string {
+    return query
+      .trim()
+      .split(/\s+/)
+      .map((term) => term.replace(/[+\-<>~*"()@]+/g, "").trim())
+      .filter(Boolean)
+      .map((term) => `+${term}*`)
+      .join(" ");
+  }
+
+  public async findAll(
+    filters?: TransactionFiltersRequest,
+  ): Promise<TransactionWithIncludes[]> {
     const allTrans: Transaction[] = await this.transactions.findMany({
       include: DEFAULT_INCLUDE,
-      where: {
-        ...where,
-      },
+      where: this.buildFiltersWhere(filters),
     });
     allTrans.sort(
       (a, b) =>
@@ -55,6 +72,66 @@ class Transactions {
         ignoreNul(a.transactedAt).getTime(),
     );
     return allTrans as any;
+  }
+
+  public async searchFulltext(
+    query: string,
+    filters?: TransactionFiltersRequest,
+    limit = DEFAULT_FULLTEXT_LIMIT,
+  ): Promise<TransactionWithIncludes[]> {
+    const normalizedQuery = this.buildBooleanFulltextQuery(query);
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    const safeLimit = Math.max(1, Math.min(limit, DEFAULT_FULLTEXT_LIMIT));
+    const sqlWhere: Prisma.Sql[] = [
+      Prisma.sql`MATCH(t.description) AGAINST (${normalizedQuery} IN BOOLEAN MODE)`,
+    ];
+
+    if (filters?.important !== undefined) {
+      sqlWhere.push(Prisma.sql`t.isImportant = ${filters.important}`);
+    }
+
+    if (filters?.categoryId) {
+      sqlWhere.push(Prisma.sql`t.categoryId = ${filters.categoryId}`);
+    }
+
+    const matches = await prisma.$queryRaw<Array<{ id: number }>>(Prisma.sql`
+      SELECT t.id
+      FROM \`transaction\` t
+      WHERE ${Prisma.join(sqlWhere, " AND ")}
+      ORDER BY
+        MATCH(t.description) AGAINST (${normalizedQuery} IN BOOLEAN MODE) DESC,
+        t.transactedAt DESC,
+        t.id DESC
+      LIMIT ${safeLimit}
+    `);
+
+    if (matches.length === 0) {
+      return [];
+    }
+
+    const ids = matches.map((match) => match.id);
+    const transactions = await this.transactions.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      include: DEFAULT_INCLUDE,
+    });
+
+    const transactionMap = new Map<number, TransactionWithIncludes>(
+      transactions.map((transaction) => [
+        transaction.id,
+        transaction as unknown as TransactionWithIncludes,
+      ]),
+    );
+
+    return ids
+      .map((id) => transactionMap.get(id))
+      .filter(Boolean) as TransactionWithIncludes[];
   }
 
   public async findSingle(

@@ -1,4 +1,7 @@
 FROM node:24-alpine AS base
+
+ENV DATABASE_URL="mysql://rubbish@just/so-that-the#build-passes"
+
 RUN apk update && apk upgrade
 RUN apk add --no-cache openssl
 
@@ -19,7 +22,8 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY prisma.config.ts package.json package-lock.json ./
+RUN npm install -g prisma
 RUN npm config set ignore-scripts true
 RUN npm install --omit=dev
 

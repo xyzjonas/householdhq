@@ -68,7 +68,11 @@
       </CardMonthSummary>
       <div
         class="flex flex-col flex-1 gap-2"
-        v-if="isCurrentMonth && !transactionsLoading"
+        v-if="
+          isCurrentMonth &&
+          !transactionsLoading &&
+          sources.filter((src) => src.isPortfolio).length > 0
+        "
       >
         <BalanceRow
           v-if="isCurrentMonth && !transactionsLoading"
@@ -195,16 +199,10 @@ import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
 import { totalExpenses, transactionsTotal } from "~/utils/transaction";
 
-definePageMeta({
-  layout: "noheader",
-});
-
 const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
-
-const search = ref("");
 
 const projectsStore = useProjectsStore();
 

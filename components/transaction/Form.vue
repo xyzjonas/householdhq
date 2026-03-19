@@ -115,7 +115,7 @@
           :loading="loading"
           color="primary"
           width="100%"
-          height="3rem"
+          height="5rem"
         >
           {{ $t("t_send") }}
         </ui-button>
@@ -185,9 +185,7 @@
       />
       <a
         v-for="index in stages"
-        :class="
-          stage === index - 1 ? 'navigation-stage active' : 'navigation-stage'
-        "
+        :class="['navigation-stage', stage === index - 1 ? 'active' : '']"
         @click="stage = index - 1"
       />
       <ui-button
@@ -272,10 +270,10 @@ onMounted(() => {
       .join(",");
     delete transaction.value.confirmed; // discard explicit confirmed property - only for confirm action
     date.value = formatDate(
-      new Date(transaction.value.transactedAt ?? new Date())
+      new Date(transaction.value.transactedAt ?? new Date()),
     );
     time.value = formatTime(
-      new Date(transaction.value.transactedAt ?? new Date())
+      new Date(transaction.value.transactedAt ?? new Date()),
     );
   }
 
@@ -401,19 +399,24 @@ const createCategory = () => {
   &-stage {
     width: 1rem;
     aspect-ratio: 1;
-    border: 1px solid var(--secondary-100);
+    border: 1px solid var(--text-100);
     border-radius: 50%;
     cursor: pointer;
+    // background-color: black;
+
+    transition:
+      background-color 0.2s ease-in-out,
+      border-color 0.2s ease-in-out;
 
     &:hover {
-      background-color: var(--secondary-100);
+      background-color: var(--color-primary);
     }
   }
 }
 
 .active {
   border-color: var(--primary-100);
-  background-color: var(--primary-100);
+  border-width: 2px;
 }
 
 .button-sm {

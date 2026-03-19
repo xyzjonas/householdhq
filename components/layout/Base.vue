@@ -1,7 +1,8 @@
 <template>
   <main>
     <header v-if="!hideHeader">
-      <div class="page flex items-center justify-between overflow-hidden px">
+      <!-- <layout-header /> -->
+      <!-- <div class="page flex items-center justify-between overflow-hidden px">
         <div class="flex items-center">
           <div class="flex-col p-2">
             <span class="line-height-none">Household HQ</span>
@@ -22,13 +23,14 @@
             />
           </div>
         </ClientOnly>
-      </div>
+      </div> -->
     </header>
 
     <ClientOnly>
-      <div class="flex flex-1 px-1 gap-2" @click.capture="onClickEverywhere">
-        <ui-drawer v-model="drawer" overlay />
-        <div class="flex-1 max-w-7xl mx-auto">
+      <div class="flex flex-1 gap-2" @click.capture="onClickEverywhere">
+        <LayoutDrawer v-model="drawer" overlay />
+        <div class="flex-1 max-w-7xl mx-auto px-2">
+          <layout-header />
           <slot />
         </div>
       </div>
@@ -37,7 +39,7 @@
     <div class="notification-drawer">
       <TransitionGroup name="slide">
         <div v-for="notif in notifications" :key="notif.created.toISOString()">
-          <ui-notification :notification="notif" />
+          <UiNotification :notification="notif" />
         </div>
       </TransitionGroup>
     </div>
@@ -45,9 +47,11 @@
 </template>
 
 <script lang="ts" setup>
+import { LayoutDrawer } from "#components";
 import { VERSION } from "@/_version";
 import { useNotifications } from "@/composables/useNotifications";
-import { useLocalStorage, useWindowSize } from "@vueuse/core";
+import { useDrawer } from "@/composables/useDrawer";
+import { useWindowSize } from "@vueuse/core";
 
 defineProps<{ hideHeader?: boolean }>();
 
@@ -59,7 +63,7 @@ const themeBool = ref(isDark.value);
 watch(themeBool, (_) => toggle());
 
 const { width } = useWindowSize();
-const drawer = useLocalStorage("drawer-open", false);
+const { drawer } = useDrawer();
 const onClickEverywhere = () => {
   // close the drawer in case of a 'mobile' device
   // see breakpoints in base.scss
@@ -75,12 +79,6 @@ main {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-}
-
-header {
-  background-color: var(--primary-100);
-  color: var(--text-over-primary);
-  z-index: 1;
 }
 
 footer {
