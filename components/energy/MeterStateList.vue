@@ -1,5 +1,9 @@
 <template>
-  <ui-timeline :items="meter.states ?? []" item-key="id" color="#38c089">
+  <ui-timeline
+    :items="meter.states ?? []"
+    item-key="id"
+    :color="meter.color ?? '#38c089'"
+  >
     <template #item="{ item }">
       <energy-meter-state-row
         :state="item"
