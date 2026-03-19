@@ -114,57 +114,67 @@
         </div>
       </div>
 
-      <input />
-
-      <div class="row card">
-        <div class="row-label">
-          <p class="item">{{ $t("delete") }}</p>
-          <p class="desc">{{ $t("delete_desc") }}</p>
-        </div>
-        <div class="item">
-          <ui-button
-            @click="deleteSource"
-            icon="i-ic-baseline-delete"
-            :loading="sourceLoading"
-            squared
-            color="danger"
-          />
-        </div>
-      </div>
-
       <h3 class="uppercase text-2xl font-300 mt-5">{{ $t("s_states") }}</h3>
       <section class="card states flex-col">
-        <Transition name="page" mode="out-in" class="my-2">
-          <balance-entry-form
-            v-if="edit"
-            @close="edit = !edit"
-            @created="newEntry"
-            :sourceId="currentSource.id"
-          />
-          <div v-else class="flex items-center justify-between">
-            <ui-button
-              color="primary"
-              @click="edit = !edit"
-              icon="i-ic-baseline-add"
-              >{{ $t("s_add_state") }}</ui-button
-            >
-            <balance-autofill-button :source-id="sourceId" />
-          </div>
-        </Transition>
-
-        <div v-for="state in sourceStates" class="state-row">
-          <div>
-            <span>{{ new Date(state.created).toLocaleString() }}</span>
-          </div>
-          <ui-price class="item" :amount="state.amount" :currency="currency" />
+        <div class="flex items-center gap-2 mb-5">
           <ui-button
-            @click="sourceStore.deleteEntry(sourceId, state.id)"
-            icon="i-ic-baseline-delete"
-            width="2rem"
-            squared
-            outlined
-          />
+            color="primary"
+            @click="edit = true"
+            icon="i-ic-baseline-add"
+            >{{ $t("s_add_state") }}</ui-button
+          >
+          <balance-autofill-button :source-id="sourceId" />
         </div>
+
+        <client-only>
+          <teleport to="body">
+            <ui-modal v-model="edit">
+              <div class="card state-form-modal">
+                <balance-entry-form
+                  @close="edit = false"
+                  @created="newEntry"
+                  :sourceId="currentSource.id"
+                />
+              </div>
+            </ui-modal>
+          </teleport>
+        </client-only>
+
+        <TransitionGroup name="timeline-slide" tag="div" class="timeline">
+          <div
+            v-for="(state, index) in sourceStates"
+            :key="state.id"
+            class="timeline-item"
+          >
+            <div class="timeline-rail">
+              <span class="timeline-dot" />
+              <span
+                v-if="index < sourceStates.length - 1"
+                class="timeline-line"
+              />
+            </div>
+
+            <div class="timeline-content">
+              <div class="timeline-main">
+                <p class="timeline-date">
+                  {{ new Date(state.created).toLocaleString() }}
+                </p>
+                <ui-price
+                  class="timeline-price"
+                  :amount="state.amount"
+                  :currency="currency"
+                />
+              </div>
+
+              <ui-button
+                @click="sourceStore.deleteEntry(sourceId, state.id)"
+                icon="i-ic-baseline-delete"
+                squared
+                outlined
+              />
+            </div>
+          </div>
+        </TransitionGroup>
         <div class="flex items-center justify-center">
           <ui-button
             link
@@ -197,7 +207,7 @@ const { currency } = storeToRefs(transactionStore);
 const route = useRoute();
 const sourceId = parseInt(route.params.id as string);
 
-const edit = ref<boolean>();
+const edit = ref(false);
 
 currentSourceId.value = sourceId;
 
@@ -226,7 +236,7 @@ const sourceStates = computed(() => {
   }
 
   const states = currentSource.value.states.toSorted(
-    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
+    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
   );
 
   if (!showMore.value && states.length > MAX_ITEMS) {
@@ -238,6 +248,8 @@ const sourceStates = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+$color: v-bind("currentSource?.color || '#cccccc'");
+
 .flex-col {
   gap: 0.3rem;
 }
@@ -262,19 +274,113 @@ const sourceStates = computed(() => {
   }
 }
 
-.state-row {
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.timeline-slide-enter-active,
+.timeline-slide-leave-active,
+.timeline-slide-move {
+  transition: all 0.22s ease;
+}
+
+.timeline-slide-enter-from,
+.timeline-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-40px);
+}
+
+.timeline-item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 0.5rem;
-  border-radius: 0.3rem;
+  gap: 0.75rem;
+}
 
-  :nth-child(2) {
-    margin-left: auto;
-  }
+.timeline-rail {
+  position: relative;
+  width: 1.25rem;
+  flex-shrink: 0;
+  align-self: stretch;
+}
 
-  &:nth-child(even) {
-    backdrop-filter: brightness(0.8);
+.timeline-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 9999px;
+  background: $color;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, $color 20%, transparent);
+}
+
+.timeline-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: calc(100% + 0.75rem);
+  border-radius: 9999px;
+  background: linear-gradient(
+    to bottom,
+    $color,
+    color-mix(in srgb, $color 25%, transparent)
+  );
+}
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border-100);
+  border-radius: 0.6rem;
+  background: var(--bg-200);
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.timeline-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.timeline-date {
+  font-size: 0.83rem;
+  color: var(--text-200);
+  opacity: 0.8;
+}
+
+.timeline-price {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.timeline-content:hover {
+  transform: translateX(2px);
+  border-color: color-mix(in srgb, $color 35%, var(--border-100));
+}
+
+@media (max-width: 37.5em) {
+  .timeline-content {
+    gap: 0.6rem;
+    padding: 0.55rem 0.6rem;
   }
+}
+
+.state-form-modal {
+  width: min(32rem, calc(100vw - 2rem));
+  padding: 1rem;
 }
 </style>
