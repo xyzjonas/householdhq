@@ -10,7 +10,7 @@
         HouseholdHQ
       </span>
     </transition>
-    <ClientOnly class="ml-auto">
+    <ClientOnly class="sm:ml-auto">
       <LayoutToggles />
     </ClientOnly>
   </div>

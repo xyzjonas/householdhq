@@ -52,6 +52,7 @@ const stateCount = computed(() => props.meter.states?.length ?? 0);
 const meterIcon = computed(
   () => props.meter.icon || "i-ic-baseline-electric-meter",
 );
+const meterColor = computed(() => props.meter.color || "var(--primary-100)");
 const latestStateLabel = computed(() => {
   if (!latestState.value) {
     return "—";
@@ -75,8 +76,8 @@ const latestStateLabel = computed(() => {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.8rem;
-  background: color-mix(in srgb, var(--primary-100) 12%, var(--bg-300));
-  color: var(--primary-100);
+  background: color-mix(in srgb, v-bind("meterColor") 12%, var(--bg-300));
+  color: v-bind("meterColor");
   flex-shrink: 0;
 
   i {

@@ -133,6 +133,7 @@ model Meter {
   created DateTime     @updatedAt
   unit    String
   icon    String?
+  color   String?
   states  MeterState[] @relation(name: "meter")
 }
 

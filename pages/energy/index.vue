@@ -29,25 +29,12 @@
     <client-only>
       <teleport to="body">
         <ui-modal v-model="newMeterModal">
-          <form
-            class="card w-sm flex flex-col gap-5"
-            @submit.prevent="createMeter"
-          >
-            <h2 class="uppercase mb-3">{{ $t("meter_create") }}</h2>
-            <ui-input :label="$t('meter_name')" v-model="newMeter.name" />
-            <ui-input :label="$t('meter_unit')" v-model="newMeter.unit" />
-            <ui-input :label="$t('meter_icon')" v-model="newMeter.icon" />
-            <ui-button
-              :loading="loading"
-              :disabled="!canCreateMeter"
-              width="100%"
-              height="3rem"
-              class="mt-3"
-              type="submit"
-              color="primary"
-              >{{ $t("t_send") }}</ui-button
-            >
-          </form>
+          <energy-meter-form
+            v-model="newMeter"
+            :title="$t('meter_create')"
+            :loading="loading"
+            @submit="createMeter"
+          />
         </ui-modal>
       </teleport>
     </client-only>
@@ -70,17 +57,15 @@ const createDefaultMeter = (): MeterCreate => ({
   name: "",
   unit: "",
   icon: "",
+  color: "#38c089",
 });
 
 const newMeter = ref<MeterCreate>(createDefaultMeter());
-const canCreateMeter = computed(
-  () => !!newMeter.value.name.trim() && !!newMeter.value.unit.trim(),
-);
 
 const tokenStore = useTokenStore();
 
 const createMeter = async () => {
-  if (!canCreateMeter.value) {
+  if (!newMeter.value.name.trim() || !newMeter.value.unit.trim()) {
     return;
   }
 

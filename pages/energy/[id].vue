@@ -1,7 +1,9 @@
 <template>
   <div>
     <div v-if="meter" class="flex-col">
-      <section class="row title meter-title-row gap-4 mb-5">
+      <section
+        class="row title meter-title-row gap-4 mb-5 flex-wrap justify-between"
+      >
         <div class="flex items-center gap-3 min-w-0">
           <span class="meter-icon">
             <i :class="meterIcon"></i>
@@ -21,16 +23,24 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-2 ml-auto">
+        <div class="flex items-center gap-2 self-center">
           <Transition name="page" mode="out-in">
-            <spinner v-show="loading" class="item" />
+            <spinner v-if="loading" class="item" />
+            <div v-else class="flex items-center gap-2 ml-auto">
+              <ui-button
+                outlined
+                icon="i-ic-baseline-edit"
+                @click="openEditMeterModal"
+                >{{ $t("edit") }}</ui-button
+              >
+              <ui-button
+                outlined
+                icon="i-ic-baseline-edit-calendar"
+                @click="newStateModal = true"
+                >{{ $t("meter_state_create") }}</ui-button
+              >
+            </div>
           </Transition>
-          <ui-button
-            outlined
-            icon="i-ic-baseline-edit-calendar"
-            @click="newStateModal = true"
-            >{{ $t("meter_state_create") }}</ui-button
-          >
         </div>
       </section>
 
@@ -53,7 +63,7 @@
       <energy-graph
         v-if="stateCount > 0"
         :states="meter.states ?? []"
-        color="#38c089"
+        :color="meter.color ?? '#38c089'"
       />
 
       <section class="card flex flex-col gap-4">
@@ -79,6 +89,15 @@
 
       <client-only>
         <teleport to="body">
+          <ui-modal v-model="editMeterModal">
+            <energy-meter-form
+              v-model="editableMeter"
+              :loading="loading"
+              :title="$t('edit')"
+              @submit="editMeter"
+            />
+          </ui-modal>
+
           <ui-modal v-model="newStateModal">
             <energy-meter-state-form
               v-model="newState"
@@ -96,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Meter, MeterStateCreate } from "~/types";
+import type { Meter, MeterCreate, MeterStateCreate } from "~/types";
 
 const route = useRoute();
 const meterId = parseInt(route.params.id as string);
@@ -112,6 +131,7 @@ const latestState = computed(() => meter.value?.states?.[0]);
 const meterIcon = computed(
   () => meter.value?.icon || "i-ic-baseline-electric-meter",
 );
+const meterColor = computed(() => meter.value?.color || "var(--primary-100)");
 const latestStateLabel = computed(() => {
   if (!latestState.value) {
     return "—";
@@ -126,6 +146,34 @@ const latestStateLabel = computed(() => {
 const tokenStore = useTokenStore();
 const loading = ref(false);
 const newStateModal = ref(false);
+const editMeterModal = ref(false);
+
+const createDefaultMeter = (): MeterCreate => ({
+  name: "",
+  unit: "",
+  icon: "",
+  color: "#38c089",
+});
+
+const editableMeter = ref<MeterCreate>(createDefaultMeter());
+
+watch(
+  meter,
+  (currentMeter) => {
+    if (!currentMeter) {
+      editableMeter.value = createDefaultMeter();
+      return;
+    }
+
+    editableMeter.value = {
+      name: currentMeter.name,
+      unit: currentMeter.unit,
+      icon: currentMeter.icon ?? "",
+      color: currentMeter.color ?? "#38c089",
+    };
+  },
+  { immediate: true },
+);
 
 const createDefaultState = (): MeterStateCreate => ({
   meteredAt: new Date(),
@@ -134,6 +182,43 @@ const createDefaultState = (): MeterStateCreate => ({
 });
 
 const newState = ref<MeterStateCreate>(createDefaultState());
+
+const openEditMeterModal = () => {
+  if (!meter.value) {
+    return;
+  }
+
+  editableMeter.value = {
+    name: meter.value.name,
+    unit: meter.value.unit,
+    icon: meter.value.icon ?? "",
+    color: meter.value.color ?? "#38c089",
+  };
+  editMeterModal.value = true;
+};
+
+const editMeter = async () => {
+  if (!meter.value) {
+    return;
+  }
+
+  if (!editableMeter.value.name.trim()) {
+    return;
+  }
+
+  loading.value = true;
+
+  try {
+    await tokenStore.patch(
+      `/api/meters/${meter.value.id}`,
+      editableMeter.value,
+    );
+    editMeterModal.value = false;
+    await refresh();
+  } finally {
+    loading.value = false;
+  }
+};
 
 const createMeterState = async () => {
   if (!meter.value) {
@@ -181,8 +266,8 @@ const deleteMeterState = async (stateId: number) => {
   width: 3.2rem;
   height: 3.2rem;
   border-radius: 1rem;
-  background: color-mix(in srgb, var(--primary-100) 12%, var(--bg-300));
-  color: var(--primary-100);
+  background: color-mix(in srgb, v-bind("meterColor") 12%, var(--bg-300));
+  color: v-bind("meterColor");
   flex-shrink: 0;
 
   i {
