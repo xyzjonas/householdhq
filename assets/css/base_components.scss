@@ -1,6 +1,6 @@
 @mixin input-mixin {
     background-color: transparent;
-    border-radius: 5px;
+    border-radius: var(--input-border-radius);
     border: 1px solid var(--color-border-dark);
     outline: 0;
     padding: 8px;

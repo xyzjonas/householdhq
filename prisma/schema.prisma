@@ -147,3 +147,20 @@ model MeterState {
 
   @@index([meterId])
 }
+
+model Vehicle {
+  id            Int       @id @default(autoincrement())
+  vin           String    @unique
+  registration  String    @unique
+  name          String
+  brand         String
+  model         String
+  color         String?
+  icon          String?
+  purchasePrice Float?
+  purchasedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("vehicle")
+}

@@ -85,6 +85,13 @@
         </span></ui-list-row
       >
 
+      <ui-list-row @click="navigateTo('/vehicles')">
+        <span class="flex items-center gap-2 flex-nowrap">
+          <i class="i-ic-baseline-directions-car"></i>
+          <h3>{{ $t("route_vehicles") }}</h3>
+        </span></ui-list-row
+      >
+
       <ui-list-row class="mt-auto" @click="session.logout()">
         <span class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-baseline-logout"></i>

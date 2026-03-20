@@ -62,6 +62,15 @@ import {
   type TransactionMonthRequest,
 } from "./transaction";
 
+import {
+  VehicleSchema,
+  VehicleCreateSchema,
+  VehicleUpdateSchema,
+  type Vehicle,
+  type VehicleCreate,
+  type VehicleUpdate,
+} from "./vehicles";
+
 export type {
   Category,
   CreateCategory,
@@ -87,6 +96,9 @@ export type {
   TagTransactionRequest,
   TransactionFiltersRequest,
   TransactionMonthRequest,
+  Vehicle,
+  VehicleCreate,
+  VehicleUpdate,
 };
 
 export {
@@ -113,6 +125,9 @@ export {
   MeterStateUpdateSchema,
   MeterUpdateSchema,
   MeterStateSchema,
+  VehicleSchema,
+  VehicleCreateSchema,
+  VehicleUpdateSchema,
 };
 
 export interface User {
