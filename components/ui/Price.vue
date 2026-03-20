@@ -31,7 +31,11 @@ const props = defineProps({
 });
 
 const { currency: currencyFromStore } = storeToRefs(useTransactionStore());
-const currency = computed(() => props.currencyIn ?? currencyFromStore.value);
+const { settings: appSettings } = useAppSettings();
+const currency = computed(
+  () =>
+    props.currencyIn ?? appSettings.value?.currency ?? currencyFromStore.value,
+);
 
 // num = new Intl.NumberFormat('hi-IN', { style: 'currency', currency: 'INR' }).format(number);
 const currencyValue = computed(() => {

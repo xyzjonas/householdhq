@@ -13,7 +13,11 @@
           <div
             class="flex items-center gap-2 flex-wrap text-sm text-[var(--text-200)]"
           >
-            <ui-pin :text="`${vehicle.brand} ${vehicle.model}`" size="small" />
+            <ui-pin
+              :text="`${vehicle.brand} ${vehicle.model}`"
+              size="small"
+              class="w-1 overflow-hidden"
+            />
             <ui-pin :text="vehicle.registration" size="small" />
           </div>
         </div>

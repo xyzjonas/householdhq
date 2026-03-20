@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!error && category" class="flex-col">
+    <div v-if="!error && category" class="flex flex-col">
       <section class="row title">
         <Icon :iconName="category.icon" class="mr" />
         <h1 class="item">{{ category.name }}</h1>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="project" class="flex-col">
+    <div v-if="project" class="flex flex-col">
       <section class="row title">
         <div class="flex flex-col">
           <h1 class="uppercase text-3xl">{{ project.name }}</h1>

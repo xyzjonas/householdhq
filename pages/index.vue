@@ -112,7 +112,7 @@
         <div
           class="border-r-amber border-r-4 border-r-solid mr-2 pos-relative"
         ></div>
-        <div class="flex-1 flex-col gap2">
+        <div class="flex flex-1 flex-col gap-2">
           <TransactionRow
             v-for="transaction in importantTransactions"
             :key="transaction.id"
@@ -133,7 +133,10 @@
       />
 
       <transition name="page">
-        <section v-if="showUpcomming || filterCategoryId > 0">
+        <section
+          v-if="showUpcomming || filterCategoryId > 0"
+          class="flex flex-col gap-1 mb-1"
+        >
           <TransactionRow
             v-for="transaction in upcomming"
             :key="transaction.id"
@@ -145,7 +148,7 @@
           />
         </section>
       </transition>
-      <section class="flex-col gap-2">
+      <section class="flex flex-col gap-2">
         <ui-empty
           v-if="!transactions || transactions.length <= 0"
           :loading="loading"

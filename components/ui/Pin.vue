@@ -47,6 +47,7 @@ const textColor = computed(() => {
 <style lang="scss" scoped>
 .pin {
   width: fit-content;
+  white-space: nowrap;
   min-width: 3rem;
   display: flex;
   align-items: center;

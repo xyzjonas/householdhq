@@ -35,7 +35,11 @@
             <i v-if="tabIndex === 1" class="i-ic-chevron-right"></i
             >{{ $t("incomes") }}
           </div>
-          <div class="text-lg font-semibold">{{ totalIncome }}</div>
+          <ui-price
+            :amount="incomeSum"
+            :currency-in="displayCurrency"
+            size="1.1rem"
+          />
         </span>
         <hr class="my-0" />
         <span
@@ -46,19 +50,23 @@
             <i v-if="tabIndex === 2" class="i-ic-chevron-right"></i>
             {{ $t("expenses") }}
           </div>
-          <div class="text-lg font-semibold">{{ totalExpenses }}</div>
+          <ui-price
+            :amount="expensesSum"
+            :currency-in="displayCurrency"
+            size="1.1rem"
+          />
         </span>
         <hr class="my-0" />
         <span class="flex justify-between p-2 capitalize gap-5">
           <div>{{ $t("net") }}</div>
-          <div
-            :class="[
-              netTotal.startsWith('-') ? 'text-red-500' : 'text-positive',
-              'text-lg font-semibold',
-            ]"
-          >
-            {{ netTotal }}
-          </div>
+          <ui-price
+            :amount="netTotal"
+            :currency-in="displayCurrency"
+            :color="
+              netTotal < 0 ? 'var(--color-danger)' : 'var(--color-success)'
+            "
+            size="1.1rem"
+          />
         </span>
       </div>
     </div>
@@ -66,6 +74,8 @@
 </template>
 <script setup lang="ts">
 import type { CategoryWithSum } from "@/types";
+
+const { settings } = useAppSettings();
 
 const selectedCategoryId = defineModel<number>("category", { default: -1 });
 
@@ -97,31 +107,14 @@ const topExpenses = computed(() => {
 const expensesSum = computed(() =>
   props.expenses.reduce((acc, curr) => acc + curr.sum, 0),
 );
-const totalExpenses = computed(() =>
-  new Intl.NumberFormat("cs-CZ", {
-    style: "currency",
-    currency: "CZK",
-  }).format(expensesSum.value),
-);
+
+const displayCurrency = computed(() => settings.value?.currency ?? "CZK");
 
 const incomeSum = computed(() =>
   props.incomes.reduce((acc, curr) => acc + curr.sum, 0),
 );
-const totalIncome = computed(() =>
-  new Intl.NumberFormat("cs-CZ", {
-    style: "currency",
-    currency: "CZK",
-  }).format(incomeSum.value),
-);
 
-const netTotal = computed(() => {
-  const net = incomeSum.value - expensesSum.value;
-  return new Intl.NumberFormat("cs-CZ", {
-    style: "currency",
-    currency: "CZK",
-    signDisplay: "always",
-  }).format(net);
-});
+const netTotal = computed(() => incomeSum.value - expensesSum.value);
 </script>
 <style lang="scss" scoped>
 h3 {

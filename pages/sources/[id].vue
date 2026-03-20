@@ -3,7 +3,7 @@
     <div v-if="!currentSource && sourceLoading" class="center">
       <MosaicLoader />
     </div>
-    <div v-else-if="currentSource" class="flex-col">
+    <div v-else-if="currentSource" class="flex flex-col">
       <section class="row title">
         <h1 class="uppercase text-3xl">{{ currentSource.name }}</h1>
         <Transition name="page" mode="out-in">

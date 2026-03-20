@@ -80,7 +80,7 @@ const isTransactionIncome = computed(() => isIncome(props.transaction))
 
 const transparentStyle = ref("");
 if (props.transparent) {
-  transparentStyle.value = "filter: opacity(0.3);";
+  transparentStyle.value = "filter: opacity(0.7);";
 }
 
 const emit = defineEmits(["patched", "delete"]);

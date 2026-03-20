@@ -137,12 +137,6 @@
   }
 }
 
-.flex-col {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .collapsible-y {
   overflow: hidden;
   // transition:max-height 0.3s linear; // note that we're transitioning max-height, not height!

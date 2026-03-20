@@ -64,12 +64,23 @@ import {
 
 import {
   VehicleSchema,
+  VehicleDetailSchema,
   VehicleCreateSchema,
   VehicleUpdateSchema,
   type Vehicle,
+  type VehicleDetail,
   type VehicleCreate,
   type VehicleUpdate,
 } from "./vehicles";
+
+  import {
+    AppSettingSchema,
+    UpdateAppSettingSchema,
+    KnownSettingsSchema,
+    type AppSetting,
+    type UpdateAppSetting,
+    type KnownSettings,
+  } from "./appSettings";
 
 export type {
   Category,
@@ -97,6 +108,10 @@ export type {
   TransactionFiltersRequest,
   TransactionMonthRequest,
   Vehicle,
+    AppSetting,
+    UpdateAppSetting,
+    KnownSettings,
+  VehicleDetail,
   VehicleCreate,
   VehicleUpdate,
 };
@@ -126,8 +141,12 @@ export {
   MeterUpdateSchema,
   MeterStateSchema,
   VehicleSchema,
+  VehicleDetailSchema,
   VehicleCreateSchema,
   VehicleUpdateSchema,
+    AppSettingSchema,
+    UpdateAppSettingSchema,
+    KnownSettingsSchema,
 };
 
 export interface User {

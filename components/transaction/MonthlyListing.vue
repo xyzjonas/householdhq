@@ -7,7 +7,7 @@
           {{ formatDateKey(key as string) }}
         </div>
       </div>
-      <div class="flex-col gap-2">
+      <div class="flex flex-col gap-1">
         <TransactionRow
           v-for="transaction in trans"
           :key="transaction.id"

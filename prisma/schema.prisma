@@ -104,12 +104,16 @@ model Transaction {
   targetId Int    @default(2)
   target   Source @relation(name: "target", fields: [targetId], references: [id])
 
+  vehicleId Int?
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+
   tags Tag[]
 
   @@index([sourceId])
   @@index([targetId])
   @@index([categoryId])
   @@index([projectId])
+  @@index([vehicleId])
   @@index([isImportant])
   @@fulltext([description])
   @@map("transaction")
@@ -149,18 +153,35 @@ model MeterState {
 }
 
 model Vehicle {
-  id            Int       @id @default(autoincrement())
-  vin           String    @unique
-  registration  String    @unique
-  name          String
-  brand         String
-  model         String
-  color         String?
-  icon          String?
-  purchasePrice Float?
-  purchasedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                  Int       @id @default(autoincrement())
+  vin                 String    @unique
+  registration        String    @unique
+  name                String
+  brand               String
+  model               String
+  color               String?
+  icon                String?
+  purchasePrice       Float?
+  purchasedAt         DateTime?
+  mass                Float?
+  engineSize          Float?
+  fuelType            String?
+  maxPower            Float?
+  dateOfFabrication   DateTime?
+  dateFirstRegistered DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  transactions Transaction[]
 
   @@map("vehicle")
+}
+
+model AppSettings {
+  id        Int      @id @default(1) // Singleton - always ID 1
+  currency  String   @default("USD")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("app_settings")
 }

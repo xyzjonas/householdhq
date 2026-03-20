@@ -1,12 +1,14 @@
 <template>
   <div class="sidenav" :style="model ? 'width: 240px' : ''">
     <div class="pseudo-header flex min-w-[240px]">
-      <div class="flex-col p-2 text-white">
+      <div class="flex flex-col p-2 text-white">
         <span class="line-height-none">Household HQ</span>
         <span class="text-xs opacity-[0.8]">{{ VERSION }}</span>
       </div>
     </div>
-    <div class="drawer-body p-3 border-r-solid border-1 flex-col gap-2 flex-1">
+    <div
+      class="drawer-body p-3 border-r-solid border-1 flex flex-col gap-2 flex-1"
+    >
       <span class="text-gray-5 text-sm mb-2">Pages</span>
       <ui-list-row
         @click="navigateTo('/')"
@@ -89,6 +91,16 @@
         <span class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-baseline-directions-car"></i>
           <h3>{{ $t("route_vehicles") }}</h3>
+        </span></ui-list-row
+      >
+
+      <ui-list-row
+        @click="navigateTo('/settings')"
+        :class="{ active: $route.path === '/settings' }"
+      >
+        <span class="flex items-center gap-2 flex-nowrap">
+          <i class="i-ic-baseline-settings"></i>
+          <h3>{{ $t("route_settings") }}</h3>
         </span></ui-list-row
       >
 
