@@ -6,6 +6,7 @@ import { z } from 'zod';
 export const AppSettingSchema = z.object({
   id: z.number(),
   currency: z.string().default('USD'),
+  defaultFuelTransactionTitle: z.string().default('Fuel'),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -17,6 +18,7 @@ export type AppSetting = z.infer<typeof AppSettingSchema>;
  */
 export const UpdateAppSettingSchema = z.object({
   currency: z.string().optional(),
+  defaultFuelTransactionTitle: z.string().min(1).optional(),
 }).strip().partial();
 
 export type UpdateAppSetting = z.infer<typeof UpdateAppSettingSchema>;
@@ -26,6 +28,7 @@ export type UpdateAppSetting = z.infer<typeof UpdateAppSettingSchema>;
  */
 export const KnownSettingsSchema = z.object({
   currency: z.string().default('USD'),
+  defaultFuelTransactionTitle: z.string().default('Fuel'),
 });
 
 export type KnownSettings = z.infer<typeof KnownSettingsSchema>;

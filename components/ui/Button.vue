@@ -26,7 +26,7 @@ const props = defineProps<{
 }>();
 
 const clazz = computed(() => {
-  let cls = "ui-btn transition-all";
+  let cls = "ui-btn transition-all text-nowrap";
   if (props.rounded) {
     cls += " rounded";
   } else if (props.squared) {

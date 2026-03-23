@@ -77,6 +77,13 @@ export const useAppSettings = () => {
     return updateSettings({ currency });
   };
 
+  /**
+   * Update default title for auto-created fuel transactions
+   */
+  const setDefaultFuelTransactionTitle = async (defaultFuelTransactionTitle: string) => {
+    return updateSettings({ defaultFuelTransactionTitle });
+  };
+
   return {
     settings: readonly(settings),
     isLoading: readonly(isLoading),
@@ -86,5 +93,6 @@ export const useAppSettings = () => {
     getSetting,
     getCurrency,
     setCurrency,
+    setDefaultFuelTransactionTitle,
   };
 };

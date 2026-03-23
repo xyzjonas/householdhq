@@ -6,6 +6,6 @@ export default defineEventHandler(async (event) => {
   console.info(event.context.params);
   const data: IDBase = await doValidate(IdSchema, event.context.params);
   return {
-    data: transactions.findSingle(data),
+    data: await transactions.findSingle(data),
   };
 });

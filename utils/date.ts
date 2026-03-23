@@ -5,7 +5,10 @@ export function formatMMYYYY(date: Date, locale: string) {
   return `${monthName} ${date.getFullYear()}`;
 }
 
-export function formatddMMYYYY(date: Date, locale: string) {
+export function formatddMMYYYY(date: Date | string, locale: string) {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
   const monthName = date
     .toLocaleDateString(locale, { month: "long" })
     .toUpperCase();

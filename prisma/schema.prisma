@@ -108,6 +108,9 @@ model Transaction {
   vehicleId Int?
   vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
 
+  fuelEntry    VehicleFuelEntry?    @relation("FuelEntryTransaction")
+  serviceEntry VehicleServiceEntry? @relation("ServiceEntryTransaction")
+
   tags Tag[]
 
   @@index([sourceId])
@@ -176,17 +179,77 @@ model Vehicle {
   categoryId Int?      @unique
   category   Category? @relation(fields: [categoryId], references: [id])
 
-  transactions Transaction[]
+  transactions   Transaction[]
+  fuelEntries    VehicleFuelEntry[]
+  serviceEntries VehicleServiceEntry[]
 
   @@index([categoryId])
   @@map("vehicle")
 }
 
-model AppSettings {
-  id        Int      @id @default(1) // Singleton - always ID 1
-  currency  String   @default("USD")
+enum VehicleServiceType {
+  REGULAR_MAINTENANCE
+  DEFECT
+}
+
+model VehicleFuelEntry {
+  id         Int      @id @default(autoincrement())
+  fueledAt   DateTime
+  odometer   Float
+  fuelAmount Float
+  unitPrice  Float
+  isFullTank Boolean  @default(true)
+
+  vehicleId Int
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  transactionId Int
+  transaction   Transaction @relation("FuelEntryTransaction", fields: [transactionId], references: [id])
+
+  previousFullTankFuelEntryId Int?
+  previousFullTankFuelEntry   VehicleFuelEntry?  @relation("FuelEntryPreviousFullTank", fields: [previousFullTankFuelEntryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  nextFuelEntries             VehicleFuelEntry[] @relation("FuelEntryPreviousFullTank")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([transactionId])
+  @@index([vehicleId])
+  @@index([fueledAt])
+  @@index([previousFullTankFuelEntryId])
+  @@map("vehicle_fuel_entry")
+}
+
+model VehicleServiceEntry {
+  id          Int                @id @default(autoincrement())
+  type        VehicleServiceType
+  odometer    Float?
+  title       String
+  servicedAt  DateTime
+  description String?
+
+  vehicleId Int
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  transactionId Int
+  transaction   Transaction @relation("ServiceEntryTransaction", fields: [transactionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([transactionId])
+  @@index([vehicleId])
+  @@index([servicedAt])
+  @@index([type])
+  @@map("vehicle_service_entry")
+}
+
+model AppSettings {
+  id                          Int      @id @default(1) // Singleton - always ID 1
+  currency                    String   @default("USD")
+  defaultFuelTransactionTitle String   @default("Fuel")
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
 
   @@map("app_settings")
 }

@@ -38,6 +38,42 @@ class VehiclesService {
             },
           },
         },
+        fuelEntries: {
+          include: {
+            transaction: {
+              select: {
+                id: true,
+                transactedAt: true,
+                description: true,
+                amount: true,
+                currency: true,
+              },
+            },
+            previousFullTankFuelEntry: {
+              select: {
+                id: true,
+                fueledAt: true,
+                odometer: true,
+                isFullTank: true,
+              },
+            },
+          },
+          orderBy: { fueledAt: "desc" },
+        },
+        serviceEntries: {
+          include: {
+            transaction: {
+              select: {
+                id: true,
+                transactedAt: true,
+                description: true,
+                amount: true,
+                currency: true,
+              },
+            },
+          },
+          orderBy: { servicedAt: "desc" },
+        },
       },
     });
     if (!vehicle) {
@@ -59,6 +95,8 @@ class VehiclesService {
           }
         : null,
       transactions: category?.transactions ?? [],
+      fuelEntries: vehicle.fuelEntries,
+      serviceEntries: vehicle.serviceEntries,
     };
   }
 

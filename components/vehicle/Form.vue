@@ -3,7 +3,10 @@
     class="card min-w-xs flex flex-col gap-5"
     @submit.prevent="$emit('submit')"
   >
-    <h2 class="uppercase mb-3">{{ title }}</h2>
+    <div class="flex justify-between items-center">
+      <h2 class="uppercase mb-0">{{ title }}</h2>
+      <ui-close-button @click="$emit('close')" />
+    </div>
 
     <ui-input :label="$t('vehicle_name')" v-model="vehicle.name" />
 
@@ -193,7 +196,7 @@ const canSubmit = computed(
     !!vehicle.value?.model?.trim(),
 );
 
-defineEmits(["submit"]);
+defineEmits(["submit", "close"]);
 </script>
 
 <style lang="scss" scoped>

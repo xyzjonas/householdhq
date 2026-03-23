@@ -23,95 +23,91 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2 self-center">
-        <Transition name="page" mode="out-in">
-          <spinner v-if="loading" class="item" />
-          <div v-else class="flex items-center gap-2 ml-auto">
-            <ui-button
-              outlined
-              icon="i-ic-baseline-edit"
-              @click="openEditVehicleModal"
-              >{{ $t("edit") }}</ui-button
-            >
-            <ui-button
-              outlined
-              icon="i-ic-baseline-delete"
-              @click="deleteVehicle"
-              >{{ $t("delete") }}</ui-button
-            >
-          </div>
-        </Transition>
+      <div class="grid grid-cols-2 gap-2">
+        <ui-button
+          outlined
+          icon="i-ic-baseline-local-gas-station"
+          @click="createFuelEntryModal = true"
+          width="100%"
+          >{{ $t("vehicle_fuel_entry_create") }}</ui-button
+        >
+        <ui-button
+          outlined
+          icon="i-ic-baseline-build"
+          @click="createServiceEntryModal = true"
+          width="100%"
+          >{{ $t("vehicle_service_entry_create") }}</ui-button
+        >
+        <ui-button
+          outlined
+          icon="i-ic-baseline-edit"
+          @click="openEditVehicleModal"
+          width="100%"
+          >{{ $t("edit") }}</ui-button
+        >
+        <ui-button
+          outlined
+          icon="i-ic-baseline-delete"
+          @click="deleteVehicle"
+          width="100%"
+          >{{ $t("delete") }}</ui-button
+        >
       </div>
     </section>
 
-    <section class="vehicle-info-grid">
-      <div class="card info-card">
-        <span class="info-label">{{ $t("vehicle_vin") }}</span>
-        <span class="info-value">{{ vehicle.vin }}</span>
-      </div>
-
-      <div class="card info-card">
-        <span class="info-label">{{ $t("vehicle_registration") }}</span>
-        <span class="info-value">{{ vehicle.registration }}</span>
-      </div>
-
-      <div class="card info-card">
-        <span class="info-label">{{ $t("vehicle_model") }}</span>
-        <span class="info-value">{{ vehicle.brand }} {{ vehicle.model }}</span>
-      </div>
-
-      <div class="card info-card">
-        <span class="info-label">{{ $t("vehicle_color") }}</span>
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded border vehicle-color"></div>
-          <span class="info-value">{{ vehicle.color || "—" }}</span>
-        </div>
-      </div>
-
-      <div v-if="vehicle.purchasePrice" class="card info-card">
-        <span class="info-label">{{ $t("vehicle_purchase_price") }}</span>
-        <ui-price
-          :amount="vehicle.purchasePrice"
-          currency-in="EUR"
-          size="1.1rem"
-        />
-      </div>
-
-      <div v-if="vehicle.purchasedAt" class="card info-card">
-        <span class="info-label">{{ $t("vehicle_purchased_at") }}</span>
-        <span class="info-value">{{ purchasedAtLabel }}</span>
-      </div>
-
-      <div v-if="vehicle.linkedCategory" class="card info-card">
-        <span class="info-label">{{ $t("vehicle_category") }}</span>
-        <category-badge :category="vehicle.linkedCategory as any" />
-      </div>
-
-      <div class="card info-card">
-        <span class="info-label">{{ $t("vehicle_created_at") }}</span>
-        <span class="info-value">{{ createdAtLabel }}</span>
-      </div>
-
-      <div class="card info-card">
-        <span class="info-label">{{ $t("vehicle_updated_at") }}</span>
-        <span class="info-value">{{ updatedAtLabel }}</span>
-      </div>
+    <section class="mb-5">
+      <ui-toggle-bar v-model="activeTab" :options="tabOptions" />
     </section>
 
-    <section v-if="vehicle.transactions?.length" class="mt-6">
-      <transaction-monthly-listing
-        :transactions="vehicle.transactions as any"
-      />
-    </section>
+    <vehicle-fuel-listing-tab
+      v-if="activeTab === 0"
+      :vehicle="vehicle"
+      @delete-entry="deleteFuelEntry"
+    />
+
+    <vehicle-maintenance-listing-tab
+      v-else-if="activeTab === 1"
+      :vehicle="vehicle"
+      @delete-entry="deleteServiceEntry"
+    />
+
+    <vehicle-transactions-listing-tab
+      v-else-if="activeTab === 2"
+      :vehicle="vehicle"
+    />
+
+    <vehicle-details-tab v-else :vehicle="vehicle" />
 
     <client-only>
       <teleport to="body">
+        <ui-modal v-model="createFuelEntryModal">
+          <vehicle-fuel-entry-form
+            v-model="newFuelEntry"
+            :loading="loading"
+            :title="$t('vehicle_fuel_entry_create')"
+            :full-tank-entries="fullTankEntries"
+            @submit="createFuelEntry"
+            @close="createFuelEntryModal = false"
+          />
+        </ui-modal>
+
+        <ui-modal v-model="createServiceEntryModal">
+          <vehicle-service-entry-form
+            v-model="newServiceEntry"
+            :loading="loading"
+            :title="$t('vehicle_service_entry_create')"
+            @submit="createServiceEntry"
+            @close="createServiceEntryModal = false"
+          />
+        </ui-modal>
+
         <ui-modal v-model="editVehicleModal">
           <vehicle-form
             v-model="editableVehicle"
             :loading="loading"
             :title="$t('edit')"
             @submit="editVehicle"
+            @close="editVehicleModal = false"
           />
         </ui-modal>
       </teleport>
@@ -124,7 +120,12 @@
 </template>
 
 <script setup lang="ts">
-import type { VehicleDetail, VehicleUpdate } from "~/types";
+import type {
+  VehicleDetail,
+  VehicleFuelEntryCreate,
+  VehicleServiceEntryCreate,
+  VehicleUpdate,
+} from "~/types";
 import { useRoute, navigateTo } from "#app";
 
 const route = useRoute();
@@ -137,9 +138,54 @@ const { data: vehicleData, refresh } = await useFetch<{ data: VehicleDetail }>(
 const vehicle = computed(() => vehicleData.value?.data);
 
 const editVehicleModal = ref(false);
+const createFuelEntryModal = ref(false);
+const createServiceEntryModal = ref(false);
+const activeTab = ref(0);
 const loading = ref(false);
+const tokenStore = useTokenStore();
 
 const editableVehicle = ref<VehicleUpdate>({});
+const newFuelEntry = ref<VehicleFuelEntryCreate>({
+  fueledAt: new Date(),
+  odometer: 0,
+  fuelAmount: 0,
+  unitPrice: 0,
+  isFullTank: true,
+  previousFullTankFuelEntryId: undefined,
+});
+
+const newServiceEntry = ref<VehicleServiceEntryCreate>({
+  type: "REGULAR_MAINTENANCE",
+  odometer: null,
+  title: "",
+  servicedAt: new Date(),
+  description: "",
+});
+
+const fullTankEntries = computed(() => {
+  return (vehicle.value?.fuelEntries ?? []).filter((entry) => entry.isFullTank);
+});
+
+const resetFuelEntryForm = () => {
+  newFuelEntry.value = {
+    fueledAt: new Date(),
+    odometer: 0,
+    fuelAmount: 0,
+    unitPrice: 0,
+    isFullTank: true,
+    previousFullTankFuelEntryId: undefined,
+  };
+};
+
+const resetServiceEntryForm = () => {
+  newServiceEntry.value = {
+    type: "REGULAR_MAINTENANCE",
+    odometer: null,
+    title: "",
+    servicedAt: new Date(),
+    description: "",
+  };
+};
 
 const openEditVehicleModal = () => {
   if (vehicle.value) {
@@ -208,36 +254,83 @@ const deleteVehicle = async () => {
   }
 };
 
-const { locale } = useI18n();
-
-const purchasedAtLabel = computed(() => {
-  if (!vehicle.value?.purchasedAt) {
-    return "—";
+const createFuelEntry = async () => {
+  loading.value = true;
+  try {
+    await tokenStore.post(
+      `/api/vehicles/${id}/fuel-entries`,
+      newFuelEntry.value as any,
+    );
+    createFuelEntryModal.value = false;
+    resetFuelEntryForm();
+    await refresh();
+    useNotifications().addNotification({
+      level: "success",
+      text: $t("vehicle_fuel_entry_created"),
+    });
+  } catch {
+    useNotifications().addNotification({
+      level: "error",
+      text: $t("vehicle_fuel_entry_create_error"),
+    });
+  } finally {
+    loading.value = false;
   }
+};
 
-  return new Intl.DateTimeFormat(locale.value, {
-    dateStyle: "medium",
-  }).format(new Date(vehicle.value.purchasedAt));
-});
-
-const createdAtLabel = computed(() => {
-  if (!vehicle.value?.createdAt) {
-    return "—";
+const createServiceEntry = async () => {
+  loading.value = true;
+  try {
+    await tokenStore.post(
+      `/api/vehicles/${id}/service-entries`,
+      newServiceEntry.value as any,
+    );
+    createServiceEntryModal.value = false;
+    resetServiceEntryForm();
+    await refresh();
+    useNotifications().addNotification({
+      level: "success",
+      text: $t("vehicle_service_entry_created"),
+    });
+  } catch {
+    useNotifications().addNotification({
+      level: "error",
+      text: $t("vehicle_service_entry_create_error"),
+    });
+  } finally {
+    loading.value = false;
   }
+};
 
-  return new Intl.DateTimeFormat(locale.value, {
-    dateStyle: "medium",
-  }).format(new Date(vehicle.value.createdAt));
-});
-
-const updatedAtLabel = computed(() => {
-  if (!vehicle.value?.updatedAt) {
-    return "—";
+const deleteFuelEntry = async (entryId: number) => {
+  loading.value = true;
+  try {
+    await tokenStore.del(`/api/vehicles/${id}/fuel-entries/${entryId}`);
+    await refresh();
+  } finally {
+    loading.value = false;
   }
+};
 
-  return new Intl.DateTimeFormat(locale.value, {
-    dateStyle: "medium",
-  }).format(new Date(vehicle.value.updatedAt));
+const deleteServiceEntry = async (entryId: number) => {
+  loading.value = true;
+  try {
+    await tokenStore.del(`/api/vehicles/${id}/service-entries/${entryId}`);
+    await refresh();
+  } finally {
+    loading.value = false;
+  }
+};
+
+const { t } = useI18n();
+
+const tabOptions = computed(() => {
+  return [
+    t("vehicle_fuel_entries"),
+    t("vehicle_service_entries"),
+    t("vehicle_tab_transactions"),
+    t("vehicle_tab_details"),
+  ];
 });
 
 const vehicleIcon = computed(
@@ -277,31 +370,5 @@ definePageMeta({
   i {
     font-size: 3rem;
   }
-}
-
-.vehicle-info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.info-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.25rem;
-}
-
-.info-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.65;
-}
-
-.info-value {
-  font-size: 1rem;
-  font-weight: 500;
 }
 </style>

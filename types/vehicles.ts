@@ -62,6 +62,58 @@ const TransactionWithIncludesSchema = z.object({
   tags: z.array(EmbeddedTagSchema),
 });
 
+const EmbeddedTransactionSummarySchema = z.object({
+  id: z.number().int(),
+  transactedAt: z.coerce.date().nullable(),
+  description: z.string(),
+  amount: z.number(),
+  currency: z.string(),
+});
+
+const PreviousFullTankEntrySchema = z
+  .object({
+    id: z.number().int(),
+    fueledAt: z.coerce.date(),
+    odometer: z.number(),
+    isFullTank: z.boolean(),
+  })
+  .nullable();
+
+export const VehicleServiceTypeSchema = z.enum([
+  "REGULAR_MAINTENANCE",
+  "DEFECT",
+]);
+
+export const VehicleFuelEntrySchema = z.object({
+  id: z.number().int(),
+  fueledAt: z.coerce.date(),
+  odometer: z.number(),
+  fuelAmount: z.number(),
+  unitPrice: z.number(),
+  isFullTank: z.boolean(),
+  vehicleId: z.number().int(),
+  transactionId: z.number().int(),
+  previousFullTankFuelEntryId: z.number().int().nullable(),
+  previousFullTankFuelEntry: PreviousFullTankEntrySchema,
+  transaction: EmbeddedTransactionSummarySchema,
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const VehicleServiceEntrySchema = z.object({
+  id: z.number().int(),
+  type: VehicleServiceTypeSchema,
+  odometer: z.number().nullable(),
+  title: z.string(),
+  servicedAt: z.coerce.date(),
+  description: z.string().nullable(),
+  vehicleId: z.number().int(),
+  transactionId: z.number().int(),
+  transaction: EmbeddedTransactionSummarySchema,
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
 export const VehicleSchema = z.object({
   id: z.number().int(),
   vin: z.string(),
@@ -87,6 +139,8 @@ export const VehicleSchema = z.object({
 export const VehicleDetailSchema = VehicleSchema.extend({
   transactions: z.array(TransactionWithIncludesSchema),
   linkedCategory: EmbeddedCategorySchema,
+  fuelEntries: z.array(VehicleFuelEntrySchema),
+  serviceEntries: z.array(VehicleServiceEntrySchema),
 });
 
 export const VehicleCreateSchema = z.object({
@@ -110,7 +164,61 @@ export const VehicleCreateSchema = z.object({
 
 export const VehicleUpdateSchema = VehicleCreateSchema.partial();
 
+export const VehicleFuelEntryCreateSchema = z.object({
+  fueledAt: z.coerce.date(),
+  odometer: z.coerce.number().nonnegative(),
+  fuelAmount: z.coerce.number().positive(),
+  unitPrice: z.coerce.number().nonnegative(),
+  isFullTank: z.boolean(),
+  previousFullTankFuelEntryId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .nullable()
+    .optional(),
+});
+
+export const VehicleFuelEntryUpdateSchema =
+  VehicleFuelEntryCreateSchema.partial();
+
+export const VehicleServiceEntryCreateSchema = z.object({
+  type: VehicleServiceTypeSchema,
+  odometer: z.coerce.number().nonnegative().nullable().optional(),
+  title: z.string().min(1, "Title is required"),
+  servicedAt: z.coerce.date(),
+  description: z.string().nullable().optional(),
+});
+
+export const VehicleServiceEntryUpdateSchema =
+  VehicleServiceEntryCreateSchema.partial();
+
+export const VehicleScopedParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
+export const VehicleEntryParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+  entryId: z.coerce.number().int().positive(),
+});
+
 export type Vehicle = z.infer<typeof VehicleSchema>;
 export type VehicleDetail = z.infer<typeof VehicleDetailSchema>;
 export type VehicleCreate = z.infer<typeof VehicleCreateSchema>;
 export type VehicleUpdate = z.infer<typeof VehicleUpdateSchema>;
+export type VehicleServiceType = z.infer<typeof VehicleServiceTypeSchema>;
+export type VehicleFuelEntry = z.infer<typeof VehicleFuelEntrySchema>;
+export type VehicleServiceEntry = z.infer<typeof VehicleServiceEntrySchema>;
+export type VehicleFuelEntryCreate = z.infer<
+  typeof VehicleFuelEntryCreateSchema
+>;
+export type VehicleFuelEntryUpdate = z.infer<
+  typeof VehicleFuelEntryUpdateSchema
+>;
+export type VehicleServiceEntryCreate = z.infer<
+  typeof VehicleServiceEntryCreateSchema
+>;
+export type VehicleServiceEntryUpdate = z.infer<
+  typeof VehicleServiceEntryUpdateSchema
+>;
+export type VehicleScopedParams = z.infer<typeof VehicleScopedParamsSchema>;
+export type VehicleEntryParams = z.infer<typeof VehicleEntryParamsSchema>;

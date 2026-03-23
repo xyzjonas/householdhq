@@ -13,8 +13,6 @@
           </p>
         </div>
       </div>
-
-      <ui-pin :text="settings?.currency || 'USD'" size="small" />
     </section>
 
     <section v-if="settings" class="settings-grid">
@@ -51,6 +49,20 @@
           <ui-pin :text="settings.currency" size="small" />
         </div>
       </div>
+
+      <div class="card row settings-card">
+        <div class="row-label">
+          <p>{{ $t("settings_default_fuel_title") }}</p>
+          <p class="desc">{{ $t("settings_default_fuel_title_desc") }}</p>
+          <small>{{ $t("settings_default_fuel_title_hint") }}</small>
+        </div>
+
+        <form-editable-field
+          :value="settings.defaultFuelTransactionTitle"
+          keyName="defaultFuelTransactionTitle"
+          @send="updateDefaultFuelTransactionTitle"
+        />
+      </div>
     </section>
 
     <section v-else class="card min-h-sm flex items-center justify-center">
@@ -66,8 +78,14 @@
 </template>
 
 <script setup lang="ts">
-const { settings, isLoading, error, fetchSettings, setCurrency } =
-  useAppSettings();
+const {
+  settings,
+  isLoading,
+  error,
+  fetchSettings,
+  setCurrency,
+  setDefaultFuelTransactionTitle,
+} = useAppSettings();
 
 await fetchSettings();
 
@@ -80,6 +98,29 @@ const updateCurrency = async (data: { currency?: string }) => {
 
   try {
     await setCurrency(currency);
+    useNotifications().addNotification({
+      level: "success",
+      text: $t("settings_saved"),
+    });
+  } catch {
+    useNotifications().addNotification({
+      level: "error",
+      text: $t("settings_save_error"),
+    });
+  }
+};
+
+const updateDefaultFuelTransactionTitle = async (data: {
+  defaultFuelTransactionTitle?: string;
+}) => {
+  const defaultFuelTransactionTitle = data.defaultFuelTransactionTitle?.trim();
+
+  if (!defaultFuelTransactionTitle) {
+    return;
+  }
+
+  try {
+    await setDefaultFuelTransactionTitle(defaultFuelTransactionTitle);
     useNotifications().addNotification({
       level: "success",
       text: $t("settings_saved"),
