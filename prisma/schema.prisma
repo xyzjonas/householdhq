@@ -24,6 +24,7 @@ model Category {
   color       String?
 
   transactions Transaction[]
+  vehicle      Vehicle?
 
   @@map("category")
 }
@@ -172,8 +173,12 @@ model Vehicle {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
+  categoryId Int?      @unique
+  category   Category? @relation(fields: [categoryId], references: [id])
+
   transactions Transaction[]
 
+  @@index([categoryId])
   @@map("vehicle")
 }
 

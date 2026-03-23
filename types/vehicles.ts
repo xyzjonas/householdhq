@@ -1,9 +1,47 @@
 import { z } from "zod";
 
-const TransactionMinimalSchema = z.object({
+const EmbeddedSourceSchema = z.object({
   id: z.number().int(),
-  created: z.date(),
-  transactedAt: z.date().nullable(),
+  name: z.string(),
+  color: z.string().nullable(),
+  type: z.string(),
+  isOut: z.boolean(),
+  isDisponible: z.boolean(),
+  isPortfolio: z.boolean(),
+  position: z.number(),
+});
+
+const EmbeddedCategorySchema = z
+  .object({
+    id: z.number().int(),
+    name: z.string(),
+    description: z.string().nullable(),
+    icon: z.string().nullable(),
+    color: z.string().nullable(),
+  })
+  .nullable();
+
+const EmbeddedProjectSchema = z
+  .object({
+    id: z.number().int(),
+    name: z.string(),
+    color: z.string().nullable(),
+    description: z.string().nullable(),
+    isCompleted: z.boolean(),
+  })
+  .nullable();
+
+const EmbeddedTagSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  color: z.string().nullable(),
+  icon: z.string().nullable(),
+});
+
+const TransactionWithIncludesSchema = z.object({
+  id: z.number().int(),
+  created: z.coerce.date(),
+  transactedAt: z.coerce.date().nullable(),
   description: z.string(),
   amount: z.number(),
   currency: z.string(),
@@ -13,10 +51,15 @@ const TransactionMinimalSchema = z.object({
   isImportant: z.boolean(),
   isHidden: z.boolean(),
   categoryId: z.number().int().nullable(),
+  category: EmbeddedCategorySchema,
   sourceId: z.number().int(),
+  source: EmbeddedSourceSchema,
   projectId: z.number().int().nullable(),
+  project: EmbeddedProjectSchema,
   targetId: z.number().int(),
+  target: EmbeddedSourceSchema,
   vehicleId: z.number().int().nullable(),
+  tags: z.array(EmbeddedTagSchema),
 });
 
 export const VehicleSchema = z.object({
@@ -38,10 +81,12 @@ export const VehicleSchema = z.object({
   dateFirstRegistered: z.date().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  categoryId: z.number().int().nullable().optional(),
 });
 
 export const VehicleDetailSchema = VehicleSchema.extend({
-  transactions: z.array(TransactionMinimalSchema),
+  transactions: z.array(TransactionWithIncludesSchema),
+  linkedCategory: EmbeddedCategorySchema,
 });
 
 export const VehicleCreateSchema = z.object({
@@ -60,6 +105,7 @@ export const VehicleCreateSchema = z.object({
   maxPower: z.coerce.number().nullable().optional(),
   dateOfFabrication: z.coerce.date().nullable().optional(),
   dateFirstRegistered: z.coerce.date().nullable().optional(),
+  categoryId: z.coerce.number().int().nullable().optional(),
 });
 
 export const VehicleUpdateSchema = VehicleCreateSchema.partial();

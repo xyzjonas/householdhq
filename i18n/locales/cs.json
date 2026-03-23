@@ -156,6 +156,7 @@
   "vehicle_icon": "Ikona vozidla",
   "vehicle_purchase_price": "Nákupní cena",
   "vehicle_purchased_at": "Pořízeno",
+  "vehicle_category": "Propojená kategorie",
   "vehicle_created_at": "Vytvořeno",
   "vehicle_updated_at": "Poslední úprava",
   "vehicle_none_title": "Zatím žádná vozidla",

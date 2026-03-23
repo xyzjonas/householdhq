@@ -33,6 +33,20 @@
       v-model="purchasedAtString"
     />
 
+    <ui-select
+      v-model.number="vehicle.categoryId"
+      :label="$t('vehicle_category')"
+    >
+      <option :value="null">—</option>
+      <option
+        v-for="category in categories"
+        :key="category.id"
+        :value="category.id"
+      >
+        {{ category.name }}
+      </option>
+    </ui-select>
+
     <div class="icon-picker-wrap">
       <div class="icon-picker-label">{{ $t("vehicle_icon") }}</div>
       <div class="icon-picker">
@@ -65,6 +79,12 @@
 
 <script setup lang="ts">
 import type { VehicleCreate, VehicleUpdate } from "~/types";
+import { useCategoriesStore } from "@/stores/categories";
+import { storeToRefs } from "pinia";
+
+const categoriesStore = useCategoriesStore();
+const { categories } = storeToRefs(categoriesStore);
+onMounted(() => categoriesStore.fetchCategories());
 
 const props = withDefaults(
   defineProps<{

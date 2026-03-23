@@ -156,6 +156,7 @@
   "vehicle_icon": "Vehicle Icon",
   "vehicle_purchase_price": "Purchase Price",
   "vehicle_purchased_at": "Purchased at",
+  "vehicle_category": "Linked Category",
   "vehicle_created_at": "Created at",
   "vehicle_updated_at": "Last Updated",
   "vehicle_none_title": "No vehicles yet",

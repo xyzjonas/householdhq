@@ -1,5 +1,11 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import type { IDBase, Vehicle, VehicleDetail, VehicleCreate, VehicleUpdate } from "~/types";
+import type {
+  IDBase,
+  Vehicle,
+  VehicleDetail,
+  VehicleCreate,
+  VehicleUpdate,
+} from "~/types";
 import { prisma } from "./prisma-client";
 
 class VehiclesService {
@@ -17,7 +23,22 @@ class VehiclesService {
   public async findSingleVehicle(data: IDBase): Promise<VehicleDetail> {
     const vehicle = await this.vehicles.findUnique({
       where: { id: data.id },
-      include: { transactions: true },
+      include: {
+        category: {
+          include: {
+            transactions: {
+              include: {
+                source: true,
+                target: true,
+                category: true,
+                project: true,
+                tags: true,
+              },
+              orderBy: { transactedAt: "desc" },
+            },
+          },
+        },
+      },
     });
     if (!vehicle) {
       throw createError({
@@ -25,7 +46,20 @@ class VehiclesService {
         statusMessage: `Vehicle '${data.id}' not found.`,
       });
     }
-    return vehicle;
+    const { category, ...rest } = vehicle;
+    return {
+      ...rest,
+      linkedCategory: category
+        ? {
+            id: category.id,
+            name: category.name,
+            description: category.description,
+            icon: category.icon,
+            color: category.color,
+          }
+        : null,
+      transactions: category?.transactions ?? [],
+    };
   }
 
   public async deleteVehicle(vehicleData: IDBase): Promise<Vehicle> {

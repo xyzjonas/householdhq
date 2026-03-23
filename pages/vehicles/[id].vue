@@ -82,6 +82,11 @@
         <span class="info-value">{{ purchasedAtLabel }}</span>
       </div>
 
+      <div v-if="vehicle.linkedCategory" class="card info-card">
+        <span class="info-label">{{ $t("vehicle_category") }}</span>
+        <category-badge :category="vehicle.linkedCategory as any" />
+      </div>
+
       <div class="card info-card">
         <span class="info-label">{{ $t("vehicle_created_at") }}</span>
         <span class="info-value">{{ createdAtLabel }}</span>
@@ -91,6 +96,12 @@
         <span class="info-label">{{ $t("vehicle_updated_at") }}</span>
         <span class="info-value">{{ updatedAtLabel }}</span>
       </div>
+    </section>
+
+    <section v-if="vehicle.transactions?.length" class="mt-6">
+      <transaction-monthly-listing
+        :transactions="vehicle.transactions as any"
+      />
     </section>
 
     <client-only>
@@ -113,13 +124,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Vehicle, VehicleUpdate } from "~/types";
+import type { VehicleDetail, VehicleUpdate } from "~/types";
 import { useRoute, navigateTo } from "#app";
 
 const route = useRoute();
 const id = parseInt(route.params.id as string);
 
-const { data: vehicleData, refresh } = await useFetch<{ data: Vehicle }>(
+const { data: vehicleData, refresh } = await useFetch<{ data: VehicleDetail }>(
   `/api/vehicles/${id}`,
 );
 
@@ -142,6 +153,7 @@ const openEditVehicleModal = () => {
       color: vehicle.value.color,
       purchasePrice: vehicle.value.purchasePrice,
       purchasedAt: vehicle.value.purchasedAt,
+      categoryId: vehicle.value.categoryId ?? undefined,
     };
   }
   editVehicleModal.value = true;
