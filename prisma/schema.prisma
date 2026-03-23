@@ -24,7 +24,8 @@ model Category {
   color       String?
 
   transactions Transaction[]
-  vehicle      Vehicle?
+  vehicle      Vehicle? @relation("VehicleCategory")
+  fuelVehicle  Vehicle? @relation("VehicleFuelCategory")
 
   @@map("category")
 }
@@ -176,14 +177,17 @@ model Vehicle {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  categoryId Int?      @unique
-  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId     Int?      @unique
+  category       Category? @relation("VehicleCategory", fields: [categoryId], references: [id])
+  fuelCategoryId Int?      @unique
+  fuelCategory   Category? @relation("VehicleFuelCategory", fields: [fuelCategoryId], references: [id])
 
   transactions   Transaction[]
   fuelEntries    VehicleFuelEntry[]
   serviceEntries VehicleServiceEntry[]
 
   @@index([categoryId])
+  @@index([fuelCategoryId])
   @@map("vehicle")
 }
 

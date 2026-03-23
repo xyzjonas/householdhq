@@ -1,7 +1,7 @@
 <template>
   <transition name="page" mode="out-in">
     <div
-      v-show="modelValue"
+      v-if="modelValue"
       class="modal-wrapper"
       @click.self="modelValue = false"
     >

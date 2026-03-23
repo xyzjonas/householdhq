@@ -4,18 +4,44 @@
       v-for="(option, index) in options"
       @click="onClick(index)"
       :class="`bar-item ${modelValue === index ? 'active' : ''}`"
-      >{{ option }}</a
     >
+      <slot
+        name="option"
+        :option="option"
+        :index="index"
+        :active="modelValue === index"
+      >
+        {{ getOptionLabel(option) }}
+      </slot>
+    </a>
   </div>
 </template>
 
 <script setup lang="ts">
+type ToggleBarOption = string | { label: string; [key: string]: unknown };
+
 const props = defineProps<{
-  options: string[];
+  options: ToggleBarOption[];
   itemWidth?: string;
   disabled?: boolean;
 }>();
-const modelValue = defineModel();
+const modelValue = defineModel<number>();
+
+defineSlots<{
+  option(props: {
+    option: ToggleBarOption;
+    index: number;
+    active: boolean;
+  }): any;
+}>();
+
+const getOptionLabel = (option: ToggleBarOption) => {
+  if (typeof option === "string") {
+    return option;
+  }
+
+  return option.label;
+};
 
 const onClick = (index: number) => {
   if (!props.disabled) {

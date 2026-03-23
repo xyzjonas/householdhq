@@ -48,8 +48,7 @@ const { data, refresh } = await useFetch<{ data: Vehicle[] }>(`/api/vehicles`);
 
 const sortedVehicles = computed(() =>
   [...(data.value?.data ?? [])].sort(
-    (a, b) =>
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   ),
 );
 
@@ -66,6 +65,14 @@ const createDefaultVehicle = (): VehicleCreate => ({
   color: "#4f46e5",
   purchasePrice: undefined,
   purchasedAt: undefined,
+  mass: undefined,
+  engineSize: undefined,
+  fuelType: undefined,
+  maxPower: undefined,
+  dateOfFabrication: undefined,
+  dateFirstRegistered: undefined,
+  categoryId: undefined,
+  fuelCategoryId: undefined,
 });
 
 const newVehicle = ref<VehicleCreate>(createDefaultVehicle());

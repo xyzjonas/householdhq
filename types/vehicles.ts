@@ -134,11 +134,13 @@ export const VehicleSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   categoryId: z.number().int().nullable().optional(),
+  fuelCategoryId: z.number().int().nullable().optional(),
 });
 
 export const VehicleDetailSchema = VehicleSchema.extend({
   transactions: z.array(TransactionWithIncludesSchema),
   linkedCategory: EmbeddedCategorySchema,
+  linkedFuelCategory: EmbeddedCategorySchema,
   fuelEntries: z.array(VehicleFuelEntrySchema),
   serviceEntries: z.array(VehicleServiceEntrySchema),
 });
@@ -160,6 +162,7 @@ export const VehicleCreateSchema = z.object({
   dateOfFabrication: z.coerce.date().nullable().optional(),
   dateFirstRegistered: z.coerce.date().nullable().optional(),
   categoryId: z.coerce.number().int().nullable().optional(),
+  fuelCategoryId: z.coerce.number().int().nullable().optional(),
 });
 
 export const VehicleUpdateSchema = VehicleCreateSchema.partial();

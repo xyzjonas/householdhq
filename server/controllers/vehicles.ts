@@ -38,6 +38,7 @@ class VehiclesService {
             },
           },
         },
+        fuelCategory: true,
         fuelEntries: {
           include: {
             transaction: {
@@ -82,7 +83,7 @@ class VehiclesService {
         statusMessage: `Vehicle '${data.id}' not found.`,
       });
     }
-    const { category, ...rest } = vehicle;
+    const { category, fuelCategory, ...rest } = vehicle;
     return {
       ...rest,
       linkedCategory: category
@@ -92,6 +93,15 @@ class VehiclesService {
             description: category.description,
             icon: category.icon,
             color: category.color,
+          }
+        : null,
+      linkedFuelCategory: fuelCategory
+        ? {
+            id: fuelCategory.id,
+            name: fuelCategory.name,
+            description: fuelCategory.description,
+            icon: fuelCategory.icon,
+            color: fuelCategory.color,
           }
         : null,
       transactions: category?.transactions ?? [],

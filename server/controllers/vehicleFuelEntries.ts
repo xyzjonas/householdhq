@@ -192,9 +192,9 @@ class VehicleFuelEntriesService {
 
     const [settings, vehicleData, route] = await Promise.all([
       getSettings(),
-      this.vehicles.findUnique({
+      (this.vehicles as any).findUnique({
         where: { id: vehicleId },
-        select: { categoryId: true },
+        select: { fuelCategoryId: true },
       }),
       this.resolveDefaultTransactionRoute(),
     ]);
@@ -219,8 +219,8 @@ class VehicleFuelEntriesService {
             confirmed: payload.fueledAt <= new Date(),
             source: { connect: { id: route.sourceId } },
             target: { connect: { id: route.targetId } },
-            ...(vehicleData?.categoryId
-              ? { category: { connect: { id: vehicleData.categoryId } } }
+            ...(vehicleData?.fuelCategoryId
+              ? { category: { connect: { id: vehicleData.fuelCategoryId } } }
               : {}),
           },
         });

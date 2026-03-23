@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center gap-4 entry">
     <div class="flex flex-col min-w-0">
-      <strong>
-        {{ entry.title }} · {{ formatDateTime(entry.servicedAt) }}
+      <strong class="capitalize">
+        {{ entry.title }}
       </strong>
       <span class="text-sm text-[var(--text-200)]">
         {{
@@ -17,6 +17,9 @@
         class="text-xs text-[var(--text-200)] truncate max-w-100"
       >
         {{ entry.description }}
+      </span>
+      <span class="text-xs text-[var(--text-200)] text-gray-5 mt-2">
+        {{ formatDateTime(entry.servicedAt) }}
       </span>
     </div>
 

@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 gap-2 w-full sm:w-fit">
         <ui-button
           outlined
           icon="i-ic-baseline-local-gas-station"
@@ -55,8 +55,14 @@
       </div>
     </section>
 
-    <section class="mb-5">
-      <ui-toggle-bar v-model="activeTab" :options="tabOptions" />
+    <section
+      class="mb-5 self-center w-full flex justify-center sm:justify-start"
+    >
+      <ui-toggle-bar v-model="activeTab" :options="tabOptions">
+        <template #option="{ option }">
+          <i :class="option" class="text-lg w-8" />
+        </template>
+      </ui-toggle-bar>
     </section>
 
     <vehicle-fuel-listing-tab
@@ -199,7 +205,14 @@ const openEditVehicleModal = () => {
       color: vehicle.value.color,
       purchasePrice: vehicle.value.purchasePrice,
       purchasedAt: vehicle.value.purchasedAt,
+      mass: vehicle.value.mass,
+      engineSize: vehicle.value.engineSize,
+      fuelType: vehicle.value.fuelType,
+      maxPower: vehicle.value.maxPower,
+      dateOfFabrication: vehicle.value.dateOfFabrication,
+      dateFirstRegistered: vehicle.value.dateFirstRegistered,
       categoryId: vehicle.value.categoryId ?? undefined,
+      fuelCategoryId: vehicle.value.fuelCategoryId ?? undefined,
     };
   }
   editVehicleModal.value = true;
@@ -326,10 +339,10 @@ const { t } = useI18n();
 
 const tabOptions = computed(() => {
   return [
-    t("vehicle_fuel_entries"),
-    t("vehicle_service_entries"),
-    t("vehicle_tab_transactions"),
-    t("vehicle_tab_details"),
+    "i-ic-baseline-local-gas-station",
+    "i-ic-baseline-build",
+    "i-ic-baseline-receipt",
+    "i-ic-baseline-settings",
   ];
 });
 

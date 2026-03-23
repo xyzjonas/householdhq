@@ -11,9 +11,15 @@
       <div class="min-w-0 flex flex-col gap-1">
         <div class="flex flex-col">
           <span class="vehicle-name line-height-snug">{{ vehicle.name }}</span>
-          <span class="text-[11px]">{{
-            `${vehicle.brand} ${vehicle.model}`
-          }}</span>
+          <span class="text-[11px]">
+            <span>{{ `${vehicle.brand} ${vehicle.model}` }}</span>
+            <span v-if="vehicle.dateOfFabrication" class="text-gray-5 mx-2"
+              >|</span
+            >
+            <strong v-if="vehicle.dateOfFabrication">{{
+              new Date(vehicle.dateOfFabrication).getFullYear()
+            }}</strong>
+          </span>
         </div>
         <div class="flex flex-col flex-wrap text-sm text-[var(--text-200)]">
           <div class="flex gap-2 flex-wrap">
@@ -32,9 +38,13 @@
     </div>
 
     <div class="flex items-center gap-3 shrink-0">
-      <div v-if="vehicle.purchasePrice" class="text-right hidden sm:block">
+      <div v-if="vehicle.purchasePrice" class="hidden sm:block">
         <div class="vehicle-label">{{ $t("vehicle_purchase_price") }}</div>
-        <ui-price :amount="vehicle.purchasePrice" size="1rem" />
+        <ui-price
+          :amount="vehicle.purchasePrice"
+          size="1.4rem"
+          class="ml-auto w-fit"
+        />
       </div>
       <i class="i-ic-baseline-chevron-right text-xl opacity-50"></i>
     </div>
