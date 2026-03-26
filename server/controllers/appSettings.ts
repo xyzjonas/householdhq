@@ -20,7 +20,6 @@ export const getSettings = async (): Promise<AppSetting> => {
       data: {
         id: SETTINGS_ID,
         currency: 'USD',
-        defaultFuelTransactionTitle: 'Fuel',
       },
     });
   }

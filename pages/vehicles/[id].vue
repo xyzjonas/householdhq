@@ -68,6 +68,7 @@
     <vehicle-fuel-listing-tab
       v-if="activeTab === 0"
       :vehicle="vehicle"
+      @edit-entry="openEditFuelEntryModal"
       @delete-entry="deleteFuelEntry"
     />
 
@@ -94,6 +95,17 @@
             :full-tank-entries="fullTankEntries"
             @submit="createFuelEntry"
             @close="createFuelEntryModal = false"
+          />
+        </ui-modal>
+
+        <ui-modal v-model="editFuelEntryModal">
+          <vehicle-fuel-entry-form
+            v-model="editableFuelEntry"
+            :loading="loading"
+            :title="$t('edit')"
+            :full-tank-entries="fullTankEntriesForEdit"
+            @submit="editFuelEntry"
+            @close="editFuelEntryModal = false"
           />
         </ui-modal>
 
@@ -129,6 +141,7 @@
 import type {
   VehicleDetail,
   VehicleFuelEntryCreate,
+  VehicleFuelEntryUpdate,
   VehicleServiceEntryCreate,
   VehicleUpdate,
 } from "~/types";
@@ -145,13 +158,24 @@ const vehicle = computed(() => vehicleData.value?.data);
 
 const editVehicleModal = ref(false);
 const createFuelEntryModal = ref(false);
+const editFuelEntryModal = ref(false);
 const createServiceEntryModal = ref(false);
 const activeTab = ref(0);
 const loading = ref(false);
 const tokenStore = useTokenStore();
+const editableFuelEntryId = ref<number | null>(null);
 
 const editableVehicle = ref<VehicleUpdate>({});
 const newFuelEntry = ref<VehicleFuelEntryCreate>({
+  fueledAt: new Date(),
+  odometer: 0,
+  fuelAmount: 0,
+  unitPrice: 0,
+  isFullTank: true,
+  previousFullTankFuelEntryId: undefined,
+});
+
+const editableFuelEntry = ref<VehicleFuelEntryCreate>({
   fueledAt: new Date(),
   odometer: 0,
   fuelAmount: 0,
@@ -170,6 +194,12 @@ const newServiceEntry = ref<VehicleServiceEntryCreate>({
 
 const fullTankEntries = computed(() => {
   return (vehicle.value?.fuelEntries ?? []).filter((entry) => entry.isFullTank);
+});
+
+const fullTankEntriesForEdit = computed(() => {
+  return fullTankEntries.value.filter(
+    (entry) => entry.id !== editableFuelEntryId.value,
+  );
 });
 
 const resetFuelEntryForm = () => {
@@ -208,6 +238,8 @@ const openEditVehicleModal = () => {
       mass: vehicle.value.mass,
       engineSize: vehicle.value.engineSize,
       fuelType: vehicle.value.fuelType,
+      defaultFuelTransactionTitle:
+        vehicle.value.defaultFuelTransactionTitle || "Fuel",
       maxPower: vehicle.value.maxPower,
       dateOfFabrication: vehicle.value.dateOfFabrication,
       dateFirstRegistered: vehicle.value.dateFirstRegistered,
@@ -216,6 +248,27 @@ const openEditVehicleModal = () => {
     };
   }
   editVehicleModal.value = true;
+};
+
+const openEditFuelEntryModal = (entryId: number) => {
+  const entry = vehicle.value?.fuelEntries.find((fuelEntry) => {
+    return fuelEntry.id === entryId;
+  });
+
+  if (!entry) {
+    return;
+  }
+
+  editableFuelEntryId.value = entry.id;
+  editableFuelEntry.value = {
+    fueledAt: new Date(entry.fueledAt),
+    odometer: entry.odometer,
+    fuelAmount: entry.fuelAmount,
+    unitPrice: entry.unitPrice,
+    isFullTank: entry.isFullTank,
+    previousFullTankFuelEntryId: entry.previousFullTankFuelEntryId,
+  };
+  editFuelEntryModal.value = true;
 };
 
 const editVehicle = async () => {
@@ -285,6 +338,34 @@ const createFuelEntry = async () => {
     useNotifications().addNotification({
       level: "error",
       text: $t("vehicle_fuel_entry_create_error"),
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+const editFuelEntry = async () => {
+  if (!editableFuelEntryId.value) {
+    return;
+  }
+
+  loading.value = true;
+  try {
+    await tokenStore.patch(
+      `/api/vehicles/${id}/fuel-entries/${editableFuelEntryId.value}`,
+      editableFuelEntry.value as VehicleFuelEntryUpdate,
+    );
+    editFuelEntryModal.value = false;
+    editableFuelEntryId.value = null;
+    await refresh();
+    useNotifications().addNotification({
+      level: "success",
+      text: $t("vehicle_fuel_entry_updated"),
+    });
+  } catch {
+    useNotifications().addNotification({
+      level: "error",
+      text: $t("vehicle_fuel_entry_update_error"),
     });
   } finally {
     loading.value = false;

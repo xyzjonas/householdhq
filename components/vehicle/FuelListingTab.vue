@@ -11,7 +11,11 @@
       :color="vehicle.color ?? 'var(--primary-100)'"
     >
       <template #item="{ item: entry }">
-        <vehicle-fuel-listing-entry :entry="entry" />
+        <vehicle-fuel-listing-entry
+          :entry="entry"
+          @edit-entry="$emit('edit-entry', $event)"
+          @delete-entry="$emit('delete-entry', $event)"
+        />
       </template>
     </ui-timeline>
 
@@ -32,6 +36,7 @@ defineProps<{
 }>();
 
 defineEmits<{
+  (e: "edit-entry", entryId: number): void;
   (e: "delete-entry", entryId: number): void;
 }>();
 </script>

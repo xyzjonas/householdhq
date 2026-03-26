@@ -35,6 +35,16 @@
       >
         {{ entry.transaction.description }}
       </nuxt-link>
+
+      <div class="flex justify-end gap-2 mt-2">
+        <ui-button
+          outlined
+          icon="i-ic-baseline-edit"
+          @click="$emit('edit-entry', entry.id)"
+        >
+          {{ $t("edit") }}
+        </ui-button>
+      </div>
     </div>
   </div>
 </template>
@@ -44,6 +54,10 @@ import type { VehicleDetail } from "~/types";
 
 const props = defineProps<{
   entry: VehicleDetail["fuelEntries"][number];
+}>();
+
+defineEmits<{
+  (e: "edit-entry", entryId: number): void;
 }>();
 
 const { locale } = useI18n();

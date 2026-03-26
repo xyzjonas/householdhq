@@ -194,13 +194,16 @@ class VehicleFuelEntriesService {
       getSettings(),
       (this.vehicles as any).findUnique({
         where: { id: vehicleId },
-        select: { fuelCategoryId: true },
+        select: {
+          fuelCategoryId: true,
+          defaultFuelTransactionTitle: true,
+        },
       }),
       this.resolveDefaultTransactionRoute(),
     ]);
 
     const transactionTitle =
-      settings.defaultFuelTransactionTitle?.trim() || "Fuel";
+      vehicleData?.defaultFuelTransactionTitle?.trim() || "Fuel";
 
     const previousFullTankFuelEntryId = await this.resolvePreviousFullTank(
       vehicleId,
@@ -301,31 +304,62 @@ class VehicleFuelEntriesService {
       entryId,
     );
 
-    return (await this.entries.update({
+    const effectiveValues = await this.entries.findUnique({
       where: { id: entryId },
-      data: {
-        ...payload,
-        previousFullTankFuelEntryId: effectivePreviousId,
+      select: {
+        fueledAt: true,
+        fuelAmount: true,
+        unitPrice: true,
       },
-      include: {
-        transaction: {
-          select: {
-            id: true,
-            transactedAt: true,
-            description: true,
-            amount: true,
-            currency: true,
+    });
+
+    if (!effectiveValues) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Fuel entry '${entryId}' not found for vehicle '${vehicleId}'.`,
+      });
+    }
+
+    const nextFueledAt = payload.fueledAt ?? effectiveValues.fueledAt;
+    const nextFuelAmount = payload.fuelAmount ?? effectiveValues.fuelAmount;
+    const nextUnitPrice = payload.unitPrice ?? effectiveValues.unitPrice;
+
+    return (await prisma.$transaction(async (tx) => {
+      await tx.transaction.update({
+        where: { id: current.transactionId },
+        data: {
+          transactedAt: nextFueledAt,
+          amount: nextFuelAmount * nextUnitPrice,
+          confirmed: nextFueledAt <= new Date(),
+        },
+      });
+
+      return await (tx as any).vehicleFuelEntry.update({
+        where: { id: entryId },
+        data: {
+          ...payload,
+          previousFullTankFuelEntryId: effectivePreviousId,
+        },
+        include: {
+          transaction: {
+            select: {
+              id: true,
+              transactedAt: true,
+              description: true,
+              amount: true,
+              currency: true,
+            },
+          },
+          previousFullTankFuelEntry: {
+            select: {
+              id: true,
+              fueledAt: true,
+              odometer: true,
+              isFullTank: true,
+            },
           },
         },
-        previousFullTankFuelEntry: {
-          select: {
-            id: true,
-            fueledAt: true,
-            odometer: true,
-            isFullTank: true,
-          },
-        },
-      },
+      });
     })) as unknown as VehicleFuelEntry;
   }
 

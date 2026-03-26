@@ -68,6 +68,7 @@ const createDefaultVehicle = (): VehicleCreate => ({
   mass: undefined,
   engineSize: undefined,
   fuelType: undefined,
+  defaultFuelTransactionTitle: "Fuel",
   maxPower: undefined,
   dateOfFabrication: undefined,
   dateFirstRegistered: undefined,

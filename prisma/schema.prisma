@@ -171,6 +171,7 @@ model Vehicle {
   mass                Float?
   engineSize          Float?
   fuelType            String?
+  defaultFuelTransactionTitle String    @default("Fuel")
   maxPower            Float?
   dateOfFabrication   DateTime?
   dateFirstRegistered DateTime?
@@ -249,11 +250,10 @@ model VehicleServiceEntry {
 }
 
 model AppSettings {
-  id                          Int      @id @default(1) // Singleton - always ID 1
-  currency                    String   @default("USD")
-  defaultFuelTransactionTitle String   @default("Fuel")
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  id        Int      @id @default(1) // Singleton - always ID 1
+  currency  String   @default("USD")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("app_settings")
 }

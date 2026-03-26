@@ -58,6 +58,16 @@
     </div>
 
     <div class="card info-card">
+      <span class="info-label">{{ $t("vehicle_default_fuel_transaction_title") }}</span>
+      <span
+        class="info-value"
+        :class="{ muted: !vehicle.defaultFuelTransactionTitle }"
+      >
+        {{ vehicle.defaultFuelTransactionTitle || emptyLabel }}
+      </span>
+    </div>
+
+    <div class="card info-card">
       <span class="info-label">{{ $t("vehicle_max_power") }}</span>
       <span class="info-value" :class="{ muted: vehicle.maxPower == null }">
         {{ formatNumber(vehicle.maxPower, "kW") }}

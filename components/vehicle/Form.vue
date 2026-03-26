@@ -58,6 +58,11 @@
       />
     </div>
 
+    <ui-input
+      :label="$t('vehicle_default_fuel_transaction_title')"
+      v-model="vehicle.defaultFuelTransactionTitle"
+    />
+
     <div class="grid grid-cols-2 gap-4 vehicle-form__grid">
       <ui-input
         :label="$t('vehicle_date_of_fabrication')"
@@ -162,6 +167,7 @@ const vehicle = defineModel<VehicleCreate | VehicleUpdate>({
     mass: undefined,
     engineSize: undefined,
     fuelType: undefined,
+    defaultFuelTransactionTitle: "Fuel",
     maxPower: undefined,
     dateOfFabrication: undefined,
     dateFirstRegistered: undefined,
@@ -276,7 +282,8 @@ const canSubmit = computed(
     !!vehicle.value?.vin?.trim() &&
     !!vehicle.value?.registration?.trim() &&
     !!vehicle.value?.brand?.trim() &&
-    !!vehicle.value?.model?.trim(),
+    !!vehicle.value?.model?.trim() &&
+    !!vehicle.value?.defaultFuelTransactionTitle?.trim(),
 );
 
 defineEmits(["submit", "close"]);
