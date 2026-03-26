@@ -28,6 +28,7 @@
         :size="'1.25rem'"
         :amount="entry.transaction.amount"
         :currency="entry.transaction.currency"
+        class="w-fit"
       />
       <nuxt-link
         :to="`/transactions/${entry.transactionId}`"

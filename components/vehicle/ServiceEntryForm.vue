@@ -34,16 +34,28 @@
       <textarea v-model="entry.description" rows="5" />
     </div>
 
-    <ui-button
-      :loading="loading"
-      :disabled="!canSubmit"
-      width="100%"
-      height="3rem"
-      type="submit"
-      color="primary"
-    >
-      {{ $t("t_send") }}
-    </ui-button>
+    <vehicle-component-selector v-model="entry.componentIds" />
+
+    <div class="flex gap-2">
+      <ui-button
+        :loading="loading"
+        :disabled="!canSubmit"
+        width="100%"
+        height="3rem"
+        type="submit"
+        color="primary"
+      >
+        {{ $t("t_send") }}
+      </ui-button>
+      <ui-button
+        v-if="entryId"
+        :loading="loading"
+        height="3rem"
+        icon="i-ic-baseline-delete"
+        outlined
+        @click="$emit('delete')"
+      />
+    </div>
   </form>
 </template>
 
@@ -54,6 +66,7 @@ const props = withDefaults(
   defineProps<{
     loading?: boolean;
     title: string;
+    entryId?: number;
   }>(),
   {
     loading: false,
@@ -67,6 +80,7 @@ const entry = defineModel<VehicleServiceEntryCreate>({
     title: "",
     servicedAt: new Date(),
     description: "",
+    componentIds: [],
   },
 });
 
@@ -100,7 +114,7 @@ const canSubmit = computed(() => {
   return !!entry.value.title?.trim();
 });
 
-defineEmits(["submit", "close"]);
+defineEmits(["submit", "close", "delete"]);
 </script>
 
 <style scoped>

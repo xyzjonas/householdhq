@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * App settings schema - singleton table with all settings as columns
  */
 export const AppSettingSchema = z.object({
   id: z.number(),
-  currency: z.string().default('USD'),
+  currency: z.string().default("USD"),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -15,9 +15,12 @@ export type AppSetting = z.infer<typeof AppSettingSchema>;
 /**
  * Create/Update app settings schema - partial fields
  */
-export const UpdateAppSettingSchema = z.object({
-  currency: z.string().optional(),
-}).strip().partial();
+export const UpdateAppSettingSchema = z
+  .object({
+    currency: z.string().optional(),
+  })
+  .strip()
+  .partial();
 
 export type UpdateAppSetting = z.infer<typeof UpdateAppSettingSchema>;
 
@@ -25,7 +28,7 @@ export type UpdateAppSetting = z.infer<typeof UpdateAppSettingSchema>;
  * Known settings - typed access to available settings
  */
 export const KnownSettingsSchema = z.object({
-  currency: z.string().default('USD'),
+  currency: z.string().default("USD"),
 });
 
 export type KnownSettings = z.infer<typeof KnownSettingsSchema>;

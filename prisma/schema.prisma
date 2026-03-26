@@ -24,8 +24,8 @@ model Category {
   color       String?
 
   transactions Transaction[]
-  vehicle      Vehicle? @relation("VehicleCategory")
-  fuelVehicle  Vehicle? @relation("VehicleFuelCategory")
+  vehicle      Vehicle?      @relation("VehicleCategory")
+  fuelVehicle  Vehicle?      @relation("VehicleFuelCategory")
 
   @@map("category")
 }
@@ -158,25 +158,25 @@ model MeterState {
 }
 
 model Vehicle {
-  id                  Int       @id @default(autoincrement())
-  vin                 String    @unique
-  registration        String    @unique
-  name                String
-  brand               String
-  model               String
-  color               String?
-  icon                String?
-  purchasePrice       Float?
-  purchasedAt         DateTime?
-  mass                Float?
-  engineSize          Float?
-  fuelType            String?
+  id                          Int       @id @default(autoincrement())
+  vin                         String    @unique
+  registration                String    @unique
+  name                        String
+  brand                       String
+  model                       String
+  color                       String?
+  icon                        String?
+  purchasePrice               Float?
+  purchasedAt                 DateTime?
+  mass                        Float?
+  engineSize                  Float?
+  fuelType                    String?
   defaultFuelTransactionTitle String    @default("Fuel")
-  maxPower            Float?
-  dateOfFabrication   DateTime?
-  dateFirstRegistered DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  maxPower                    Float?
+  dateOfFabrication           DateTime?
+  dateFirstRegistered         DateTime?
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
 
   categoryId     Int?      @unique
   category       Category? @relation("VehicleCategory", fields: [categoryId], references: [id])
@@ -239,6 +239,8 @@ model VehicleServiceEntry {
   transactionId Int
   transaction   Transaction @relation("ServiceEntryTransaction", fields: [transactionId], references: [id])
 
+  components VehicleComponent[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -247,6 +249,21 @@ model VehicleServiceEntry {
   @@index([servicedAt])
   @@index([type])
   @@map("vehicle_service_entry")
+}
+
+model VehicleComponent {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  icon        String?
+  color       String?
+  description String?
+
+  serviceEntries VehicleServiceEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("vehicle_component")
 }
 
 model AppSettings {

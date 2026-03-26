@@ -76,6 +76,10 @@ import {
   VehicleServiceTypeSchema,
   VehicleScopedParamsSchema,
   VehicleEntryParamsSchema,
+  VehicleComponentSchema,
+  VehicleComponentCreateSchema,
+  VehicleComponentUpdateSchema,
+  VehicleComponentIdSchema,
   type Vehicle,
   type VehicleDetail,
   type VehicleCreate,
@@ -89,6 +93,9 @@ import {
   type VehicleServiceType,
   type VehicleScopedParams,
   type VehicleEntryParams,
+  type VehicleComponent,
+  type VehicleComponentCreate,
+  type VehicleComponentUpdate,
 } from "./vehicles";
 
 import {
@@ -141,6 +148,9 @@ export type {
   VehicleDetail,
   VehicleCreate,
   VehicleUpdate,
+  VehicleComponent,
+  VehicleComponentCreate,
+  VehicleComponentUpdate,
 };
 
 export {
@@ -180,6 +190,10 @@ export {
   VehicleServiceTypeSchema,
   VehicleScopedParamsSchema,
   VehicleEntryParamsSchema,
+  VehicleComponentSchema,
+  VehicleComponentCreateSchema,
+  VehicleComponentUpdateSchema,
+  VehicleComponentIdSchema,
   AppSettingSchema,
   UpdateAppSettingSchema,
   KnownSettingsSchema,

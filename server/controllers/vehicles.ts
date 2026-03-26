@@ -72,6 +72,7 @@ class VehiclesService {
                 currency: true,
               },
             },
+            components: true,
           },
           orderBy: { servicedAt: "desc" },
         },

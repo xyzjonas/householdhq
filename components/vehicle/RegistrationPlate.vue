@@ -1,10 +1,10 @@
 <template>
   <div class="plate">
     <span class="band flex flex-col items-center justify-center">
-      <i class="i-simple-icons-europeanunion text-white translate-y-[3px]"></i>
-      <span class="text-[0.4rem] text-white line-height-snug">CZ</span>
+      <!-- <i class="i-simple-icons-europeanunion text-white translate-y-[3px]"></i>
+      <span class="text-[0.4rem] text-white line-height-snug">CZ</span> -->
     </span>
-    <span class="px-3">
+    <span class="px-3 py-1">
       <span class="value uppercase text-black">{{ value }}</span>
     </span>
   </div>
@@ -27,7 +27,7 @@ defineProps<{
 }
 
 .band {
-  width: 24px;
+  width: 12px;
   height: 100%;
   background-color: #2a54a1;
   padding-block: 3px;

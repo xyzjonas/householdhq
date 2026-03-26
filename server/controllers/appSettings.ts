@@ -1,8 +1,5 @@
-import { prisma } from './prisma-client';
-import type {
-  AppSetting,
-  UpdateAppSetting,
-} from '~/types/appSettings';
+import { prisma } from "./prisma-client";
+import type { AppSetting, UpdateAppSetting } from "~/types/appSettings";
 
 const SETTINGS_ID = 1; // Singleton ID
 
@@ -19,7 +16,7 @@ export const getSettings = async (): Promise<AppSetting> => {
     settings = await prisma.appSettings.create({
       data: {
         id: SETTINGS_ID,
-        currency: 'USD',
+        currency: "USD",
       },
     });
   }
@@ -31,7 +28,7 @@ export const getSettings = async (): Promise<AppSetting> => {
  * Update settings
  */
 export const updateSettings = async (
-  data: UpdateAppSetting
+  data: UpdateAppSetting,
 ): Promise<AppSetting> => {
   // Ensure settings exist
   await getSettings();

@@ -84,6 +84,30 @@ export const VehicleServiceTypeSchema = z.enum([
   "DEFECT",
 ]);
 
+export const VehicleComponentSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  icon: z.string().nullable(),
+  color: z.string().nullable(),
+  description: z.string().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const VehicleComponentCreateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  icon: z.string().nullable().optional(),
+  color: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+});
+
+export const VehicleComponentUpdateSchema =
+  VehicleComponentCreateSchema.partial();
+
+export const VehicleComponentIdSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
 export const VehicleFuelEntrySchema = z.object({
   id: z.number().int(),
   fueledAt: z.coerce.date(),
@@ -110,6 +134,7 @@ export const VehicleServiceEntrySchema = z.object({
   vehicleId: z.number().int(),
   transactionId: z.number().int(),
   transaction: EmbeddedTransactionSummarySchema,
+  components: z.array(VehicleComponentSchema),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -192,6 +217,7 @@ export const VehicleServiceEntryCreateSchema = z.object({
   title: z.string().min(1, "Title is required"),
   servicedAt: z.coerce.date(),
   description: z.string().nullable().optional(),
+  componentIds: z.array(z.coerce.number().int().positive()).optional(),
 });
 
 export const VehicleServiceEntryUpdateSchema =
@@ -227,3 +253,10 @@ export type VehicleServiceEntryUpdate = z.infer<
 >;
 export type VehicleScopedParams = z.infer<typeof VehicleScopedParamsSchema>;
 export type VehicleEntryParams = z.infer<typeof VehicleEntryParamsSchema>;
+export type VehicleComponent = z.infer<typeof VehicleComponentSchema>;
+export type VehicleComponentCreate = z.infer<
+  typeof VehicleComponentCreateSchema
+>;
+export type VehicleComponentUpdate = z.infer<
+  typeof VehicleComponentUpdateSchema
+>;

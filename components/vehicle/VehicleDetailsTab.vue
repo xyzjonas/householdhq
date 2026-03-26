@@ -58,7 +58,9 @@
     </div>
 
     <div class="card info-card">
-      <span class="info-label">{{ $t("vehicle_default_fuel_transaction_title") }}</span>
+      <span class="info-label">{{
+        $t("vehicle_default_fuel_transaction_title")
+      }}</span>
       <span
         class="info-value"
         :class="{ muted: !vehicle.defaultFuelTransactionTitle }"

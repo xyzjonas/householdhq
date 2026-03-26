@@ -66,6 +66,7 @@ class VehicleServiceEntriesService {
             currency: true,
           },
         },
+        components: true,
       },
       orderBy: { servicedAt: "desc" },
     })) as unknown as VehicleServiceEntry[];
@@ -107,11 +108,16 @@ class VehicleServiceEntriesService {
           },
         });
 
+        const { componentIds, ...entryData } = payload;
+
         return await (tx as any).vehicleServiceEntry.create({
           data: {
-            ...payload,
+            ...entryData,
             vehicleId,
             transactionId: transaction.id,
+            ...(componentIds?.length
+              ? { components: { connect: componentIds.map((id) => ({ id })) } }
+              : {}),
           },
           include: {
             transaction: {
@@ -123,6 +129,7 @@ class VehicleServiceEntriesService {
                 currency: true,
               },
             },
+            components: true,
           },
         });
       })) as unknown as VehicleServiceEntry;
@@ -162,7 +169,15 @@ class VehicleServiceEntriesService {
 
     return (await this.entries.update({
       where: { id: entryId },
-      data: payload,
+      data: {
+        ...(() => {
+          const { componentIds, ...rest } = payload;
+          return rest;
+        })(),
+        ...(payload.componentIds !== undefined
+          ? { components: { set: payload.componentIds.map((id) => ({ id })) } }
+          : {}),
+      },
       include: {
         transaction: {
           select: {
@@ -173,6 +188,7 @@ class VehicleServiceEntriesService {
             currency: true,
           },
         },
+        components: true,
       },
     })) as unknown as VehicleServiceEntry;
   }
@@ -206,6 +222,7 @@ class VehicleServiceEntriesService {
               currency: true,
             },
           },
+          components: true,
         },
       });
 

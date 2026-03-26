@@ -49,7 +49,6 @@
           <ui-pin :text="settings.currency" size="small" />
         </div>
       </div>
-
     </section>
 
     <section v-else class="card min-h-sm flex items-center justify-center">
@@ -65,13 +64,8 @@
 </template>
 
 <script setup lang="ts">
-const {
-  settings,
-  isLoading,
-  error,
-  fetchSettings,
-  setCurrency,
-} = useAppSettings();
+const { settings, isLoading, error, fetchSettings, setCurrency } =
+  useAppSettings();
 
 await fetchSettings();
 

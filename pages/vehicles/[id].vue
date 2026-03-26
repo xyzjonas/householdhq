@@ -75,6 +75,7 @@
     <vehicle-maintenance-listing-tab
       v-else-if="activeTab === 1"
       :vehicle="vehicle"
+      @edit-entry="openEditServiceEntryModal"
       @delete-entry="deleteServiceEntry"
     />
 
@@ -119,6 +120,18 @@
           />
         </ui-modal>
 
+        <ui-modal v-model="editServiceEntryModal">
+          <vehicle-service-entry-form
+            v-model="editableServiceEntry"
+            :loading="loading"
+            :title="$t('edit')"
+            :entry-id="editableServiceEntryId ?? undefined"
+            @submit="editServiceEntry"
+            @close="editServiceEntryModal = false"
+            @delete="deleteServiceEntry(editableServiceEntryId!)"
+          />
+        </ui-modal>
+
         <ui-modal v-model="editVehicleModal">
           <vehicle-form
             v-model="editableVehicle"
@@ -143,6 +156,7 @@ import type {
   VehicleFuelEntryCreate,
   VehicleFuelEntryUpdate,
   VehicleServiceEntryCreate,
+  VehicleServiceEntryUpdate,
   VehicleUpdate,
 } from "~/types";
 import { useRoute, navigateTo } from "#app";
@@ -160,10 +174,12 @@ const editVehicleModal = ref(false);
 const createFuelEntryModal = ref(false);
 const editFuelEntryModal = ref(false);
 const createServiceEntryModal = ref(false);
+const editServiceEntryModal = ref(false);
 const activeTab = ref(0);
 const loading = ref(false);
 const tokenStore = useTokenStore();
 const editableFuelEntryId = ref<number | null>(null);
+const editableServiceEntryId = ref<number | null>(null);
 
 const editableVehicle = ref<VehicleUpdate>({});
 const newFuelEntry = ref<VehicleFuelEntryCreate>({
@@ -190,6 +206,16 @@ const newServiceEntry = ref<VehicleServiceEntryCreate>({
   title: "",
   servicedAt: new Date(),
   description: "",
+  componentIds: [],
+});
+
+const editableServiceEntry = ref<VehicleServiceEntryCreate>({
+  type: "REGULAR_MAINTENANCE",
+  odometer: null,
+  title: "",
+  servicedAt: new Date(),
+  description: "",
+  componentIds: [],
 });
 
 const fullTankEntries = computed(() => {
@@ -220,6 +246,7 @@ const resetServiceEntryForm = () => {
     title: "",
     servicedAt: new Date(),
     description: "",
+    componentIds: [],
   };
 };
 
@@ -390,6 +417,55 @@ const createServiceEntry = async () => {
     useNotifications().addNotification({
       level: "error",
       text: $t("vehicle_service_entry_create_error"),
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+const openEditServiceEntryModal = (entryId: number) => {
+  const entry = vehicle.value?.serviceEntries.find((serviceEntry) => {
+    return serviceEntry.id === entryId;
+  });
+
+  if (!entry) {
+    return;
+  }
+
+  editableServiceEntryId.value = entry.id;
+  editableServiceEntry.value = {
+    type: entry.type,
+    odometer: entry.odometer,
+    title: entry.title,
+    servicedAt: new Date(entry.servicedAt),
+    description: entry.description,
+    componentIds: entry.components.map((c) => c.id),
+  };
+  editServiceEntryModal.value = true;
+};
+
+const editServiceEntry = async () => {
+  if (!editableServiceEntryId.value) {
+    return;
+  }
+
+  loading.value = true;
+  try {
+    await tokenStore.patch(
+      `/api/vehicles/${id}/service-entries/${editableServiceEntryId.value}`,
+      editableServiceEntry.value as VehicleServiceEntryUpdate,
+    );
+    editServiceEntryModal.value = false;
+    editableServiceEntryId.value = null;
+    await refresh();
+    useNotifications().addNotification({
+      level: "success",
+      text: $t("vehicle_service_entry_updated"),
+    });
+  } catch {
+    useNotifications().addNotification({
+      level: "error",
+      text: $t("vehicle_service_entry_update_error"),
     });
   } finally {
     loading.value = false;

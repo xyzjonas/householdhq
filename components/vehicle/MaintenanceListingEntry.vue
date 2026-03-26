@@ -18,6 +18,25 @@
       >
         {{ entry.description }}
       </span>
+      <div v-if="entry.components?.length" class="flex flex-wrap gap-1 mt-1">
+        <span
+          v-for="comp in entry.components"
+          :key="comp.id"
+          class="component-chip"
+          :style="
+            comp.color
+              ? {
+                  backgroundColor: comp.color,
+                  color: shouldInvert(comp.color) ? '#000' : '#fff',
+                  borderColor: comp.color,
+                }
+              : {}
+          "
+        >
+          <i v-if="comp.icon" :class="comp.icon" class="text-xs" />
+          {{ comp.name }}
+        </span>
+      </div>
       <span class="text-xs text-[var(--text-200)] text-gray-5 mt-2">
         {{ formatDateTime(entry.servicedAt) }}
       </span>
@@ -35,26 +54,30 @@
       >
         {{ entry.transaction.description }}
       </nuxt-link>
+      <div class="flex gap-1 mt-2">
+        <ui-button
+          outlined
+          icon="i-ic-baseline-edit"
+          size="small"
+          @click="$emit('edit-entry', entry.id)"
+        >
+          {{ $t("edit") }}
+        </ui-button>
+      </div>
     </div>
-
-    <!-- <ui-button
-      outlined
-      icon="i-ic-baseline-delete"
-      @click="$emit('delete-entry', entry.id)"
-    >
-      {{ $t("delete") }}
-    </ui-button> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import type { VehicleDetail } from "~/types";
+import { shouldInvert } from "~/utils/color";
 
 defineProps<{
   entry: VehicleDetail["serviceEntries"][number];
 }>();
 
 defineEmits<{
+  (e: "edit-entry", entryId: number): void;
   (e: "delete-entry", entryId: number): void;
 }>();
 
@@ -76,5 +99,20 @@ const formatDateTime = (value: string | Date | null | undefined): string => {
   border: 1px solid var(--border-100);
   border-radius: var(--border-radius);
   padding: 1rem;
+}
+
+.component-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid;
+  white-space: nowrap;
+
+  i {
+    margin-right: 0.1rem;
+  }
 }
 </style>
