@@ -82,6 +82,8 @@ const PreviousFullTankEntrySchema = z
 export const VehicleServiceTypeSchema = z.enum([
   "REGULAR_MAINTENANCE",
   "DEFECT",
+  "FEES",
+  "UPGRADE",
 ]);
 
 export const VehicleComponentSchema = z.object({
@@ -217,6 +219,7 @@ export const VehicleServiceEntryCreateSchema = z.object({
   title: z.string().min(1, "Title is required"),
   servicedAt: z.coerce.date(),
   description: z.string().nullable().optional(),
+  price: z.coerce.number().nonnegative().nullable().optional(),
   componentIds: z.array(z.coerce.number().int().positive()).optional(),
 });
 

@@ -105,8 +105,10 @@
             :loading="loading"
             :title="$t('edit')"
             :full-tank-entries="fullTankEntriesForEdit"
+            :entry-id="editableFuelEntryId ?? undefined"
             @submit="editFuelEntry"
             @close="editFuelEntryModal = false"
+            @delete="deleteFuelEntry(editableFuelEntryId!)"
           />
         </ui-modal>
 
@@ -476,6 +478,10 @@ const deleteFuelEntry = async (entryId: number) => {
   loading.value = true;
   try {
     await tokenStore.del(`/api/vehicles/${id}/fuel-entries/${entryId}`);
+    if (editableFuelEntryId.value === entryId) {
+      editFuelEntryModal.value = false;
+      editableFuelEntryId.value = null;
+    }
     await refresh();
   } finally {
     loading.value = false;

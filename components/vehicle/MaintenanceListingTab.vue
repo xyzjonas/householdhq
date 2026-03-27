@@ -5,7 +5,7 @@
     </div>
 
     <!-- Component filters -->
-    <div v-if="allComponents.length" class="flex flex-wrap gap-2">
+    <div v-if="allComponents.length" class="flex flex-wrap gap-1">
       <button
         v-for="comp in allComponents"
         :key="comp.id"
@@ -111,8 +111,8 @@ function getChipStyle(comp: VehicleComponent) {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius);
   border: 1px solid var(--border-100);
   background: var(--bg-200);
   color: var(--text-100);

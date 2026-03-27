@@ -23,7 +23,7 @@
       </span>
     </div>
 
-    <div class="text-right ml-auto">
+    <div class="text-right ml-auto flex flex-col items-end gap-1">
       <ui-price
         :size="'1.25rem'"
         :amount="entry.transaction.amount"

@@ -8,13 +8,15 @@
         {{
           entry.type === "DEFECT"
             ? $t("vehicle_service_type_defect")
-            : $t("vehicle_service_type_regular")
+            : entry.type === "FEES"
+              ? $t("vehicle_service_type_fees")
+              : $t("vehicle_service_type_regular")
         }}
         <span v-if="entry.odometer"> · {{ entry.odometer }} km</span>
       </span>
       <span
         v-if="entry.description"
-        class="text-xs text-[var(--text-200)] truncate max-w-100"
+        class="text-xs text-gray-5 text-wrap truncate line-clamp-2"
       >
         {{ entry.description }}
       </span>
@@ -105,9 +107,9 @@ const formatDateTime = (value: string | Date | null | undefined): string => {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  padding-inline: 8px;
+  border-radius: var(--border-radius);
+  font-size: 10px;
   border: 1px solid;
   white-space: nowrap;
 

@@ -125,6 +125,13 @@
     padding: $padd;
     transition: 0.3s ease-in-out;
   }
+
+  &:has(input[type="date"]) label {
+    top: calc(0px - #{$font-top}/ 1.5);
+    color: var(--color-font-light);
+    font-size: $font-top;
+    background-color: var(--bg-200);
+  }
 }
 
 .graph {

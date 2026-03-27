@@ -4,20 +4,26 @@
       <h2 class="uppercase text-xl">{{ $t("vehicle_fuel_entries") }}</h2>
     </div>
 
-    <ui-timeline
-      v-if="vehicle.fuelEntries?.length"
-      :items="vehicle.fuelEntries"
-      item-key="id"
-      :color="vehicle.color ?? 'var(--primary-100)'"
-    >
-      <template #item="{ item: entry }">
-        <vehicle-fuel-listing-entry
-          :entry="entry"
-          @edit-entry="$emit('edit-entry', $event)"
-          @delete-entry="$emit('delete-entry', $event)"
-        />
-      </template>
-    </ui-timeline>
+    <template v-if="vehicle.fuelEntries?.length">
+      <vehicle-fuel-chart
+        :entries="vehicle.fuelEntries"
+        :color="vehicle.color ?? 'var(--primary-100)'"
+      />
+
+      <ui-timeline
+        :items="vehicle.fuelEntries"
+        item-key="id"
+        :color="vehicle.color ?? 'var(--primary-100)'"
+      >
+        <template #item="{ item: entry }">
+          <vehicle-fuel-listing-entry
+            :entry="entry"
+            @edit-entry="$emit('edit-entry', $event)"
+            @delete-entry="$emit('delete-entry', $event)"
+          />
+        </template>
+      </ui-timeline>
+    </template>
 
     <ui-empty
       v-else

@@ -148,3 +148,7 @@
   // transition:max-height 0.3s linear; // note that we're transitioning max-height, not height!
   max-height: 0;
 }
+
+.modal-window {
+  width: min(42rem, calc(100vw - 1rem));
+}

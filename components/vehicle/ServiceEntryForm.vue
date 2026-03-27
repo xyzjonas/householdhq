@@ -1,6 +1,6 @@
 <template>
   <form
-    class="card min-w-xs flex flex-col gap-4"
+    class="card min-w-xs flex flex-col gap-4 modal-window"
     @submit.prevent="$emit('submit')"
   >
     <div class="flex justify-between items-center">
@@ -13,6 +13,7 @@
         {{ $t("vehicle_service_type_regular") }}
       </option>
       <option value="DEFECT">{{ $t("vehicle_service_type_defect") }}</option>
+      <option value="FEES">{{ $t("vehicle_service_type_fees") }}</option>
     </ui-select>
 
     <ui-input :label="$t('vehicle_service_title')" v-model="entry.title" />
@@ -26,7 +27,15 @@
     <ui-input
       :label="$t('vehicle_service_odometer')"
       type="number"
-      v-model="odometerValue"
+      inputmode="numeric"
+      v-model.number="odometerValue"
+    />
+
+    <ui-input
+      :label="$t('vehicle_service_price')"
+      type="number"
+      step="0.01"
+      v-model.number="priceValue"
     />
 
     <div class="service-description">
@@ -80,6 +89,7 @@ const entry = defineModel<VehicleServiceEntryCreate>({
     title: "",
     servicedAt: new Date(),
     description: "",
+    price: null,
     componentIds: [],
   },
 });
@@ -103,10 +113,19 @@ const servicedAtInput = computed({
 
 const odometerValue = computed({
   get() {
-    return entry.value.odometer ?? undefined;
+    return entry.value.odometer ?? 0;
   },
   set(value: number | undefined) {
     entry.value.odometer = Number.isFinite(value) ? value : null;
+  },
+});
+
+const priceValue = computed({
+  get() {
+    return entry.value.price ?? 0;
+  },
+  set(value: number | undefined) {
+    entry.value.price = Number.isFinite(value) ? value : null;
   },
 });
 

@@ -1,6 +1,6 @@
 <template>
   <form
-    class="card min-w-xs flex flex-col gap-5 vehicle-form"
+    class="card min-w-xs flex flex-col gap-5 vehicle-form modal-window"
     @submit.prevent="$emit('submit')"
   >
     <div class="flex justify-between items-center">
@@ -291,7 +291,6 @@ defineEmits(["submit", "close"]);
 
 <style lang="scss" scoped>
 .vehicle-form {
-  width: min(42rem, calc(100vw - 1rem));
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
   overscroll-behavior: contain;

@@ -97,7 +97,7 @@ class VehicleServiceEntriesService {
           data: {
             transactedAt: payload.servicedAt,
             description,
-            amount: 0,
+            amount: payload.price ?? 0,
             currency: settings.currency,
             confirmed: payload.servicedAt <= new Date(),
             source: { connect: { id: route.sourceId } },
@@ -108,7 +108,7 @@ class VehicleServiceEntriesService {
           },
         });
 
-        const { componentIds, ...entryData } = payload;
+        const { componentIds, price: _price, ...entryData } = payload;
 
         return await (tx as any).vehicleServiceEntry.create({
           data: {
@@ -157,7 +157,7 @@ class VehicleServiceEntriesService {
 
     const current = await this.entries.findFirst({
       where: { id: entryId, vehicleId },
-      select: { id: true },
+      select: { id: true, transactionId: true },
     });
 
     if (!current) {
@@ -167,11 +167,18 @@ class VehicleServiceEntriesService {
       });
     }
 
+    if (payload.price !== undefined && current.transactionId) {
+      await prisma.transaction.update({
+        where: { id: current.transactionId },
+        data: { amount: payload.price ?? 0 },
+      });
+    }
+
     return (await this.entries.update({
       where: { id: entryId },
       data: {
         ...(() => {
-          const { componentIds, ...rest } = payload;
+          const { componentIds, price: _price, ...rest } = payload;
           return rest;
         })(),
         ...(payload.componentIds !== undefined
