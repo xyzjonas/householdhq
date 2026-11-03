@@ -3,10 +3,10 @@
     icon="i-ic-baseline-close"
     flat
     squared
-    @click="model = !model"
     type="button"
+    @click="model = !model"
   />
 </template>
 <script setup lang="ts">
-const model = defineModel();
+const model = defineModel<boolean>();
 </script>

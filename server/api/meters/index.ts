@@ -2,7 +2,7 @@
 
 import meters from "~/server/controllers/meters";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   const allMeters = await meters.findAllMeters();
   return {
     data: allMeters,

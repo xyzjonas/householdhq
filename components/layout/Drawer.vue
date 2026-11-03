@@ -11,8 +11,8 @@
     >
       <span class="text-gray-5 text-sm mb-2">Pages</span>
       <ui-list-row
-        @click="navigateTo('/')"
         :class="{ active: $route.path === '/' }"
+        @click="navigateTo('/')"
       >
         <span class="flex justify-between items-center">
           <span class="flex items-center gap-2">
@@ -24,8 +24,8 @@
       </ui-list-row>
 
       <ui-list-row
-        @click="navigateTo('/sources')"
         :class="{ active: $route.path === '/sources' }"
+        @click="navigateTo('/sources')"
       >
         <span class="flex justify-between items-center">
           <span class="flex items-center gap-2 flex-nowrap">
@@ -37,8 +37,8 @@
       </ui-list-row>
 
       <ui-list-row
-        @click="navigateTo('/categories')"
         :class="{ active: $route.path === '/categories' }"
+        @click="navigateTo('/categories')"
       >
         <span class="flex justify-between items-center">
           <span class="flex items-center gap-2 flex-nowrap">
@@ -50,8 +50,8 @@
       </ui-list-row>
 
       <ui-list-row
-        @click="navigateTo('/projects')"
         :class="{ active: $route.path === '/projects' }"
+        @click="navigateTo('/projects')"
       >
         <span class="flex justify-between items-center">
           <span class="flex items-center gap-2 flex-nowrap">
@@ -63,8 +63,8 @@
       </ui-list-row>
 
       <ui-list-row
-        @click="navigateTo('/transactions')"
         :class="{ active: $route.path === '/transactions' }"
+        @click="navigateTo('/transactions')"
       >
         <span class="flex justify-between items-center">
           <span class="flex items-center gap-2 flex-nowrap">
@@ -95,8 +95,8 @@
       >
 
       <ui-list-row
-        @click="navigateTo('/settings')"
         :class="{ active: $route.path === '/settings' }"
+        @click="navigateTo('/settings')"
       >
         <span class="flex items-center gap-2 flex-nowrap">
           <i class="i-ic-baseline-settings"></i>

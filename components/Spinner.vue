@@ -21,6 +21,8 @@
 </template>
 <script lang="ts" setup>
 type Spinner = "roller" | "ellipsis" | "spinner";
+
+defineOptions({ name: "AppSpinner" });
 defineProps<{
   name?: Spinner;
 }>();

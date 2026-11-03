@@ -5,16 +5,18 @@
       <h2 v-if="operand">{{ operand }} {{ anotherNumber }}</h2>
     </div>
     <div class="calculator-numpad">
-      <ui-button v-for="index in 9" @click="add(index)">{{ index }}</ui-button>
-      <ui-button @click="newOperand('-')" icon="i-ic-baseline-minus" />
+      <ui-button v-for="index in 9" :key="index" @click="add(index)">{{
+        index
+      }}</ui-button>
+      <ui-button icon="i-ic-baseline-minus" @click="newOperand('-')" />
       <ui-button @click="add(0)">0</ui-button>
-      <ui-button @click="newOperand('+')" icon="i-ic-baseline-plus" />
-      <ui-button @click="remove" icon="i-ic-outline-backspace" />
-      <ui-button @click="clear" icon="i-ic-baseline-delete" />
+      <ui-button icon="i-ic-baseline-plus" @click="newOperand('+')" />
+      <ui-button icon="i-ic-outline-backspace" @click="remove" />
+      <ui-button icon="i-ic-baseline-delete" @click="clear" />
       <ui-button
         v-if="operand"
-        @click="addOrSubstract"
         icon="i-ic-baseline-equals"
+        @click="addOrSubstract"
       />
       <ui-button v-else @click="$emit('confirm')">OK</ui-button>
     </div>

@@ -1,7 +1,7 @@
 <template>
   <div
-    class="text-center flex flex-col items-center justify-center gap-5"
     v-if="loaded"
+    class="text-center flex flex-col items-center justify-center gap-5"
   >
     <!-- <h1 class="text-left font-light text-xl uppercase">{{ category.name }}</h1> -->
     <div class="h-60 w-full">
@@ -9,23 +9,23 @@
     </div>
     <div class="toggle-bar m-1">
       <a
-        @click="dataSelection = 6"
         :class="`bar-item ${dataSelection === 6 ? 'active' : ''}`"
+        @click="dataSelection = 6"
         >{{ t("summary_recent") }}</a
       >
       <a
-        @click="dataSelection = 12"
         :class="`bar-item ${dataSelection === 12 ? 'active' : ''}`"
+        @click="dataSelection = 12"
         >{{ t("summary_year") }}</a
       >
       <a
-        @click="dataSelection = 0"
         :class="`bar-item ${dataSelection === 0 ? 'active' : ''}`"
+        @click="dataSelection = 0"
         >{{ t("summary_all") }}</a
       >
     </div>
   </div>
-  <spinner name="roller" class="center h-full" v-else />
+  <spinner v-else name="roller" class="center h-full" />
 </template>
 <script lang="ts" setup>
 import { Bar } from "vue-chartjs";
@@ -33,12 +33,15 @@ import { useCategoriesStore } from "../stores/categories";
 import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "../types";
 import { getRelativePosition } from "chart.js/helpers";
+import type { ChartData, ChartOptions } from "chart.js";
 import { useLocalStorage } from "@vueuse/core";
 
 const { t } = useI18n();
 
 const categoriesStore = useCategoriesStore();
 const { summary } = storeToRefs(categoriesStore);
+
+defineOptions({ name: "CategorySummary" });
 
 const props = defineProps<{
   category: Pick<CategoryWithSum, "id" | "name" | "color">;
@@ -88,37 +91,31 @@ const formatMMYYYY = (date: Date) => {
   return month;
 };
 
-const chartData = computed<any>(() => {
+const chartData = computed<ChartData<"bar">>(() => {
   return {
     labels: labels.value,
     datasets: [
       {
         label: props.category.name,
-        labels: {
-          value: {
-            color: "green",
-          },
-        },
-        borderColor: props.category.color,
+        borderColor: props.category.color ?? undefined,
         backgroundColor: `${props.category.color}99`,
         data: data.value.map((s) => s.amount),
-        cubicInterpolationMode: "monotone",
-        tension: 0.4,
-        pointStyle: false,
         borderRadius: 4,
-        month: data.value.map((s) => s.month),
       },
     ],
   };
 });
 
-const callback = (e: any) => {
+const callback: ChartOptions<"bar">["onClick"] = (e, _elements, chart) => {
   // OnClick emit filter by category
-  console.info(e.chart);
-  const canvasPosition = getRelativePosition(e, e.chart);
+  console.info(chart);
+  const canvasPosition = getRelativePosition(e, chart);
 
   // Substitute the appropriate scale IDs
-  const dataX = e.chart.scales.x.getValueForPixel(canvasPosition.x);
+  const dataX = chart.scales.x?.getValueForPixel(canvasPosition.x);
+  if (dataX === undefined) {
+    return;
+  }
 
   const item = summary.value.slice(-1 * dataSelection.value)[dataX];
   if (item) {
@@ -127,13 +124,12 @@ const callback = (e: any) => {
   }
 };
 
-const options = {
-  type: "bar",
+const options: ChartOptions<"bar"> = {
   responsive: true,
   onClick: callback,
   maintainAspectRatio: false,
   plugins: {
-    datalabels: false,
+    datalabels: { display: false },
   },
   scales: {
     y: {
@@ -142,15 +138,15 @@ const options = {
         display: false,
       },
       ticks: {
-        callback: (value: number, index: number, ticks: number) =>
-          `${value / 1000}${value / 1000 > 1 ? "k" : ""}`,
+        callback: (value) =>
+          `${Number(value) / 1000}${Number(value) / 1000 > 1 ? "k" : ""}`,
       },
     },
     x: {
       display: true,
     },
   },
-} as any;
+};
 </script>
 <style lang="scss" scoped>
 .bar-item {

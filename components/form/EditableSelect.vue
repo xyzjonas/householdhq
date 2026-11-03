@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editting" class="flex gap-1">
-      <ui-button @click="send" color="success" class="uppercase">{{
+      <ui-button color="success" class="uppercase" @click="send">{{
         $t("ok").toUpperCase()
       }}</ui-button>
-      <ui-button @click="editting = false" color="secondary" outlined>{{
+      <ui-button color="secondary" outlined @click="editting = false">{{
         $t("cancel")
       }}</ui-button>
       <ui-select v-model="valueCopy">
@@ -17,7 +17,7 @@
         </option>
       </ui-select>
     </div>
-    <p v-else @click="editting = true" style="text-align: end">
+    <p v-else style="text-align: end" @click="editting = true">
       {{ valueCopy || $t("undefined") }}
     </p>
   </div>
@@ -38,7 +38,7 @@ const valueCopy = ref(props.value ?? "");
 const emit = defineEmits(["send"]);
 
 function send() {
-  const data: { [key: string]: any } = {};
+  const data: Record<string, string> = {};
   data[props.keyName] = valueCopy.value;
   emit("send", data);
   editting.value = false;

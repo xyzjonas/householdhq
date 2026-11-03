@@ -48,7 +48,6 @@
 
 <script lang="ts" setup>
 import { LayoutDrawer } from "#components";
-import { VERSION } from "@/_version";
 import { useNotifications } from "@/composables/useNotifications";
 import { useDrawer } from "@/composables/useDrawer";
 import { useWindowSize } from "@vueuse/core";
@@ -57,7 +56,7 @@ defineProps<{ hideHeader?: boolean }>();
 
 const { notifications } = useNotifications();
 
-const { theme, isDark, toggle } = useTheme();
+const { isDark, toggle } = useTheme();
 const themeBool = ref(isDark.value);
 
 watch(themeBool, (_) => toggle());

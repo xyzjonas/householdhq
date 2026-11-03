@@ -1,9 +1,9 @@
 <template>
   <form class="card w-sm flex flex-col gap-5" @submit.prevent="$emit('submit')">
     <h2 class="uppercase mb-3">{{ title }}</h2>
-    <ui-input :label="$t('meter_name')" v-model="meter.name" />
-    <ui-input :label="$t('meter_unit')" v-model="meter.unit" />
-    <ui-input :label="$t('color')" type="color" v-model="meter.color" />
+    <ui-input v-model="meter.name" :label="$t('meter_name')" />
+    <ui-input v-model="meter.unit" :label="$t('meter_unit')" />
+    <ui-input v-model="meter.color" :label="$t('color')" type="color" />
 
     <div class="icon-picker-wrap">
       <div class="icon-picker-label">{{ $t("meter_icon") }}</div>
@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import type { MeterCreate } from "~/types";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     loading?: boolean;
     title: string;

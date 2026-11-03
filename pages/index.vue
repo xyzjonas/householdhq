@@ -43,7 +43,7 @@
             link
             flat
             icon="i-ic-round-format-list-bulleted"
-            iconSize="1rem"
+            icon-size="1rem"
             @click="legendModalOpen = true"
           >
             Breakdown
@@ -67,12 +67,12 @@
         </div>
       </CardMonthSummary>
       <div
-        class="flex flex-col flex-1 gap-2"
         v-if="
           isCurrentMonth &&
           !transactionsLoading &&
           sources.filter((src) => src.isPortfolio).length > 0
         "
+        class="flex flex-col flex-1 gap-2"
       >
         <BalanceRow
           v-if="isCurrentMonth && !transactionsLoading"
@@ -93,10 +93,10 @@
       <section v-if="addExpense" class="mt-1">
         <transaction-form
           v-if="addExpense"
+          :processing="putLoading"
           @cancel="addExpense = false"
           @send="putTransaction"
           @close="addExpense = false"
-          :processing="putLoading"
         />
       </section>
     </transition>
@@ -170,7 +170,7 @@
       <ui-button
         :color="addExpense ? 'secondary' : 'primary'"
         icon="i-ic-baseline-plus"
-        iconSize="1.5rem"
+        icon-size="1.5rem"
         width="4rem"
         rounded
         outlined
@@ -182,8 +182,8 @@
       <teleport to="body">
         <ui-modal v-model="legendModalOpen">
           <card-categories
-            :items="currentCategories"
             v-model:selected-category-id="filterCategoryId"
+            :items="currentCategories"
             class="min-w-sm"
           />
         </ui-modal>
@@ -200,9 +200,9 @@ import { useSourcesStore } from "@/stores/sources";
 import { useTransactionStore } from "@/stores/transactions";
 import type { Transaction } from "@/types";
 import { useNotifications } from "@/composables/useNotifications";
-import { totalExpenses, transactionsTotal } from "~/utils/transaction";
+import { transactionsTotal } from "~/utils/transaction";
 
-const { isCurrent: isCurrentMonth, month, dateFormatted } = useCurrentMonth();
+const { isCurrent: isCurrentMonth, month } = useCurrentMonth();
 
 const tokenStore = useTokenStore();
 const { token } = storeToRefs(tokenStore);
@@ -210,11 +210,11 @@ const { token } = storeToRefs(tokenStore);
 const projectsStore = useProjectsStore();
 
 const transactionStore = useTransactionStore();
-const { currentMonth, passed, upcomming, currency, loading } =
+const { currentMonth, upcomming, currency, loading } =
   storeToRefs(transactionStore);
 
 const transactionsLoading = ref(false);
-watch(month, async (to, from) => {
+watch(month, async () => {
   transactionsLoading.value = true;
   await initialFetch();
   transactionsLoading.value = false;
@@ -338,7 +338,7 @@ const deleteTransaction = (transactionData: Transaction) => {
     },
     body: transactionData,
   })
-    .then((res) => {
+    .then(() => {
       currentMonth.value = currentMonth.value.filter(
         (t: Transaction) => t.id != transactionData.id,
       );

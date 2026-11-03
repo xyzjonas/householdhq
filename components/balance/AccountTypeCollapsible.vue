@@ -1,8 +1,8 @@
 <template>
   <div>
     <ui-list-row
-      @click="collapsed = !collapsed"
       class="flex justify-between gap-10"
+      @click="collapsed = !collapsed"
     >
       <span class="flex items-center gap-2">
         <i
@@ -22,7 +22,11 @@
     </ui-list-row>
     <transition name="slide" mode="out-in">
       <div v-if="!collapsed" class="pl-2">
-        <BalanceItem v-for="source in sources" :source="source" />
+        <BalanceItem
+          v-for="source in sources"
+          :key="source.id"
+          :source="source"
+        />
       </div>
     </transition>
   </div>
@@ -34,7 +38,7 @@ import { sourceIcons, type Source, type SourceType } from "~/types";
 
 const props = defineProps<{
   sources: Source[];
-  type: any;
+  type: string;
 }>();
 
 const collapsed = useLocalStorage(`${props.type}-collapsed`, true);

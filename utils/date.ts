@@ -16,7 +16,7 @@ export function formatddMMYYYY(date: Date | string, locale: string) {
 }
 
 export function getNextMont(date: Date | number, isCorrected: boolean = false) {
-  let next = new Date();
+  let next: Date;
   if (typeof date == "number") {
     next = new Date();
     if (isCorrected) {

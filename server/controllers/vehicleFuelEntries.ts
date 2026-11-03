@@ -8,10 +8,10 @@ import { prisma } from "./prisma-client";
 import { getSettings } from "./appSettings";
 
 class VehicleFuelEntriesService {
-  private entries = (prisma as any).vehicleFuelEntry;
+  private entries = prisma.vehicleFuelEntry;
   private vehicles = prisma.vehicle;
   private transactions = prisma.transaction;
-  private serviceEntries = (prisma as any).vehicleServiceEntry;
+  private serviceEntries = prisma.vehicleServiceEntry;
 
   private async assertVehicleExists(vehicleId: number): Promise<void> {
     const exists = await this.vehicles.findUnique({
@@ -145,10 +145,11 @@ class VehicleFuelEntriesService {
           });
         }
 
-        const node = await this.entries.findUnique({
-          where: { id: cursor },
-          select: { previousFullTankFuelEntryId: true },
-        });
+        const node: { previousFullTankFuelEntryId: number | null } | null =
+          await this.entries.findUnique({
+            where: { id: cursor },
+            select: { previousFullTankFuelEntryId: true },
+          });
         cursor = node?.previousFullTankFuelEntryId ?? null;
       }
     }
@@ -192,7 +193,7 @@ class VehicleFuelEntriesService {
 
     const [settings, vehicleData, route] = await Promise.all([
       getSettings(),
-      (this.vehicles as any).findUnique({
+      this.vehicles.findUnique({
         where: { id: vehicleId },
         select: {
           fuelCategoryId: true,
@@ -228,7 +229,7 @@ class VehicleFuelEntriesService {
           },
         });
 
-        return await (tx as any).vehicleFuelEntry.create({
+        return await tx.vehicleFuelEntry.create({
           data: {
             ...payload,
             vehicleId,
@@ -334,7 +335,7 @@ class VehicleFuelEntriesService {
         },
       });
 
-      return await (tx as any).vehicleFuelEntry.update({
+      return await tx.vehicleFuelEntry.update({
         where: { id: entryId },
         data: {
           ...payload,
@@ -380,7 +381,7 @@ class VehicleFuelEntriesService {
     }
 
     return (await prisma.$transaction(async (tx) => {
-      const deleted = await (tx as any).vehicleFuelEntry.delete({
+      const deleted = await tx.vehicleFuelEntry.delete({
         where: { id: entryId },
         include: {
           transaction: {

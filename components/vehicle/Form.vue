@@ -8,71 +8,71 @@
       <ui-close-button @click="$emit('close')" />
     </div>
 
-    <ui-input :label="$t('vehicle_name')" v-model="vehicle.name" />
+    <ui-input v-model="vehicle.name" :label="$t('vehicle_name')" />
 
     <div class="grid grid-cols-2 gap-4 vehicle-form__grid">
-      <ui-input :label="$t('vehicle_brand')" v-model="vehicle.brand" />
-      <ui-input :label="$t('vehicle_model')" v-model="vehicle.model" />
+      <ui-input v-model="vehicle.brand" :label="$t('vehicle_brand')" />
+      <ui-input v-model="vehicle.model" :label="$t('vehicle_model')" />
     </div>
 
-    <ui-input :label="$t('vehicle_vin')" v-model="vehicle.vin" />
+    <ui-input v-model="vehicle.vin" :label="$t('vehicle_vin')" />
     <ui-input
-      :label="$t('vehicle_registration')"
       v-model="vehicle.registration"
+      :label="$t('vehicle_registration')"
     />
 
     <div class="grid grid-cols-2 gap-4 vehicle-form__grid">
-      <ui-color-input :label="$t('vehicle_color')" v-model="vehicle.color" />
+      <ui-color-input v-model="vehicle.color" :label="$t('vehicle_color')" />
       <ui-input
+        v-model="vehicle.purchasePrice"
         :label="$t('vehicle_purchase_price')"
         type="number"
-        v-model="vehicle.purchasePrice"
       />
     </div>
 
     <ui-input
+      v-model="purchasedAtString"
       :label="$t('vehicle_purchased_at')"
       type="date"
-      v-model="purchasedAtString"
     />
 
     <div class="grid grid-cols-2 gap-4 vehicle-form__grid">
       <ui-input
+        v-model="vehicle.mass"
         :label="$t('vehicle_mass')"
         type="number"
-        v-model="vehicle.mass"
       />
       <ui-input
+        v-model="vehicle.engineSize"
         :label="$t('vehicle_engine_size')"
         type="number"
-        v-model="vehicle.engineSize"
       />
     </div>
 
     <div class="grid grid-cols-2 gap-4 vehicle-form__grid">
-      <ui-input :label="$t('vehicle_fuel_type')" v-model="vehicle.fuelType" />
+      <ui-input v-model="vehicle.fuelType" :label="$t('vehicle_fuel_type')" />
       <ui-input
+        v-model="vehicle.maxPower"
         :label="$t('vehicle_max_power')"
         type="number"
-        v-model="vehicle.maxPower"
       />
     </div>
 
     <ui-input
-      :label="$t('vehicle_default_fuel_transaction_title')"
       v-model="vehicle.defaultFuelTransactionTitle"
+      :label="$t('vehicle_default_fuel_transaction_title')"
     />
 
     <div class="grid grid-cols-2 gap-4 vehicle-form__grid">
       <ui-input
+        v-model="dateOfFabricationString"
         :label="$t('vehicle_date_of_fabrication')"
         type="date"
-        v-model="dateOfFabricationString"
       />
       <ui-input
+        v-model="dateFirstRegisteredString"
         :label="$t('vehicle_date_first_registered')"
         type="date"
-        v-model="dateFirstRegisteredString"
       />
     </div>
 
@@ -143,7 +143,7 @@ const categoriesStore = useCategoriesStore();
 const { categories } = storeToRefs(categoriesStore);
 onMounted(() => categoriesStore.fetchCategories());
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     loading?: boolean;
     title: string;

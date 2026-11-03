@@ -15,10 +15,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { sourceIcons, type Source } from "@/types";
 import type { Category } from "@prisma/client";
 
-const props = defineProps<{ category: Category }>();
+defineProps<{ category: Category }>();
 </script>
 <style lang="scss" scoped>
 .color-flag {

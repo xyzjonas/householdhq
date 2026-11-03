@@ -94,7 +94,7 @@ const createVehicle = async () => {
       level: "success",
       text: $t("vehicle_created"),
     });
-  } catch (error) {
+  } catch {
     useNotifications().addNotification({
       level: "error",
       text: $t("vehicle_create_error"),

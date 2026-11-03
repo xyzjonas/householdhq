@@ -11,19 +11,19 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   const loading = ref(false);
 
-  const { month, year, isCurrent } = useCurrentMonth();
+  const { month, year } = useCurrentMonth();
 
   const currentMonth = ref<Transaction[]>([]);
 
   const passed = computed(() => {
     return currentMonth.value.filter(
-      (trans) => new Date(trans.transactedAt) <= new Date()
+      (trans) => new Date(trans.transactedAt) <= new Date(),
     );
   });
 
   const upcomming = computed(() => {
     return currentMonth.value.filter(
-      (trans) => new Date(trans.transactedAt) > new Date()
+      (trans) => new Date(trans.transactedAt) > new Date(),
     );
   });
 
@@ -47,11 +47,10 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   const createTransaction = async (transactionData: Transaction) => {
     loading.value = true;
-    const url = "/api/transactions";
     try {
       const response = await tokenStore.put(
         "/api/transactions",
-        transactionData
+        transactionData,
       );
       const transaction: Transaction = response.data;
 
@@ -69,14 +68,12 @@ export const useTransactionStore = defineStore("transaction", () => {
     }
   };
 
-  const editTransaction = async (transactionData: {
-    [K in keyof Transaction]?: any;
-  }) => {
+  const editTransaction = async (transactionData: Partial<Transaction>) => {
     loading.value = true;
     try {
       const response = await tokenStore.patch(
         "/api/transactions",
-        transactionData
+        transactionData,
       );
       const transaction: Transaction = response.data;
       currentMonth.value = currentMonth.value.map((t) => {

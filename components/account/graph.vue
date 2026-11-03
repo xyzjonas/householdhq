@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { Line } from "vue-chartjs";
+import type { ChartData, ChartOptions } from "chart.js";
 import type { SourceState } from "~/types";
 
 const props = defineProps<{ states: SourceState[]; color?: string }>();
@@ -29,48 +30,40 @@ const labels = computed(() => {
   return result;
 });
 
-const chartData = computed<any>(() => {
+const chartData = computed<ChartData<"line">>(() => {
   return {
     labels: labels.value,
     datasets: [
       {
-        labels: {
-          value: {
-            color: "green",
-          },
-        },
         borderColor: props.color,
         backgroundColor: `${props.color}99`,
         data: props.states.map((state) => state.amount),
         cubicInterpolationMode: "monotone",
         tension: 0.4,
         pointStyle: false,
-        borderRadius: 0,
       },
     ],
   };
 });
 
-const options = {
-  type: "bar",
+const options: ChartOptions<"line"> = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    datalabels: false,
+    datalabels: { display: false },
   },
   scales: {
     y: {
       display: true,
       grid: {
         color: "#66666640",
-        drawBorder: false,
       },
       title: {
         display: false,
       },
       ticks: {
-        callback: (value: number, index: number, ticks: number) =>
-          `${value / 1000}${value / 1000 > 1 ? "k" : ""}`,
+        callback: (value) =>
+          `${Number(value) / 1000}${Number(value) / 1000 > 1 ? "k" : ""}`,
       },
     },
     x: {
@@ -80,9 +73,8 @@ const options = {
       },
       grid: {
         color: "#66666655",
-        drawBorder: false,
       },
     },
   },
-} as any;
+};
 </script>

@@ -2,8 +2,9 @@
   <div class="toggle-bar">
     <a
       v-for="(option, index) in options"
-      @click="onClick(index)"
+      :key="index"
       :class="`bar-item ${modelValue === index ? 'active' : ''}`"
+      @click="onClick(index)"
     >
       <slot
         name="option"
@@ -32,7 +33,7 @@ defineSlots<{
     option: ToggleBarOption;
     index: number;
     active: boolean;
-  }): any;
+  }): unknown;
 }>();
 
 const getOptionLabel = (option: ToggleBarOption) => {

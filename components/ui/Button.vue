@@ -1,6 +1,6 @@
 <template>
   <button :class="clazz" :disabled="disabled || loading">
-    <spinner name="ellipsis" v-if="loading" />
+    <spinner v-if="loading" name="ellipsis" />
     <i v-if="!loading && icon" :class="icon"></i>
     <slot v-if="!loading" />
     <i v-if="!loading && iconLeft" :class="iconLeft"></i>
@@ -65,6 +65,8 @@ const h = computed(() => {
   if (props.height) {
     return props.height;
   }
+
+  return null;
 });
 
 const iSize = computed(() => props.iconSize);

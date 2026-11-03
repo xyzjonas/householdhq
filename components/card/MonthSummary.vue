@@ -11,9 +11,9 @@
     </div>
     <div class="p-5 flex gap-15 flex-wrap justify-center">
       <BarGraph
+        v-model:selected-category-id="selectedCategoryId"
         :items="data"
         :expand="expandGraph"
-        v-model:selected-category-id="selectedCategoryId"
         :class="[
           'flex-1',
           'min-w-[280px]',

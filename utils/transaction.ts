@@ -5,7 +5,7 @@ export function isSummary(source: Source) {
 }
 
 export function isExpense(transaction: Transaction) {
-  return !transaction.source.isOut
+  return !transaction.source.isOut;
 }
 
 export function isIncome(transaction: Transaction) {
@@ -31,17 +31,17 @@ export function getExpenseSum(transactions: Transaction[]) {
 export function totalExpenses(transactions: Transaction[]) {
   return transactions.reduce((a, b) => {
     if (isExpense(b)) {
-      return a + b.amount
+      return a + b.amount;
     }
-    return a
-  }, 0)
+    return a;
+  }, 0);
 }
 
 export function transactionsTotal(transactions: Transaction[]) {
   return transactions.reduce((a, b) => {
     if (isExpense(b)) {
-      return a - b.amount
+      return a - b.amount;
     }
-    return a + b.amount
-  }, 0)
+    return a + b.amount;
+  }, 0);
 }

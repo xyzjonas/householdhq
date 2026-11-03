@@ -20,10 +20,10 @@
               @keydown.enter="send"
             />
             <div class="edit-modal__actions">
-              <ui-button @click="send" color="success">
+              <ui-button color="success" @click="send">
                 {{ $t("ok").toUpperCase() }}
               </ui-button>
-              <ui-button @click="cancel" outlined>
+              <ui-button outlined @click="cancel">
                 {{ $t("cancel") }}
               </ui-button>
             </div>
@@ -36,8 +36,10 @@
 <script lang="ts" setup>
 import type { HTMLAttributes } from "vue";
 
+type FieldValue = string | number | null | undefined;
+
 const props = defineProps<{
-  value: any;
+  value: FieldValue;
   keyName: string;
   type?: "text" | "number" | "email";
   inputmode?: HTMLAttributes["inputmode"];
@@ -46,7 +48,7 @@ const props = defineProps<{
 const editting = ref(false);
 const columns = ref(15);
 
-const valueCopy = ref<string>();
+const valueCopy = ref<FieldValue>();
 valueCopy.value = props.value;
 
 watch(
@@ -60,7 +62,7 @@ watch(
 
 const rowCount = computed(() => {
   if (valueCopy.value) {
-    return Math.round(valueCopy.value.length / columns.value) || 1;
+    return Math.round(String(valueCopy.value).length / columns.value) || 1;
   }
   return 1;
 });
@@ -78,7 +80,7 @@ function cancel() {
 }
 
 function send() {
-  const data: { [key: string]: any } = {};
+  const data: Record<string, FieldValue> = {};
   data[props.keyName] = valueCopy.value;
   emit("send", data);
   editting.value = false;

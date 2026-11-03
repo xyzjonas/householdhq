@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import type { VehicleDetail } from "~/types";
 
-const props = defineProps<{
+defineProps<{
   entry: VehicleDetail["fuelEntries"][number];
 }>();
 

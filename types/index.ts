@@ -232,12 +232,7 @@ export interface SourceState {
 }
 
 export type SourceType =
-  | "ACCOUNT"
-  | "OUT"
-  | "CASH"
-  | "SAVINGS"
-  | "INVESTMENT"
-  | "DEBT";
+  "ACCOUNT" | "OUT" | "CASH" | "SAVINGS" | "INVESTMENT" | "DEBT";
 export const SourceTypes = [
   "ACCOUNT",
   "OUT",
@@ -342,9 +337,9 @@ export interface ProjectApi {
   color?: string;
 }
 
-export interface Project extends ProjectApi {}
+export type Project = ProjectApi;
 
-export interface CreateProject extends Omit<
+export type CreateProject = Omit<
   ProjectApi,
   "id" | "created" | "transactions" | "isComplete"
-> {}
+>;

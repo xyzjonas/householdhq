@@ -4,10 +4,4 @@ import tags from "./tags";
 import transactions from "./transactions";
 import * as appSettings from "./appSettings";
 
-export {
-  sources,
-  categories,
-  tags,
-  transactions,
-  appSettings,
-}
+export { sources, categories, tags, transactions, appSettings };

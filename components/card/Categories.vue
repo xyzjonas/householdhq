@@ -1,7 +1,7 @@
 <template>
   <div class="legend card font-sans">
     <div
-      v-for="item in items
+      v-for="item in [...items]
         .sort((a, b) => b.sum - a.sum)
         .filter((it) => it.sum > 10)"
       :key="item.id"

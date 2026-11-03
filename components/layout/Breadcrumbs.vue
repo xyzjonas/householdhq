@@ -1,7 +1,7 @@
 <template>
   <div v-if="pathSegments.length" class="crumbs py-4 mb-3 text-gray-5 text-md">
     <NuxtLink to="/" class="segment">Home</NuxtLink>
-    <span v-for="(segment, index) in pathSegments">
+    <span v-for="(segment, index) in pathSegments" :key="`${index}-${segment}`">
       <i class="i-ic-baseline-chevron-right mx-2"></i>
       <NuxtLink
         :to="`/${pathSegments.slice(0, index + 1).join('/')}`"

@@ -2,27 +2,24 @@ import { acceptHMRUpdate, defineStore } from "pinia";
 import { useNotifications } from "@/composables/useNotifications";
 
 interface ErrorResponse {
-  url: string
-  statusMessage: string
-  message: string
-  statusCode: number
-  stack: string
+  url: string;
+  statusMessage: string;
+  message: string;
+  statusCode: number;
+  stack: string;
 }
 
-
-
 export class ServerError extends Error {}
-
 
 export const useTokenStore = defineStore("token", () => {
   const n = useNotifications();
   const { t } = useI18n();
-  
+
   const token = useCookie("token", {
     // maxAge: new Date(2147483647 * 1000).getTime() / 1000,
     expires: new Date(2147483647 * 1000),
   });
-  const loggedUser  = useCookie("logged-user", undefined);
+  const loggedUser = useCookie("logged-user", undefined);
 
   const loginLoading = ref(false);
   const loginError = ref<string>();
@@ -73,7 +70,7 @@ export const useTokenStore = defineStore("token", () => {
     }
 
     if (response.status >= 400) {
-      const res = await response.json() as ErrorResponse
+      const res = (await response.json()) as ErrorResponse;
       n.addNotification({
         text: res.message,
         level: "error",
@@ -92,7 +89,7 @@ export const useTokenStore = defineStore("token", () => {
   const post = async (
     url: string,
     requestData?: object,
-    method: string = "POST"
+    method: string = "POST",
   ) => {
     const result = await fetch(url, {
       method: method,
@@ -127,7 +124,19 @@ export const useTokenStore = defineStore("token", () => {
     return await (await postprocess(response)).json();
   };
 
-  return { token, loggedUser, loginLoading, loginError, login, logout, get, post, put, patch, del };
+  return {
+    token,
+    loggedUser,
+    loginLoading,
+    loginError,
+    login,
+    logout,
+    get,
+    post,
+    put,
+    patch,
+    del,
+  };
 });
 
 if (import.meta.hot) {

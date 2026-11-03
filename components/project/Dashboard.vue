@@ -5,6 +5,7 @@
   >
     <project-row
       v-for="proj in projects.filter((proj) => !proj.isCompleted)"
+      :key="proj.id"
       :project="proj"
     />
     <!-- <div

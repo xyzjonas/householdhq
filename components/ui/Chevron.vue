@@ -9,7 +9,7 @@
 </template>
 <script setup lang="ts">
 const props = defineProps<{ readonly?: boolean }>();
-const model = defineModel();
+const model = defineModel<boolean>();
 
 const onClick = () => {
   if (props.readonly) {

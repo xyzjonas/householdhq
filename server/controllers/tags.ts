@@ -1,4 +1,4 @@
-import { PrismaClient, type Tag, Prisma } from "@prisma/client";
+import { type Tag, Prisma } from "@prisma/client";
 import type { IDBase } from "~/types/base";
 import type { CreateTagRequest, EditTagRequest } from "~/types/tag";
 import { prisma } from "./prisma-client";
@@ -33,14 +33,14 @@ class Tags {
 
   public async createTag(tagData: CreateTagRequest): Promise<Tag> {
     try {
-      const data: any = {
+      const data: Prisma.TagCreateInput = {
         name: tagData.name,
         description: tagData.description,
         icon: tagData.icon,
         // color: tagData.color,
       };
       if (tagData.parentId) {
-        data["parentTag"] = { connect: { id: tagData.parentId } };
+        data.parentTag = { connect: { id: tagData.parentId } };
       }
       const tag = await this.tags.create({ data: data });
       return tag;
@@ -64,7 +64,7 @@ class Tags {
   }
 
   public async editTag(tagData: EditTagRequest): Promise<Tag> {
-    let data = { ...tagData };
+    const data = { ...tagData };
     const parentId = data.parentId;
     delete data.parentId;
     try {

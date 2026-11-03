@@ -4,12 +4,12 @@
     <section v-else class="flex flex-col items-center">
       <i class="text-3xl font-light" :class="icon"></i>
       <h1>{{ title }}</h1>
-      <h2 class="text-gray-5" v-show="subtitle">{{ subtitle }}</h2>
+      <h2 v-show="subtitle" class="text-gray-5">{{ subtitle }}</h2>
     </section>
   </section>
 </template>
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   loading?: boolean;
   icon?: string;
   title: string;

@@ -15,7 +15,7 @@ type Response = {
 };
 
 const { data } = await useFetch<Response>(
-  "/api/transactions/all?important=true"
+  "/api/transactions/all?important=true",
 );
 
 const transactions = computed(() => {
@@ -30,22 +30,8 @@ const transactions = computed(() => {
 
   return result.sort(
     (a, b) =>
-      new Date(a.transactedAt).getTime() - new Date(b.transactedAt).getTime()
+      new Date(a.transactedAt).getTime() - new Date(b.transactedAt).getTime(),
   );
-});
-
-const transactionsByMonth = computed(() => {
-  const months: { [key: string]: Transaction[] } = {};
-  for (const trans of transactions.value) {
-    const date = new Date(trans.transactedAt);
-    const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-    if (!months[monthKey]) {
-      months[monthKey] = [trans];
-    } else {
-      months[monthKey].push(trans);
-    }
-  }
-  return months;
 });
 </script>
 

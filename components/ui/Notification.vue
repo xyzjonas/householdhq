@@ -10,43 +10,41 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Notification } from '@/composables/useNotifications';
+import type { Notification } from "@/composables/useNotifications";
 const props = defineProps<{
-  notification: Notification
-}>()
+  notification: Notification;
+}>();
 
-const level = computed(() => props.notification.level ?? 'info')
+const level = computed(() => props.notification.level ?? "info");
 
 const icon = computed(() => {
   if (props.notification.icon) {
-    return props.notification.icon
+    return props.notification.icon;
   }
 
   switch (level.value) {
-    case 'error':
-      return 'i-ic-round-error-outline'
-    case 'success':
-      return 'i-ic-baseline-check'
-    case 'warning':
-      return 'i-ic-round-warning-amber'
+    case "error":
+      return "i-ic-round-error-outline";
+    case "success":
+      return "i-ic-baseline-check";
+    case "warning":
+      return "i-ic-round-warning-amber";
   }
-  
-  return undefined
-})
 
+  return undefined;
+});
 </script>
 <style lang="css" scoped>
 .notification {
-  padding: .8rem;
+  padding: 0.8rem;
 }
 
 .notification-row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: .5rem;
+  gap: 0.5rem;
 }
-
 
 .info {
   color: var(--bg-200);
@@ -64,7 +62,7 @@ const icon = computed(() => {
 }
 
 .warning {
-  background-color: #FDB750;
+  background-color: #fdb750;
   color: var(--bg-200);
 }
 

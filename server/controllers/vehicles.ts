@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import type {
   IDBase,
   Vehicle,
@@ -120,7 +120,7 @@ class VehiclesService {
   public async createVehicle(vehicleData: VehicleCreate): Promise<Vehicle> {
     try {
       return await this.vehicles.create({
-        data: { ...vehicleData } as any,
+        data: { ...vehicleData },
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
