@@ -198,6 +198,7 @@ const openEditMeterModal = () => {
     unit: meter.value.unit,
     icon: meter.value.icon ?? "",
     color: meter.value.color ?? "#38c089",
+    meterNumber: meter.value.meterNumber ?? "",
   };
   editMeterModal.value = true;
 };
