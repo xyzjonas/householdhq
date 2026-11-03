@@ -50,9 +50,7 @@ export const renewSession = (session: Session): string => {
   //     ...partialSession,
   //     exp: expires,
   // }
-  const newSession: any = { ...session };
-  delete newSession.exp;
-  delete newSession.iat;
+  const { exp: _exp, iat: _iat, ...newSession } = session;
   console.info(newSession);
   return jwt.sign(newSession, SECRET_KEY, { expiresIn: EXPIRES_SECONDS });
 };
@@ -81,7 +79,10 @@ export const decodeSession = (tokenString: string): Session => {
 const passwordDatabase: { [username: string]: string | undefined } = {};
 passwordDatabase["admin"] = process.env.MASTER_PASSWORD;
 
-export const validatePassword = (username: string, password: string): boolean => {
+export const validatePassword = (
+  username: string,
+  password: string,
+): boolean => {
   if (passwordDatabase[username] && passwordDatabase[username] === password) {
     return true;
   }

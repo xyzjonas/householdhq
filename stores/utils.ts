@@ -1,8 +1,10 @@
 import type { CreateUpdateTransaction, Transaction } from "~/types";
 
-export function transactionToUpdateTransaction(trans: Transaction): CreateUpdateTransaction {
+export function transactionToUpdateTransaction(
+  trans: Transaction,
+): CreateUpdateTransaction {
   let transactedAt;
-  if (typeof trans.transactedAt === 'string') {
+  if (typeof trans.transactedAt === "string") {
     transactedAt = trans.transactedAt;
   } else {
     transactedAt = trans.transactedAt.toUTCString();
@@ -27,5 +29,7 @@ export function transactionToUpdateTransaction(trans: Transaction): CreateUpdate
 }
 
 export function byDate(a: Transaction, b: Transaction): number {
-  return new Date(b.transactedAt).getTime() - new Date(a.transactedAt).getTime()
+  return (
+    new Date(b.transactedAt).getTime() - new Date(a.transactedAt).getTime()
+  );
 }

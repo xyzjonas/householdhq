@@ -27,29 +27,29 @@
         <ui-button
           outlined
           icon="i-ic-baseline-local-gas-station"
-          @click="createFuelEntryModal = true"
           width="100%"
+          @click="createFuelEntryModal = true"
           >{{ $t("vehicle_fuel_entry_create") }}</ui-button
         >
         <ui-button
           outlined
           icon="i-ic-baseline-build"
-          @click="createServiceEntryModal = true"
           width="100%"
+          @click="createServiceEntryModal = true"
           >{{ $t("vehicle_service_entry_create") }}</ui-button
         >
         <ui-button
           outlined
           icon="i-ic-baseline-edit"
-          @click="openEditVehicleModal"
           width="100%"
+          @click="openEditVehicleModal"
           >{{ $t("edit") }}</ui-button
         >
         <ui-button
           outlined
           icon="i-ic-baseline-delete"
-          @click="deleteVehicle"
           width="100%"
+          @click="deleteVehicle"
           >{{ $t("delete") }}</ui-button
         >
       </div>
@@ -315,7 +315,7 @@ const editVehicle = async () => {
       level: "success",
       text: $t("vehicle_updated"),
     });
-  } catch (error) {
+  } catch {
     useNotifications().addNotification({
       level: "error",
       text: $t("vehicle_update_error"),
@@ -338,7 +338,7 @@ const deleteVehicle = async () => {
         text: $t("vehicle_deleted"),
       });
       await navigateTo("/vehicles");
-    } catch (error) {
+    } catch {
       useNotifications().addNotification({
         level: "error",
         text: $t("vehicle_delete_error"),
@@ -354,7 +354,7 @@ const createFuelEntry = async () => {
   try {
     await tokenStore.post(
       `/api/vehicles/${id}/fuel-entries`,
-      newFuelEntry.value as any,
+      newFuelEntry.value,
     );
     createFuelEntryModal.value = false;
     resetFuelEntryForm();
@@ -406,7 +406,7 @@ const createServiceEntry = async () => {
   try {
     await tokenStore.post(
       `/api/vehicles/${id}/service-entries`,
-      newServiceEntry.value as any,
+      newServiceEntry.value,
     );
     createServiceEntryModal.value = false;
     resetServiceEntryForm();
@@ -497,8 +497,6 @@ const deleteServiceEntry = async (entryId: number) => {
     loading.value = false;
   }
 };
-
-const { t } = useI18n();
 
 const tabOptions = computed(() => {
   return [

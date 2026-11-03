@@ -3,15 +3,13 @@ import type { CreateProject, Project } from "~/types";
 import { useTokenStore } from "./tokenStore";
 
 export const useProjectsStore = defineStore("project", () => {
-  const n = useNotifications();
-
   const tokenStore = useTokenStore();
 
   const allProjects = ref<Project[]>([]);
 
   const projects = computed<Project[]>(() => allProjects.value);
 
-  const currentProjectId = ref<number>()
+  const currentProjectId = ref<number>();
   const currentProject = computed<Project | undefined>(() => {
     return projects.value.find((src) => src.id === currentProjectId.value);
   });
@@ -41,13 +39,18 @@ export const useProjectsStore = defineStore("project", () => {
   //   }
   // };
 
-  const patchProject = async (projId: number, projectData: any) => {
+  const patchProject = async (
+    projId: number,
+    projectData: Partial<Project>,
+  ) => {
     loading.value = true;
     const url = "/api/projects";
     projectData.id = projId;
     try {
       const newProject = await tokenStore.patch(url, projectData);
-      allProjects.value = allProjects.value.filter((proj) => proj.id !== projId);
+      allProjects.value = allProjects.value.filter(
+        (proj) => proj.id !== projId,
+      );
       allProjects.value.push(newProject.data);
     } finally {
       loading.value = false;

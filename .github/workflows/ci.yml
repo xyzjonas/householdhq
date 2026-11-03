@@ -15,7 +15,7 @@ env:
 
 jobs:
   checks:
-    name: Typecheck, test & build
+    name: Format, lint, typecheck, test & build
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -32,6 +32,12 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint -- --max-warnings 0
 
       - name: Typecheck
         run: npx nuxt typecheck

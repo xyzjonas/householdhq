@@ -3,10 +3,10 @@
     <div class="flex">
       <transition name="slide">
         <div v-if="value !== valueCopy" class="flex gap-1 mr-1">
-          <ui-button @click="send" color="success">
+          <ui-button color="success" @click="send">
             {{ $t("ok").toUpperCase() }}
           </ui-button>
-          <ui-button @click="valueCopy = value" outlined>
+          <ui-button outlined @click="valueCopy = value">
             {{ $t("cancel") }}
           </ui-button>
         </div>
@@ -18,9 +18,9 @@
       >
         <input
           id="primary_color"
-          @change="update"
-          type="color"
           v-model="valueCopy"
+          type="color"
+          @change="update"
         />
       </label>
     </div>
@@ -28,7 +28,11 @@
 </template>
 <script>
 export default {
-  props: ["value", "keyName"],
+  props: {
+    value: { type: String, default: null },
+    keyName: { type: String, required: true },
+  },
+  emits: ["send"],
 
   data() {
     return {
@@ -37,16 +41,16 @@ export default {
     };
   },
 
+  created() {
+    this.valueCopy = this.value;
+  },
+
   methods: {
     send() {
       const data = {};
       data[this.keyName] = this.valueCopy;
       this.$emit("send", data);
     },
-  },
-
-  created() {
-    this.valueCopy = this.value;
   },
 };
 </script>

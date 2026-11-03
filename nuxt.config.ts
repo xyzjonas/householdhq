@@ -46,6 +46,7 @@ export default defineNuxtConfig({
     "@vite-pwa/nuxt",
     "@unocss/nuxt",
     "@nuxt/test-utils/module",
+    "@nuxt/eslint",
   ],
 
   i18n: {

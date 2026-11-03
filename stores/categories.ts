@@ -3,7 +3,6 @@ import type {
   Category,
   CreateCategory,
   Summary,
-  Tag,
   CategoryWithSum,
   Transaction,
 } from "~/types";
@@ -124,7 +123,7 @@ export const useCategoriesStore = defineStore("category", () => {
       const response = await tokenStore.get(url);
       console.info(response);
       categories.value = categories.value.filter(
-        (cat) => cat.id !== categoryId
+        (cat) => cat.id !== categoryId,
       );
       categories.value.push(response.data);
     } finally {
@@ -132,7 +131,10 @@ export const useCategoriesStore = defineStore("category", () => {
     }
   };
 
-  const patchCategory = async (categoryId: number, categoryData: any) => {
+  const patchCategory = async (
+    categoryId: number,
+    categoryData: Partial<Category>,
+  ) => {
     categoryLoading.value = true;
     const url = "/api/categories";
     // console.info(sourceData)
@@ -140,7 +142,7 @@ export const useCategoriesStore = defineStore("category", () => {
     try {
       const newCategory = await tokenStore.patch(url, categoryData);
       categories.value = categories.value.filter(
-        (cat) => cat.id !== categoryId
+        (cat) => cat.id !== categoryId,
       );
       categories.value.push(newCategory.data);
     } finally {

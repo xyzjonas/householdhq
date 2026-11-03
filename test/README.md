@@ -89,16 +89,12 @@ import { YourSchema } from "~/types/your-module";
 
 describe("Your Feature API", () => {
   it("validates correct payload", () => {
-    const result = YourSchema.safeParse({
-      /* valid data */
-    });
+    const result = YourSchema.safeParse({/* valid data */});
     expect(result.success).toBe(true);
   });
 
   it("rejects invalid payload", () => {
-    const result = YourSchema.safeParse({
-      /* invalid data */
-    });
+    const result = YourSchema.safeParse({/* invalid data */});
     expect(result.success).toBe(false);
   });
 });

@@ -13,31 +13,31 @@
       <!-- ENTIRE FORM -->
       <div v-if="stage === 3" class="form">
         <ui-input
-          :label="$t('t_amount')"
           v-model.number="transaction.amount"
+          :label="$t('t_amount')"
           type="number"
           inputmode="numeric"
           :required="true"
         />
         <div class="row-simple">
           <ui-input
-            :label="$t('t_date')"
             v-model="date"
+            :label="$t('t_date')"
             type="date"
             :required="true"
             class="flex-1"
           />
           <ui-input
-            :label="$t('t_time')"
             v-model="time"
+            :label="$t('t_time')"
             type="time"
             :required="true"
             class="flex-1"
           />
         </div>
         <ui-input
-          :label="$t('t_desc')"
           v-model="transaction.description"
+          :label="$t('t_desc')"
           type="text"
           :required="true"
         />
@@ -89,8 +89,8 @@
           <ui-toggle v-model="isRecurring"></ui-toggle>
           <ui-input
             v-if="isRecurring"
-            :label="$t('t_recurring_label')"
             v-model.number="transaction.recurring"
+            :label="$t('t_recurring_label')"
             type="number"
             class="w-20 text-center ml-auto flex-1"
           />
@@ -111,11 +111,11 @@
         </div>
 
         <ui-button
-          @click="send"
           :loading="loading"
           color="primary"
           width="100%"
           height="5rem"
+          @click="send"
         >
           {{ $t("t_send") }}
         </ui-button>
@@ -126,6 +126,7 @@
         <div class="categories">
           <CategoryBadge
             v-for="category in categories"
+            :key="category.id"
             :category="category"
             @selected="categorySelected(category)"
           />
@@ -144,10 +145,10 @@
           <ui-button
             color="success"
             icon="fa-solid fa-arrow-trend-up"
-            @click="makeIncome"
             width="8rem"
             height="8rem"
             rounded
+            @click="makeIncome"
           >
             {{ $t("t_add_in") }}
           </ui-button>
@@ -165,10 +166,10 @@
         <div class="flex items-center justify-center gap-10">
           <ui-button
             icon="fa-solid fa-arrow-trend-up"
-            @click="makeHidden"
             width="6rem"
             height="6rem"
             rounded
+            @click="makeHidden"
           >
             {{ $t("t_add_hidden") }}
           </ui-button>
@@ -177,23 +178,24 @@
     </transition>
     <div class="navigation">
       <ui-button
-        @click="stage = stage - 1"
         :disabled="stage <= 0"
         rounded
         color="primary"
         icon="i-ic-baseline-arrow-back"
+        @click="stage = stage - 1"
       />
       <a
         v-for="index in stages"
+        :key="index"
         :class="['navigation-stage', stage === index - 1 ? 'active' : '']"
         @click="stage = index - 1"
       />
       <ui-button
-        @click="stage = stage + 1"
         :disabled="stage >= stages - 1"
         rounded
         color="primary"
         icon="i-ic-baseline-arrow-forward"
+        @click="stage = stage + 1"
       />
     </div>
     <p class="error" style="text-align: right">{{ error }}</p>
@@ -202,7 +204,7 @@
         <ui-modal v-model="showNewCategory">
           <form class="card w-sm" @submit.prevent="createCategory">
             <h3 class="mb-5 text-xl uppercase">{{ $t("c_new") }}</h3>
-            <ui-input :label="$t('c_name')" v-model="newCategoryName" />
+            <ui-input v-model="newCategoryName" :label="$t('c_name')" />
             <ui-button
               :loading="categoryLoading"
               :disabled="!newCategoryName"
@@ -226,7 +228,7 @@ import { useSourcesStore } from "@/stores/sources";
 import type { Transaction, CreateUpdateTransaction, Category } from "@/types";
 import { transactionToUpdateTransaction } from "@/stores/utils";
 
-const focusDiv = ref<any>(null);
+const focusDiv = ref<HTMLElement | null>(null);
 
 const props = defineProps<{
   transactionIn?: Transaction;
@@ -287,7 +289,7 @@ onMounted(() => {
 
   isRecurring.value = transaction.value.recurring !== 0;
 
-  focusDiv.value.scrollIntoView({ block: "center", behavior: "smooth" });
+  focusDiv.value?.scrollIntoView({ block: "center", behavior: "smooth" });
 });
 
 const makeIncome = () => {
@@ -311,8 +313,7 @@ const isRecurring = ref(false);
 watch(isRecurring, (value) => {
   if (value && transaction.value.recurring <= 0) {
     transaction.value.recurring = 1;
-  } else if (transaction.value.recurring > 0) {
-  } else {
+  } else if (!(transaction.value.recurring > 0)) {
     transaction.value.recurring = 0;
   }
 });

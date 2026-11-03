@@ -1,5 +1,5 @@
-import { appSettings } from '~/server/controllers';
-import { UpdateAppSettingSchema } from '~/types/appSettings';
+import { appSettings } from "~/server/controllers";
+import { UpdateAppSettingSchema } from "~/types/appSettings";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     const updatedSettings = await appSettings.updateSettings(validatedData);
     return {
       data: updatedSettings,
-      message: 'Settings updated successfully',
+      message: "Settings updated successfully",
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     }
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to update settings',
+      statusMessage: "Failed to update settings",
     });
   }
 });

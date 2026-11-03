@@ -28,7 +28,7 @@ import type { Transaction } from "~/types";
 
 defineProps<{ upcomming: Transaction[]; currency?: string }>();
 
-const showUpcomming = defineModel("show");
+const showUpcomming = defineModel<boolean>("show");
 
 const { t } = useI18n();
 const mapTransactionDeclention = (count: number) => {

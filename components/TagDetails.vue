@@ -1,20 +1,21 @@
 <template>
-    <section>
-        <button @click="$emit('cancel')">{{ $t('back') }}</button>
-        <button style="margin-left: 0.5em;">
-            <NuxtLink :to="`/tags/${tagId}`">{{ $t('edit') }}</NuxtLink>
-        </button>
-    </section>
+  <section>
+    <button @click="$emit('cancel')">{{ $t("back") }}</button>
+    <button style="margin-left: 0.5em">
+      <NuxtLink :to="`/tags/${tagId}`">{{ $t("edit") }}</NuxtLink>
+    </button>
+  </section>
 </template>
 <script>
 export default {
-
-    props: ['tagId']
-    
-}
+  props: {
+    tagId: { type: [String, Number], required: true },
+  },
+  emits: ["cancel"],
+};
 </script>
 <style lang="scss" scoped>
 section {
-    padding: 1em
+  padding: 1em;
 }
 </style>

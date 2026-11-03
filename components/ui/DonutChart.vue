@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { Doughnut } from "vue-chartjs";
+import type { ArcElement, Chart, ChartOptions } from "chart.js";
 import { useLocalStorage } from "@vueuse/core";
 
 export interface DonutChartSegment {
@@ -47,7 +48,7 @@ const props = withDefaults(
 );
 
 const theme = useLocalStorage<string>("theme", "light");
-const doughnutChart = ref<any>(null);
+const doughnutChart = shallowRef<{ chart?: Chart | null } | null>(null);
 
 watch(theme, () => {
   doughnutChart.value?.chart?.update();
@@ -106,9 +107,9 @@ const shortName = (name: string) => {
 
 const calloutLabelsPlugin = {
   id: "donut-callout-labels",
-  afterDatasetsDraw(chart: any) {
+  afterDatasetsDraw(chart: Chart<"doughnut">) {
     const meta = chart.getDatasetMeta(0);
-    const arcs = meta?.data ?? [];
+    const arcs = (meta?.data ?? []) as ArcElement[];
 
     if (!arcs.length || segments.value.length <= 1) {
       return;
@@ -129,6 +130,10 @@ const calloutLabelsPlugin = {
             ["x", "y", "startAngle", "endAngle", "outerRadius", "innerRadius"],
             true,
           );
+
+        if (x === null || y === null) {
+          return null;
+        }
 
         const angle = (startAngle + endAngle) / 2;
         const middleRadius = (innerRadius + outerRadius) / 2;
@@ -243,12 +248,12 @@ const calloutLabelsPlugin = {
   },
 };
 
-const options = {
+const options: ChartOptions<"doughnut"> = {
   responsive: true,
   maintainAspectRatio: false,
   layout: {
-    padding: (context: any) => {
-      const width = context?.chart?.width ?? 0;
+    padding: (context) => {
+      const width = context.chart.width ?? 0;
       const side = width < 420 ? 22 : 42;
 
       return {
@@ -268,7 +273,7 @@ const options = {
       display: () => false,
     },
   },
-} as any;
+};
 </script>
 
 <style lang="scss" scoped>

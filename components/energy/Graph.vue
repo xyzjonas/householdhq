@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import { useLocalStorage } from "@vueuse/core";
 import { Line } from "vue-chartjs";
+import type { ChartData, ChartOptions } from "chart.js";
 import type { MeterState } from "~/types";
 
 const props = defineProps<{ states: MeterState[]; color?: string }>();
@@ -57,24 +58,18 @@ const dataSet = computed<{ label: string; value: number }[]>(() => {
   }
 });
 
-const chartData = computed<any>(() => {
+const chartData = computed<ChartData<"line">>(() => {
   if (showIncrements.value) {
     return {
       labels: dataSet.value.map((item) => item.label),
       datasets: [
         {
-          labels: {
-            value: {
-              color: "green",
-            },
-          },
           borderColor: props.color ?? "#38c089",
           backgroundColor: `${props.color ?? "#38c089"}99`,
           data: dataSet.value.map((item) => item.value),
           cubicInterpolationMode: "monotone",
           tension: 0.4,
           pointStyle: false,
-          borderRadius: 0,
         },
       ],
     };
@@ -83,18 +78,12 @@ const chartData = computed<any>(() => {
     labels: dataSet.value.map((item) => item.label),
     datasets: [
       {
-        labels: {
-          value: {
-            color: "green",
-          },
-        },
         borderColor: props.color,
         backgroundColor: `${props.color}99`,
         data: dataSet.value.map((item) => item.value),
         cubicInterpolationMode: "monotone",
         tension: 0.4,
         pointStyle: false,
-        borderRadius: 0,
       },
     ],
   };
@@ -102,19 +91,17 @@ const chartData = computed<any>(() => {
 
 const { isDark } = useTheme();
 
-const options = {
-  type: "bar",
+const options: ChartOptions<"line"> = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    datalabels: false,
+    datalabels: { display: false },
   },
   scales: {
     y: {
       display: true,
       grid: {
         color: isDark.value ? "#666" : "#aaa",
-        drawBorder: false,
       },
       title: {
         display: false,
@@ -130,9 +117,8 @@ const options = {
       },
       grid: {
         color: isDark.value ? "#66666655" : "#cccccc55",
-        drawBorder: false,
       },
     },
   },
-} as any;
+};
 </script>

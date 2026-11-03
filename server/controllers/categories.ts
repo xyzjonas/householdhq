@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import type { Category, CreateCategory, EditCategory, IDBase } from "~/types";
 import { prisma } from "./prisma-client";
 
@@ -28,7 +28,7 @@ class Categories {
 
   public async createCategory(categoryData: CreateCategory): Promise<Category> {
     try {
-      return await this.categories.create({ data: { ...categoryData } as any });
+      return await this.categories.create({ data: { ...categoryData } });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === "P2002") {

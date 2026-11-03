@@ -26,8 +26,8 @@
             <!-- <ui-pin :text="`${vehicle.brand} ${vehicle.model}`" size="small" /> -->
             <!-- <ui-pin :text="vehicle.registration" size="small" /> -->
             <vehicle-registration-plate
-              :value="vehicle.registration"
               v-if="vehicle.registration"
+              :value="vehicle.registration"
             />
           </div>
           <span v-if="vehicle.purchasedAt" class="text-[10px] text-gray-5"

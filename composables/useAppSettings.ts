@@ -59,7 +59,9 @@ export const useAppSettings = () => {
   /**
    * Get a specific setting value
    */
-  const getSetting = (key: keyof AppSetting): any => {
+  const getSetting = <K extends keyof AppSetting>(
+    key: K,
+  ): AppSetting[K] | undefined => {
     return settings.value?.[key];
   };
 

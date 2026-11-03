@@ -1,16 +1,16 @@
-import { appSettings } from '~/server/controllers';
+import { appSettings } from "~/server/controllers";
 
 export default defineEventHandler(async () => {
   try {
     const settings = await appSettings.getSettings();
     return {
       data: settings,
-      message: 'Settings retrieved successfully',
+      message: "Settings retrieved successfully",
     };
-  } catch (error) {
+  } catch {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to retrieve settings',
+      statusMessage: "Failed to retrieve settings",
     });
   }
 });

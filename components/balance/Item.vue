@@ -17,7 +17,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { sourceIcons, type Source } from "@/types";
+import type { Source } from "@/types";
 
 const props = defineProps<{
   source: Source;
@@ -27,6 +27,7 @@ const lastEntry = computed(() => {
   if (props.source.states && props.source.states.length > 0) {
     return props.source.states.reduce((_, b) => b);
   }
+  return null;
 });
 
 const lastEntryNotThisMonth = computed(() => {
@@ -47,7 +48,7 @@ const lastEntryNotThisMonth = computed(() => {
   return false;
 });
 
-const emit = defineEmits(["autoupdated"]);
+defineEmits(["autoupdated"]);
 </script>
 <style lang="scss" scoped>
 .bal-wrapper {

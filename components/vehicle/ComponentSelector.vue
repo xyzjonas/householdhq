@@ -64,8 +64,8 @@
             $t("vehicle_component_color")
           }}</label>
           <input
-            type="color"
             v-model="newColor"
+            type="color"
             class="color-input"
             title="Component color"
           />

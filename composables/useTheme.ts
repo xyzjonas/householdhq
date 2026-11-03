@@ -1,10 +1,8 @@
 import { useStorage } from "@vueuse/core";
 
-
 const theme = useStorage("theme", "");
 
 export const useTheme = () => {
-
   // if (!theme.value) {
   //   theme.value = document.documentElement.getAttribute("data-theme") ?? ""
   // }
@@ -22,7 +20,7 @@ export const useTheme = () => {
     theme.value = value;
   }
 
-  const isDark = computed(() => theme.value === "dark")
+  const isDark = computed(() => theme.value === "dark");
 
   return {
     theme,

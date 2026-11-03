@@ -9,7 +9,7 @@
     ]"
   >
     <div class="">
-      <h1 class="text-center uppercase text-xl" v-if="notSearchedYet">
+      <h1 v-if="notSearchedYet" class="text-center uppercase text-xl">
         search for transactions
       </h1>
       <ui-input
@@ -38,11 +38,9 @@ const search = ref("");
 const loading = ref(false);
 const transactions = ref<Transaction[]>([]);
 
-const { month, year } = useMonth();
-
 const notSearchedYet = ref(true);
 
-const fetch = async (query?: { year: number; month: number }) => {
+const fetch = async () => {
   const searchValue = search.value.trim();
   if (!searchValue) {
     return;
@@ -75,36 +73,6 @@ watch(search, () => {
 });
 
 const displayedTransactions = computed(() => transactions.value);
-
-const { token } = useTokenStore();
-
-const deleteTransaction = (transactionData: Transaction) => {
-  const url = "/api/transactions";
-  loading.value = true;
-  $fetch(url, {
-    method: "DELETE",
-    headers: {
-      Authorization: "Bearer " + token,
-    },
-    body: transactionData,
-  })
-    .then((res) => {
-      transactions.value = transactions.value.filter(
-        (t: Transaction) => t.id != transactionData.id,
-      );
-    })
-    .finally(() => (loading.value = false));
-};
-
-const updateTransaction = (transaction: Transaction) => {
-  console.info("UPDATED");
-  transactions.value = transactions.value.map((trans) => {
-    if (trans.id === transaction.id) {
-      return transaction;
-    }
-    return trans;
-  });
-};
 </script>
 
 <style lang="css" scoped>

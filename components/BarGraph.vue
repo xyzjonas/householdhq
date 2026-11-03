@@ -9,11 +9,11 @@
       class="my-auto"
     />
     <Summary
+      v-else-if="selectedCategory"
       :category="selectedCategory"
+      class="flex-1 relative"
       @edit="navigateTo(`/tags/${selectedCategory.id}`)"
       @close="selectedCategoryId = -1"
-      v-else-if="selectedCategory"
-      class="flex-1 relative"
     />
     <div v-else class="graph-wrapper">
       <Doughnut
@@ -30,6 +30,7 @@
 </template>
 <script setup lang="ts">
 import { Doughnut } from "vue-chartjs";
+import type { ArcElement, Chart, ChartOptions } from "chart.js";
 import { storeToRefs } from "pinia";
 import type { CategoryWithSum } from "@/types";
 
@@ -37,7 +38,7 @@ import { useTransactionStore } from "@/stores/transactions";
 import { useLocalStorage } from "@vueuse/core";
 
 const theme = useLocalStorage<string>("theme", "light");
-const doughnutChart = ref<any>(null);
+const doughnutChart = shallowRef<{ chart?: Chart | null } | null>(null);
 
 watch(theme, () => {
   doughnutChart.value?.chart?.update();
@@ -133,9 +134,9 @@ const shortName = (name?: string | null) => {
 
 const calloutLabelsPlugin = {
   id: "callout-labels",
-  afterDatasetsDraw(chart: any) {
+  afterDatasetsDraw(chart: Chart<"doughnut">) {
     const meta = chart.getDatasetMeta(0);
-    const arcs = meta?.data ?? [];
+    const arcs = (meta?.data ?? []) as ArcElement[];
 
     if (!arcs.length || showedItems.value.length <= 1) {
       return;
@@ -156,6 +157,10 @@ const calloutLabelsPlugin = {
             ["x", "y", "startAngle", "endAngle", "outerRadius", "innerRadius"],
             true,
           );
+
+        if (x === null || y === null) {
+          return null;
+        }
 
         const angle = (startAngle + endAngle) / 2;
         const middleRadius = (innerRadius + outerRadius) / 2;
@@ -280,18 +285,24 @@ const selectCategoryByName = (name: string) => {
   }
 };
 
-const callback = (e: any) => {
+const callback: ChartOptions<"doughnut">["onClick"] = (
+  _event,
+  _elements,
+  chart,
+) => {
   // OnClick emit filter by category
-  const label = e.chart.tooltip.title[0];
-  selectCategoryByName(label);
+  const label = chart.tooltip?.title[0];
+  if (label !== undefined) {
+    selectCategoryByName(label);
+  }
 };
 
-const options = {
+const options: ChartOptions<"doughnut"> = {
   responsive: true,
   maintainAspectRatio: false,
   layout: {
-    padding: (context: any) => {
-      const width = context?.chart?.width ?? 0;
+    padding: (context) => {
+      const width = context.chart.width ?? 0;
       const side = width < 420 ? 22 : 42;
 
       return {
@@ -312,7 +323,7 @@ const options = {
       display: () => false,
     },
   },
-} as any;
+};
 </script>
 <style lang="scss" scoped>
 section {

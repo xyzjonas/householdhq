@@ -14,7 +14,6 @@ const props = defineProps({
   amount: {
     type: [String, Number],
     default: "N/A",
-    required: true,
   },
   size: {
     type: String,
@@ -26,7 +25,7 @@ const props = defineProps({
   },
   currencyIn: {
     type: String,
-    required: false,
+    default: undefined,
   },
 });
 

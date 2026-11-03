@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { useScrollLock } from "@vueuse/core";
 
-const modelValue = defineModel({ default: true });
+const modelValue = defineModel<boolean>({ default: true });
 
 const lock = useScrollLock(document);
 lock.value = modelValue.value;

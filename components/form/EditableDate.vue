@@ -1,34 +1,33 @@
 <template>
-    <div>
-        <div v-if="editting" class="input">
-            <input id="firstname" class="input" type="date" v-model="valueCopy"/>
-            <button @click="editting = false">cancel</button>
-        </div>
-        <p v-else @click="editting = true">{{ displayDate }}</p>
+  <div>
+    <div v-if="editting" class="input">
+      <input id="firstname" v-model="valueCopy" class="input" type="date" />
+      <button @click="editting = false">cancel</button>
     </div>
+    <p v-else @click="editting = true">{{ displayDate }}</p>
+  </div>
 </template>
 <script>
 export default {
+  props: {
+    date: { type: [String, Number, Date], required: true },
+  },
 
-    props: ['date'],
+  data() {
+    return {
+      editting: false,
+      valueCopy: null,
+      displayDate: null,
+    };
+  },
 
-    data() {
-        return {
-            editting: false,
-            valueCopy: null,
-            displayDate: null
-        }
-    },
+  created() {
+    const locale = this.$i18n.locale;
+    const parsedDate = new Date(this.date);
+    this.displayDate = parsedDate.toLocaleDateString(locale);
 
-    created() {
-        const locale = this.$i18n.locale;
-        const parsedDate = new Date(this.date);
-        this.displayDate = parsedDate.toLocaleDateString(locale);
-
-        this.valueCopy = `${parsedDate.getUTCFullYear()}-${parsedDate.getMonth() + 1}-${parsedDate.getDate()}`;
-    }
-    
-}
+    this.valueCopy = `${parsedDate.getUTCFullYear()}-${parsedDate.getMonth() + 1}-${parsedDate.getDate()}`;
+  },
+};
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

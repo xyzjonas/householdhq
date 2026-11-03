@@ -36,13 +36,12 @@
 
 <script setup lang="ts">
 import { Line } from "vue-chartjs";
+import type { ChartOptions } from "chart.js";
 import { useLocalStorage, useWindowSize } from "@vueuse/core";
 import type { VehicleFuelEntry } from "~/types";
 
 type FuelChartMode =
-  | "ODOMETER_CHANGE"
-  | "UNIT_PRICE_CHANGE"
-  | "YEARLY_DISTANCE";
+  "ODOMETER_CHANGE" | "UNIT_PRICE_CHANGE" | "YEARLY_DISTANCE";
 
 type ChartPoint = {
   label: string;
@@ -286,7 +285,7 @@ const chartData = computed(() => {
   };
 });
 
-const chartOptions = computed(() => {
+const chartOptions = computed<ChartOptions<"line">>(() => {
   const dark = theme.value === "dark";
   const axisColor = dark ? "#a1a1aa" : "#52525b";
   const gridColor = dark ? "rgba(161,161,170,0.25)" : "rgba(82,82,91,0.12)";
@@ -332,7 +331,7 @@ const chartOptions = computed(() => {
         display: false,
       },
     },
-  } as any;
+  };
 });
 
 const totalValue = computed(() => {

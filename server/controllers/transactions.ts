@@ -1,11 +1,11 @@
 import { Prisma, type Transaction } from "@prisma/client";
 import type { Transaction as TransactionWithIncludes } from "~/types";
-import {
-  type CreateTransactionRequest as CreateDto,
-  type EditTransactionRequest as EditDto,
-  type TagTransactionRequest as TagDto,
-  type TransactionFiltersRequest,
-  type TransactionMonthRequest as MonthDto,
+import type {
+  CreateTransactionRequest as CreateDto,
+  EditTransactionRequest as EditDto,
+  TagTransactionRequest as TagDto,
+  TransactionFiltersRequest,
+  TransactionMonthRequest as MonthDto,
 } from "~/types/transaction";
 import type { IDBase } from "~/types/base";
 import { prisma } from "./prisma-client";
@@ -71,7 +71,7 @@ class Transactions {
         ignoreNul(b.transactedAt).getTime() -
         ignoreNul(a.transactedAt).getTime(),
     );
-    return allTrans as any;
+    return allTrans as unknown as TransactionWithIncludes[];
   }
 
   public async searchFulltext(
@@ -147,7 +147,7 @@ class Transactions {
         statusMessage: `No such transaction id=${transactionData.id}`,
       });
     }
-    return transaction as any;
+    return transaction as unknown as TransactionWithIncludes;
   }
 
   public async findRecent(data: MonthDto): Promise<GetTransactionsResponse> {
@@ -168,8 +168,8 @@ class Transactions {
       monthNext = monthNext % 12;
       yearNext++;
     }
-    const queryDate = new Date((year = year), (month = month));
-    const queryDateNext = new Date((year = yearNext), (month = monthNext));
+    const queryDate = new Date(year, month);
+    const queryDateNext = new Date(yearNext, monthNext);
     const allTrans = await this.findInterval(queryDate, queryDateNext);
     allTrans.sort(
       (a, b) =>
@@ -179,7 +179,7 @@ class Transactions {
     return {
       month: `${year}-${month}`,
       count: allTrans.length,
-      data: allTrans as any,
+      data: allTrans,
     };
   }
 
@@ -201,7 +201,7 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return allTrans as any;
+    return allTrans as unknown as TransactionWithIncludes[];
   }
 
   public async createTransaction(
@@ -326,7 +326,7 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return trans as any;
+    return trans as unknown as TransactionWithIncludes;
   }
 
   public async deleteTransaction(
@@ -352,7 +352,7 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return trans as any;
+    return trans as unknown as TransactionWithIncludes;
   }
 
   public async untagTransaction(
@@ -370,7 +370,7 @@ class Transactions {
       },
       include: DEFAULT_INCLUDE,
     });
-    return trans as any;
+    return trans as unknown as TransactionWithIncludes;
   }
 }
 
