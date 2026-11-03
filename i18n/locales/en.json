@@ -219,5 +219,22 @@
   "vehicle_transaction_link": "Linked transaction",
   "vehicle_tab_transactions": "Transactions",
   "vehicle_tab_details": "Details",
-  "vehicle_transactions_empty": "No transactions linked to this vehicle category yet."
+  "vehicle_transactions_empty": "No transactions linked to this vehicle category yet.",
+  "home_overview": "{month} Overview",
+  "home_cashflow_range": "Household cashflow {range}",
+  "home_this_period": "This month",
+  "home_period_prev": "Previous period",
+  "home_period_next": "Next period",
+  "home_month_summary": "month summary",
+  "home_until_month_end": "End of month ({date})",
+  "home_until_period_end": "End of fiscal period ({date})",
+  "home_pending_count": "{count} pending",
+  "home_uncategorized": "Uncategorized",
+  "home_due_now": "due",
+  "t_deleted": "Transaction deleted.",
+  "settings_fiscal_day": "Fiscal period end day",
+  "settings_fiscal_day_desc": "Day of the month on which your monthly period ends, typically the day before wages arrive. Balance projections and the monthly overview follow it.",
+  "settings_fiscal_day_hint": "Enter a day from 1 to 31. Shorter months end on their last day.",
+  "settings_fiscal_day_error": "Enter a whole number from 1 to 31.",
+  "settings_fiscal_day_current": "Current period: {range}"
 }

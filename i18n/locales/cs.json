@@ -222,5 +222,22 @@
   "vehicle_transaction_link": "Navázaná transakce",
   "vehicle_tab_transactions": "Transakce",
   "vehicle_tab_details": "Detaily",
-  "vehicle_transactions_empty": "Zatím nejsou dostupné žádné transakce propojené přes kategorii vozidla."
+  "vehicle_transactions_empty": "Zatím nejsou dostupné žádné transakce propojené přes kategorii vozidla.",
+  "home_overview": "Přehled – {month}",
+  "home_cashflow_range": "Cashflow domácnosti {range}",
+  "home_this_period": "Tento měsíc",
+  "home_period_prev": "Předchozí období",
+  "home_period_next": "Další období",
+  "home_month_summary": "souhrn měsíce",
+  "home_until_month_end": "Konec měsíce ({date})",
+  "home_until_period_end": "Konec fiskálního období ({date})",
+  "home_pending_count": "čeká: {count}",
+  "home_uncategorized": "Bez kategorie",
+  "home_due_now": "splatné",
+  "t_deleted": "Transakce smazána.",
+  "settings_fiscal_day": "Poslední den fiskálního období",
+  "settings_fiscal_day_desc": "Den v měsíci, kterým končí vaše měsíční období, typicky den před výplatou. Projekce zůstatku i měsíční přehled se řídí tímto dnem.",
+  "settings_fiscal_day_hint": "Zadejte den od 1 do 31. Kratší měsíce končí posledním dnem.",
+  "settings_fiscal_day_error": "Zadejte celé číslo od 1 do 31.",
+  "settings_fiscal_day_current": "Aktuální období: {range}"
 }
