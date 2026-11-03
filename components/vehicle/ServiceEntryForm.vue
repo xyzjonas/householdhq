@@ -16,26 +16,26 @@
       <option value="FEES">{{ $t("vehicle_service_type_fees") }}</option>
     </ui-select>
 
-    <ui-input :label="$t('vehicle_service_title')" v-model="entry.title" />
+    <ui-input v-model="entry.title" :label="$t('vehicle_service_title')" />
 
     <ui-input
+      v-model="servicedAtInput"
       :label="$t('vehicle_service_datetime')"
       type="datetime-local"
-      v-model="servicedAtInput"
     />
 
     <ui-input
+      v-model.number="odometerValue"
       :label="$t('vehicle_service_odometer')"
       type="number"
       inputmode="numeric"
-      v-model.number="odometerValue"
     />
 
     <ui-input
+      v-model.number="priceValue"
       :label="$t('vehicle_service_price')"
       type="number"
       step="0.01"
-      v-model.number="priceValue"
     />
 
     <div class="service-description">
@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import type { VehicleServiceEntryCreate } from "~/types";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     loading?: boolean;
     title: string;
@@ -79,6 +79,7 @@ const props = withDefaults(
   }>(),
   {
     loading: false,
+    entryId: undefined,
   },
 );
 

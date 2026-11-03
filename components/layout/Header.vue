@@ -17,8 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import { transition } from "@vueuse/core";
-
 const { drawer } = useDrawer();
 </script>
 

@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { sourceIcons, type Source } from "@/types";
 
-const props = defineProps<{ source: Source }>();
+defineProps<{ source: Source }>();
 </script>
 <style lang="scss" scoped>
 .color-flag {

@@ -1,9 +1,4 @@
-import {
-  Prisma,
-  PrismaClient,
-  type Project,
-  type Transaction,
-} from "@prisma/client";
+import { Prisma, type Project } from "@prisma/client";
 import type { CreateProjectRequest, EditProjectRequest } from "~/types/project";
 import type { IDBase } from "~/types/base";
 import { prisma } from "./prisma-client";
@@ -43,7 +38,7 @@ class Projects {
     projectData: CreateProjectRequest,
   ): Promise<Project> {
     try {
-      return await this.projects.create({ data: { ...projectData } as any });
+      return await this.projects.create({ data: { ...projectData } });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === "P2002") {

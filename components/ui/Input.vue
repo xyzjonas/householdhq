@@ -2,15 +2,15 @@
   <div :class="clazz">
     <label v-if="label" :for="uniqueId">{{ label }}</label>
     <input
-      ref="inputRef"
       :id="uniqueId"
+      ref="inputRef"
       :value="modelValue"
-      @input="emitValue(($event.target as HTMLInputElement).value)"
       :type="type"
       :name="label"
       :required="required"
       :inputmode="inputmode ?? 'text'"
       :autocomplete="autocomplete"
+      @input="emitValue(($event.target as HTMLInputElement).value)"
     />
   </div>
 </template>
@@ -18,7 +18,7 @@
 import type { HTMLAttributes } from "vue";
 
 const props = defineProps<{
-  modelValue: any;
+  modelValue: string | number | null | undefined;
   label?: string;
   type?: string;
   inputmode?: HTMLAttributes["inputmode"];
@@ -32,7 +32,7 @@ const clazz = computed(() => {
 });
 
 const emit = defineEmits(["update:modelValue"]);
-function emitValue(value: any) {
+function emitValue(value: string) {
   if (props.type === "number") {
     emit("update:modelValue", parseFloat(value));
   } else {

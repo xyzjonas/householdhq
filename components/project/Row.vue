@@ -1,7 +1,7 @@
 <template>
   <ui-list-row
-    @click="navigateTo(`/projects/${project.id}`)"
     class="flex justify-between"
+    @click="navigateTo(`/projects/${project.id}`)"
   >
     <div class="flex items-center gap-3">
       <span class="color-flag"></span>
@@ -17,7 +17,7 @@
   </ui-list-row>
 </template>
 <script setup lang="ts">
-import { type Project } from "@/types";
+import type { Project } from "@/types";
 
 const props = defineProps<{ project: Project }>();
 

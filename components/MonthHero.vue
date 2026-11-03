@@ -12,8 +12,8 @@
           :to="`/?year=${previous.getFullYear()}&month=${
             previous.getMonth() + 1
           }`"
-          @click="$emit('reload', previous)"
           class="left flex"
+          @click="$emit('reload', previous)"
         >
           <i class="i-ic-baseline-arrow-back text-2xl"></i>
         </NuxtLink>
@@ -22,16 +22,16 @@
         <NuxtLink
           v-if="!isCurrent"
           to="/"
-          @click="$emit('reload', new Date())"
           class="left flex"
+          @click="$emit('reload', new Date())"
         >
           <ui-pin text="This month" clickable></ui-pin>
         </NuxtLink>
       </div>
       <NuxtLink
         :to="`/?year=${next.getFullYear()}&month=${next.getMonth() + 1}`"
-        @click="$emit('reload', next)"
         class="right flex"
+        @click="$emit('reload', next)"
       >
         <i class="i-ic-baseline-arrow-forward text-2xl"></i>
       </NuxtLink>
@@ -41,8 +41,7 @@
 <script setup lang="ts">
 import { useCurrentMonth } from "~/composables/useCurrentMonth";
 
-const { monthName, year, next, previous, isCurrent, dateFormatted } =
-  useCurrentMonth();
+const { monthName, year, next, previous, isCurrent } = useCurrentMonth();
 
 defineEmits(["reload"]);
 </script>

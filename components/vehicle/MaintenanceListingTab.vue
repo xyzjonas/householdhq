@@ -52,8 +52,8 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: "edit-entry", entryId: number): void;
-  (e: "delete-entry", entryId: number): void;
+  "edit-entry": [entryId: number];
+  "delete-entry": [entryId: number];
 }>();
 
 const selectedComponentIds = ref<number[]>([]);

@@ -67,8 +67,8 @@
       <transition name="page" mode="out-in">
         <section v-if="editing" class="mt-1">
           <transaction-form
-            :transactionIn="transaction"
-            :startStage="3"
+            :transaction-in="transaction"
+            :start-stage="3"
             @send="editTransaction"
             @cancel="editing = false"
             @close="editing = false"
@@ -233,14 +233,6 @@ const transaction = computed(() => data.value?.data);
 const editing = ref(false);
 const transactionStore = useTransactionStore();
 
-const recurringLabel = computed(() => {
-  if (!transaction.value?.recurring) {
-    return t("undefined");
-  }
-
-  return `${transaction.value.recurring}m`;
-});
-
 const isIncomeTransaction = computed(() => {
   if (!transaction.value) {
     return false;
@@ -289,7 +281,7 @@ const statusPins = computed<StatusPin[]>(() => {
   return pins;
 });
 
-const editTransaction = async (transactionData: { [key: string]: any }) => {
+const editTransaction = async (transactionData: Partial<Transaction>) => {
   try {
     await transactionStore.editTransaction({ id, ...transactionData });
     await refresh();

@@ -36,7 +36,7 @@ export const useSearch = () => {
         value.project?.name ?? "",
         value.source?.name ?? "",
         value.target?.name ?? "",
-      ].join(" ")
+      ].join(" "),
     );
   }
 

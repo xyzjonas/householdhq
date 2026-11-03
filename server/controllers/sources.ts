@@ -1,4 +1,4 @@
-import { PrismaClient, type Source, type SourceState } from "@prisma/client";
+import type { Source, SourceState } from "@prisma/client";
 import type { IDBase } from "~/types/base";
 import type {
   CreateSourceRequest,
@@ -36,37 +36,32 @@ class Sources {
   public async createSource(sourceData: CreateSourceRequest): Promise<Source> {
     // const data = { ...sourceData };
     const source: Source = await this.sources.create({
-      data: { ...sourceData } as any,
+      data: { ...sourceData },
     });
     return source;
   }
 
   public async editSource(sourceData: EditSourceRequest) {
-    const data: any = { ...sourceData };
-    delete data.id;
+    const { id, ...data } = sourceData;
     const source: Source = await this.sources.update({
-      where: { id: sourceData.id },
-      data: {
-        ...data,
-        type: data.type as any,
-      },
+      where: { id },
+      data,
       include: { states: true },
     });
     return source;
   }
 
   public async insertState(sourceData: UpdateSourceStateRequest) {
-    const data: any = { ...sourceData };
-    delete data.sourceId;
+    const { sourceId, ...data } = sourceData;
     const sourceState: SourceState = await this.sourceStates.create({
       data: {
         ...data,
         source: {
           connect: {
-            id: sourceData.sourceId,
+            id: sourceId,
           },
         },
-      } as any,
+      },
       include: {
         source: true,
       },
@@ -128,7 +123,7 @@ class Sources {
         source: {
           connect: { id },
         },
-      } as any,
+      },
       include: {
         source: true,
       },

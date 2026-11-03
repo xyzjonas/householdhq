@@ -2,13 +2,14 @@
   <div class="card flex flex-col gap-2 overflow-y-scroll">
     <balance-account-type-collapsible
       v-for="(accounts, key) in allGroups"
+      :key="key"
       :sources="accounts"
       :type="key"
     />
   </div>
 </template>
 <script setup lang="ts">
-import { type Source } from "@/types";
+import type { Source } from "@/types";
 
 const props = defineProps<{
   upcomming?: number;

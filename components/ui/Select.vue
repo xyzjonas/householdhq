@@ -2,13 +2,13 @@
   <div class="input-group">
     <label :for="uniqueId">{{ label }}</label>
     <select
-      ref="inputRef"
       :id="uniqueId"
+      ref="inputRef"
       :value="modelValue"
+      :required="required"
       @input="
         $emit('update:modelValue', ($event.target as HTMLSelectElement).value)
       "
-      :required="required"
     >
       <slot />
     </select>
@@ -17,12 +17,12 @@
 </template>
 <script lang="ts" setup>
 const props = defineProps<{
-  modelValue: any;
+  modelValue: string | number | null | undefined;
   label?: string;
   required?: boolean;
 }>();
 
-const emit = defineEmits(["update:modelValue"]);
+defineEmits(["update:modelValue"]);
 
 const uniqueId = Math.random().toString(16).substring(2);
 const inputRef = ref<HTMLInputElement | null>(null);

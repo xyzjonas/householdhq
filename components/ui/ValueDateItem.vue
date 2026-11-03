@@ -12,10 +12,10 @@
     </div>
 
     <ui-button
-      @click="emit('delete')"
       icon="i-ic-baseline-delete"
       squared
       outlined
+      @click="emit('delete')"
     />
   </div>
 </template>

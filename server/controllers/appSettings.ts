@@ -42,7 +42,9 @@ export const updateSettings = async (
 /**
  * Get a specific setting value
  */
-export const getSetting = async (key: keyof AppSetting): Promise<any> => {
+export const getSetting = async <K extends keyof AppSetting>(
+  key: K,
+): Promise<AppSetting[K]> => {
   const settings = await getSettings();
   return settings[key];
 };

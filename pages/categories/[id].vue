@@ -2,7 +2,7 @@
   <div>
     <div v-if="!error && category" class="flex flex-col">
       <section class="row title">
-        <Icon :iconName="category.icon" class="mr" />
+        <Icon :icon-name="category.icon" class="mr" />
         <h1 class="item">{{ category.name }}</h1>
         <Transition name="page" mode="out-in">
           <spinner v-show="categoryLoading" class="item" />
@@ -13,16 +13,16 @@
         <div class="text-gray-5 capitalize">{{ $t("name") }}</div>
         <form-editable-field
           :value="category.name"
-          keyName="name"
-          @send="patchCategory"
+          key-name="name"
           class="item"
+          @send="patchCategory"
         />
       </div>
 
       <div class="card flex gap-5 justify-between items-center">
         <div class="text-gray-5 capitalize">{{ $t("description") }}</div>
         <form-editable-field
-          keyName="description"
+          key-name="description"
           :value="category.description"
           @send="patchCategory"
         />
@@ -31,7 +31,7 @@
       <div class="card flex gap-5 justify-between items-center">
         <div class="text-gray-5 capitalize">{{ $t("color") }}</div>
         <form-editable-color
-          keyName="color"
+          key-name="color"
           :value="category.color || '#ffffffff'"
           @send="patchCategory"
         />
@@ -70,7 +70,7 @@ const category = computed(() => data.value?.data ?? undefined);
 const categoriesStore = useCategoriesStore();
 const { categoryLoading } = storeToRefs(categoriesStore);
 
-const patchCategory = async (tagData: any) => {
+const patchCategory = async (tagData: Partial<Category>) => {
   await categoriesStore.patchCategory(categoryId, tagData);
   await refresh();
 };

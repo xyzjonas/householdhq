@@ -7,7 +7,7 @@ import type {
 import { prisma } from "./prisma-client";
 
 class VehicleComponentsService {
-  private components = (prisma as any).vehicleComponent;
+  private components = prisma.vehicleComponent;
 
   public async findAll(): Promise<VehicleComponent[]> {
     return (await this.components.findMany({

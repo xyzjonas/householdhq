@@ -28,6 +28,7 @@ const props = withDefaults(
     size?: "small" | "normal";
   }>(),
   {
+    color: null,
     clickable: false,
     size: "normal",
   },

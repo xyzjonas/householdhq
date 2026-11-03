@@ -2,10 +2,10 @@
   <div class="flex">
     <div class="slideOne" @click="toggle">
       <input
-        disabled
-        v-model="modelValue"
-        type="checkbox"
         id="slideOne"
+        v-model="modelValue"
+        disabled
+        type="checkbox"
         name="check"
       />
       <label disabled for="slideOne"></label>

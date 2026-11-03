@@ -1,7 +1,7 @@
-import type { Tag } from "@prisma/client";
 import transactions from "../../controllers/transactions";
 import {
   EditTransactionSchema,
+  type CreateTransactionRequest,
   type EditTransactionRequest,
 } from "~/types/transaction";
 import doValidate from "../../validators/validator";
@@ -21,14 +21,28 @@ export default defineEventHandler(async (event) => {
       console.info(
         `${updatedTransaction.id} is recurring, each ${updatedTransaction.recurring} monhts`,
       );
-      const newData: any = { ...updatedTransaction };
-      delete newData.id;
-      delete newData.source;
-      newData.transactedAt = new Date(newData.transactedAt);
-      newData.tags = newData.tags.map((t: Tag) => t.name);
-      newData.transactedAt = newData.transactedAt.setMonth(
-        newData.transactedAt.getMonth() + newData.recurring,
-      );
+      // the persisted row also carries the foreign keys, which the shared type omits
+      const previous = updatedTransaction as Transaction & {
+        sourceId: number;
+        targetId: number;
+        categoryId: number | null;
+      };
+      const transactedAt = new Date(previous.transactedAt);
+      transactedAt.setMonth(transactedAt.getMonth() + previous.recurring);
+      const newData: CreateTransactionRequest = {
+        transactedAt,
+        description: previous.description,
+        amount: previous.amount,
+        recurring: previous.recurring,
+        categoryId: previous.categoryId ?? undefined,
+        sourceId: previous.sourceId,
+        targetId: previous.targetId,
+        projectId: previous.projectId ?? undefined,
+        currency: previous.currency,
+        tags: previous.tags.map((t) => t.name),
+        isImportant: previous.isImportant,
+        isHidden: previous.isHidden,
+      };
       const createdTrans = await transactions.createTransaction(newData);
       console.info(
         `Created a new transaction: id=${createdTrans.id} date=${createdTrans.transactedAt}`,

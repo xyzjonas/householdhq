@@ -25,7 +25,7 @@
 
         <form-editable-field
           :value="settings.currency"
-          keyName="currency"
+          key-name="currency"
           @send="updateCurrency"
         />
       </div>

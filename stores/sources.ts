@@ -12,13 +12,12 @@ export const useSourcesStore = defineStore("source", () => {
   const allSources = ref<SourceApi[]>([]);
   const currentSourceId = ref<number>();
 
-
   function getLastEntry(source: SourceApi) {
     if (source.states && source.states.length > 0) {
       return source.states.reduce((_, b) => b);
     }
 
-    return undefined
+    return undefined;
   }
 
   function isThisMonth(date: Date) {
@@ -44,10 +43,10 @@ export const useSourcesStore = defineStore("source", () => {
       const out_ = currentMonth.value
         .filter((trans) => trans.confirmed)
         .filter((trans) => trans.source.id === src.id);
-      
+
       const lastEntry = getLastEntry(src);
-      
-      let sum = 0
+
+      let sum = 0;
       let lastDate = new Date();
       if (!lastEntry || !isThisMonth(new Date(lastEntry.created))) {
         sum = 0;
@@ -55,19 +54,19 @@ export const useSourcesStore = defineStore("source", () => {
         lastDate = new Date(lastEntry.created);
         sum = lastEntry.amount;
       }
-      
+
       in_
         .filter(
           (tr) =>
             new Date(tr.transactedAt) < new Date() &&
-            new Date(tr.transactedAt) > lastDate
+            new Date(tr.transactedAt) > lastDate,
         )
         .forEach((tr) => (sum += tr.amount));
       out_
         .filter(
           (tr) =>
             new Date(tr.transactedAt) < new Date() &&
-            new Date(tr.transactedAt) > lastDate
+            new Date(tr.transactedAt) > lastDate,
         )
         .forEach((tr) => (sum -= tr.amount));
 
@@ -75,7 +74,7 @@ export const useSourcesStore = defineStore("source", () => {
         ...src,
         transactionsIn: in_,
         transactionsOut: out_,
-        sum: sum
+        sum: sum,
       };
     });
   });
@@ -117,7 +116,7 @@ export const useSourcesStore = defineStore("source", () => {
     }
   };
 
-  const patchSource = async (sourceId: number, sourceData: any) => {
+  const patchSource = async (sourceId: number, sourceData: Partial<Source>) => {
     sourceLoading.value = true;
     const url = "/api/sources";
     sourceData.id = sourceId;
@@ -153,7 +152,7 @@ export const useSourcesStore = defineStore("source", () => {
     sourceLoading.value = true;
     const url = "/api/sources";
     try {
-      const newSource = await tokenStore.del(url, sourceData);
+      await tokenStore.del(url, sourceData);
       allSources.value = allSources.value.filter((s) => s.id !== sourceData.id);
       n.addNotification({ text: "Deleted", level: "success" });
     } finally {
@@ -163,7 +162,7 @@ export const useSourcesStore = defineStore("source", () => {
 
   const autoCompleteSourceState = async (
     sourceId: number,
-    loadingRef?: Ref
+    loadingRef?: Ref,
   ) => {
     if (loadingRef) {
       loadingRef.value = true;

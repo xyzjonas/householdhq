@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import type {
   IDBase,
   Meter,
@@ -58,7 +58,7 @@ class MetersService {
   public async createMeter(meterData: MeterCreate): Promise<Meter> {
     try {
       return await this.meters.create({
-        data: { ...meterData } as any,
+        data: { ...meterData },
         include: { states: true },
       });
     } catch (e) {
@@ -138,7 +138,7 @@ class MetersService {
       await this.findSingleMeter({ id: stateData.meterId });
 
       return await this.meterStates.create({
-        data: { ...stateData } as any,
+        data: { ...stateData },
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {

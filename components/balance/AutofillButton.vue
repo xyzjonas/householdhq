@@ -1,8 +1,8 @@
 <template>
   <ui-button
-    @click="onAutoUpdate"
     :loading="updating"
     icon="i-ic-baseline-auto-fix-high"
+    @click="onAutoUpdate"
     >{{ $t("s_state_autocomplete") }}</ui-button
   >
 </template>

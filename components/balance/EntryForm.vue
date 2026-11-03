@@ -11,20 +11,19 @@
       <small class="error">{{ $t(error.statusMessage) }}</small>
     </div>
     <div class="row-simple">
-      <ui-button @click="send" :loading="processing" color="primary">{{
+      <ui-button :loading="processing" color="primary" @click="send">{{
         $t("t_send")
       }}</ui-button>
-      <ui-button @click="$emit('close')" outlined>{{ $t("cancel") }}</ui-button>
+      <ui-button outlined @click="$emit('close')">{{ $t("cancel") }}</ui-button>
     </div>
   </div>
 </template>
 <script>
-import { Spinner } from "#components";
-
 export default {
-  components: { Spinner },
-
-  props: ["sourceId"],
+  props: {
+    sourceId: { type: [String, Number], required: true },
+  },
+  emits: ["close", "created"],
 
   data() {
     return {
@@ -49,7 +48,7 @@ export default {
     formatDate(date) {
       return `${date.getUTCFullYear()}-${String(date.getMonth() + 1).padStart(
         2,
-        "0"
+        "0",
       )}-${String(date.getDate()).padStart(2, "0")}`;
     },
     formatTime(date) {

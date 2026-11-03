@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-for="(trans, key) in transactionsByMonth" class="month-section">
+    <div
+      v-for="(trans, key) in transactionsByMonth"
+      :key="key"
+      class="month-section"
+    >
       <div class="flex items-center mb-3 gap-3">
         <span class="circle-sm bg-blue"></span>
         <div class="text-xl font-bold light:text-dark-1 dark:text-gray-3">
@@ -25,11 +29,6 @@ import type { Transaction } from "~/types";
 const props = defineProps<{
   transactions: Transaction[];
 }>();
-
-type Response = {
-  data: Transaction[];
-  count: number;
-};
 
 const transactionsByMonth = computed(() => {
   const months: { [key: string]: Transaction[] } = {};

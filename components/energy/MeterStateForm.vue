@@ -4,19 +4,19 @@
       <h2 class="uppercase mb-3">{{ $t("meter_state_create") }}</h2>
       <ui-pin :text="meterName" />
     </div>
-    <ui-input type="date" :label="$t('meter_state_form_date')" v-model="date" />
-    <ui-input type="time" :label="$t('meter_state_form_time')" v-model="time" />
+    <ui-input v-model="date" type="date" :label="$t('meter_state_form_date')" />
+    <ui-input v-model="time" type="time" :label="$t('meter_state_form_time')" />
     <ui-input
-      :label="$t('meter_state_form_value')"
       v-model="meterState.value"
+      :label="$t('meter_state_form_value')"
     />
     <ui-button
-      @click="$emit('submit')"
       :loading="loading"
       width="100%"
       height="3rem"
       type="submit"
       color="primary"
+      @click="$emit('submit')"
       >{{ $t("t_send") }}</ui-button
     >
   </form>
@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import type { MeterStateCreate } from "~/types";
 
-const props = defineProps<{
+defineProps<{
   loading?: boolean;
   meterName: string;
 }>();

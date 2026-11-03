@@ -1,13 +1,9 @@
 <template>
-  <div>
-    
-  </div>
+  <div></div>
 </template>
 <script setup lang="ts">
 definePageMeta({
   layout: "single",
 });
 </script>
-<style lang="">
-  
-</style>
+<style lang=""></style>

@@ -23,9 +23,11 @@
         </div>
         <form-editable-field
           :value="currentSource.name"
-          keyName="name"
-          @send="(data: string) => sourceStore.patchSource(sourceId, data)"
+          key-name="name"
           class="item"
+          @send="
+            (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+          "
         />
       </div>
       <div class="row card">
@@ -34,10 +36,12 @@
           <p class="desc">{{ $t("s_isout_desc") }}</p>
         </div>
         <form-editable-boolean
-          keyName="isOut"
+          key-name="isOut"
           :value="currentSource.isOut"
-          @send="(data: string) => sourceStore.patchSource(sourceId, data)"
           class="item"
+          @send="
+            (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+          "
         />
       </div>
 
@@ -47,10 +51,12 @@
           <p class="desc">{{ $t("s_isdisp_desc") }}</p>
         </div>
         <form-editable-boolean
-          keyName="isDisponible"
+          key-name="isDisponible"
           :value="currentSource.isDisponible"
-          @send="(data: string) => sourceStore.patchSource(sourceId, data)"
           class="item"
+          @send="
+            (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+          "
         />
       </div>
 
@@ -60,10 +66,12 @@
           <p class="desc">{{ $t("s_isport_desc") }}</p>
         </div>
         <form-editable-boolean
-          keyName="isPortfolio"
+          key-name="isPortfolio"
           :value="currentSource.isPortfolio"
-          @send="(data: string) => sourceStore.patchSource(sourceId, data)"
           class="item"
+          @send="
+            (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+          "
         />
       </div>
 
@@ -74,9 +82,11 @@
         </div>
         <div class="item">
           <form-editable-color
-            keyName="color"
+            key-name="color"
             :value="currentSource.color || '#ffffffff'"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
+            @send="
+              (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+            "
           />
         </div>
       </div>
@@ -88,11 +98,13 @@
         </div>
         <div class="item">
           <form-editable-field
-            keyName="position"
+            key-name="position"
             :value="currentSource.position"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
             type="number"
             inputmode="numeric"
+            @send="
+              (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+            "
           />
         </div>
       </div>
@@ -106,10 +118,12 @@
           <form-editable-select
             :value="currentSource.type"
             :options="SourceTypes"
-            keyName="type"
-            @send="(data: string) => sourceStore.patchSource(sourceId, data)"
+            key-name="type"
             type="number"
             inputmode="numeric"
+            @send="
+              (data: Partial<Source>) => sourceStore.patchSource(sourceId, data)
+            "
           />
         </div>
       </div>
@@ -119,8 +133,8 @@
         <div class="flex items-center gap-2 mb-5">
           <ui-button
             color="primary"
-            @click="edit = true"
             icon="i-ic-baseline-add"
+            @click="edit = true"
             >{{ $t("s_add_state") }}</ui-button
           >
           <balance-autofill-button :source-id="sourceId" />
@@ -131,9 +145,9 @@
             <ui-modal v-model="edit">
               <div class="card state-form-modal">
                 <balance-entry-form
+                  :source-id="currentSource.id"
                   @close="edit = false"
                   @created="newEntry"
-                  :sourceId="currentSource.id"
                 />
               </div>
             </ui-modal>
@@ -157,8 +171,8 @@
         </ui-timeline>
         <div class="flex items-center justify-center">
           <ui-button
-            link
             v-if="!showMore && currentSource?.states?.length > MAX_ITEMS"
+            link
             class="mt-5"
             icon="i-ic-baseline-expand-more"
             @click="showMore = true"
@@ -175,7 +189,7 @@
 import { useSourcesStore } from "@/stores/sources";
 import { storeToRefs } from "pinia";
 import { useTransactionStore } from "@/stores/transactions";
-import { SourceTypes, type SourceState } from "~/types";
+import { SourceTypes, type Source } from "~/types";
 
 const sourceStore = useSourcesStore();
 const { sourceLoading, currentSourceId, currentSource } =
@@ -200,12 +214,6 @@ onMounted(() => {
 const newEntry = () => {
   edit.value = false;
   sourceStore.fetchSingleSource(sourceId);
-};
-
-const router = useRouter();
-const deleteSource = async () => {
-  await sourceStore.deleteSource({ id: sourceId });
-  navigateTo("/sources");
 };
 
 const MAX_ITEMS = 5;

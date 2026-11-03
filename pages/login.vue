@@ -6,14 +6,14 @@
       <client-only>
         <div class="form-wrapper-form-inputs mb-10">
           <ui-input
-            label="Username"
             v-model="username"
+            label="Username"
             type="text"
             :required="true"
           />
           <ui-input
-            label="Password"
             v-model="password"
+            label="Password"
             type="password"
             :required="true"
             autocomplete="password"

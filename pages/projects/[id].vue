@@ -22,9 +22,9 @@
         </div>
         <form-editable-field
           :value="project.name"
-          keyName="name"
-          @send="(data: string) => patchProject(data)"
+          key-name="name"
           class="item"
+          @send="(data: Partial<Project>) => patchProject(data)"
         />
       </div>
 
@@ -35,9 +35,9 @@
         </div>
         <form-editable-field
           :value="project.description"
-          keyName="description"
-          @send="(data: string) => patchProject(data)"
+          key-name="description"
           class="item"
+          @send="(data: Partial<Project>) => patchProject(data)"
         />
       </div>
 
@@ -48,20 +48,20 @@
         </div>
         <form-editable-field
           :value="project.estimate"
-          keyName="estimate"
-          @send="(data: string) => patchProject(data)"
+          key-name="estimate"
           type="number"
           inputmode="numeric"
           class="item"
+          @send="(data: Partial<Project>) => patchProject(data)"
         />
       </div>
 
       <div class="card flex gap-5 justify-between items-center">
         <div class="text-gray-5 capitalize">{{ $t("color") }}</div>
         <form-editable-color
-          keyName="color"
+          key-name="color"
           :value="project.color || '#ffffffff'"
-          @send="(data: string) => patchProject(data)"
+          @send="(data: Partial<Project>) => patchProject(data)"
         />
       </div>
 
@@ -71,10 +71,10 @@
           <p class="desc">{{ $t("p_completed_desc") }}</p>
         </div>
         <form-editable-boolean
-          keyName="isCompleted"
+          key-name="isCompleted"
           :value="project.isCompleted"
-          @send="(data: string) => patchProject(data)"
           class="item"
+          @send="(data: Partial<Project>) => patchProject(data)"
         />
       </div>
 
@@ -110,7 +110,7 @@ import type { Project } from "~/types";
 
 const route = useRoute();
 const id = parseInt(route.params.id as string);
-const { data, error, refresh } = await useFetch<{ data: Project }>(
+const { data, refresh } = await useFetch<{ data: Project }>(
   `/api/projects/${id}`,
 );
 
@@ -119,7 +119,7 @@ const { loading } = storeToRefs(projectsStore);
 
 const project = computed(() => data.value?.data as Project);
 
-const patchProject = async (data: any) => {
+const patchProject = async (data: Partial<Project>) => {
   await projectsStore.patchProject(project.value?.id, data);
   await refresh();
 };

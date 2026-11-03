@@ -1,40 +1,38 @@
 @mixin input-mixin {
-    background-color: transparent;
-    border-radius: var(--input-border-radius);
-    border: 1px solid var(--color-border-dark);
-    outline: 0;
-    padding: 8px;
-    color: var(--color-font-light);
+  background-color: transparent;
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--color-border-dark);
+  outline: 0;
+  padding: 8px;
+  color: var(--color-font-light);
 }
 
 input {
-    @include input-mixin();
+  @include input-mixin();
 
-    &:focus {
-        border: 1px solid white;
-    }
+  &:focus {
+    border: 1px solid white;
+  }
 }
 
-
 textarea {
-    @include input-mixin();
+  @include input-mixin();
 }
 
 select {
-    @include input-mixin();
-    appearance: none;
-    outline: none;
-
+  @include input-mixin();
+  appearance: none;
+  outline: none;
 }
 
 select option {
-    background: var(--shadow-100);
-    color: var(--text-100);
-    border: none;
-    border-radius: 1rem;
+  background: var(--shadow-100);
+  color: var(--text-100);
+  border: none;
+  border-radius: 1rem;
 }
 
 hr {
-    border: none;
-    border-bottom: 1px solid var(--border-100);
+  border: none;
+  border-bottom: 1px solid var(--border-100);
 }

@@ -1,14 +1,22 @@
 <template>
   <div class="card center">
-    <section class="hdr" v-if="!loading">
+    <section v-if="!loading" class="hdr">
       <p class="flex flex-1 items-center justify-center in">
         <i class="i-ic-outline-trending-up"></i>
-        <ui-price :amount="income" size="1.3rem" color="var(--text-200)"></ui-price>
+        <ui-price
+          :amount="income"
+          size="1.3rem"
+          color="var(--text-200)"
+        ></ui-price>
       </p>
       <p class="separator"></p>
       <p class="flex flex-1 items-center justify-center out">
         <i class="i-ic-outline-trending-down"></i>
-        <ui-price :amount="expense" size="1.3rem" color="var(--text-200)"></ui-price>
+        <ui-price
+          :amount="expense"
+          size="1.3rem"
+          color="var(--text-200)"
+        ></ui-price>
       </p>
     </section>
     <Spinner v-else />
@@ -20,7 +28,7 @@ import { useTransactionStore } from "@/stores/transactions";
 import type { Transaction } from "~/types";
 
 const transactionStore = useTransactionStore();
-const { currency, loading } = storeToRefs(transactionStore);
+const { loading } = storeToRefs(transactionStore);
 
 const props = defineProps<{ transactions: Transaction[] }>();
 

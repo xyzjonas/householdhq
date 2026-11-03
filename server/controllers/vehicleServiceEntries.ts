@@ -8,7 +8,7 @@ import { prisma } from "./prisma-client";
 import { getSettings } from "./appSettings";
 
 class VehicleServiceEntriesService {
-  private entries = (prisma as any).vehicleServiceEntry;
+  private entries = prisma.vehicleServiceEntry;
   private vehicles = prisma.vehicle;
 
   private async assertVehicleExists(vehicleId: number): Promise<void> {
@@ -110,7 +110,7 @@ class VehicleServiceEntriesService {
 
         const { componentIds, price: _price, ...entryData } = payload;
 
-        return await (tx as any).vehicleServiceEntry.create({
+        return await tx.vehicleServiceEntry.create({
           data: {
             ...entryData,
             vehicleId,
@@ -217,7 +217,7 @@ class VehicleServiceEntriesService {
     }
 
     return (await prisma.$transaction(async (tx) => {
-      const deleted = await (tx as any).vehicleServiceEntry.delete({
+      const deleted = await tx.vehicleServiceEntry.delete({
         where: { id: entryId },
         include: {
           transaction: {

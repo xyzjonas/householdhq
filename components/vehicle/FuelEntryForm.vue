@@ -9,28 +9,28 @@
     </div>
 
     <ui-input
+      v-model="fueledAtInput"
       :label="$t('vehicle_fuel_datetime')"
       type="datetime-local"
-      v-model="fueledAtInput"
     />
 
     <div class="grid grid-cols-2 gap-4">
       <ui-input
+        v-model="entry.odometer"
         :label="$t('vehicle_fuel_odometer')"
         type="number"
-        v-model="entry.odometer"
       />
       <ui-input
+        v-model="entry.fuelAmount"
         :label="$t('vehicle_fuel_amount')"
         type="number"
-        v-model="entry.fuelAmount"
       />
     </div>
 
     <ui-input
+      v-model="entry.unitPrice"
       :label="$t('vehicle_fuel_unit_price')"
       type="number"
-      v-model="entry.unitPrice"
     />
 
     <ui-select
@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import type { VehicleFuelEntryCreate } from "~/types";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     loading?: boolean;
     title: string;
@@ -93,6 +93,7 @@ const props = withDefaults(
   }>(),
   {
     loading: false,
+    entryId: undefined,
   },
 );
 
