@@ -11,6 +11,9 @@
       <div class="min-w-0 flex flex-col gap-1">
         <span class="meter-name truncate">{{ meter.name }}</span>
         <div class="flex flex-col flex-wrap text-sm text-[var(--text-200)]">
+          <span v-if="meter.meterNumber" class="text-[11px]"
+            >{{ $t("meter_number") }}: {{ meter.meterNumber }}</span
+          >
           <div class="flex gap-2">
             <ui-pin :text="!!meter.unit ? meter.unit : '-'" size="small" />
             <span>{{ stateCount }} {{ $t("meter_states") }}</span>

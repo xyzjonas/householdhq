@@ -3,6 +3,7 @@
     <h2 class="uppercase mb-3">{{ title }}</h2>
     <ui-input v-model="meter.name" :label="$t('meter_name')" />
     <ui-input v-model="meter.unit" :label="$t('meter_unit')" />
+    <ui-input v-model="meter.meterNumber" :label="$t('meter_number')" />
     <ui-input v-model="meter.color" :label="$t('color')" type="color" />
 
     <div class="icon-picker-wrap">
@@ -54,6 +55,7 @@ const meter = defineModel<MeterCreate>({
     unit: "",
     icon: "",
     color: "#38c089",
+    meterNumber: "",
   },
 });
 

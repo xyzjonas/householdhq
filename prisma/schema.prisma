@@ -137,13 +137,14 @@ model Project {
 }
 
 model Meter {
-  id      Int          @id @default(autoincrement())
-  name    String
-  created DateTime     @updatedAt
-  unit    String
-  icon    String?
-  color   String?
-  states  MeterState[] @relation(name: "meter")
+  id          Int          @id @default(autoincrement())
+  name        String
+  created     DateTime     @updatedAt
+  unit        String
+  icon        String?
+  color       String?
+  meterNumber String?
+  states      MeterState[] @relation(name: "meter")
 }
 
 model MeterState {

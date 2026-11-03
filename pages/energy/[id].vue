@@ -15,6 +15,9 @@
               class="flex items-center gap-2 flex-wrap text-sm text-[var(--text-200)]"
             >
               <ui-pin :text="!!meter.unit ? meter.unit : '-'" size="small" />
+              <span v-if="meter.meterNumber"
+                >{{ $t("meter_number") }}: {{ meter.meterNumber }}</span
+              >
               <span>{{ stateCount }} {{ $t("meter_states") }}</span>
               <span v-if="latestState"
                 >· {{ $t("meter_last_update") }} {{ latestStateLabel }}</span
@@ -153,6 +156,7 @@ const createDefaultMeter = (): MeterCreate => ({
   unit: "",
   icon: "",
   color: "#38c089",
+  meterNumber: "",
 });
 
 const editableMeter = ref<MeterCreate>(createDefaultMeter());
@@ -170,6 +174,7 @@ watch(
       unit: currentMeter.unit,
       icon: currentMeter.icon ?? "",
       color: currentMeter.color ?? "#38c089",
+      meterNumber: currentMeter.meterNumber ?? "",
     };
   },
   { immediate: true },

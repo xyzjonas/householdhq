@@ -122,6 +122,7 @@
   "meter_create": "Přidat nový meřič",
   "meter_name": "název",
   "meter_unit": "jednotka",
+  "meter_number": "ID měřidla",
   "meter_icon": "ikona",
   "meter_state_create": "Nový stav",
   "meter_states": "stavy",

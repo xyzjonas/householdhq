@@ -15,6 +15,7 @@ export const MeterSchema = z.object({
   unit: z.string(),
   icon: z.string().nullable().optional(),
   color: z.string().nullable().optional(),
+  meterNumber: z.string().nullable().optional(),
   states: z.array(MeterStateSchema).optional(),
 });
 
@@ -29,6 +30,11 @@ export const MeterCreateSchema = z.object({
   unit: z.string(),
   icon: z.string().nullable().optional(),
   color: z.string().nullable().optional(),
+  meterNumber: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((v) => (v == null ? v : v.trim() || null)),
   isComputed: z.boolean().optional(),
 });
 

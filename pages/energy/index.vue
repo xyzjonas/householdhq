@@ -58,6 +58,7 @@ const createDefaultMeter = (): MeterCreate => ({
   unit: "",
   icon: "",
   color: "#38c089",
+  meterNumber: "",
 });
 
 const newMeter = ref<MeterCreate>(createDefaultMeter());
