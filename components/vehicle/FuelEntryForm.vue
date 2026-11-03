@@ -98,14 +98,14 @@ withDefaults(
 );
 
 const entry = defineModel<VehicleFuelEntryCreate>({
-  default: {
+  default: () => ({
     fueledAt: new Date(),
     odometer: 0,
     fuelAmount: 0,
     unitPrice: 0,
     isFullTank: true,
     previousFullTankFuelEntryId: undefined,
-  },
+  }),
 });
 
 const previousEntryLabel = (fuelEntry: {

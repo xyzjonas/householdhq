@@ -84,7 +84,7 @@ withDefaults(
 );
 
 const entry = defineModel<VehicleServiceEntryCreate>({
-  default: {
+  default: () => ({
     type: "REGULAR_MAINTENANCE",
     odometer: null,
     title: "",
@@ -92,7 +92,7 @@ const entry = defineModel<VehicleServiceEntryCreate>({
     description: "",
     price: null,
     componentIds: [],
-  },
+  }),
 });
 
 const servicedAtInput = computed({

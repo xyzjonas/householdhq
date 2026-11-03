@@ -21,7 +21,7 @@ useHead({
       `,
       tagPosition: "head",
       type: "text/javascript",
-      defer: "false",
+      defer: false,
     },
   ],
 });
