@@ -270,10 +270,13 @@ model VehicleComponent {
 }
 
 model AppSettings {
-  id        Int      @id @default(1) // Singleton - always ID 1
-  currency  String   @default("USD")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 Int      @id @default(1) // Singleton - always ID 1
+  currency           String   @default("USD")
+  // calendar day (1-31) on which the monthly fiscal period ends, e.g. the payday;
+  // days beyond the length of a month fall back to its last day
+  fiscalPeriodEndDay Int      @default(31)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@map("app_settings")
 }
