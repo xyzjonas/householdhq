@@ -50,13 +50,13 @@ withDefaults(
 );
 
 const meter = defineModel<MeterCreate>({
-  default: {
+  default: () => ({
     name: "",
     unit: "",
     icon: "",
     color: "#38c089",
     meterNumber: "",
-  },
+  }),
 });
 
 const iconOptions = [

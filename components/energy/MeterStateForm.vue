@@ -31,10 +31,11 @@ defineProps<{
 }>();
 
 const meterState = defineModel<MeterStateCreate>({
-  default: {
+  default: () => ({
     meteredAt: new Date(),
     value: 0,
-  },
+    meterId: 0,
+  }),
 });
 
 const meteredAt = ref(meterState.value.meteredAt);

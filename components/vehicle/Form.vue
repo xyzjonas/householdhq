@@ -154,7 +154,7 @@ withDefaults(
 );
 
 const vehicle = defineModel<VehicleCreate | VehicleUpdate>({
-  default: {
+  default: () => ({
     name: "",
     brand: "",
     model: "",
@@ -173,7 +173,7 @@ const vehicle = defineModel<VehicleCreate | VehicleUpdate>({
     dateFirstRegistered: undefined,
     categoryId: undefined,
     fuelCategoryId: undefined,
-  },
+  }),
 });
 
 const iconOptions = [

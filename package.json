@@ -48,7 +48,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.0",
-    "vue-tsc": "^3.2.6"
+    "vue-tsc": "^3.3.14"
   },
   "dependencies": {
     "@iconify-json/simple-icons": "^1.2.74",
