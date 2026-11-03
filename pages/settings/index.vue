@@ -30,6 +30,33 @@
         />
       </div>
 
+      <div class="card row settings-card">
+        <div class="row-label">
+          <p>{{ $t("settings_fiscal_day") }}</p>
+          <p class="desc">{{ $t("settings_fiscal_day_desc") }}</p>
+          <small>{{ $t("settings_fiscal_day_hint") }}</small>
+          <small v-if="currentPeriod" class="block">
+            {{
+              $t("settings_fiscal_day_current", {
+                range: formatDayRange(
+                  currentPeriod.startDay,
+                  currentPeriod.endDay,
+                  locale,
+                ),
+              })
+            }}
+          </small>
+        </div>
+
+        <form-editable-field
+          :value="settings.fiscalPeriodEndDay"
+          key-name="fiscalPeriodEndDay"
+          type="number"
+          inputmode="numeric"
+          @send="updateFiscalDay"
+        />
+      </div>
+
       <div class="card preview-card">
         <div class="row-label mb-3">
           <p>{{ $t("settings_preview") }}</p>
@@ -64,10 +91,50 @@
 </template>
 
 <script setup lang="ts">
-const { settings, isLoading, error, fetchSettings, setCurrency } =
-  useAppSettings();
+import { FiscalPeriodEndDaySchema } from "~/types/appSettings";
+import type { HomePeriod } from "~/types/home";
+
+const {
+  settings,
+  isLoading,
+  error,
+  fetchSettings,
+  setCurrency,
+  updateSettings,
+} = useAppSettings();
+const { t, locale } = useI18n();
 
 await fetchSettings();
+
+// always the current period, regardless of the period selected on the home page
+const { data: currentPeriod, refresh: refreshCurrentPeriod } =
+  await useFetch<HomePeriod>("/api/home/period", { key: "settings-period" });
+
+const updateFiscalDay = async (data: { fiscalPeriodEndDay?: unknown }) => {
+  const parsed = FiscalPeriodEndDaySchema.safeParse(data.fiscalPeriodEndDay);
+
+  if (!parsed.success) {
+    useNotifications().addNotification({
+      level: "error",
+      text: t("settings_fiscal_day_error"),
+    });
+    return;
+  }
+
+  try {
+    await updateSettings({ fiscalPeriodEndDay: parsed.data });
+    await refreshCurrentPeriod();
+    useNotifications().addNotification({
+      level: "success",
+      text: t("settings_saved"),
+    });
+  } catch {
+    useNotifications().addNotification({
+      level: "error",
+      text: t("settings_save_error"),
+    });
+  }
+};
 
 const updateCurrency = async (data: { currency?: string }) => {
   const currency = data.currency?.trim().toUpperCase();
