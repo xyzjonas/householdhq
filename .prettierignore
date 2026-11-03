@@ -1,0 +1,9 @@
+.nuxt
+.output
+node_modules
+dist
+coverage
+package-lock.json
+prisma/migrations
+public
+*.csv
