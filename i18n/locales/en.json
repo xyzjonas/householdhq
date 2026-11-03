@@ -122,6 +122,7 @@
   "meter_create": "new meter",
   "meter_name": "meter name",
   "meter_unit": "meterunit",
+  "meter_number": "meter ID",
   "meter_icon": "meter icon",
   "meter_state_create": "new state",
   "meter_states": "states",
