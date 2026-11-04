@@ -9,13 +9,13 @@ import Wallet from "@lucide/svelte/icons/wallet";
 export interface NavItem {
   label: string;
   /** Items without an href are not built yet and render disabled. */
-  href?: "/";
+  href?: "/" | "/accounts";
   icon: Component;
 }
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Accounts", icon: Wallet },
+  { label: "Accounts", href: "/accounts", icon: Wallet },
   { label: "Categories", icon: Tags },
   { label: "Transactions", icon: Receipt },
   { label: "Analytics", icon: ChartColumn },
