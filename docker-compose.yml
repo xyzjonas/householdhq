@@ -33,7 +33,6 @@ services:
     build:
       context: .
       target: runtime
-    image: scotch3840/householdhq:latest
     restart: unless-stopped
     environment:
       DATABASE_URL: mysql://home:home@db:3306/home
@@ -41,7 +40,7 @@ services:
       # x-forwarded-proto nothing is needed; otherwise set PUBLIC_SCHEME=https.
       PUBLIC_SCHEME: http
     ports:
-      - "8080:3000"
+      - "3373:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
