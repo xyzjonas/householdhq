@@ -104,7 +104,7 @@
 
 <form
   method="POST"
-  class="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[390px_1fr] lg:items-start"
+  class="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[2fr_1fr] lg:items-start"
   use:enhance={({ cancel }) => {
     if (stage !== stages.length || !canAdvance) {
       cancel();
@@ -117,7 +117,7 @@
     };
   }}
 >
-  <div class="mx-auto flex w-full max-w-[390px] flex-col gap-4">
+  <div class="mx-auto flex w-full max-w-[390px] flex-col gap-4 lg:max-w-none">
     <header class="flex items-center gap-3">
       <a
         href={resolve("/")}
@@ -216,7 +216,7 @@
       class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
     >
       <div
-        class="mx-auto flex max-w-[390px] items-center justify-between gap-3"
+        class="mx-auto flex max-w-[390px] items-center justify-between gap-3 lg:max-w-md"
       >
         {#if stage === 1}
           <a
@@ -297,6 +297,12 @@
     width: 100%;
     flex-shrink: 0;
     padding: 0.25rem;
+  }
+  /* In the wide column keep the stage content at a thumb-friendly width. */
+  @media (min-width: 64rem) {
+    .panel {
+      padding-inline: max(0.25rem, calc((100% - 28rem) / 2));
+    }
   }
   /* Collapse off-screen panels once the slide finishes so the page doesn't
      keep the height of the tallest stage. */
