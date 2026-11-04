@@ -39,4 +39,13 @@ test.describe("categories", () => {
     await page.getByRole("link", { name: /Previous month/ }).click();
     await expect(page).toHaveURL(/\/categories\?month=\d{4}-\d{2}$/);
   });
+
+  test("creates a category", async ({ page }) => {
+    const name = `E2E category ${Date.now()}`;
+    await page.getByRole("button", { name: "New category" }).click();
+    await page.getByLabel("Category name").fill(name);
+    await page.getByRole("button", { name: "Create category" }).click();
+    await expect(page).toHaveURL(/\/categories$/);
+    await expect(page.getByText(name).first()).toBeVisible();
+  });
 });

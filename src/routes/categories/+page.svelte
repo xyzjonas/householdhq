@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import BurnConcentration from "#lib/components/categories/BurnConcentration.svelte";
+  import CreateCategoryDialog from "#lib/components/categories/CreateCategoryDialog.svelte";
   import CategoriesDirectory from "#lib/components/categories/CategoriesDirectory.svelte";
   import MonthSwitcher from "#lib/components/categories/MonthSwitcher.svelte";
   import RunRateCard from "#lib/components/categories/RunRateCard.svelte";
@@ -14,7 +15,7 @@
   } from "#lib/categories-view.ts";
   import type { PageProps } from "./$types";
 
-  let { data }: PageProps = $props();
+  let { data, form }: PageProps = $props();
 
   // Budgeting is not implemented in the backend yet: no category has one.
   const items = $derived(buildItems(data.categories));
@@ -38,11 +39,14 @@
       </h1>
       <p class="text-sm text-surface-600-400">{label} household ledger</p>
     </div>
-    <MonthSwitcher
-      month={data.month}
-      previous={data.previousMonth}
-      next={data.nextMonth}
-    />
+    <div class="flex flex-wrap items-center gap-3">
+      <MonthSwitcher
+        month={data.month}
+        previous={data.previousMonth}
+        next={data.nextMonth}
+      />
+      <CreateCategoryDialog message={form?.message} />
+    </div>
   </header>
 
   <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
