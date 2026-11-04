@@ -35,7 +35,7 @@
 
   <fieldset>
     <legend class="sr-only">Category</legend>
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
       {#each visible as c (c.id)}
         {@const Icon = categoryIcon(c.icon)}
         <label

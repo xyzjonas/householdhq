@@ -216,7 +216,7 @@
       class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
     >
       <div
-        class="mx-auto flex max-w-[390px] items-center justify-between gap-3 lg:max-w-md"
+        class="mx-auto flex max-w-[390px] items-center justify-between gap-3 lg:max-w-none"
       >
         {#if stage === 1}
           <a
@@ -297,12 +297,6 @@
     width: 100%;
     flex-shrink: 0;
     padding: 0.25rem;
-  }
-  /* In the wide column keep the stage content at a thumb-friendly width. */
-  @media (min-width: 64rem) {
-    .panel {
-      padding-inline: max(0.25rem, calc((100% - 28rem) / 2));
-    }
   }
   /* Collapse off-screen panels once the slide finishes so the page doesn't
      keep the height of the tallest stage. */
