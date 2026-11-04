@@ -26,14 +26,14 @@ export interface Group {
   tab: Exclude<TabId, "all"> | null;
   /** Tailwind classes for the pillar dot / bar segment */
   color: string;
+  /** Hex fallback for the account icon accent when the account has no color */
+  accent: string;
   subtitle: string;
   /** Operational scope shown on pillar cards */
   scope: string;
   /** Tailwind classes for the percentage badge */
   badge: string;
 }
-
-const neutralBadge = "border-slate-200 bg-white text-slate-700";
 
 /** Display order of the directory sections. */
 export const groups: Group[] = [
@@ -42,45 +42,50 @@ export const groups: Group[] = [
     title: "Daily banking",
     subtitle: "Checking",
     scope: "Daily transaction rails",
-    badge: neutralBadge,
+    badge: "border-[#2391ff]/40 bg-[#2391ff]/15 text-surface-900-100",
     tab: "bank",
-    color: "bg-slate-900",
+    color: "bg-[#2391ff]",
+    accent: "#2391ff",
   },
   {
     type: "CASH",
     title: "Physical cash",
     subtitle: "Hotovost",
     scope: "Physical custody",
-    badge: neutralBadge,
+    badge: "border-[#fff83f]/40 bg-[#fff83f]/15 text-surface-900-100",
     tab: "bank",
-    color: "bg-slate-400",
+    color: "bg-[#fff83f]",
+    accent: "#fff83f",
   },
   {
     type: "SAVINGS",
     title: "Savings & vaults",
     subtitle: "Spoření",
     scope: "Emergency & sinking funds",
-    badge: "border-emerald-100 bg-emerald-50 text-emerald-700",
+    badge: "border-[#00ff9c]/40 bg-[#00ff9c]/15 text-surface-900-100",
     tab: "savings",
-    color: "bg-emerald-500",
+    color: "bg-[#00ff9c]",
+    accent: "#00ff9c",
   },
   {
     type: "INVESTMENT",
     title: "Investments",
     subtitle: "Investice",
     scope: "Core portfolios",
-    badge: "border-blue-100 bg-blue-50 text-blue-700",
+    badge: "border-[#ffcd54]/40 bg-[#ffcd54]/15 text-surface-900-100",
     tab: "investments",
-    color: "bg-blue-500",
+    color: "bg-[#ffcd54]",
+    accent: "#ffcd54",
   },
   {
     type: "DEBT",
     title: "Debts",
     subtitle: "Liabilities",
     scope: "Loans & credit",
-    badge: "border-rose-100 bg-rose-50 text-rose-700",
+    badge: "border-[#f70063]/40 bg-[#f70063]/15 text-surface-900-100",
     tab: null,
-    color: "bg-rose-500",
+    color: "bg-[#f70063]",
+    accent: "#f70063",
   },
 ];
 
