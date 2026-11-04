@@ -14,6 +14,14 @@ import type {
 
 export type { Category, SourceType, Tag };
 
+/** A category with its activity within a date range. */
+export type CategoryWithActivity = Category & {
+  /** Money moved from household accounts to external ("out") accounts. */
+  spent: number;
+  /** Money received from external accounts. */
+  received: number;
+};
+
 /** Accounts are stored in the `Source` table. */
 export type Account = Source;
 export type AccountState = SourceState;

@@ -140,6 +140,54 @@ describe.skipIf(!core)("core layer", () => {
       );
     });
 
+    it("sums spending and income per category within a range", async () => {
+      const category = await c.categories.create({ name: `${run}-act` });
+      ids.categories.push(category.id);
+      const main = await c.accounts.create({ name: `${run}-act-main` });
+      const outside = await c.accounts.create({
+        name: `${run}-act-out`,
+        isOut: true,
+        type: "OUT",
+      });
+      ids.accounts.push(main.id, outside.id);
+      const tx = async (
+        amount: number,
+        sourceId: number,
+        targetId: number,
+        transactedAt: Date,
+        extra: { cancelled?: boolean } = {},
+      ) => {
+        const t = await c.transactions.create({
+          description: `${run}-act`,
+          amount,
+          sourceId,
+          targetId,
+          categoryId: category.id,
+          transactedAt,
+        });
+        if (extra.cancelled) {
+          await db!.transaction.update({
+            where: { id: t.id },
+            data: { cancelled: true },
+          });
+        }
+        ids.transactions.push(t.id);
+      };
+      const from = new Date("2001-02-01T00:00:00Z");
+      const to = new Date("2001-03-01T00:00:00Z");
+      const inRange = new Date("2001-02-10T12:00:00Z");
+      await tx(100, main.id, outside.id, inRange);
+      await tx(50, main.id, outside.id, inRange);
+      await tx(900, outside.id, main.id, inRange);
+      await tx(70, main.id, outside.id, inRange, { cancelled: true });
+      await tx(999, main.id, outside.id, new Date("2001-03-01T00:00:00Z"));
+
+      const found = (await c.categories.listWithActivity({ from, to })).find(
+        (x) => x.id === category.id,
+      );
+      expect(found).toMatchObject({ spent: 150, received: 900 });
+    });
+
     it("rejects duplicate names", async () => {
       const first = await c.categories.create({ name: `${run}-dup` });
       ids.categories.push(first.id);
