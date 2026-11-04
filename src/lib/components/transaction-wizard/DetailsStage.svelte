@@ -41,7 +41,7 @@
   );
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="grid gap-4 lg:grid-cols-2 lg:items-start lg:gap-6">
   <div class="flex flex-col gap-4 rounded-2xl bg-surface-50-950 p-4">
     <label class="label">
       <span class="wizard-label label-text">{accountLabel}</span>

@@ -19,7 +19,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="field-group grid-cols-[auto_1fr]">
+  <div class="field-group grid-cols-[auto_1fr] lg:max-w-md">
     <span class="label preset-tonal" aria-hidden="true">
       <Search size={16} />
     </span>
@@ -35,7 +35,7 @@
 
   <fieldset>
     <legend class="sr-only">Category</legend>
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
       {#each visible as c (c.id)}
         {@const Icon = categoryIcon(c.icon)}
         <label

@@ -99,7 +99,7 @@
 
 <form
   method="POST"
-  class="mx-auto flex w-full max-w-[390px] flex-col gap-4"
+  class="mx-auto flex w-full max-w-xl flex-col gap-4 lg:max-w-6xl lg:gap-6"
   use:enhance={({ cancel }) => {
     if (stage !== stages.length || !canAdvance) {
       cancel();
@@ -209,7 +209,9 @@
     aria-label="Wizard steps"
     class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
   >
-    <div class="mx-auto flex max-w-[390px] items-center justify-between gap-3">
+    <div
+      class="mx-auto flex max-w-xl items-center justify-between gap-3 lg:max-w-none"
+    >
       {#if stage === 1}
         <a
           href={resolve("/")}
