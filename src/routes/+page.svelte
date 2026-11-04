@@ -1,36 +1,15 @@
 <script lang="ts">
   import AccountList from "#lib/components/AccountList.svelte";
-  import AllocationBar, {
-    type Segment,
-  } from "#lib/components/AllocationBar.svelte";
+  import PillarOverview from "#lib/components/accounts/PillarOverview.svelte";
   import BalanceCard from "#lib/components/BalanceCard.svelte";
   import TransactionList from "#lib/components/TransactionList.svelte";
+  import { resolve } from "$app/paths";
+  import { buildPillars } from "#lib/accounts-view.ts";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
 
-  const portfolio = $derived<Segment[]>([
-    {
-      label: "Bank",
-      amount: data.balances.byType.ACCOUNT ?? 0,
-      color: "bg-slate-900",
-    },
-    {
-      label: "Cash",
-      amount: data.balances.byType.CASH ?? 0,
-      color: "bg-slate-400",
-    },
-    {
-      label: "Savings",
-      amount: data.balances.byType.SAVINGS ?? 0,
-      color: "bg-emerald-500",
-    },
-    {
-      label: "Investments",
-      amount: data.balances.byType.INVESTMENT ?? 0,
-      color: "bg-blue-500",
-    },
-  ]);
+  const pillars = $derived(buildPillars(data.accounts));
 </script>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
@@ -51,9 +30,30 @@
     />
   </section>
 
-  <section aria-labelledby="accounts-heading" class="flex flex-col gap-4">
-    <h2 id="accounts-heading" class="text-xl font-bold">Accounts</h2>
-    <AllocationBar segments={portfolio} />
+  <section
+    aria-labelledby="accounts-heading"
+    class="flex flex-col gap-5 card border border-surface-200-800 p-4 sm:p-6"
+  >
+    <header class="flex items-start justify-between gap-3">
+      <div>
+        <h2
+          id="accounts-heading"
+          class="text-lg font-extrabold tracking-tight sm:text-xl"
+        >
+          Accounts
+        </h2>
+        <p class="mt-1 text-xs font-medium text-surface-600-400 sm:text-sm">
+          Distribution across transaction rails, cash, savings and investments
+        </p>
+      </div>
+      <a
+        class="shrink-0 anchor text-sm font-semibold"
+        href={resolve("/accounts")}
+      >
+        View all
+      </a>
+    </header>
+    <PillarOverview {pillars} />
     <AccountList accounts={data.accounts.filter((a) => !a.isOut)} />
   </section>
 

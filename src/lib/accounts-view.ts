@@ -27,7 +27,13 @@ export interface Group {
   /** Tailwind classes for the pillar dot / bar segment */
   color: string;
   subtitle: string;
+  /** Operational scope shown on pillar cards */
+  scope: string;
+  /** Tailwind classes for the percentage badge */
+  badge: string;
 }
+
+const neutralBadge = "border-slate-200 bg-white text-slate-700";
 
 /** Display order of the directory sections. */
 export const groups: Group[] = [
@@ -35,6 +41,8 @@ export const groups: Group[] = [
     type: "ACCOUNT",
     title: "Daily banking",
     subtitle: "Checking",
+    scope: "Daily transaction rails",
+    badge: neutralBadge,
     tab: "bank",
     color: "bg-slate-900",
   },
@@ -42,6 +50,8 @@ export const groups: Group[] = [
     type: "CASH",
     title: "Physical cash",
     subtitle: "Hotovost",
+    scope: "Physical custody",
+    badge: neutralBadge,
     tab: "bank",
     color: "bg-slate-400",
   },
@@ -49,6 +59,8 @@ export const groups: Group[] = [
     type: "SAVINGS",
     title: "Savings & vaults",
     subtitle: "Spoření",
+    scope: "Emergency & sinking funds",
+    badge: "border-emerald-100 bg-emerald-50 text-emerald-700",
     tab: "savings",
     color: "bg-emerald-500",
   },
@@ -56,6 +68,8 @@ export const groups: Group[] = [
     type: "INVESTMENT",
     title: "Investments",
     subtitle: "Investice",
+    scope: "Core portfolios",
+    badge: "border-blue-100 bg-blue-50 text-blue-700",
     tab: "investments",
     color: "bg-blue-500",
   },
@@ -63,6 +77,8 @@ export const groups: Group[] = [
     type: "DEBT",
     title: "Debts",
     subtitle: "Liabilities",
+    scope: "Loans & credit",
+    badge: "border-rose-100 bg-rose-50 text-rose-700",
     tab: null,
     color: "bg-rose-500",
   },
