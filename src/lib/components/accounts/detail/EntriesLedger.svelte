@@ -3,6 +3,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { SvelteURLSearchParams } from "svelte/reactivity";
+  import { Dialog, Pagination, Portal } from "@skeletonlabs/skeleton-svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Plus from "@lucide/svelte/icons/plus";
@@ -33,9 +34,8 @@
     };
   } = $props();
 
-  let confirming = $state<number | null>(null);
+  let deleting = $state<TransactionWithRelations | null>(null);
 
-  const pages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
   const first = $derived(total === 0 ? 0 : (filters.page - 1) * PAGE_SIZE + 1);
   const last = $derived(Math.min(total, filters.page * PAGE_SIZE));
 
@@ -194,43 +194,14 @@
               </span>
             </td>
             <td class="py-3 text-right whitespace-nowrap">
-              {#if confirming === t.id}
-                <form
-                  method="POST"
-                  action="?/delete"
-                  class="inline-flex items-center gap-2"
-                  use:enhance={() =>
-                    async ({ update }) => {
-                      confirming = null;
-                      await update();
-                    }}
-                >
-                  <input type="hidden" name="id" value={t.id} />
-                  <span class="text-xs">Delete?</span>
-                  <button
-                    type="submit"
-                    class="btn preset-filled-error-500 text-xs btn-sm"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    type="button"
-                    class="btn preset-tonal text-xs btn-sm"
-                    onclick={() => (confirming = null)}
-                  >
-                    Cancel
-                  </button>
-                </form>
-              {:else}
-                <button
-                  type="button"
-                  class="btn-icon btn-icon-sm hover:preset-tonal-error"
-                  aria-label="Delete {t.description}"
-                  onclick={() => (confirming = t.id)}
-                >
-                  <Trash2 size={16} aria-hidden="true" />
-                </button>
-              {/if}
+              <button
+                type="button"
+                class="btn-icon btn-icon-sm hover:preset-tonal-error"
+                aria-label="Delete {t.description}"
+                onclick={() => (deleting = t)}
+              >
+                <Trash2 size={16} aria-hidden="true" />
+              </button>
             </td>
           </tr>
         {:else}
@@ -248,30 +219,82 @@
     class="flex flex-wrap items-center justify-between gap-3 text-sm text-surface-600-400"
   >
     <p>Showing {first} to {last} of {total} entries</p>
-    <nav aria-label="Pagination" class="flex items-center gap-2">
-      <button
-        type="button"
-        class="btn preset-tonal btn-sm"
-        disabled={filters.page <= 1}
-        onclick={() => go({ page: filters.page - 1 })}
-      >
+    <Pagination
+      count={total}
+      pageSize={PAGE_SIZE}
+      page={filters.page}
+      onPageChange={(e) => go({ page: e.page })}
+      aria-label="Pagination"
+      class="flex items-center gap-1"
+    >
+      <Pagination.PrevTrigger class="btn-icon preset-tonal btn-icon-sm">
         <ChevronLeft size={16} aria-hidden="true" />
-        Previous
-      </button>
-      <span
-        class="rounded-full preset-filled-surface-950-50 px-3 py-1 text-xs font-bold"
-      >
-        {filters.page} / {pages}
-      </span>
-      <button
-        type="button"
-        class="btn preset-tonal btn-sm"
-        disabled={filters.page >= pages}
-        onclick={() => go({ page: filters.page + 1 })}
-      >
-        Next
+        <span class="sr-only">Previous</span>
+      </Pagination.PrevTrigger>
+      <Pagination.Context>
+        {#snippet children(pagination)}
+          {#each pagination().pages as item, i (i)}
+            {#if item.type === "page"}
+              <Pagination.Item
+                {...item}
+                class="btn-icon btn-icon-sm {item.value === filters.page
+                  ? 'preset-filled-surface-950-50'
+                  : 'preset-tonal'}"
+              >
+                {item.value}
+              </Pagination.Item>
+            {:else}
+              <Pagination.Ellipsis index={i}>&#8230;</Pagination.Ellipsis>
+            {/if}
+          {/each}
+        {/snippet}
+      </Pagination.Context>
+      <Pagination.NextTrigger class="btn-icon preset-tonal btn-icon-sm">
         <ChevronRight size={16} aria-hidden="true" />
-      </button>
-    </nav>
+        <span class="sr-only">Next</span>
+      </Pagination.NextTrigger>
+    </Pagination>
   </footer>
 </section>
+
+<Dialog
+  open={deleting !== null}
+  onOpenChange={(e) => {
+    if (!e.open) deleting = null;
+  }}
+>
+  <Portal>
+    <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
+    <Dialog.Positioner
+      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <Dialog.Content
+        class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
+      >
+        <Dialog.Title class="text-lg font-bold">Delete entry?</Dialog.Title>
+        <Dialog.Description class="text-sm text-surface-600-400">
+          “{deleting?.description}” will be permanently removed from the
+          journal.
+        </Dialog.Description>
+        <form
+          method="POST"
+          action="?/delete"
+          class="flex justify-end gap-2"
+          use:enhance={() =>
+            async ({ update }) => {
+              deleting = null;
+              await update();
+            }}
+        >
+          <input type="hidden" name="id" value={deleting?.id} />
+          <Dialog.CloseTrigger class="btn preset-tonal"
+            >Cancel</Dialog.CloseTrigger
+          >
+          <button type="submit" class="btn preset-filled-error-500">
+            Delete
+          </button>
+        </form>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Portal>
+</Dialog>
