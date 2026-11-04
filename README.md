@@ -1,42 +1,33 @@
-# Nuxt 3 Minimal Starter
+# Household HQ
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Household budget & finance dashboard. SvelteKit 3 (+ PWA manifest), Skeleton UI on Tailwind 4, Prisma 7 on MySQL.
 
-## Setup
+## Layout
 
-Make sure to install the dependencies:
+- `src/lib/server/core/` – **the core layer**: the only code that touches Prisma. Exposes repositories (`accounts`, `categories`, `transactions`, `users`) via `createCore(db)`. Pages, form actions and future API routes use `getCore()` from `src/lib/server`. ESLint forbids importing `@prisma/*` anywhere else.
+- `src/lib/components/` – UI built from Skeleton components/utilities.
+- `prisma/` – schema + migrations (unchanged from the Nuxt version) and `seed.ts`.
+- `e2e/` – Playwright tests.
 
-```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
-# pnpm
-pnpm install
-```
-
-## Development Server
-
-Start the development server on http://localhost:3000
+## Develop
 
 ```bash
-npm run dev
+cp .env.example .env
+just dev        # starts mysql (docker), applies migrations, runs vite
+just seed       # optional sample data
 ```
 
-## Production
-
-Build the application for production:
+## Quality
 
 ```bash
-npm run build
+just ci         # format:check, lint, typecheck, unit/core tests
+just e2e        # migrate + seed + Playwright (needs the database)
 ```
 
-Locally preview production build:
+## Run with Docker
 
 ```bash
-npm run preview
+just up         # db -> one-shot `migrate` service -> app on http://localhost:8080
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+`docker-compose.yml` runs migrations as a separate `migrate` service; the app only starts after it completed successfully.
