@@ -54,9 +54,9 @@ export function transactionsRepo(db: Db) {
   async function searchIds(
     query: string,
     f: ReturnType<typeof TransactionFilter.parse>,
-  ): Promise<number[]> {
+  ): Promise<{ ids: number[]; total: number }> {
     const q = toBooleanQuery(query);
-    if (!q) return [];
+    if (!q) return { ids: [], total: 0 };
     const where: Prisma.Sql[] = [
       Prisma.sql`MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE)`,
     ];
@@ -66,14 +66,25 @@ export function transactionsRepo(db: Db) {
     if (f.categoryId !== undefined) {
       where.push(Prisma.sql`t.categoryId = ${f.categoryId}`);
     }
+    if (f.accountId !== undefined) {
+      where.push(
+        Prisma.sql`(t.sourceId = ${f.accountId} OR t.targetId = ${f.accountId})`,
+      );
+    }
+    if (f.from) where.push(Prisma.sql`t.transactedAt >= ${f.from}`);
+    if (f.to) where.push(Prisma.sql`t.transactedAt < ${f.to}`);
+    const condition = Prisma.join(where, " AND ");
+    const [{ total }] = await db.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`
+      SELECT COUNT(*) AS total FROM \`transaction\` t WHERE ${condition}
+    `);
     const rows = await db.$queryRaw<Array<{ id: number }>>(Prisma.sql`
       SELECT t.id FROM \`transaction\` t
-      WHERE ${Prisma.join(where, " AND ")}
+      WHERE ${condition}
       ORDER BY MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE) DESC,
                t.transactedAt DESC, t.id DESC
       LIMIT ${f.limit} OFFSET ${f.offset}
     `);
-    return rows.map((r) => r.id);
+    return { ids: rows.map((r) => r.id), total: Number(total) };
   }
 
   return {
@@ -83,14 +94,14 @@ export function transactionsRepo(db: Db) {
       const filter = TransactionFilter.parse(input);
 
       if (filter.search) {
-        const ids = await searchIds(filter.search, filter);
+        const { ids, total } = await searchIds(filter.search, filter);
         const found = await db.transaction.findMany({
           where: { id: { in: ids } },
           include,
         });
         const byId = new Map(found.map((t) => [t.id, t]));
         const items = ids.flatMap((id) => byId.get(id) ?? []);
-        return { items, total: items.length };
+        return { items, total };
       }
 
       const where = buildWhere(filter);

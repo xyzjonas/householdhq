@@ -19,6 +19,13 @@ export type Account = Source;
 export type AccountState = SourceState;
 export type AccountWithBalance = Account & { balance: number };
 
+export interface AccountTrajectory {
+  /** Closing balance per calendar month, oldest first. */
+  points: { monthStart: Date; balance: number }[];
+  /** Balance expected at the end of the current month. */
+  projectedMonthEnd: number;
+}
+
 /** Users never leave the core layer with their password hash attached. */
 export type PublicUser = Omit<User, "password">;
 

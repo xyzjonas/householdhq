@@ -5,6 +5,7 @@ import {
   NotFoundError,
   type Account,
   type AccountState,
+  type AccountTrajectory,
   type AccountWithBalance,
   type Balances,
 } from "./types";
@@ -14,16 +15,17 @@ export function accountsRepo(db: Db) {
    * Balance = latest recorded state + confirmed transactions since then
    * (incoming minus outgoing). Same rule the legacy app used.
    */
-  async function balanceOf(account: Account): Promise<number> {
+  async function balanceOf(
+    account: Account,
+    asOf: Date = new Date(),
+  ): Promise<number> {
     const state = await db.sourceState.findFirst({
-      where: { sourceId: account.id },
+      where: { sourceId: account.id, created: { lte: asOf } },
       orderBy: { created: "desc" },
     });
     const since: Prisma.TransactionWhereInput = {
       cancelled: false,
-      transactedAt: state
-        ? { gte: state.created, lte: new Date() }
-        : { lte: new Date() },
+      transactedAt: state ? { gte: state.created, lte: asOf } : { lte: asOf },
     };
     const [incoming, outgoing] = await Promise.all([
       db.transaction.aggregate({
@@ -69,6 +71,54 @@ export function accountsRepo(db: Db) {
         summary.byType[a.type] = (summary.byType[a.type] ?? 0) + a.balance;
       }
       return summary;
+    },
+
+    /** Balance as it was (or, for future dates, is projected to be) at `asOf`. */
+    async balanceAt(id: number, asOf: Date): Promise<number> {
+      return balanceOf(await this.get(id), asOf);
+    },
+
+    /**
+     * Closing balance of each of the last `months` calendar months, oldest
+     * first. The current month closes "now"; `projectedMonthEnd` is the
+     * balance expected once its scheduled transactions have happened.
+     */
+    async trajectory(
+      id: number,
+      months = 6,
+      now: Date = new Date(),
+    ): Promise<AccountTrajectory> {
+      const account = await this.get(id);
+      const points = await Promise.all(
+        Array.from({ length: months }, async (_, i) => {
+          const monthStart = new Date(
+            now.getFullYear(),
+            now.getMonth() - (months - 1 - i),
+            1,
+          );
+          const monthEnd = new Date(
+            monthStart.getFullYear(),
+            monthStart.getMonth() + 1,
+            1,
+          );
+          const isCurrent = i === months - 1;
+          return {
+            monthStart,
+            balance: await balanceOf(
+              account,
+              isCurrent ? now : new Date(monthEnd.getTime() - 1),
+            ),
+          };
+        }),
+      );
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      return {
+        points,
+        projectedMonthEnd: await balanceOf(
+          account,
+          new Date(endOfMonth.getTime() - 1),
+        ),
+      };
     },
 
     async get(id: number): Promise<Account> {
