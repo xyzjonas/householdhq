@@ -2,7 +2,9 @@
   import { untrack } from "svelte";
   import { patchAccount, type AccountChanges } from "#lib/accounts-client.ts";
   import type { Account } from "#lib/server/core/types.ts";
+  import AccountTypePicker from "./AccountTypePicker.svelte";
   import InlineField from "./InlineField.svelte";
+  import PositionStepper from "./PositionStepper.svelte";
   import ToggleTile from "./ToggleTile.svelte";
 
   let { account }: { account: Account } = $props();
@@ -38,13 +40,24 @@
   aria-labelledby="properties-heading"
   class="flex flex-col gap-4 card border border-surface-200-800 p-6"
 >
-  <header class="flex flex-col gap-1">
-    <h2 id="properties-heading" class="text-lg font-bold">
-      Account configuration & properties
-    </h2>
-    <p class="text-sm text-surface-600-400">
-      Changes are saved as soon as you make them · Account ID: {account.id}
-    </p>
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div class="flex flex-col gap-1">
+      <h2 id="properties-heading" class="text-lg font-bold">
+        Account configuration & properties
+      </h2>
+      <p class="text-sm text-surface-600-400">
+        Changes are saved as soon as you make them · Account ID: {account.id}
+      </p>
+    </div>
+    <div class="flex flex-col items-end gap-1">
+      <p class="text-xs font-bold tracking-wider uppercase opacity-60">
+        Position in summary
+      </p>
+      <PositionStepper
+        value={current.position}
+        onsave={(position) => save({ position })}
+      />
+    </div>
   </header>
 
   <div class="grid gap-4 md:grid-cols-3">
@@ -53,13 +66,7 @@
       value={current.name}
       onsave={(name) => save({ name })}
     />
-    <InlineField
-      label="Position in summary"
-      type="number"
-      value={current.position}
-      hint={current.position === 1 ? "Top priority anchor" : undefined}
-      onsave={(position) => save({ position: Number(position) })}
-    />
+    <AccountTypePicker value={current.type} onsave={(type) => save({ type })} />
     <div
       class="flex items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
     >

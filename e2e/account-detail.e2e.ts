@@ -58,6 +58,49 @@ test.describe("account detail", () => {
     await restore;
   });
 
+  test("changes the account type through the dialog", async ({ page }) => {
+    await page.getByRole("button", { name: "Change type" }).click();
+    const patch = page.waitForResponse(
+      (r) => r.request().method() === "PATCH" && r.ok(),
+    );
+    await page.getByRole("radio", { name: /Savings/ }).click();
+    await patch;
+    await expect(page.getByText("Savings", { exact: true })).toBeVisible();
+
+    await page.reload();
+    await page.getByRole("button", { name: "Change type" }).click();
+    await expect(page.getByRole("radio", { name: /Savings/ })).toBeChecked();
+
+    // restore for repeatable runs
+    const restore = page.waitForResponse(
+      (r) => r.request().method() === "PATCH" && r.ok(),
+    );
+    await page.getByRole("radio", { name: /^Cash/ }).click();
+    await restore;
+  });
+
+  test("steps the position with the counter", async ({ page }) => {
+    const position = page.getByRole("group", { name: "Position in summary" });
+    const output = position.getByRole("status");
+    const before = Number(await output.textContent());
+    const patch = page.waitForResponse(
+      (r) => r.request().method() === "PATCH" && r.ok(),
+    );
+    await position
+      .getByRole("button", { name: "Move down in summary" })
+      .click();
+    await expect(output).toHaveText(String(before + 1));
+    await patch;
+    await page.reload();
+    await expect(output).toHaveText(String(before + 1));
+
+    const restore = page.waitForResponse(
+      (r) => r.request().method() === "PATCH" && r.ok(),
+    );
+    await position.getByRole("button", { name: "Move up in summary" }).click();
+    await restore;
+  });
+
   test("rejects PATCH for unknown accounts", async ({ page }) => {
     const res = await page.request.patch("/api/accounts/999999", {
       data: { name: "x" },

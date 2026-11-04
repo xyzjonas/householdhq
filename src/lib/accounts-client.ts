@@ -3,7 +3,13 @@ import type { Account } from "#lib/server/core/types.ts";
 export type AccountChanges = Partial<
   Pick<
     Account,
-    "name" | "position" | "color" | "isOut" | "isDisponible" | "isPortfolio"
+    | "name"
+    | "type"
+    | "position"
+    | "color"
+    | "isOut"
+    | "isDisponible"
+    | "isPortfolio"
   >
 >;
 

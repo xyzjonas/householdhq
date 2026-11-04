@@ -7,14 +7,10 @@
   let {
     label,
     value,
-    type = "text",
-    hint,
     onsave,
   }: {
     label: string;
-    value: string | number;
-    type?: "text" | "number";
-    hint?: string;
+    value: string;
     onsave: (value: string) => Promise<void>;
   } = $props();
 
@@ -61,9 +57,8 @@
           bind:this={input}
           bind:value={draft}
           class="input"
-          {type}
+          type="text"
           required
-          step={type === "number" ? 1 : undefined}
           disabled={saving}
           onkeydown={(e) => e.key === "Escape" && (editing = false)}
         />
@@ -92,8 +87,6 @@
       </p>
       <p class="truncate text-base font-bold">
         {value}
-        {#if hint}<span class="text-xs font-medium opacity-60">{hint}</span
-          >{/if}
       </p>
     </div>
     <button
