@@ -12,10 +12,10 @@
 
 <fieldset class="flex flex-col gap-3">
   <legend class="sr-only">Type of transaction</legend>
-  <div class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+  <div class="grid grid-cols-2 gap-3">
     {#each transactionTypes as t (t.value)}
       <label
-        class="type-pill flex cursor-pointer flex-col gap-1 rounded-2xl border-2 p-4 transition-colors duration-150 active:scale-95 lg:p-6 {value ===
+        class="type-pill flex cursor-pointer flex-col gap-1 rounded-2xl border-2 p-4 transition-colors duration-150 active:scale-95 {value ===
         t.value
           ? t.active
           : 'border-surface-200-800 bg-surface-50-950 text-surface-950-50'}"

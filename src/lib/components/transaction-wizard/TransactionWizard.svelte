@@ -10,6 +10,7 @@
   import { evaluate } from "./calculator";
   import CategoryStage from "./CategoryStage.svelte";
   import DetailsStage from "./DetailsStage.svelte";
+  import TransactionOverview from "./TransactionOverview.svelte";
   import TypeStage from "./TypeStage.svelte";
   import {
     stages,
@@ -59,9 +60,12 @@
   let important = $state(false);
   let saving = $state(false);
   let heading = $state<HTMLElement>();
+  let reached = $state(1);
 
   const amount = $derived(evaluate(tape));
   const category = $derived(categories.find((c) => c.id === categoryId));
+  const accountName = $derived(accounts.find((a) => a.id === sourceId)?.name);
+  const targetName = $derived(accounts.find((a) => a.id === targetId)?.name);
   const transactedAt = $derived.by(() => {
     const d = new Date(`${date}T${time}`);
     return Number.isNaN(d.getTime()) ? "" : d.toISOString();
@@ -85,6 +89,7 @@
     // Entering the category stage settles any pending formula on the tape.
     if (next >= 3 && stage <= 2) tape = amount > 0 ? String(amount) : "";
     stage = next;
+    reached = Math.max(reached, next);
     await tick();
     window.scrollTo({ top: 0 });
     heading?.focus();
@@ -99,7 +104,7 @@
 
 <form
   method="POST"
-  class="mx-auto flex w-full max-w-xl flex-col gap-4 lg:max-w-6xl lg:gap-6"
+  class="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[390px_1fr] lg:items-start"
   use:enhance={({ cancel }) => {
     if (stage !== stages.length || !canAdvance) {
       cancel();
@@ -112,157 +117,176 @@
     };
   }}
 >
-  <header class="flex items-center gap-3">
-    <a
-      href={resolve("/")}
-      class="btn-icon size-10 rounded-full preset-tonal"
-      aria-label="Cancel and go back"
-    >
-      <X size={18} aria-hidden="true" />
-    </a>
-    <h1 class="flex-1 text-center text-base font-bold text-surface-950-50">
-      Add Transaction
-    </h1>
-    <span class="size-10" aria-hidden="true"></span>
-  </header>
-
-  <div class="flex flex-col gap-3">
-    <div class="flex items-center gap-3">
-      <span
-        class="flex size-8 items-center justify-center rounded-full bg-[#10b981] text-sm font-bold text-white"
-        aria-hidden="true">{stage}</span
+  <div class="mx-auto flex w-full max-w-[390px] flex-col gap-4">
+    <header class="flex items-center gap-3">
+      <a
+        href={resolve("/")}
+        class="btn-icon size-10 rounded-full preset-tonal"
+        aria-label="Cancel and go back"
       >
-      <h2
-        bind:this={heading}
-        tabindex="-1"
-        class="text-sm font-semibold text-surface-950-50 outline-none"
-      >
-        <span class="sr-only">Step {stage} of {stages.length}:</span>
-        {stages[stage - 1].title}
-      </h2>
-    </div>
-    <ol class="grid grid-cols-4 gap-2" aria-hidden="true">
-      {#each stages as s, i (s.title)}
-        <li
-          class="h-1.5 rounded-full transition-colors {i + 1 < stage
-            ? 'bg-[#10b981]'
-            : i + 1 === stage
-              ? 'bg-[#059669]'
-              : 'bg-surface-200-800'}"
-        ></li>
-      {/each}
-    </ol>
-  </div>
+        <X size={18} aria-hidden="true" />
+      </a>
+      <h1 class="flex-1 text-center text-base font-bold text-surface-950-50">
+        Add Transaction
+      </h1>
+      <span class="size-10" aria-hidden="true"></span>
+    </header>
 
-  {#if errors.length > 0}
-    <ul
-      role="alert"
-      class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-sm font-semibold text-[#991b1b] dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-    >
-      {#each errors as e (e)}<li>{e}</li>{/each}
-    </ul>
-  {/if}
-
-  <div class="overflow-hidden">
-    <div
-      class="track flex items-start"
-      style="transform: translateX(-{(stage - 1) * 100}%)"
-    >
-      <section class="panel" inert={stage !== 1} aria-label={stages[0].title}>
-        <TypeStage bind:value={type} onchange={setType} />
-      </section>
-      <section class="panel" inert={stage !== 2} aria-label={stages[1].title}>
-        <AmountStage
-          bind:tape
-          bind:currency
-          {category}
-          {onsplit}
-          onchangecategory={() => goTo(3)}
-        />
-      </section>
-      <section class="panel" inert={stage !== 3} aria-label={stages[2].title}>
-        <CategoryStage {categories} bind:value={categoryId} />
-      </section>
-      <section class="panel" inert={stage !== 4} aria-label={stages[3].title}>
-        <DetailsStage
-          {type}
-          {accounts}
-          {suggestions}
-          bind:sourceId={() => sourceId, (id) => (chosenSourceId = id)}
-          bind:targetId
-          bind:description
-          bind:date
-          bind:time
-          bind:recurring
-          bind:hidden
-          bind:important
-        />
-      </section>
-    </div>
-  </div>
-
-  <input type="hidden" name="amount" value={amount} />
-  <input type="hidden" name="currency" value={currency} />
-  <input type="hidden" name="transactedAt" value={transactedAt} />
-
-  <nav
-    aria-label="Wizard steps"
-    class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
-  >
-    <div
-      class="mx-auto flex max-w-xl items-center justify-between gap-3 lg:max-w-none"
-    >
-      {#if stage === 1}
-        <a
-          href={resolve("/")}
-          class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
-          aria-label="Cancel"
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3">
+        <span
+          class="flex size-8 items-center justify-center rounded-full bg-[#10b981] text-sm font-bold text-white"
+          aria-hidden="true">{stage}</span
         >
-          <ArrowLeft size={20} aria-hidden="true" />
-        </a>
-      {:else}
-        <button
-          type="button"
-          class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
-          aria-label="Previous step"
-          onclick={() => goTo(stage - 1)}
+        <h2
+          bind:this={heading}
+          tabindex="-1"
+          class="text-sm font-semibold text-surface-950-50 outline-none"
         >
-          <ArrowLeft size={20} aria-hidden="true" />
-        </button>
-      {/if}
-
-      <ol class="flex items-center gap-2" aria-hidden="true">
+          <span class="sr-only">Step {stage} of {stages.length}:</span>
+          {stages[stage - 1].title}
+        </h2>
+      </div>
+      <ol class="grid grid-cols-4 gap-2" aria-hidden="true">
         {#each stages as s, i (s.title)}
           <li
-            class="dot size-2.5 rounded-full {i + 1 === stage
-              ? 'scale-125 bg-emerald-600'
-              : 'bg-surface-200-800'}"
+            class="h-1.5 rounded-full transition-colors {i + 1 < stage
+              ? 'bg-[#10b981]'
+              : i + 1 === stage
+                ? 'bg-[#059669]'
+                : 'bg-surface-200-800'}"
           ></li>
         {/each}
       </ol>
-
-      {#if stage < stages.length}
-        <button
-          type="button"
-          class="cta flex items-center gap-2 rounded-full bg-[#006c48] px-6 py-3.5 font-bold text-white shadow-sm active:scale-95 disabled:opacity-40"
-          disabled={!canAdvance}
-          onclick={() => goTo(stage + 1)}
-        >
-          {stages[stage - 1].next}
-          <ArrowRight size={18} aria-hidden="true" />
-        </button>
-      {:else}
-        <button
-          type="submit"
-          class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-surface-950-50 px-6 font-bold text-surface-50-950 active:scale-95 disabled:opacity-40"
-          disabled={!canAdvance || saving}
-        >
-          {saving ? "Saving…" : stages[stage - 1].next}
-          <Check size={18} aria-hidden="true" />
-        </button>
-      {/if}
     </div>
-  </nav>
+
+    {#if errors.length > 0}
+      <ul
+        role="alert"
+        class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-sm font-semibold text-[#991b1b] dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+      >
+        {#each errors as e (e)}<li>{e}</li>{/each}
+      </ul>
+    {/if}
+
+    <div class="overflow-hidden">
+      <div
+        class="track flex items-start"
+        style="transform: translateX(-{(stage - 1) * 100}%)"
+      >
+        <section class="panel" inert={stage !== 1} aria-label={stages[0].title}>
+          <TypeStage bind:value={type} onchange={setType} />
+        </section>
+        <section class="panel" inert={stage !== 2} aria-label={stages[1].title}>
+          <AmountStage
+            bind:tape
+            bind:currency
+            {category}
+            {onsplit}
+            onchangecategory={() => goTo(3)}
+          />
+        </section>
+        <section class="panel" inert={stage !== 3} aria-label={stages[2].title}>
+          <CategoryStage {categories} bind:value={categoryId} />
+        </section>
+        <section class="panel" inert={stage !== 4} aria-label={stages[3].title}>
+          <DetailsStage
+            {type}
+            {accounts}
+            {suggestions}
+            bind:sourceId={() => sourceId, (id) => (chosenSourceId = id)}
+            bind:targetId
+            bind:description
+            bind:date
+            bind:time
+            bind:recurring
+            bind:hidden
+            bind:important
+          />
+        </section>
+      </div>
+    </div>
+
+    <input type="hidden" name="amount" value={amount} />
+    <input type="hidden" name="currency" value={currency} />
+    <input type="hidden" name="transactedAt" value={transactedAt} />
+
+    <nav
+      aria-label="Wizard steps"
+      class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
+    >
+      <div
+        class="mx-auto flex max-w-[390px] items-center justify-between gap-3"
+      >
+        {#if stage === 1}
+          <a
+            href={resolve("/")}
+            class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
+            aria-label="Cancel"
+          >
+            <ArrowLeft size={20} aria-hidden="true" />
+          </a>
+        {:else}
+          <button
+            type="button"
+            class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
+            aria-label="Previous step"
+            onclick={() => goTo(stage - 1)}
+          >
+            <ArrowLeft size={20} aria-hidden="true" />
+          </button>
+        {/if}
+
+        <ol class="flex items-center gap-2" aria-hidden="true">
+          {#each stages as s, i (s.title)}
+            <li
+              class="dot size-2.5 rounded-full {i + 1 === stage
+                ? 'scale-125 bg-emerald-600'
+                : 'bg-surface-200-800'}"
+            ></li>
+          {/each}
+        </ol>
+
+        {#if stage < stages.length}
+          <button
+            type="button"
+            class="cta flex items-center gap-2 rounded-full bg-[#006c48] px-6 py-3.5 font-bold text-white shadow-sm active:scale-95 disabled:opacity-40"
+            disabled={!canAdvance}
+            onclick={() => goTo(stage + 1)}
+          >
+            {stages[stage - 1].next}
+            <ArrowRight size={18} aria-hidden="true" />
+          </button>
+        {:else}
+          <button
+            type="submit"
+            class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-surface-950-50 px-6 font-bold text-surface-50-950 active:scale-95 disabled:opacity-40"
+            disabled={!canAdvance || saving}
+          >
+            {saving ? "Saving…" : stages[stage - 1].next}
+            <Check size={18} aria-hidden="true" />
+          </button>
+        {/if}
+      </div>
+    </nav>
+  </div>
+
+  <TransactionOverview
+    {stage}
+    {reached}
+    {type}
+    {amount}
+    {currency}
+    {category}
+    {accountName}
+    {targetName}
+    {description}
+    {date}
+    {time}
+    {recurring}
+    {hidden}
+    {important}
+  />
 </form>
 
 <style scoped>
