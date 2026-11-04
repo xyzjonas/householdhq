@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Source` ADD COLUMN `position` INTEGER NOT NULL DEFAULT 999;

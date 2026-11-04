@@ -1,9 +1,11 @@
-.nuxt
-.output
+.svelte-kit
+build
 node_modules
-dist
 coverage
 package-lock.json
 prisma/migrations
-public
+static
+test-results
+playwright-report
 *.csv
+docs
