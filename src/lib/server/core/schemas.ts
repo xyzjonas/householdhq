@@ -89,7 +89,7 @@ export const TransactionFilter = z.object({
 export type TransactionFilter = z.input<typeof TransactionFilter>;
 
 export const UserInput = z.object({
-  email: z.email(),
+  email: z.email().trim().toLowerCase(),
   password: z.string().min(8),
 });
 export type UserInput = z.input<typeof UserInput>;

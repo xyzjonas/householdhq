@@ -1,10 +1,14 @@
 import { accountsRepo } from "./accounts";
+import { ensureDefaultAccounts } from "./bootstrap";
 import { categoriesRepo } from "./categories";
 import type { Db } from "./prisma";
+import { sessionsRepo } from "./sessions";
 import { transactionsRepo } from "./transactions";
 import { usersRepo } from "./users";
 
 export { createPrismaClient } from "./prisma";
+export { DEFAULT_BANK_ACCOUNT, DEFAULT_EXPENSE_ACCOUNT } from "./bootstrap";
+export { SESSION_TTL_MS } from "./sessions";
 export * from "./schemas";
 export * from "./types";
 
@@ -18,6 +22,9 @@ export function createCore(db: Db) {
     categories: categoriesRepo(db),
     transactions: transactionsRepo(db),
     users: usersRepo(db),
+    sessions: sessionsRepo(db),
+    /** Idempotent first-run setup of the default accounts. */
+    ensureDefaults: () => ensureDefaultAccounts(db),
     disconnect: () => db.$disconnect(),
   };
 }

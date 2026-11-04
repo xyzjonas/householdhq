@@ -3,7 +3,9 @@
  * reachable through DATABASE_URL (see `just test-unit`).
  */
 import "dotenv/config";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
+import { ensureDefaultAccounts } from "./bootstrap";
+import type { Db } from "./prisma";
 import {
   createCore,
   createPrismaClient,
@@ -12,8 +14,37 @@ import {
 } from "./index";
 
 const url = process.env.DATABASE_URL;
-const core = url ? createCore(createPrismaClient(url)) : undefined;
+const db = url ? createPrismaClient(url) : undefined;
+const core = db ? createCore(db) : undefined;
 const run = `t${Date.now()}`;
+
+describe("ensureDefaultAccounts", () => {
+  const fake = (existing: number) => {
+    const create = vi.fn().mockResolvedValue({});
+    const db = { source: { count: async () => existing, create } };
+    return { db: db as unknown as Db, create };
+  };
+
+  it("creates the bank account first and the expense account second when blank", async () => {
+    const { db, create } = fake(0);
+    expect(await ensureDefaultAccounts(db)).toBe(true);
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(create.mock.calls[0][0].data).toMatchObject({
+      type: "ACCOUNT",
+      isDisponible: true,
+    });
+    expect(create.mock.calls[1][0].data).toMatchObject({
+      type: "OUT",
+      isOut: true,
+    });
+  });
+
+  it("does nothing when accounts already exist", async () => {
+    const { db, create } = fake(3);
+    expect(await ensureDefaultAccounts(db)).toBe(false);
+    expect(create).not.toHaveBeenCalled();
+  });
+});
 
 describe.skipIf(!core)("core layer", () => {
   const c = core!;
@@ -32,6 +63,66 @@ describe.skipIf(!core)("core layer", () => {
       await c.categories.remove(id).catch(() => {});
     for (const id of ids.users) await c.users.remove(id).catch(() => {});
     await c.disconnect();
+  });
+
+  describe("sessions", () => {
+    it("creates, validates and invalidates sessions", async () => {
+      const user = await c.users.create({
+        email: `${run}-s@example.com`,
+        password: "correct horse",
+      });
+      ids.users.push(user.id);
+
+      const { token } = await c.sessions.create(user.id);
+      expect(token.length).toBeGreaterThan(30);
+      const valid = await c.sessions.validate(token);
+      expect(valid?.user).toEqual(user);
+      expect(valid?.renewed).toBe(false);
+
+      await c.sessions.invalidate(token);
+      expect(await c.sessions.validate(token)).toBeNull();
+      expect(await c.sessions.validate("not-a-token")).toBeNull();
+    });
+
+    it("rejects expired sessions and renews old ones", async () => {
+      const user = await c.users.create({
+        email: `${run}-e@example.com`,
+        password: "correct horse",
+      });
+      ids.users.push(user.id);
+
+      const expired = await c.sessions.create(user.id);
+      await db!.session.updateMany({
+        where: { userId: user.id },
+        data: { expiresAt: new Date(Date.now() - 1000) },
+      });
+      expect(await c.sessions.validate(expired.token)).toBeNull();
+
+      const old = await c.sessions.create(user.id);
+      await db!.session.updateMany({
+        where: { userId: user.id },
+        data: { expiresAt: new Date(Date.now() + 60_000) },
+      });
+      const renewed = await c.sessions.validate(old.token);
+      expect(renewed?.renewed).toBe(true);
+      expect(renewed!.expiresAt.getTime()).toBeGreaterThan(
+        Date.now() + 86_400_000,
+      );
+
+      await c.sessions.invalidateAllForUser(user.id);
+      expect(await c.sessions.validate(old.token)).toBeNull();
+    });
+
+    it("stores only a hash of the token", async () => {
+      const user = await c.users.create({
+        email: `${run}-h@example.com`,
+        password: "correct horse",
+      });
+      ids.users.push(user.id);
+      const { token } = await c.sessions.create(user.id);
+      expect(await db!.session.findUnique({ where: { id: token } })).toBeNull();
+      await c.sessions.invalidateAllForUser(user.id);
+    });
   });
 
   describe("categories", () => {

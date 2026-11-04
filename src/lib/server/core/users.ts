@@ -27,8 +27,16 @@ async function verifyPassword(password: string, stored: string) {
 
 const publicSelect = { id: true, email: true } as const;
 
+// Verified against when the email is unknown, so response time does not
+// reveal which emails exist.
+const DUMMY_HASH = `scrypt$${"00".repeat(16)}$${"00".repeat(64)}`;
+
 export function usersRepo(db: Db) {
   return {
+    count(): Promise<number> {
+      return db.user.count();
+    },
+
     list(): Promise<PublicUser[]> {
       return db.user.findMany({ select: publicSelect, orderBy: { id: "asc" } });
     },
@@ -79,10 +87,11 @@ export function usersRepo(db: Db) {
       email: string,
       password: string,
     ): Promise<PublicUser | null> {
-      const user = await db.user.findUnique({ where: { email } });
-      if (!user || !(await verifyPassword(password, user.password))) {
-        return null;
-      }
+      const user = await db.user.findUnique({
+        where: { email: email.trim().toLowerCase() },
+      });
+      const ok = await verifyPassword(password, user?.password ?? DUMMY_HASH);
+      if (!user || !ok) return null;
       return { id: user.id, email: user.email };
     },
   };
