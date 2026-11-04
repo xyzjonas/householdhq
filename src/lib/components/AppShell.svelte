@@ -60,7 +60,7 @@
       </form>
       <a
         href={resolve("/transactions/new")}
-        class="ml-auto btn rounded-full preset-filled-surface-950-50 sm:ml-0"
+        class="ml-auto btn preset-filled-surface-950-50 sm:ml-0"
       >
         <Plus size={16} aria-hidden="true" />
         <span>Add record</span>
