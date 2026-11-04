@@ -25,7 +25,7 @@
     </Switch.Label>
     <span class="text-xs opacity-60">{description}</span>
   </span>
-  <Switch.Control>
+  <Switch.Control class="shrink-0">
     <Switch.Thumb />
   </Switch.Control>
   <Switch.HiddenInput />
