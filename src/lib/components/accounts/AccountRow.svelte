@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Component } from "svelte";
+  import { resolve } from "$app/paths";
   import Banknote from "@lucide/svelte/icons/banknote";
   import CreditCard from "@lucide/svelte/icons/credit-card";
   import Landmark from "@lucide/svelte/icons/landmark";
@@ -26,7 +27,7 @@
 </script>
 
 <article
-  class="flex flex-col items-start justify-between gap-4 card border border-surface-200-800 p-5 transition-colors hover:border-surface-400-600 lg:flex-row lg:items-center"
+  class="relative flex flex-col items-start justify-between gap-4 card border border-surface-200-800 p-5 transition-colors hover:border-surface-400-600 lg:flex-row lg:items-center"
 >
   <div class="flex min-w-0 items-center gap-4">
     <span
@@ -36,7 +37,14 @@
     </span>
     <div class="flex min-w-0 flex-col gap-2">
       <div class="flex flex-wrap items-center gap-2">
-        <h4 class="truncate text-base font-bold">{account.name}</h4>
+        <h4 class="truncate text-base font-bold">
+          <a
+            href={resolve("/accounts/[id]", { id: String(account.id) })}
+            class="after:absolute after:inset-0 hover:underline"
+          >
+            {account.name}
+          </a>
+        </h4>
         <span class="badge preset-tonal text-[11px] font-bold">
           Pos #{account.position}
         </span>

@@ -5,7 +5,7 @@
   import ArrowRight from "@lucide/svelte/icons/arrow-right";
   import Check from "@lucide/svelte/icons/check";
   import X from "@lucide/svelte/icons/x";
-  import { tick } from "svelte";
+  import { tick, untrack } from "svelte";
   import AmountStage from "./AmountStage.svelte";
   import { evaluate } from "./calculator";
   import CategoryStage from "./CategoryStage.svelte";
@@ -25,6 +25,7 @@
     categories,
     suggestions = [],
     errors = [],
+    initialAccountId = null,
     onsplit,
   }: {
     accounts: WizardAccount[];
@@ -33,6 +34,8 @@
     suggestions?: string[];
     /** Server side validation messages to surface after a failed submit. */
     errors?: string[];
+    /** Account to pre-select as the source. */
+    initialAccountId?: number | null;
     /** Enables the "Split" banner on the amount stage. */
     onsplit?: (amount: number) => void;
   } = $props();
@@ -45,7 +48,7 @@
   let tape = $state("");
   let currency = $state<Currency>("CZK");
   let categoryId = $state<number | null>(null);
-  let chosenSourceId = $state<number | null>(null);
+  let chosenSourceId = $state<number | null>(untrack(() => initialAccountId));
   const sourceId = $derived(
     chosenSourceId ?? accounts.find((a) => !a.isOut)?.id ?? null,
   );
