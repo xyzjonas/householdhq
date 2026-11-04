@@ -30,7 +30,9 @@
 
   <Tabs value={tab} onValueChange={(e) => (tab = e.value as TabId)}>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <Tabs.List class="flex gap-2 overflow-x-auto border-0 pb-2">
+      <Tabs.List
+        class="flex gap-2 overflow-x-auto border-0 lg:mb-0! lg:border-b-0! lg:pb-0!"
+      >
         {#each tabs as t (t.id)}
           <Tabs.Trigger
             value={t.id}
