@@ -36,7 +36,7 @@
         {#each tabs as t (t.id)}
           <Tabs.Trigger
             value={t.id}
-            class="btn rounded-full text-xs font-semibold {tab === t.id
+            class="btn text-xs font-semibold {tab === t.id
               ? 'preset-filled-surface-950-50'
               : 'border border-surface-200-800 preset-filled-surface-50-950'}"
           >

@@ -10,9 +10,7 @@
   const rootClass = $derived(
     layout === "sidebar" ? "w-full bg-transparent p-0" : "bg-transparent",
   );
-  const triggerClass = $derived(
-    layout === "bar" ? "min-w-0 flex-1 px-0" : "rounded-full",
-  );
+  const triggerClass = $derived(layout === "bar" ? "min-w-0 flex-1 px-0" : "");
 </script>
 
 <Navigation {layout} class={rootClass}>
