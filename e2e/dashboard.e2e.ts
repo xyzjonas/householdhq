@@ -1,8 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { login } from "./helpers";
 
 // Requires a migrated database seeded with `npm run db:seed` (see `just e2e`).
 
 test.describe("dashboard", () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test("renders layout, balances, accounts and transactions", async ({
     page,
   }) => {
@@ -21,7 +26,7 @@ test.describe("dashboard", () => {
 
     const accounts = page.getByRole("region", { name: "Accounts" });
     await expect(
-      accounts.getByRole("heading", { name: "Main checking" }),
+      accounts.getByRole("heading", { name: "Bank account" }),
     ).toBeVisible();
     await expect(
       accounts.getByRole("heading", { name: "Global ETFs" }),
@@ -53,8 +58,8 @@ test.describe("dashboard", () => {
 
     await page.getByLabel("Description").fill(description);
     await page.getByLabel("Amount").fill("100");
-    await page.getByLabel("From").selectOption({ label: "Main checking" });
-    await page.getByLabel("To").selectOption({ label: "Outside world" });
+    await page.getByLabel("From").selectOption({ label: "Bank account" });
+    await page.getByLabel("To").selectOption({ label: "Expenses" });
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(/\/$/);
@@ -72,7 +77,7 @@ test.describe("dashboard", () => {
     await page.goto("/transactions/new");
     await page.getByLabel("Description").fill("Bad amount");
     await page.getByLabel("Amount").fill("0");
-    await page.getByLabel("From").selectOption({ label: "Main checking" });
+    await page.getByLabel("From").selectOption({ label: "Bank account" });
     await page.getByLabel("To").selectOption({ label: "Wallet" });
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByText("Amount must be positive")).toBeVisible();

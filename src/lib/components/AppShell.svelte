@@ -2,10 +2,12 @@
   import { resolve } from "$app/paths";
   import type { Snippet } from "svelte";
   import Plus from "@lucide/svelte/icons/plus";
+  import LogOut from "@lucide/svelte/icons/log-out";
   import Search from "@lucide/svelte/icons/search";
   import NavItems from "./NavItems.svelte";
 
-  let { children }: { children: Snippet } = $props();
+  let { user, children }: { user: { email: string }; children: Snippet } =
+    $props();
 </script>
 
 <div class="min-h-screen lg:grid lg:grid-cols-[17.5rem_1fr]">
@@ -18,6 +20,15 @@
     <nav aria-label="Main">
       <NavItems layout="sidebar" />
     </nav>
+    <div class="mt-auto flex flex-col gap-2 text-sm">
+      <p class="truncate opacity-70" title={user.email}>{user.email}</p>
+      <form method="POST" action={resolve("/logout")}>
+        <button type="submit" class="btn w-full preset-tonal">
+          <LogOut size={16} aria-hidden="true" />
+          <span>Sign out</span>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <div class="flex min-w-0 flex-col">
@@ -54,6 +65,15 @@
         <Plus size={16} aria-hidden="true" />
         <span>Add record</span>
       </a>
+      <form method="POST" action={resolve("/logout")} class="lg:hidden">
+        <button
+          type="submit"
+          class="btn-icon preset-tonal"
+          aria-label="Sign out"
+        >
+          <LogOut size={16} aria-hidden="true" />
+        </button>
+      </form>
     </header>
 
     <main class="flex-1 p-4 pb-24 lg:p-8 lg:pb-8">

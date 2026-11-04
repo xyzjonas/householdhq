@@ -4,7 +4,7 @@
   import AppShell from "#lib/components/AppShell.svelte";
   import type { LayoutProps } from "./$types";
 
-  let { children }: LayoutProps = $props();
+  let { data, children }: LayoutProps = $props();
 </script>
 
 <svelte:head>
@@ -12,4 +12,8 @@
   <title>Household HQ</title>
 </svelte:head>
 
-<AppShell>{@render children()}</AppShell>
+{#if data.user}
+  <AppShell user={data.user}>{@render children()}</AppShell>
+{:else}
+  {@render children()}
+{/if}

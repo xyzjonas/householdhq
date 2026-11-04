@@ -1,9 +1,16 @@
 /**
  * Development/e2e seed data, written through the core layer.
- * Idempotent: does nothing when accounts already exist.
+ * Idempotent: every step is skipped when its data already exists.
+ *
+ *   SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD override the dev admin login.
  */
 import "dotenv/config";
-import { createCore, createPrismaClient } from "../src/lib/server/core";
+import {
+  DEFAULT_BANK_ACCOUNT,
+  DEFAULT_EXPENSE_ACCOUNT,
+  createCore,
+  createPrismaClient,
+} from "../src/lib/server/core";
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL is not set");
@@ -11,22 +18,37 @@ if (!url) throw new Error("DATABASE_URL is not set");
 const core = createCore(createPrismaClient(url));
 
 try {
-  if ((await core.accounts.list()).length > 0) {
-    console.log("seed: accounts already exist, skipping");
-  } else {
-    // Transactions default to targetId=2, so the "outside world" comes second.
-    const main = await core.accounts.create({
-      name: "Main checking",
-      type: "ACCOUNT",
+  if ((await core.users.count()) === 0) {
+    await core.users.create({
+      email: process.env.SEED_ADMIN_EMAIL ?? "admin@example.com",
+      password: process.env.SEED_ADMIN_PASSWORD ?? "password123",
+    });
+    console.log("seed: created admin user");
+  }
+
+  await core.ensureDefaults();
+  const accounts = await core.accounts.list();
+  const named = (name: string) => accounts.find((a) => a.name === name);
+
+  const main =
+    named(DEFAULT_BANK_ACCOUNT) ??
+    (await core.accounts.create({
+      name: DEFAULT_BANK_ACCOUNT,
       isDisponible: true,
       position: 1,
-    });
-    const outside = await core.accounts.create({
-      name: "Outside world",
+    }));
+  const outside =
+    named(DEFAULT_EXPENSE_ACCOUNT) ??
+    (await core.accounts.create({
+      name: DEFAULT_EXPENSE_ACCOUNT,
       type: "OUT",
       isOut: true,
       position: 2,
-    });
+    }));
+
+  if ((await core.transactions.list({ limit: 1 })).total > 0) {
+    console.log("seed: transactions already exist, skipping sample data");
+  } else {
     const cash = await core.accounts.create({
       name: "Wallet",
       type: "CASH",
@@ -55,14 +77,14 @@ try {
     const energy = await core.categories.create({ name: "Energy" });
     const salary = await core.categories.create({ name: "Income" });
 
-    const day = (n: number) => new Date(Date.now() - n * 86_400_000);
+    const now = new Date();
     await core.transactions.create({
       description: "Salary",
       amount: 15_000,
       sourceId: outside.id,
       targetId: main.id,
       categoryId: salary.id,
-      transactedAt: day(0),
+      transactedAt: now,
     });
     await core.transactions.create({
       description: "Rohlik delivery",
@@ -70,7 +92,7 @@ try {
       sourceId: main.id,
       targetId: outside.id,
       categoryId: groceries.id,
-      transactedAt: day(0),
+      transactedAt: now,
     });
     await core.transactions.create({
       description: "Electricity advance",
@@ -78,9 +100,9 @@ try {
       sourceId: main.id,
       targetId: outside.id,
       categoryId: energy.id,
-      transactedAt: day(0),
+      transactedAt: now,
     });
-    console.log("seed: done");
+    console.log("seed: created sample data");
   }
 } finally {
   await core.disconnect();
