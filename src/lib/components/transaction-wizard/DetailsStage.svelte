@@ -42,7 +42,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="flex flex-col gap-4 rounded-2xl bg-white p-4">
+  <div class="flex flex-col gap-4 rounded-2xl bg-surface-50-950 p-4">
     <label class="label">
       <span class="wizard-label label-text">{accountLabel}</span>
       <select class="select" name="accountId" bind:value={sourceId} required>
@@ -51,7 +51,7 @@
         {/each}
       </select>
       {#if source}
-        <small class="text-slate-500">
+        <small class="text-surface-600-400">
           Balance {formatMoney(source.balance)}
         </small>
       {/if}
@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  <ul class="rounded-2xl bg-white px-4">
+  <ul class="rounded-2xl bg-surface-50-950 px-4">
     <ToggleRow
       name="recurring"
       label="Recurring transaction"
@@ -124,6 +124,6 @@
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #64748b;
+    color: light-dark(#64748b, #94a3b8);
   }
 </style>

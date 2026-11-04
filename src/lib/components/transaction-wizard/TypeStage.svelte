@@ -15,10 +15,10 @@
   <div class="grid grid-cols-2 gap-3">
     {#each transactionTypes as t (t.value)}
       <label
-        class="type-pill flex cursor-pointer flex-col gap-1 rounded-2xl border-2 bg-white p-4 transition-colors duration-150 active:scale-95 {value ===
+        class="type-pill flex cursor-pointer flex-col gap-1 rounded-2xl border-2 p-4 transition-colors duration-150 active:scale-95 {value ===
         t.value
           ? t.active
-          : 'border-[#e2e8f0] text-[#1e293b]'}"
+          : 'border-surface-200-800 bg-surface-50-950 text-surface-950-50'}"
       >
         <input
           class="sr-only"

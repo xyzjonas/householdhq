@@ -14,7 +14,7 @@
   } = $props();
 </script>
 
-<li class="border-b border-slate-100 py-3 last:border-b-0">
+<li class="border-b border-surface-200-800 py-3 last:border-b-0">
   <Switch
     {name}
     {checked}
@@ -22,10 +22,10 @@
     class="flex items-center justify-between gap-4"
   >
     <span class="flex flex-col">
-      <Switch.Label class="text-sm font-semibold text-slate-800">
+      <Switch.Label class="text-sm font-semibold text-surface-950-50">
         {label}
       </Switch.Label>
-      <span class="text-xs text-slate-500">{description}</span>
+      <span class="text-xs text-surface-600-400">{description}</span>
     </span>
     <Switch.Control>
       <Switch.Thumb />

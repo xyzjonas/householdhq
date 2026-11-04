@@ -38,7 +38,7 @@
 </script>
 
 <div
-  class="keypad grid grid-cols-3 gap-3 rounded-2xl border border-[#f1f5f9] bg-[#f1f5f9]/70 p-4"
+  class="keypad grid grid-cols-3 gap-3 rounded-2xl border border-surface-200-800 bg-surface-100-900 p-4"
   role="group"
   aria-label="Calculator keypad"
 >
@@ -85,9 +85,9 @@
     justify-content: center;
     padding-block: 0.875rem;
     border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    color: #1e293b;
+    border: 1px solid light-dark(#e2e8f0, #334155);
+    background: light-dark(#fff, #1e293b);
+    color: light-dark(#1e293b, #f1f5f9);
     font-size: 1.25rem;
     font-weight: 600;
     box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.05);
@@ -99,14 +99,14 @@
   }
   .key:active {
     transform: scale(0.95);
-    background: #e2e8f0;
+    background: light-dark(#e2e8f0, #475569);
   }
   .key:focus-visible {
     outline: 2px solid #059669;
     outline-offset: 2px;
   }
   .operator {
-    color: #059669;
+    color: light-dark(#059669, #34d399);
   }
   @media (prefers-reduced-motion: reduce) {
     .key {

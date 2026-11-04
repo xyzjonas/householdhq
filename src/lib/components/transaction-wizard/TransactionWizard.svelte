@@ -120,7 +120,7 @@
     >
       <X size={18} aria-hidden="true" />
     </a>
-    <h1 class="flex-1 text-center text-base font-bold text-[#0f172a]">
+    <h1 class="flex-1 text-center text-base font-bold text-surface-950-50">
       Add Transaction
     </h1>
     <span class="size-10" aria-hidden="true"></span>
@@ -135,7 +135,7 @@
       <h2
         bind:this={heading}
         tabindex="-1"
-        class="text-sm font-semibold text-slate-800 outline-none"
+        class="text-sm font-semibold text-surface-950-50 outline-none"
       >
         <span class="sr-only">Step {stage} of {stages.length}:</span>
         {stages[stage - 1].title}
@@ -148,7 +148,7 @@
             ? 'bg-[#10b981]'
             : i + 1 === stage
               ? 'bg-[#059669]'
-              : 'bg-[#e2e8f0]'}"
+              : 'bg-surface-200-800'}"
         ></li>
       {/each}
     </ol>
@@ -157,7 +157,7 @@
   {#if errors.length > 0}
     <ul
       role="alert"
-      class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-sm font-semibold text-[#991b1b]"
+      class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-sm font-semibold text-[#991b1b] dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
     >
       {#each errors as e (e)}<li>{e}</li>{/each}
     </ul>
@@ -207,13 +207,13 @@
 
   <nav
     aria-label="Wizard steps"
-    class="dock fixed inset-x-0 bottom-0 z-20 border-t border-slate-100 bg-white/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
+    class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
   >
     <div class="mx-auto flex max-w-[390px] items-center justify-between gap-3">
       {#if stage === 1}
         <a
           href={resolve("/")}
-          class="flex size-12 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white active:bg-slate-100"
+          class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
           aria-label="Cancel"
         >
           <ArrowLeft size={20} aria-hidden="true" />
@@ -221,7 +221,7 @@
       {:else}
         <button
           type="button"
-          class="flex size-12 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white active:bg-slate-100"
+          class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
           aria-label="Previous step"
           onclick={() => goTo(stage - 1)}
         >
@@ -234,7 +234,7 @@
           <li
             class="dot size-2.5 rounded-full {i + 1 === stage
               ? 'scale-125 bg-emerald-600'
-              : 'bg-slate-200'}"
+              : 'bg-surface-200-800'}"
           ></li>
         {/each}
       </ol>
@@ -252,7 +252,7 @@
       {:else}
         <button
           type="submit"
-          class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-slate-900 px-6 font-bold text-white active:scale-95 disabled:opacity-40"
+          class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-surface-950-50 px-6 font-bold text-surface-50-950 active:scale-95 disabled:opacity-40"
           disabled={!canAdvance || saving}
         >
           {saving ? "Saving…" : stages[stage - 1].next}

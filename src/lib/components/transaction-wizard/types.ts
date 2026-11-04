@@ -33,28 +33,32 @@ export const transactionTypes: {
     label: "Expense",
     hint: "Money you spent",
     dot: "bg-[#ef4444]",
-    active: "border-[#ef4444] bg-[#fef2f2] text-[#991b1b]",
+    active:
+      "border-[#ef4444] bg-[#fef2f2] text-[#991b1b] dark:bg-red-950/50 dark:text-red-200",
   },
   {
     value: "INCOME",
     label: "Income",
     hint: "Money you received",
     dot: "bg-[#10b981]",
-    active: "border-[#10b981] bg-[#ecfdf5] text-[#065f46]",
+    active:
+      "border-[#10b981] bg-[#ecfdf5] text-[#065f46] dark:bg-emerald-950/50 dark:text-emerald-200",
   },
   {
     value: "TRANSFER",
     label: "Transfer",
     hint: "Between your accounts",
     dot: "bg-[#3b82f6]",
-    active: "border-[#3b82f6] bg-[#eff6ff] text-[#1e40af]",
+    active:
+      "border-[#3b82f6] bg-[#eff6ff] text-[#1e40af] dark:bg-blue-950/50 dark:text-blue-200",
   },
   {
     value: "HIDDEN",
     label: "Hidden",
     hint: "Kept out of dashboard totals",
     dot: "bg-[#64748b]",
-    active: "border-[#64748b] bg-[#f8fafc] text-[#334155]",
+    active:
+      "border-[#64748b] bg-[#f8fafc] text-[#334155] dark:bg-slate-800 dark:text-slate-200",
   },
 ];
 

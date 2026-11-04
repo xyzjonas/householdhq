@@ -39,10 +39,10 @@
       {#each visible as c (c.id)}
         {@const Icon = categoryIcon(c.icon)}
         <label
-          class="category-tile flex cursor-pointer items-center gap-3 rounded-2xl border-2 bg-white p-3 transition-colors active:scale-95 {value ===
+          class="category-tile flex cursor-pointer items-center gap-3 rounded-2xl border-2 bg-surface-50-950 p-3 transition-colors active:scale-95 {value ===
           c.id
-            ? 'border-[#059669] bg-emerald-50/60'
-            : 'border-[#e2e8f0]'}"
+            ? 'border-[#059669] bg-emerald-50/60 dark:bg-emerald-950/40'
+            : 'border-surface-200-800'}"
         >
           <input
             class="sr-only"
@@ -58,20 +58,20 @@
             <Icon size={20} aria-hidden="true" />
           </span>
           <span
-            class="min-w-0 flex-1 text-sm font-bold break-words text-slate-800"
+            class="min-w-0 flex-1 text-sm font-bold break-words text-surface-950-50"
           >
             {c.name}
           </span>
           {#if value === c.id}
             <Check
               size={16}
-              class="shrink-0 text-[#059669]"
+              class="shrink-0 text-emerald-600 dark:text-emerald-400"
               aria-hidden="true"
             />
           {/if}
         </label>
       {:else}
-        <p class="col-span-2 py-6 text-center text-sm text-slate-500">
+        <p class="col-span-2 py-6 text-center text-sm text-surface-600-400">
           No category matches “{query}”.
         </p>
       {/each}
