@@ -24,6 +24,11 @@ export const init: ServerInit = async () => {
 const ASSET_PATHS = new Set([
   "/manifest.webmanifest",
   "/icon.svg",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/icon-maskable-512.png",
+  "/apple-touch-icon.png",
+  "/service-worker.js",
   "/robots.txt",
 ]);
 const isPublic = (path: string) => path === "/login" || ASSET_PATHS.has(path);
