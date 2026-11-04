@@ -27,6 +27,9 @@ test.describe("account detail", () => {
     await page.getByLabel("Account name").fill("Wallet (renamed)");
     await page.getByRole("button", { name: "Save account name" }).click();
     await expect(page.getByText("Wallet (renamed)").first()).toBeVisible();
+    await expect(
+      page.getByText("Name changed to “Wallet (renamed)”"),
+    ).toBeVisible();
 
     await page.reload();
     await expect(
@@ -48,6 +51,9 @@ test.describe("account detail", () => {
     );
     await page.getByText("Portfolio overview", { exact: true }).click();
     await patch;
+    await expect(
+      page.getByText(/Portfolio overview (enabled|disabled)/),
+    ).toBeVisible();
     await page.reload();
     expect(await toggle.isChecked()).toBe(!before);
 

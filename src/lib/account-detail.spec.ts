@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   areaPath,
   chartPoints,
+  describeChanges,
   linePath,
   monthRange,
   signedFor,
@@ -66,5 +67,26 @@ describe("chart geometry", () => {
     expect(linePath(pts)).toBe("M10.0 50.0 L90.0 10.0");
     expect(areaPath(pts, 60)).toBe("M10.0 50.0 L90.0 10.0 L90.0 60 L10.0 60 Z");
     expect(areaPath([], 60)).toBe("");
+  });
+});
+
+describe("describeChanges", () => {
+  it("describes every kind of change", () => {
+    expect(describeChanges({ name: "Wallet" })).toEqual([
+      "Name changed to “Wallet”",
+    ]);
+    expect(describeChanges({ type: "SAVINGS" })).toEqual([
+      "Type changed to Savings",
+    ]);
+    expect(describeChanges({ position: 2 })).toEqual([
+      "Position in summary set to 2",
+    ]);
+    expect(describeChanges({ color: "#006c48" })).toEqual([
+      "Accent color set to #006c48",
+    ]);
+    expect(describeChanges({ isOut: true, isPortfolio: false })).toEqual([
+      "Expense account enabled",
+      "Portfolio overview disabled",
+    ]);
   });
 });

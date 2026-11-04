@@ -10,6 +10,7 @@
   import Search from "@lucide/svelte/icons/search";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { PAGE_SIZE, signedFor } from "#lib/account-detail.ts";
+  import { toaster } from "#lib/toaster.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
@@ -281,8 +282,14 @@
           action="?/delete"
           class="flex justify-end gap-2"
           use:enhance={() =>
-            async ({ update }) => {
+            async ({ result, update }) => {
+              const description = deleting?.description;
               deleting = null;
+              if (result.type === "success") {
+                toaster.success({ title: `Deleted “${description}”` });
+              } else {
+                toaster.error({ title: "Could not delete the entry" });
+              }
               await update();
             }}
         >

@@ -43,7 +43,7 @@
 <div
   role="group"
   aria-label="Position in summary"
-  class="inline-flex items-center gap-1 rounded-full border border-surface-200-800 bg-surface-100-900/70 p-1"
+  class="inline-flex items-center gap-1 rounded-base border border-surface-200-800 bg-surface-100-900/70 p-1"
 >
   <button
     type="button"

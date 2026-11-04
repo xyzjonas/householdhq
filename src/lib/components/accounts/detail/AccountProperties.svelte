@@ -1,5 +1,7 @@
 <script lang="ts">
   import { untrack } from "svelte";
+  import { describeChanges } from "#lib/account-detail.ts";
+  import { toaster } from "#lib/toaster.ts";
   import { patchAccount, type AccountChanges } from "#lib/accounts-client.ts";
   import type { Account } from "#lib/server/core/types.ts";
   import AccountTypePicker from "./AccountTypePicker.svelte";
@@ -11,28 +13,28 @@
 
   // The page re-keys this component per account, so the initial value is enough.
   let current = $state<Account>(untrack(() => ({ ...account })));
-  let error = $state("");
-  let saving = $state(false);
 
   /** Apply optimistically, roll back when the server refuses. */
   async function save(changes: AccountChanges) {
     const before = { ...current };
     Object.assign(current, changes);
-    error = "";
-    saving = true;
     try {
       current = await patchAccount(account.id, changes);
+      for (const title of describeChanges(changes)) {
+        toaster.success({ title });
+      }
     } catch (e) {
       current = before;
-      error = e instanceof Error ? e.message : "Could not save the change";
+      toaster.error({
+        title: "Could not save the change",
+        description: e instanceof Error ? e.message : undefined,
+      });
       throw e;
-    } finally {
-      saving = false;
     }
   }
 
   // Toggles and the colour picker have no field to keep open, so a failure
-  // is only surfaced through `error`.
+  // is only surfaced through the error toast.
   const quiet = (changes: AccountChanges) => save(changes).catch(() => {});
 </script>
 
@@ -115,12 +117,4 @@
       onchange={(isPortfolio) => quiet({ isPortfolio })}
     />
   </div>
-
-  <p role="status" class="min-h-5 text-sm">
-    {#if error}
-      <span class="text-error-600-400" role="alert">{error}</span>
-    {:else if saving}
-      <span class="opacity-60">Saving…</span>
-    {/if}
-  </p>
 </section>

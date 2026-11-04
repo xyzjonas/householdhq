@@ -1,6 +1,7 @@
 <script lang="ts">
   import "./layout.css";
   import favicon from "#lib/assets/favicon.svg";
+  import Toaster from "#lib/components/Toaster.svelte";
   import AppShell from "#lib/components/AppShell.svelte";
   import type { LayoutProps } from "./$types";
 
@@ -17,3 +18,5 @@
 {:else}
   {@render children()}
 {/if}
+
+<Toaster />
