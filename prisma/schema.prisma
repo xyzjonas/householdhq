@@ -16,6 +16,17 @@ model User {
   password String
 }
 
+model Session {
+  id        String   @id @db.Char(64) // sha256 of the session token (the token itself is never stored)
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("session")
+}
+
 model Category {
   id          Int     @id @default(autoincrement())
   name        String  @unique

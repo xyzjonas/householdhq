@@ -1,13 +1,17 @@
 {
-  "extends": "./.nuxt/tsconfig.json",
+  "extends": "$app/tsconfig",
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ES2023",
     "strict": true,
-    "esModuleInterop": true
-    // "ignoreDeprecations": "6.0"
-  }
-  // https://nuxt.com/docs/guide/concepts/typescript
+    "types": ["$app/types", "node"]
+  },
+  "include": [
+    "e2e",
+    "prisma/seed.ts",
+    "prisma.config.ts",
+    "src",
+    "vite.config.ts",
+    "prettier.config.js",
+    "eslint.config.js",
+    "playwright.config.ts"
+  ]
 }
