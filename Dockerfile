@@ -26,6 +26,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/build ./build
+COPY server.js ./
 USER node
 EXPOSE 3000
-CMD ["node", "build"]
+CMD ["node", "server.js"]

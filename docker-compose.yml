@@ -37,8 +37,9 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: mysql://home:home@db:3306/home
-      # Must match the URL users reach the app on (SvelteKit CSRF check)
-      ORIGIN: http://localhost:8080
+      # Served over plain http by default. Behind a TLS proxy that sends
+      # x-forwarded-proto nothing is needed; otherwise set PUBLIC_SCHEME=https.
+      PUBLIC_SCHEME: http
     ports:
       - "8080:3000"
     depends_on:
