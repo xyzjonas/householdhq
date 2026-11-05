@@ -12,6 +12,14 @@
   let { data }: PageProps = $props();
 
   const pillars = $derived(buildPillars(data.accounts));
+
+  const UPCOMING_PREVIEW_COUNT = 3;
+  let showAllUpcoming = $state(false);
+  const visibleUpcoming = $derived(
+    showAllUpcoming
+      ? data.upcoming
+      : data.upcoming.slice(0, UPCOMING_PREVIEW_COUNT),
+  );
 </script>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
@@ -71,9 +79,21 @@
       Upcoming until {formatDate(data.interval.end)}
     </h2>
     <TransactionList
-      transactions={data.upcoming}
+      transactions={visibleUpcoming}
       empty="Nothing scheduled in this interval."
     />
+    {#if data.upcoming.length > UPCOMING_PREVIEW_COUNT}
+      <button
+        type="button"
+        class="self-start anchor text-sm font-semibold"
+        aria-expanded={showAllUpcoming}
+        onclick={() => (showAllUpcoming = !showAllUpcoming)}
+      >
+        {showAllUpcoming
+          ? "Show less"
+          : `Show more (${data.upcoming.length - UPCOMING_PREVIEW_COUNT})`}
+      </button>
+    {/if}
   </section>
 
   <section aria-labelledby="transactions-heading" class="flex flex-col gap-4">
