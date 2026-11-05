@@ -30,7 +30,7 @@ FROM deps AS migrate
 ENV NODE_ENV=production
 COPY prisma.config.ts ./
 COPY prisma ./prisma
-CMD ["npx", "prisma", "migrate", "deploy"]
+ENTRYPOINT ["npx", "prisma", "migrate", "deploy"]
 
 # --- runtime: distroless nodejs, production deps + built output only ---
 FROM gcr.io/distroless/nodejs24-debian13:nonroot AS runtime

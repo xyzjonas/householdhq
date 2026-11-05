@@ -75,7 +75,7 @@ image := "scotch3840/householdhq-v2"
 
 # build the production image (tagged as `image` via docker-compose.yml)
 docker-build:
-  docker compose build app
+  docker compose build app migrate
 
 # run the full stack (db, one-shot migrations, app) on http://localhost:8080
 up:
@@ -87,8 +87,10 @@ down:
 logs:
   docker compose logs -f
 
-# build the hardened image and push it to Docker Hub (latest + commit sha)
+# build the app + migrate images and push both to Docker Hub (latest + commit sha)
 docker: docker-build
-  docker tag {{image}}:latest {{image}}:$(git rev-parse --short HEAD)
-  docker push {{image}}:latest
-  docker push {{image}}:$(git rev-parse --short HEAD)
+  for i in {{image}} {{image}}-migrate; do \
+    docker tag $i:latest $i:$(git rev-parse --short HEAD); \
+    docker push $i:latest; \
+    docker push $i:$(git rev-parse --short HEAD); \
+  done
