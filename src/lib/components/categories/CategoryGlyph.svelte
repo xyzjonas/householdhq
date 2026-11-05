@@ -7,17 +7,25 @@
   let {
     icon = null,
     color = null,
-  }: { icon?: string | null; color?: string | null } = $props();
+    compact = false,
+  }: {
+    icon?: string | null;
+    color?: string | null;
+    /** 28px tile instead of the default 36px one. */
+    compact?: boolean;
+  } = $props();
 
   const Icon = $derived(categoryIcon(icon));
 </script>
 
 <span
-  class="glyph grid size-9 shrink-0 place-items-center rounded-xl"
+  class="glyph grid shrink-0 place-items-center {compact
+    ? 'size-7 rounded-lg'
+    : 'size-9 rounded-xl'}"
   style="--cat: {color ?? fallbackColor}"
   aria-hidden="true"
 >
-  <Icon size={18} />
+  <Icon size={compact ? 14 : 18} />
 </span>
 
 <style scoped>
