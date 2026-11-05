@@ -6,7 +6,12 @@
   let {
     categories,
     value = $bindable(),
-  }: { categories: WizardCategory[]; value: number | null } = $props();
+    onselect,
+  }: {
+    categories: WizardCategory[];
+    value: number | null;
+    onselect?: (id: number) => void;
+  } = $props();
 
   let query = $state("");
 
@@ -42,7 +47,10 @@
           icon={c.icon}
           color={c.color}
           selected={value === c.id}
-          onselect={(id) => (value = id)}
+          onselect={(id) => {
+            value = id;
+            onselect?.(id);
+          }}
         />
       {:else}
         <p class="col-span-2 py-6 text-center text-sm text-surface-600-400">

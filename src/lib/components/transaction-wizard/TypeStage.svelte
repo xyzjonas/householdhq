@@ -26,7 +26,7 @@
           name="type"
           value={t.value}
           bind:group={value}
-          onchange={() => onchange?.(t.value)}
+          onclick={() => onchange?.(t.value)}
         />
         <span class="flex items-center gap-2 text-base font-bold">
           <span class="size-2.5 rounded-full {t.dot}" aria-hidden="true"></span>

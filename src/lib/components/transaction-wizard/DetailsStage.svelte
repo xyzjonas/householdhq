@@ -29,6 +29,12 @@
     important: boolean;
   } = $props();
 
+  let descriptionInput = $state<HTMLInputElement>();
+
+  export function focusDescription() {
+    descriptionInput?.focus({ preventScroll: true });
+  }
+
   const owned = $derived(accounts.filter((a) => !a.isOut));
   const targets = $derived(owned.filter((a) => a.id !== sourceId));
   const source = $derived(owned.find((a) => a.id === sourceId));
@@ -73,6 +79,7 @@
       <span class="wizard-label label-text">Description / merchant</span>
       <input
         class="input"
+        bind:this={descriptionInput}
         name="description"
         list="wizard-suggestions"
         autocomplete="off"

@@ -64,6 +64,7 @@
   let saving = $state(false);
   let heading = $state<HTMLElement>();
   let reached = $state(1);
+  let details = $state<ReturnType<typeof DetailsStage>>();
 
   const amount = $derived(evaluate(tape));
   const category = $derived(categories.find((c) => c.id === categoryId));
@@ -95,13 +96,15 @@
     reached = Math.max(reached, next);
     await tick();
     window.scrollTo({ top: 0 });
-    heading?.focus();
+    if (next === stages.length) details?.focusDescription();
+    else heading?.focus();
   }
 
   function setType(next: TransactionType) {
     // "Hidden" is both a type and a flag; keep the two in sync.
     hidden = next === "HIDDEN";
     if (next !== "TRANSFER") targetId = null;
+    goTo(2);
   }
 </script>
 
@@ -190,10 +193,15 @@
           />
         </section>
         <section class="panel" inert={stage !== 3} aria-label={stages[2].title}>
-          <CategoryStage {categories} bind:value={categoryId} />
+          <CategoryStage
+            {categories}
+            bind:value={categoryId}
+            onselect={() => goTo(4)}
+          />
         </section>
         <section class="panel" inert={stage !== 4} aria-label={stages[3].title}>
           <DetailsStage
+            bind:this={details}
             {type}
             {accounts}
             {suggestions}
