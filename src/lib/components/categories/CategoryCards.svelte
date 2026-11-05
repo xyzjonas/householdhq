@@ -19,9 +19,7 @@
           <div class="flex min-w-0 items-center gap-3">
             <CategoryGlyph icon={item.icon} color={item.color} />
             <div class="min-w-0">
-              <h3
-                class="truncate text-sm font-bold tracking-tight text-slate-900"
-              >
+              <h3 class="truncate text-sm font-bold tracking-tight">
                 <a
                   href={resolve("/categories/[id]", { id: String(item.id) })}
                   class="after:absolute after:inset-0 hover:underline"
@@ -36,7 +34,7 @@
             <span
               class="block text-base font-bold tabular-nums {item.isInflow
                 ? 'text-emerald-600'
-                : 'text-slate-900'}"
+                : 'text-surface-950-50'}"
             >
               {item.isInflow ? "+" : ""}{formatMoney(item.amount)}
             </span>
