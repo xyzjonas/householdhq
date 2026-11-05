@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import CurrencyForm from "#lib/components/settings/CurrencyForm.svelte";
+  import ThemeForm from "#lib/components/settings/ThemeForm.svelte";
   import type { PageProps } from "./$types";
 
   let { data, form }: PageProps = $props();
@@ -26,4 +27,6 @@
     message={form && "message" in form ? form.message : ""}
     saved={form !== null && "saved" in form}
   />
+
+  <ThemeForm />
 </div>
