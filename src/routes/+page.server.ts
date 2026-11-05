@@ -18,7 +18,8 @@ export const load: PageServerLoad = async () => {
     core.transactions.upcoming(now, interval.end),
   ]);
   return {
-    accounts,
+    // "Out" accounts are external (expenses etc.), not part of the household.
+    accounts: accounts.filter((a) => !a.isOut),
     balances,
     interval,
     availableToSpend: availableToSpend(balances.liquid, upcoming),
