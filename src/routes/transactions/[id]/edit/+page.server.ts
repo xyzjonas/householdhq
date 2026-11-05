@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-  default: async ({ request, params }) => {
+  update: async ({ request, params }) => {
     const id = parseId(params.id);
     const input = await parseTransactionForm(request);
     if ("status" in input) return input;

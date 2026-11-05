@@ -12,5 +12,6 @@
   categories={data.categories}
   suggestions={data.suggestions}
   initial={data.transaction}
+  action="?/update"
   errors={form?.errors ?? []}
 />

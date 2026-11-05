@@ -30,6 +30,7 @@
     errors = [],
     initialAccountId = null,
     initial,
+    action,
     onsplit,
   }: {
     accounts: WizardAccount[];
@@ -42,6 +43,8 @@
     initialAccountId?: number | null;
     /** Existing values; switches the wizard into edit mode. */
     initial?: WizardInitial;
+    /** Form action to post to; defaults to the page's default action. */
+    action?: string;
     /** Enables the "Split" banner on the amount stage. */
     onsplit?: (amount: number) => void;
   } = $props();
@@ -122,7 +125,7 @@
 {#snippet deleteButton()}
   <button
     type="button"
-    class="btn w-full preset-tonal-error"
+    class="btn h-12 w-full preset-tonal-error"
     onclick={() => (confirmingDelete = true)}
   >
     <Trash2 size={18} aria-hidden="true" />
@@ -132,6 +135,7 @@
 
 <form
   method="POST"
+  {action}
   class="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[2fr_1fr] lg:items-start"
   use:enhance={({ cancel }) => {
     if (stage !== stages.length || !canAdvance) {
