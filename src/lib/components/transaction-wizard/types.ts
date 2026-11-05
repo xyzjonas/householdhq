@@ -10,6 +10,22 @@ export interface WizardAccount {
   balance: number;
 }
 
+/** Values used to pre-populate the wizard when editing a transaction. */
+export interface WizardInitial {
+  type: TransactionType;
+  amount: number;
+  currency: Currency;
+  categoryId: number | null;
+  accountId: number;
+  targetId: number | null;
+  description: string;
+  /** ISO timestamp. */
+  transactedAt: string;
+  recurring: boolean;
+  hidden: boolean;
+  important: boolean;
+}
+
 export interface WizardCategory {
   id: number;
   name: string;
