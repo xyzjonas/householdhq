@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { formatMoney } from "#lib/format.ts";
   import type { CategoryItem } from "#lib/categories-view.ts";
   import BudgetBadge from "./BudgetBadge.svelte";
@@ -12,7 +13,7 @@
   {#each items as item (item.id)}
     <li>
       <article
-        class="flex min-h-12 flex-col gap-3 card border border-surface-200-800 p-4"
+        class="relative flex min-h-12 flex-col gap-3 card border border-surface-200-800 p-4"
       >
         <div class="flex items-start justify-between gap-3">
           <div class="flex min-w-0 items-center gap-3">
@@ -21,7 +22,12 @@
               <h3
                 class="truncate text-sm font-bold tracking-tight text-slate-900"
               >
-                {item.name}
+                <a
+                  href={resolve("/categories/[id]", { id: String(item.id) })}
+                  class="after:absolute after:inset-0 hover:underline"
+                >
+                  {item.name}
+                </a>
               </h3>
               <BudgetBadge pct={item.consumptionPct} status={item.status} />
             </div>

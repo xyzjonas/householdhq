@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { formatMoney } from "#lib/format.ts";
   import type { CategoryItem } from "#lib/categories-view.ts";
   import BudgetBadge from "./BudgetBadge.svelte";
@@ -24,7 +25,7 @@
     </thead>
     <tbody class="divide-y divide-surface-200-800">
       {#each items as item (item.id)}
-        <tr class="transition-colors hover:bg-surface-100-900">
+        <tr class="relative transition-colors hover:bg-surface-100-900">
           <th scope="row" class="px-4 py-3 font-normal">
             <span class="flex items-center gap-3">
               <CategoryGlyph icon={item.icon} color={item.color} />
@@ -32,7 +33,12 @@
                 <span
                   class="block truncate text-sm font-bold tracking-tight text-slate-900"
                 >
-                  {item.name}
+                  <a
+                    href={resolve("/categories/[id]", { id: String(item.id) })}
+                    class="after:absolute after:inset-0 hover:underline"
+                  >
+                    {item.name}
+                  </a>
                 </span>
                 {#if item.subtitle}
                   <span class="block truncate text-xs text-slate-400">

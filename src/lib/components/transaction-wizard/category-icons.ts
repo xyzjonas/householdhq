@@ -28,3 +28,6 @@ export function categoryIcon(name: string | null): Component {
 }
 
 export const fallbackColor = "#64748b";
+
+/** Icon names a category can be given. */
+export const iconNames = Object.keys(icons);
