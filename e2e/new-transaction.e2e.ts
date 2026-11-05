@@ -18,10 +18,8 @@ test.describe("add record wizard", () => {
     await expect(
       page.getByRole("heading", { name: /Type of transaction/ }),
     ).toBeVisible();
-    await page.getByLabel("Income").check();
+    // Picking a type moves on to the amount stage.
     await page.getByLabel("Expense").check();
-
-    await step("Amount").click();
     // Zero amount cannot advance.
     await expect(step("Category")).toBeDisabled();
 
@@ -41,14 +39,16 @@ test.describe("add record wizard", () => {
     await expect(page.getByRole("status")).toHaveText("0");
     await step("5").click();
 
-    await step("Category").click();
+    // Enter on the keyboard moves on to the category stage.
+    await page.keyboard.press("Enter");
     await expect(step("Details")).toBeDisabled();
     await page.getByLabel("Search categories").fill("groc");
     await expect(page.getByLabel("Energy")).toHaveCount(0);
+    // Picking a category moves on to the details stage.
     await page.getByLabel("Groceries").check();
-    await step("Details").click();
 
     await expect(page.getByLabel("Paid from")).toBeVisible();
+    await expect(page.getByLabel("Description / merchant")).toBeFocused();
     await expect(
       page.getByRole("button", { name: "Confirm & Save" }),
     ).toBeEnabled();
@@ -60,11 +60,9 @@ test.describe("add record wizard", () => {
 
   test("transfers require a distinct target account", async ({ page }) => {
     await page.getByLabel("Transfer").check();
-    await page.getByRole("button", { name: "Amount" }).click();
     await page.getByRole("button", { name: "5", exact: true }).click();
     await page.getByRole("button", { name: "Category" }).click();
     await page.getByLabel("Groceries").check();
-    await page.getByRole("button", { name: "Details" }).click();
     await expect(
       page.getByRole("button", { name: "Confirm & Save" }),
     ).toBeDisabled();

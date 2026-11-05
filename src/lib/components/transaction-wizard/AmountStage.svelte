@@ -18,13 +18,19 @@
     tape = $bindable(),
     currency = $bindable(),
     category,
+    active = true,
     onchangecategory,
+    onadvance,
     onsplit,
   }: {
     tape: string;
     currency: Currency;
     category: WizardCategory | undefined;
+    /** Only the visible stage reacts to the physical keyboard. */
+    active?: boolean;
     onchangecategory: () => void;
+    /** Fired on Enter to move on to the next step. */
+    onadvance?: () => void;
     /** Renders the itemised-split banner when provided. */
     onsplit?: (amount: number) => void;
   } = $props();
@@ -32,11 +38,41 @@
   const total = $derived(evaluate(tape));
   const CategoryIcon = $derived(categoryIcon(category?.icon ?? null));
 
+  const keyMap: Record<string, Key> = {
+    ",": ".",
+    Backspace: "back",
+    Delete: "clear",
+  };
+
+  function onkeydown(e: KeyboardEvent) {
+    if (!active || e.defaultPrevented) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // Leave focused controls (buttons, inputs, …) to their native behaviour.
+    if (
+      e.target instanceof HTMLElement &&
+      e.target.closest("button, a, input, select, textarea, [contenteditable]")
+    ) {
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onadvance?.();
+      return;
+    }
+    const key = keyMap[e.key] ?? e.key;
+    if (/^[0-9.+\-=]$/.test(key) || key === "back" || key === "clear") {
+      e.preventDefault();
+      tape = press(tape, key as Key);
+    }
+  }
+
   function cycleCurrency() {
     currency =
       currencies[(currencies.indexOf(currency) + 1) % currencies.length];
   }
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class="flex flex-col gap-4">
   <section
