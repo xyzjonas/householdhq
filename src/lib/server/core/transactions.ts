@@ -4,6 +4,9 @@ import {
   TransactionFilter,
   TransactionInput,
   TransactionPatch,
+  type TransactionFlow,
+  type TransactionSort,
+  type TransactionStatus,
 } from "./schemas";
 import {
   NotFoundError,
@@ -33,58 +36,119 @@ function toBooleanQuery(query: string): string {
     .join(" ");
 }
 
+type Filter = ReturnType<typeof TransactionFilter.parse>;
+
+const flowWhere: Record<TransactionFlow, Prisma.TransactionWhereInput> = {
+  spent: { source: { isOut: false }, target: { isOut: true } },
+  received: { source: { isOut: true }, target: { isOut: false } },
+  transfer: {
+    OR: [
+      { source: { isOut: false }, target: { isOut: false } },
+      { source: { isOut: true }, target: { isOut: true } },
+    ],
+  },
+};
+
+const statusWhere: Record<TransactionStatus, Prisma.TransactionWhereInput> = {
+  completed: { cancelled: false, confirmed: true },
+  pending: { cancelled: false, confirmed: false },
+  cancelled: { cancelled: true },
+};
+
+const orderBy: Record<
+  TransactionSort,
+  Prisma.TransactionOrderByWithRelationInput[]
+> = {
+  "date-desc": [{ transactedAt: "desc" }, { id: "desc" }],
+  "date-asc": [{ transactedAt: "asc" }, { id: "asc" }],
+  "amount-desc": [{ amount: "desc" }, { id: "desc" }],
+  "amount-asc": [{ amount: "asc" }, { id: "asc" }],
+};
+
 export function transactionsRepo(db: Db) {
-  function buildWhere(
-    f: ReturnType<typeof TransactionFilter.parse>,
-  ): Prisma.TransactionWhereInput {
+  function buildWhere(f: Filter): Prisma.TransactionWhereInput {
+    const and: Prisma.TransactionWhereInput[] = [];
+    if (f.accountId !== undefined) {
+      and.push({ OR: [{ sourceId: f.accountId }, { targetId: f.accountId }] });
+    }
+    if (f.flow) and.push(flowWhere[f.flow]);
+    if (f.status) and.push(statusWhere[f.status]);
     return {
       ...(f.from || f.to
         ? { transactedAt: { gte: f.from, lt: f.to } }
         : undefined),
-      ...(f.categoryId !== undefined ? { categoryId: f.categoryId } : {}),
+      ...(f.uncategorized
+        ? { categoryId: null }
+        : f.categoryId !== undefined
+          ? { categoryId: f.categoryId }
+          : {}),
+      ...(f.sourceId !== undefined ? { sourceId: f.sourceId } : {}),
+      ...(f.targetId !== undefined ? { targetId: f.targetId } : {}),
       ...(f.important !== undefined ? { isImportant: f.important } : {}),
-      ...(f.accountId !== undefined
-        ? {
-            OR: [{ sourceId: f.accountId }, { targetId: f.accountId }],
-          }
+      ...(f.hidden !== undefined ? { isHidden: f.hidden } : {}),
+      ...(f.recurring !== undefined
+        ? { recurring: f.recurring ? { gt: 0 } : 0 }
         : {}),
+      ...(f.minAmount !== undefined || f.maxAmount !== undefined
+        ? { amount: { gte: f.minAmount, lte: f.maxAmount } }
+        : {}),
+      ...(f.tag ? { tags: { some: { name: f.tag } } } : {}),
+      ...(and.length ? { AND: and } : {}),
     };
   }
 
-  async function searchIds(
-    query: string,
-    f: ReturnType<typeof TransactionFilter.parse>,
-  ): Promise<{ ids: number[]; total: number }> {
+  /** Ids of every transaction matching the text, best match first. */
+  async function searchIds(query: string): Promise<number[]> {
     const q = toBooleanQuery(query);
-    if (!q) return { ids: [], total: 0 };
-    const where: Prisma.Sql[] = [
-      Prisma.sql`MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE)`,
-    ];
-    if (f.important !== undefined) {
-      where.push(Prisma.sql`t.isImportant = ${f.important}`);
-    }
-    if (f.categoryId !== undefined) {
-      where.push(Prisma.sql`t.categoryId = ${f.categoryId}`);
-    }
-    if (f.accountId !== undefined) {
-      where.push(
-        Prisma.sql`(t.sourceId = ${f.accountId} OR t.targetId = ${f.accountId})`,
-      );
-    }
-    if (f.from) where.push(Prisma.sql`t.transactedAt >= ${f.from}`);
-    if (f.to) where.push(Prisma.sql`t.transactedAt < ${f.to}`);
-    const condition = Prisma.join(where, " AND ");
-    const [{ total }] = await db.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`
-      SELECT COUNT(*) AS total FROM \`transaction\` t WHERE ${condition}
-    `);
+    if (!q) return [];
     const rows = await db.$queryRaw<Array<{ id: number }>>(Prisma.sql`
       SELECT t.id FROM \`transaction\` t
-      WHERE ${condition}
+      WHERE MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE)
       ORDER BY MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE) DESC,
                t.transactedAt DESC, t.id DESC
-      LIMIT ${f.limit} OFFSET ${f.offset}
     `);
-    return { ids: rows.map((r) => r.id), total: Number(total) };
+    return rows.map((r) => r.id);
+  }
+
+  async function listSearch(
+    filter: Filter,
+    where: Prisma.TransactionWhereInput,
+    matches: number[],
+  ): Promise<Page<TransactionWithRelations>> {
+    const scoped = { AND: [where, { id: { in: matches } }] };
+    if (filter.sort) {
+      const [items, total] = await Promise.all([
+        db.transaction.findMany({
+          where: scoped,
+          include,
+          orderBy: orderBy[filter.sort],
+          take: filter.limit,
+          skip: filter.offset,
+        }),
+        db.transaction.count({ where: scoped }),
+      ]);
+      return { items, total };
+    }
+    // Relevance order: the match order is the sort, so page in memory.
+    const eligible = new Set(
+      (
+        await db.transaction.findMany({
+          where: scoped,
+          select: { id: true },
+        })
+      ).map((t) => t.id),
+    );
+    const ranked = matches.filter((id) => eligible.has(id));
+    const ids = ranked.slice(filter.offset, filter.offset + filter.limit);
+    const found = await db.transaction.findMany({
+      where: { id: { in: ids } },
+      include,
+    });
+    const byId = new Map(found.map((t) => [t.id, t]));
+    return {
+      items: ids.flatMap((id) => byId.get(id) ?? []),
+      total: ranked.length,
+    };
   }
 
   return {
@@ -92,30 +156,34 @@ export function transactionsRepo(db: Db) {
       input: TransactionFilter = {},
     ): Promise<Page<TransactionWithRelations>> {
       const filter = TransactionFilter.parse(input);
+      const where = buildWhere(filter);
 
       if (filter.search) {
-        const { ids, total } = await searchIds(filter.search, filter);
-        const found = await db.transaction.findMany({
-          where: { id: { in: ids } },
-          include,
-        });
-        const byId = new Map(found.map((t) => [t.id, t]));
-        const items = ids.flatMap((id) => byId.get(id) ?? []);
-        return { items, total };
+        const matches = await searchIds(filter.search);
+        if (!matches.length) return { items: [], total: 0 };
+        return listSearch(filter, where, matches);
       }
 
-      const where = buildWhere(filter);
       const [items, total] = await Promise.all([
         db.transaction.findMany({
           where,
           include,
-          orderBy: [{ transactedAt: "desc" }, { id: "desc" }],
+          orderBy: orderBy[filter.sort ?? "date-desc"],
           take: filter.limit,
           skip: filter.offset,
         }),
         db.transaction.count({ where }),
       ]);
       return { items, total };
+    },
+
+    /** Names of all tags in use, for filter menus. */
+    async tags(): Promise<string[]> {
+      const tags = await db.tag.findMany({
+        select: { name: true },
+        orderBy: { name: "asc" },
+      });
+      return tags.map((t) => t.name);
     },
 
     async get(id: number): Promise<TransactionWithRelations> {

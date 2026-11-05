@@ -76,13 +76,42 @@ export type TransactionInput = z.input<typeof TransactionInput>;
 export const TransactionPatch = z.object(transactionShape).partial();
 export type TransactionPatch = z.input<typeof TransactionPatch>;
 
+export const TransactionFlow = z.enum(["spent", "received", "transfer"]);
+export type TransactionFlow = z.infer<typeof TransactionFlow>;
+
+export const TransactionStatus = z.enum(["completed", "pending", "cancelled"]);
+export type TransactionStatus = z.infer<typeof TransactionStatus>;
+
+export const TransactionSort = z.enum([
+  "date-desc",
+  "date-asc",
+  "amount-desc",
+  "amount-asc",
+]);
+export type TransactionSort = z.infer<typeof TransactionSort>;
+
 export const TransactionFilter = z.object({
   from: z.coerce.date().optional(),
   to: z.coerce.date().optional(),
   categoryId: z.number().int().optional(),
+  /** Only transactions without a category. */
+  uncategorized: z.boolean().optional(),
+  /** Either side of the transaction. */
   accountId: z.number().int().optional(),
+  sourceId: z.number().int().optional(),
+  targetId: z.number().int().optional(),
+  flow: TransactionFlow.optional(),
+  status: TransactionStatus.optional(),
   important: z.boolean().optional(),
+  recurring: z.boolean().optional(),
+  hidden: z.boolean().optional(),
+  minAmount: z.number().min(0).optional(),
+  maxAmount: z.number().min(0).optional(),
+  /** Tag name. */
+  tag: z.string().trim().min(1).optional(),
   search: z.string().trim().optional(),
+  /** Defaults to newest first; a search without a sort ranks by relevance. */
+  sort: TransactionSort.optional(),
   limit: z.number().int().min(1).max(500).default(50),
   offset: z.number().int().min(0).default(0),
 });

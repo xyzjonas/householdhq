@@ -338,6 +338,98 @@ describe.skipIf(!core)("core layer", () => {
       expect(important.items.map((t) => t.id)).toEqual([tx.id]);
     });
 
+    it("filters by flow, status, amount, tag and sorts", async () => {
+      const [own, own2, out] = await Promise.all([
+        c.accounts.create({ name: `${run}-own` }),
+        c.accounts.create({ name: `${run}-own2` }),
+        c.accounts.create({ name: `${run}-out`, isOut: true }),
+      ]);
+      ids.accounts.push(own.id, own2.id, out.id);
+      const make = async (
+        description: string,
+        amount: number,
+        sourceId: number,
+        targetId: number,
+        extra: { tags?: string[]; transactedAt?: Date } = {},
+      ) => {
+        const t = await c.transactions.create({
+          description: `${run} ${description}`,
+          amount,
+          sourceId,
+          targetId,
+          ...extra,
+        });
+        ids.transactions.push(t.id);
+        return t;
+      };
+      const spent = await make("lunch", 10, own.id, out.id, {
+        tags: [`${run}-trip`],
+      });
+      const received = await make("wage", 30, out.id, own.id);
+      const moved = await make("shift", 20, own.id, own2.id);
+      const future = await make("later", 5, own.id, out.id, {
+        transactedAt: new Date(Date.now() + 86_400_000 * 30),
+      });
+      const mine = { accountId: own.id };
+      const idsOf = async (f: Parameters<typeof c.transactions.list>[0]) =>
+        (await c.transactions.list({ ...mine, ...f })).items.map((t) => t.id);
+
+      expect(await idsOf({ flow: "spent", sort: "amount-asc" })).toEqual([
+        future.id,
+        spent.id,
+      ]);
+      expect(await idsOf({ flow: "received" })).toEqual([received.id]);
+      expect(await idsOf({ flow: "transfer" })).toEqual([moved.id]);
+      expect(await idsOf({ status: "pending" })).toEqual([future.id]);
+      expect(await idsOf({ status: "completed", sort: "amount-desc" })).toEqual(
+        [received.id, moved.id, spent.id],
+      );
+      expect(
+        await idsOf({ minAmount: 10, maxAmount: 20, sort: "date-asc" }),
+      ).toEqual([spent.id, moved.id]);
+      expect(await idsOf({ tag: `${run}-trip` })).toEqual([spent.id]);
+      expect(await idsOf({ sourceId: out.id })).toEqual([received.id]);
+      expect(await idsOf({ targetId: own2.id })).toEqual([moved.id]);
+      expect(await idsOf({ uncategorized: true, limit: 2 })).toHaveLength(2);
+      expect(await idsOf({ hidden: true })).toEqual([]);
+      expect(await idsOf({ recurring: true })).toEqual([]);
+      expect(await c.transactions.tags()).toContain(`${run}-trip`);
+    });
+
+    it("combines search with filters and paginates the matches", async () => {
+      const [a, b] = await Promise.all([
+        c.accounts.create({ name: `${run}-sa` }),
+        c.accounts.create({ name: `${run}-sb` }),
+      ]);
+      ids.accounts.push(a.id, b.id);
+      for (const amount of [1, 2, 3]) {
+        const t = await c.transactions.create({
+          description: `${run}zebra purchase`,
+          amount,
+          sourceId: a.id,
+          targetId: b.id,
+        });
+        ids.transactions.push(t.id);
+      }
+      const search = `${run}zebra`;
+      const all = await c.transactions.list({ search, limit: 2 });
+      expect(all.total).toBe(3);
+      expect(all.items).toHaveLength(2);
+      const rest = await c.transactions.list({ search, limit: 2, offset: 2 });
+      expect(rest.items).toHaveLength(1);
+
+      const big = await c.transactions.list({
+        search,
+        minAmount: 2,
+        sort: "amount-desc",
+      });
+      expect(big.items.map((t) => t.amount)).toEqual([3, 2]);
+      expect(big.total).toBe(2);
+      expect((await c.transactions.list({ search: "zzzznomatch" })).total).toBe(
+        0,
+      );
+    });
+
     it("throws NotFoundError for unknown ids", async () => {
       await expect(c.transactions.get(2_000_000_000)).rejects.toBeInstanceOf(
         NotFoundError,
