@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import CurrencyForm from "#lib/components/settings/CurrencyForm.svelte";
+  import FiscalIntervalForm from "#lib/components/settings/FiscalIntervalForm.svelte";
   import ThemeForm from "#lib/components/settings/ThemeForm.svelte";
   import type { PageProps } from "./$types";
 
@@ -26,6 +27,12 @@
     currencies={data.currencies}
     message={form && "message" in form ? form.message : ""}
     saved={form !== null && "saved" in form}
+  />
+
+  <FiscalIntervalForm
+    startDay={data.settings.fiscalIntervalStartDay}
+    message={form && "intervalMessage" in form ? form.intervalMessage : ""}
+    saved={form !== null && "intervalSaved" in form}
   />
 
   <ThemeForm />
