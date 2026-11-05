@@ -30,7 +30,7 @@
 
 <style scoped>
   .glyph {
-    background-color: color-mix(in srgb, var(--cat) 15%, white);
+    background-color: color-mix(in srgb, var(--cat) 15%, transparent);
     color: var(--cat);
   }
 </style>

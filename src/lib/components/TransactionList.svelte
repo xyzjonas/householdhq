@@ -24,9 +24,7 @@
   }
 </script>
 
-<ul
-  class="overflow-hidden card border border-surface-200-800 bg-surface-50/60 dark:bg-surface-900/60"
->
+<ul class="overflow-hidden card border border-surface-200-800">
   {#each transactions as t (t.id)}
     {@const amount = signed(t)}
     <li
