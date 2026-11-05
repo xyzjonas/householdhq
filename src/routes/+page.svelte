@@ -17,7 +17,10 @@
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
   <h1 class="sr-only">Dashboard</h1>
 
-  <section aria-labelledby="balances-heading" class="grid gap-4 sm:grid-cols-2">
+  <section
+    aria-labelledby="balances-heading"
+    class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto overscroll-x-contain px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible sm:px-0"
+  >
     <h2 id="balances-heading" class="sr-only">Balances</h2>
     <BalanceCard
       featured
@@ -85,3 +88,13 @@
     <TransactionList transactions={data.transactions} />
   </section>
 </div>
+
+<style scoped>
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+</style>
