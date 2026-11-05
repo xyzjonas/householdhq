@@ -21,7 +21,7 @@
   </div>
 
   <ul
-    class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 flex-nowrap gap-3.5 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0"
+    class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 flex-nowrap gap-3.5 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0"
   >
     {#each pillars as p (p.type)}
       <li

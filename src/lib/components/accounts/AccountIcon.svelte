@@ -3,6 +3,7 @@
   import Banknote from "@lucide/svelte/icons/banknote";
   import CreditCard from "@lucide/svelte/icons/credit-card";
   import Landmark from "@lucide/svelte/icons/landmark";
+  import Hourglass from "@lucide/svelte/icons/hourglass";
   import PiggyBank from "@lucide/svelte/icons/piggy-bank";
   import TrendingUp from "@lucide/svelte/icons/trending-up";
   import { groups } from "#lib/accounts-view.ts";
@@ -26,6 +27,7 @@
     CASH: Banknote,
     SAVINGS: PiggyBank,
     INVESTMENT: TrendingUp,
+    RETIREMENT: Hourglass,
     DEBT: CreditCard,
     OUT: Banknote,
   };

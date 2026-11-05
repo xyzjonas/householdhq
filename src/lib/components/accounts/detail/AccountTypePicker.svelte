@@ -41,6 +41,11 @@
       Account type
     </p>
     <p class="truncate text-base font-bold">{accountTypeLabel(value)}</p>
+    {#if value === "RETIREMENT"}
+      <p class="text-xs text-surface-600-400">
+        Retirement accounts are not included in the net worth calculation.
+      </p>
+    {/if}
   </div>
   <button
     type="button"

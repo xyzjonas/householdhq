@@ -88,6 +88,7 @@ enum SourceType {
   CASH
   SAVINGS
   INVESTMENT
+  RETIREMENT
   DEBT
 }
 

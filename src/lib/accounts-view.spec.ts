@@ -4,6 +4,7 @@ import {
   buildPillars,
   buildSections,
   countForTab,
+  netWorthOf,
   orderSections,
 } from "./accounts-view";
 
@@ -31,30 +32,32 @@ const accounts = [
   acc("Fund", "SAVINGS", 45_000, 4),
   acc("ETF B", "INVESTMENT", 38_400, 6),
   acc("ETF A", "INVESTMENT", 82_400, 5),
+  acc("Pension", "RETIREMENT", 20_000, 8),
   acc("Loan", "DEBT", -5_000, 7),
 ];
 
 describe("buildPillars", () => {
-  it("sums balances and computes shares of the four pillars", () => {
+  it("sums balances and computes shares of the pillars", () => {
     const pillars = buildPillars(accounts);
     expect(pillars.map((p) => p.balance)).toEqual([
-      11_651, 2_450, 45_000, 120_800,
+      11_651, 2_450, 45_000, 120_800, 20_000,
     ]);
     expect(pillars.reduce((s, p) => s + p.share, 0)).toBeCloseTo(100);
-    expect(pillars[3].share).toBeCloseTo(67.0, 0);
+    expect(pillars[3].share).toBeCloseTo(60.6, 0);
   });
 
   it("returns zero shares when nothing is held", () => {
-    expect(buildPillars([]).map((p) => p.share)).toEqual([0, 0, 0, 0]);
+    expect(buildPillars([]).map((p) => p.share)).toEqual([0, 0, 0, 0, 0]);
   });
 });
 
 describe("tabs", () => {
   it("counts accounts per tab", () => {
-    expect(countForTab(accounts, "all")).toBe(6);
+    expect(countForTab(accounts, "all")).toBe(7);
     expect(countForTab(accounts, "bank")).toBe(2);
     expect(countForTab(accounts, "savings")).toBe(1);
     expect(countForTab(accounts, "investments")).toBe(2);
+    expect(countForTab(accounts, "retirement")).toBe(1);
   });
 
   it("filters sections by tab", () => {
@@ -103,5 +106,13 @@ describe("sorting and search", () => {
     });
     expect(sections).toHaveLength(1);
     expect(sections[0].accounts.map((a) => a.name)).toEqual(["ETF A"]);
+  });
+});
+
+describe("netWorthOf", () => {
+  it("leaves retirement accounts out of the net worth", () => {
+    expect(netWorthOf(accounts)).toBe(
+      accounts.reduce((s, a) => s + a.balance, 0) - 20_000,
+    );
   });
 });

@@ -66,7 +66,7 @@ export function accountsRepo(db: Db) {
       const summary: Balances = { liquid: 0, total: 0, byType: {} };
       for (const a of accounts) {
         if (a.isOut) continue;
-        summary.total += a.balance;
+        if (a.type !== "RETIREMENT") summary.total += a.balance;
         if (a.isDisponible) summary.liquid += a.balance;
         summary.byType[a.type] = (summary.byType[a.type] ?? 0) + a.balance;
       }

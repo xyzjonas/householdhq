@@ -23,7 +23,7 @@
     {/each}
   </div>
 
-  <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
     {#each pillars as p (p.type)}
       <li
         class="flex flex-col gap-1 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-4"
