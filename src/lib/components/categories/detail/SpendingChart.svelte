@@ -81,7 +81,7 @@
           href={resolve(`/categories/[id]?${queryFor({ range: r.id })}`, {
             id: String(categoryId),
           })}
-          data-sveltekit-noscroll
+          data-sveltekit-reset="false"
           aria-current={r.id === range ? "true" : undefined}
           class="btn rounded-full text-xs btn-sm {r.id === range
             ? 'preset-filled-surface-950-50'

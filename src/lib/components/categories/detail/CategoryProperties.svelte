@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidateAll } from "$app/navigation";
   import { untrack } from "svelte";
   import { describeChanges } from "#lib/category-detail.ts";
   import { toaster } from "#lib/toaster.ts";
@@ -21,6 +22,8 @@
     Object.assign(current, changes);
     try {
       current = await patchCategory(category.id, changes);
+      // Header, chart etc. render the page data, so refresh it too.
+      await invalidateAll();
       for (const title of describeChanges(changes)) {
         toaster.success({ title });
       }
@@ -34,8 +37,8 @@
     }
   }
 
-  // The colour picker and icon select have no field to keep open, so a
-  // failure is only surfaced through the error toast.
+  // The colour picker has no field to keep open, so a failure is only
+  // surfaced through the error toast.
   const quiet = (changes: CategoryChanges) => save(changes).catch(() => {});
 </script>
 
@@ -67,10 +70,10 @@
     />
     <CategoryIconPicker
       value={current.icon}
-      onsave={(icon) => quiet({ icon })}
+      onsave={(icon) => save({ icon })}
     />
     <div
-      class="flex items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
+      class="flex min-h-24 items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
     >
       <div class="min-w-0">
         <p class="text-xs font-bold tracking-wider uppercase opacity-60">

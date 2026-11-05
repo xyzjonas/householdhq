@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { Switch } from "@skeletonlabs/skeleton-svelte";
   import Plus from "@lucide/svelte/icons/plus";
   import Search from "@lucide/svelte/icons/search";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -45,6 +46,8 @@
       resolve(`/categories/[id]?${queryFor(changes)}`, {
         id: String(categoryId),
       }),
+      // A filter change, not a navigation: keep scroll position and focus.
+      { reset: false },
     );
 </script>
 
@@ -80,15 +83,17 @@
         go({ search: typeof q === "string" ? q.trim() : "" });
       }}
     >
-      <label class="flex cursor-pointer items-center gap-2 text-sm font-medium">
-        <input
-          type="checkbox"
-          class="checkbox"
-          checked={view.all}
-          onchange={(e) => go({ all: e.currentTarget.checked })}
-        />
-        All time
-      </label>
+      <Switch
+        checked={view.all}
+        onCheckedChange={(e) => go({ all: e.checked })}
+        class="flex items-center gap-2"
+      >
+        <Switch.Control>
+          <Switch.Thumb />
+        </Switch.Control>
+        <Switch.Label class="text-sm font-medium">All time</Switch.Label>
+        <Switch.HiddenInput />
+      </Switch>
       <div class="field-group grid-cols-[auto_1fr]">
         <span class="label preset-tonal">
           <Search size={16} aria-hidden="true" />

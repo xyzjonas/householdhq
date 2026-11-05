@@ -35,7 +35,7 @@ test.describe("category detail", () => {
   });
 
   test("all-time toggle and search browse every entry", async ({ page }) => {
-    await page.getByLabel("All time").check();
+    await page.getByText("All time", { exact: true }).click();
     await expect(page).toHaveURL(/all=1/);
     await page
       .getByRole("searchbox", { name: "Search entries" })
@@ -67,5 +67,18 @@ test.describe("category detail", () => {
     await page.getByLabel("Description").fill("");
     await page.getByRole("button", { name: "Save description" }).click();
     await expect(page.getByText("Description cleared")).toBeVisible();
+  });
+
+  test("picks an icon from the searchable catalog", async ({ page }) => {
+    await page.getByRole("button", { name: "Change icon" }).click();
+    await page.getByRole("searchbox", { name: "Search icons" }).fill("petrol");
+    await page.getByRole("button", { name: "Fuel" }).click();
+    await expect(page.getByText("Icon set to fuel")).toBeVisible();
+    await expect(page.getByText("fuel", { exact: true })).toBeVisible();
+
+    // restore for repeatable runs
+    await page.getByRole("button", { name: "Change icon" }).click();
+    await page.getByRole("button", { name: "Use default icon" }).click();
+    await expect(page.getByText("Icon cleared")).toBeVisible();
   });
 });
