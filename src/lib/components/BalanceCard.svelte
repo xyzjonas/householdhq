@@ -15,7 +15,7 @@
 </script>
 
 <article
-  class="flex flex-col gap-1 card p-5 {featured
+  class="flex w-[calc(100%-1.5rem)] shrink-0 snap-start flex-col gap-1 card p-5 sm:w-auto sm:shrink {featured
     ? 'preset-filled-surface-950-50'
     : 'border border-surface-200-800 preset-filled-surface-50-950'}"
 >
