@@ -8,10 +8,15 @@
     label,
     value,
     onsave,
+    required = true,
+    placeholder = "",
   }: {
     label: string;
     value: string;
     onsave: (value: string) => Promise<void>;
+    /** Optional fields may be saved empty to clear them. */
+    required?: boolean;
+    placeholder?: string;
   } = $props();
 
   let editing = $state(false);
@@ -58,7 +63,8 @@
           bind:value={draft}
           class="input"
           type="text"
-          required
+          {required}
+          {placeholder}
           disabled={saving}
           onkeydown={(e) => e.key === "Escape" && (editing = false)}
         />
@@ -86,7 +92,7 @@
         {label}
       </p>
       <p class="truncate text-base font-bold">
-        {value}
+        {value || "—"}
       </p>
     </div>
     <button
