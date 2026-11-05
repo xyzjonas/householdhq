@@ -15,3 +15,18 @@ export function formatDate(date: Date | string | null): string {
     month: "short",
   }).format(new Date(date));
 }
+
+/** Like {@link formatDate}, but adds the year when it isn't the current one. */
+export function formatDateWithYear(
+  date: Date | string | null,
+  now = new Date(),
+): string {
+  if (!date) return "";
+  const d = new Date(date);
+  if (d.getFullYear() === now.getFullYear()) return formatDate(d);
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(d);
+}
