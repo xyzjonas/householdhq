@@ -5,13 +5,13 @@
 
 <a
   href={resolve("/transactions/new")}
-  class="cta group relative flex items-center gap-4 overflow-hidden card bg-linear-to-br from-emerald-500 to-emerald-700 p-6 text-white shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99]"
+  class="relative flex items-center gap-4 overflow-hidden card bg-linear-to-br from-emerald-500 to-emerald-700 p-6 text-white shadow-lg"
 >
-  <span class="cta-icon relative grid size-14 shrink-0 place-items-center">
+  <span class="relative grid size-14 shrink-0 place-items-center">
     <span class="ripple" aria-hidden="true"></span>
     <span class="ripple ripple-delayed" aria-hidden="true"></span>
     <span
-      class="relative grid size-14 place-items-center rounded-full bg-white text-emerald-600 transition-transform group-hover:rotate-90"
+      class="relative grid size-14 place-items-center rounded-full bg-white text-emerald-600"
     >
       <Plus size={28} strokeWidth={3} aria-hidden="true" />
     </span>
@@ -23,20 +23,16 @@
 </a>
 
 <style scoped>
-  .cta {
-    animation: glow 2.4s ease-in-out infinite;
-  }
-
   .ripple {
     position: absolute;
     inset: 0;
     border-radius: 9999px;
     background: rgb(255 255 255 / 0.6);
-    animation: ripple 2.4s ease-out infinite;
+    animation: ripple 4s ease-out infinite;
   }
 
   .ripple-delayed {
-    animation-delay: 1.2s;
+    animation-delay: 2s;
   }
 
   @keyframes ripple {
@@ -50,18 +46,7 @@
     }
   }
 
-  @keyframes glow {
-    0%,
-    100% {
-      box-shadow: 0 0 12px 0 rgb(16 185 129 / 0.35);
-    }
-    50% {
-      box-shadow: 0 0 36px 6px rgb(16 185 129 / 0.7);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .cta,
     .ripple {
       animation: none;
     }
