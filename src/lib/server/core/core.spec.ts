@@ -6,6 +6,7 @@ import "dotenv/config";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import { ensureDefaultAccounts } from "./bootstrap";
 import type { Db } from "./prisma";
+import { settingsRepo } from "./settings";
 import {
   createCore,
   createPrismaClient,
@@ -43,6 +44,43 @@ describe("ensureDefaultAccounts", () => {
     const { db, create } = fake(3);
     expect(await ensureDefaultAccounts(db)).toBe(false);
     expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe("settings", () => {
+  const fake = () => {
+    const upsert = vi.fn().mockResolvedValue({ id: 1, currency: "EUR" });
+    const db = { appSettings: { upsert } } as unknown as Db;
+    return { repo: settingsRepo(db), upsert };
+  };
+
+  it("get creates the singleton row with defaults when missing", async () => {
+    const { repo, upsert } = fake();
+    await repo.get();
+    expect(upsert).toHaveBeenCalledWith({
+      where: { id: 1 },
+      create: { id: 1 },
+      update: {},
+    });
+  });
+
+  it("update normalizes the currency and only touches given fields", async () => {
+    const { repo, upsert } = fake();
+    await repo.update({ currency: " eur " });
+    expect(upsert).toHaveBeenCalledWith({
+      where: { id: 1 },
+      create: { id: 1, currency: "EUR" },
+      update: { currency: "EUR" },
+    });
+    await repo.update({});
+    expect(upsert.mock.calls[1][0].update).toEqual({});
+  });
+
+  it("update rejects invalid currencies", async () => {
+    const { repo, upsert } = fake();
+    await expect(repo.update({ currency: "EURO" })).rejects.toThrow();
+    await expect(repo.update({ currency: "12" })).rejects.toThrow();
+    expect(upsert).not.toHaveBeenCalled();
   });
 });
 

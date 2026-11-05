@@ -93,3 +93,14 @@ export const UserInput = z.object({
   password: z.string().min(8),
 });
 export type UserInput = z.input<typeof UserInput>;
+
+export const SettingsInput = z.object({
+  currency: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO 4217 code"),
+});
+export type SettingsInput = z.input<typeof SettingsInput>;
+export const SettingsPatch = SettingsInput.partial();
+export type SettingsPatch = z.input<typeof SettingsPatch>;

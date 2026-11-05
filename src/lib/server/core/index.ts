@@ -3,6 +3,7 @@ import { ensureDefaultAccounts } from "./bootstrap";
 import { categoriesRepo } from "./categories";
 import type { Db } from "./prisma";
 import { sessionsRepo } from "./sessions";
+import { settingsRepo } from "./settings";
 import { transactionsRepo } from "./transactions";
 import { usersRepo } from "./users";
 
@@ -23,6 +24,7 @@ export function createCore(db: Db) {
     transactions: transactionsRepo(db),
     users: usersRepo(db),
     sessions: sessionsRepo(db),
+    settings: settingsRepo(db),
     /** Creates the default accounts, but only on a database without any accounts. */
     ensureDefaults: () => ensureDefaultAccounts(db),
     disconnect: () => db.$disconnect(),
