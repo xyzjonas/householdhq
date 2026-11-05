@@ -61,9 +61,14 @@
   </section>
 
   <section aria-labelledby="transactions-heading" class="flex flex-col gap-4">
-    <h2 id="transactions-heading" class="text-xl font-bold">
-      Recent transactions
-    </h2>
+    <header class="flex items-baseline justify-between gap-4">
+      <h2 id="transactions-heading" class="text-xl font-bold">
+        Recent transactions
+      </h2>
+      <a class="anchor text-sm font-semibold" href={resolve("/transactions")}>
+        View all
+      </a>
+    </header>
     <TransactionList transactions={data.transactions} />
   </section>
 </div>

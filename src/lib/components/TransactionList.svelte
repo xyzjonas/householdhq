@@ -7,7 +7,14 @@
   import { formatDate, formatMoney } from "#lib/format.ts";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
-  let { transactions }: { transactions: TransactionWithRelations[] } = $props();
+  let {
+    transactions,
+    empty = "No transactions yet.",
+  }: {
+    transactions: TransactionWithRelations[];
+    /** Shown instead of the rows when there are none. */
+    empty?: string;
+  } = $props();
 
   /** Money leaving an owned account is negative, money arriving positive. */
   function signed(t: TransactionWithRelations): number {
@@ -98,6 +105,6 @@
       </a>
     </li>
   {:else}
-    <li class="p-3 text-sm opacity-70">No transactions yet.</li>
+    <li class="p-3 text-sm opacity-70">{empty}</li>
   {/each}
 </ul>
