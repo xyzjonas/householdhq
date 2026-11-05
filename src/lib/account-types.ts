@@ -28,6 +28,11 @@ export const accountTypeOptions: AccountTypeOption[] = [
     description: "Brokerage accounts, ETFs and other assets",
   },
   {
+    type: "RETIREMENT",
+    label: "Retirement",
+    description: "Pension and retirement funds · excluded from net worth",
+  },
+  {
     type: "DEBT",
     label: "Debt",
     description: "Loans, mortgages and other liabilities",

@@ -12,16 +12,18 @@
     class="flex h-3 w-full overflow-hidden rounded-full bg-surface-200-800 shadow-inner"
   >
     {#each pillars as p (p.type)}
-      <span
-        class="h-full transition-all duration-500 {p.color}"
-        style:width="{p.share}%"
-        title="{p.title}: {p.share.toFixed(1)}%"
-      ></span>
+      {#if p.share !== null}
+        <span
+          class="h-full transition-all duration-500 {p.color}"
+          style:width="{p.share}%"
+          title="{p.title}: {p.share.toFixed(1)}%"
+        ></span>
+      {/if}
     {/each}
   </div>
 
   <ul
-    class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 flex-nowrap gap-3.5 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0"
+    class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 flex-nowrap gap-3.5 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0"
   >
     {#each pillars as p (p.type)}
       <li
@@ -33,11 +35,13 @@
             ></span>
             <h3 class="text-sm font-bold tracking-tight">{p.title}</h3>
           </div>
-          <span
-            class="rounded-full border px-2 py-0.5 text-xs font-bold tabular-nums {p.badge}"
-          >
-            {p.share.toFixed(1)}%
-          </span>
+          {#if p.share !== null}
+            <span
+              class="rounded-full border px-2 py-0.5 text-xs font-bold tabular-nums {p.badge}"
+            >
+              {p.share.toFixed(1)}%
+            </span>
+          {/if}
         </div>
         <p class="text-xl font-extrabold tracking-tight tabular-nums">
           {formatMoney(p.balance)}

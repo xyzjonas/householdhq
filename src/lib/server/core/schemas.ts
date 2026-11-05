@@ -12,6 +12,7 @@ export const sourceTypes = [
   "CASH",
   "SAVINGS",
   "INVESTMENT",
+  "RETIREMENT",
   "DEBT",
 ] as const;
 

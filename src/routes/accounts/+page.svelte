@@ -3,14 +3,14 @@
   import CreateAccountDialog from "#lib/components/accounts/CreateAccountDialog.svelte";
   import AccountDirectory from "#lib/components/accounts/AccountDirectory.svelte";
   import PillarAllocation from "#lib/components/accounts/PillarAllocation.svelte";
-  import { buildPillars } from "#lib/accounts-view.ts";
+  import { buildPillars, netWorthOf } from "#lib/accounts-view.ts";
   import { formatMoney } from "#lib/format.ts";
   import type { PageProps } from "./$types";
 
   let { data, form }: PageProps = $props();
 
   const pillars = $derived(buildPillars(data.accounts));
-  const netWorth = $derived(data.accounts.reduce((s, a) => s + a.balance, 0));
+  const netWorth = $derived(netWorthOf(data.accounts));
 </script>
 
 <svelte:head><title>Accounts · Household HQ</title></svelte:head>

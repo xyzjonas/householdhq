@@ -19,11 +19,13 @@
     class="flex h-3 w-full overflow-hidden rounded-full bg-surface-200-800"
   >
     {#each pillars as p (p.type)}
-      <span class={p.color} style:width="{p.share}%"></span>
+      {#if p.share !== null}
+        <span class={p.color} style:width="{p.share}%"></span>
+      {/if}
     {/each}
   </div>
 
-  <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
     {#each pillars as p (p.type)}
       <li
         class="flex flex-col gap-1 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-4"
@@ -35,11 +37,13 @@
         </div>
         <p class="text-xs text-surface-600-400">{p.subtitle}</p>
         <p class="mt-2 text-lg font-bold">{formatMoney(p.balance)}</p>
-        <p>
-          <span class="badge preset-tonal text-[11px] font-bold">
-            {p.share.toFixed(1)}%
-          </span>
-        </p>
+        {#if p.share !== null}
+          <p>
+            <span class="badge preset-tonal text-[11px] font-bold">
+              {p.share.toFixed(1)}%
+            </span>
+          </p>
+        {/if}
       </li>
     {/each}
   </ul>

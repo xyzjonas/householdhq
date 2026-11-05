@@ -59,7 +59,7 @@ export interface Page<T> {
 export interface Balances {
   /** Sum of accounts marked as available to spend */
   liquid: number;
-  /** Sum of all owned (non-"out") accounts */
+  /** Sum of all owned (non-"out") accounts, excluding retirement */
   total: number;
   /** Per account type totals */
   byType: Partial<Record<SourceType, number>>;

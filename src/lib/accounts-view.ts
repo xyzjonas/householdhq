@@ -1,6 +1,6 @@
 import type { AccountWithBalance, SourceType } from "#lib/server/core/types.ts";
 
-export type TabId = "all" | "bank" | "savings" | "investments";
+export type TabId = "all" | "bank" | "savings" | "investments" | "retirement";
 export type SortId = "position" | "balance";
 
 export interface Tab {
@@ -13,6 +13,7 @@ export const tabs: Tab[] = [
   { id: "bank", label: "Bank & Cash" },
   { id: "savings", label: "Savings & Vaults" },
   { id: "investments", label: "Investments" },
+  { id: "retirement", label: "Retirement" },
 ];
 
 export const sortOptions: { id: SortId; label: string }[] = [
@@ -78,6 +79,16 @@ export const groups: Group[] = [
     accent: "#ffcd54",
   },
   {
+    type: "RETIREMENT",
+    title: "Retirement",
+    subtitle: "Důchod",
+    scope: "Long-term, outside net worth",
+    badge: "border-[#b678ff]/40 bg-[#b678ff]/15 text-surface-900-100",
+    tab: "retirement",
+    color: "bg-[#b678ff]",
+    accent: "#b678ff",
+  },
+  {
     type: "DEBT",
     title: "Debts",
     subtitle: "Liabilities",
@@ -89,13 +100,22 @@ export const groups: Group[] = [
   },
 ];
 
-/** The four pillars shown in the allocation card (debts are not a pillar). */
+/** The pillars shown in the allocation card (debts are not a pillar). */
 export const pillarGroups = groups.filter((g) => g.type !== "DEBT");
+
+/** Account types left out of the net worth (e.g. locked-in retirement funds). */
+export const excludedFromNetWorth: readonly SourceType[] = ["RETIREMENT"];
+
+export function netWorthOf(accounts: AccountWithBalance[]): number {
+  return accounts
+    .filter((a) => !excludedFromNetWorth.includes(a.type))
+    .reduce((sum, a) => sum + a.balance, 0);
+}
 
 export interface Pillar extends Group {
   balance: number;
-  /** Share of the sum of all pillars, 0–100 */
-  share: number;
+  /** Share of the sum of the pillars counted in net worth, 0–100; `null` for excluded ones */
+  share: number | null;
 }
 
 export function buildPillars(accounts: AccountWithBalance[]): Pillar[] {
@@ -104,11 +124,19 @@ export function buildPillars(accounts: AccountWithBalance[]): Pillar[] {
       .filter((a) => a.type === g.type)
       .reduce((sum, a) => sum + a.balance, 0),
   );
-  const total = sums.reduce((sum, s) => sum + s, 0);
+  const counted = (g: Group) => !excludedFromNetWorth.includes(g.type);
+  const total = pillarGroups.reduce(
+    (sum, g, i) => (counted(g) ? sum + sums[i] : sum),
+    0,
+  );
   return pillarGroups.map((g, i) => ({
     ...g,
     balance: sums[i],
-    share: total > 0 ? (Math.max(sums[i], 0) / total) * 100 : 0,
+    share: !counted(g)
+      ? null
+      : total > 0
+        ? (Math.max(sums[i], 0) / total) * 100
+        : 0,
   }));
 }
 
