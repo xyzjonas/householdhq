@@ -54,7 +54,7 @@
       </a>
     </header>
     <PillarOverview {pillars} />
-    <AccountList accounts={data.accounts.filter((a) => !a.isOut)} />
+    <AccountList accounts={data.accounts.filter((a) => a.isPortfolio)} />
   </section>
 
   <section aria-labelledby="transactions-heading" class="flex flex-col gap-4">

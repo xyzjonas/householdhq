@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { groups } from "#lib/accounts-view.ts";
   import { formatMoney } from "#lib/format.ts";
   import type {
@@ -16,11 +17,18 @@
   {#each accounts as account (account.id)}
     {@const group = groupOf(account.type)}
     <li
-      class="flex items-center gap-3 card border border-surface-200-800 p-4 transition-colors hover:border-surface-400-600"
+      class="relative flex items-center gap-3 card border border-surface-200-800 p-4 transition-colors hover:border-surface-400-600"
     >
       <AccountIcon {account} size={18} class="size-10" />
       <div class="flex min-w-0 flex-1 flex-col">
-        <h3 class="truncate font-semibold">{account.name}</h3>
+        <h3 class="truncate font-semibold">
+          <a
+            href={resolve("/accounts/[id]", { id: String(account.id) })}
+            class="after:absolute after:inset-0 hover:underline"
+          >
+            {account.name}
+          </a>
+        </h3>
         <p
           class="flex items-center gap-1.5 text-xs font-medium text-surface-600-400"
         >
