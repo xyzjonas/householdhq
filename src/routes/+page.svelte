@@ -2,6 +2,7 @@
   import AccountList from "#lib/components/AccountList.svelte";
   import PillarOverview from "#lib/components/accounts/PillarOverview.svelte";
   import BalanceCard from "#lib/components/BalanceCard.svelte";
+  import NewRecordCta from "#lib/components/NewRecordCta.svelte";
   import TransactionList from "#lib/components/TransactionList.svelte";
   import { resolve } from "$app/paths";
   import { buildPillars } from "#lib/accounts-view.ts";
@@ -29,6 +30,8 @@
       hint="All owned accounts"
     />
   </section>
+
+  <NewRecordCta />
 
   <section
     aria-labelledby="accounts-heading"
