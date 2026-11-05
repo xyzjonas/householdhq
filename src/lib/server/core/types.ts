@@ -3,6 +3,7 @@
  * instead of reaching into `@prisma/client`.
  */
 import type {
+  AppSettings,
   Category,
   Source,
   SourceState,
@@ -12,7 +13,7 @@ import type {
   User,
 } from "@prisma/client";
 
-export type { Category, SourceType, Tag };
+export type { AppSettings, Category, SourceType, Tag };
 
 /** A category with its activity within a date range. */
 export type CategoryWithActivity = Category & {
