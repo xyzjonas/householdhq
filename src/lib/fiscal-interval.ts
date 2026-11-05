@@ -19,6 +19,10 @@ function startOfIntervalIn(year: number, month: number, day: number): Date {
 
 /** The interval containing `now`, for intervals starting on `startDay`. */
 export function fiscalIntervalAt(now: Date, startDay: number): FiscalInterval {
+  // Anything but a whole day 1–31 falls back to the calendar month.
+  if (!Number.isInteger(startDay) || startDay < 1 || startDay > 31) {
+    startDay = 1;
+  }
   const year = now.getFullYear();
   const month = now.getMonth();
   const thisMonthStart = startOfIntervalIn(year, month, startDay);

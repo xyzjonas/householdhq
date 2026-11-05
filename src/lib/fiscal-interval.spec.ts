@@ -46,6 +46,15 @@ describe("fiscalIntervalAt", () => {
     });
   });
 
+  it("falls back to the calendar month for an invalid start day", () => {
+    const calendarMonth = fiscalIntervalAt(d(2026, 11, 5), 1);
+    for (const bad of [undefined, NaN, 0, 32, 1.5]) {
+      expect(fiscalIntervalAt(d(2026, 11, 5), bad as number)).toEqual(
+        calendarMonth,
+      );
+    }
+  });
+
   it("clamps day 31 to short months", () => {
     expect(fiscalIntervalAt(d(2026, 2, 28), 31)).toEqual({
       start: d(2026, 2, 28),
