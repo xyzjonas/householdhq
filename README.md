@@ -36,6 +36,8 @@ just e2e        # migrate + seed + Playwright (needs the database)
 just up         # db -> one-shot `migrate` service -> app on http://localhost:8080
 ```
 
+The runtime image is distroless (no shell, non-root; read-only rootfs in compose) and is published as `scotch3840/householdhq-v2` with `just docker`.
+
 The container entrypoint is `server.js` (wraps adapter-node so plain-http deployments pass SvelteKit's CSRF check; behind a TLS proxy that sends `x-forwarded-proto` nothing changes, otherwise set `PUBLIC_SCHEME=https`).
 
 `docker-compose.yml` runs migrations as a separate `migrate` service; the app only starts after it completed successfully.
