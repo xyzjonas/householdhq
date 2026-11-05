@@ -18,6 +18,7 @@
     type TransactionType,
     type WizardAccount,
     type WizardCategory,
+    type WizardInitial,
   } from "./types";
 
   let {
@@ -26,6 +27,7 @@
     suggestions = [],
     errors = [],
     initialAccountId = null,
+    initial,
     onsplit,
   }: {
     accounts: WizardAccount[];
@@ -36,34 +38,40 @@
     errors?: string[];
     /** Account to pre-select as the source. */
     initialAccountId?: number | null;
+    /** Existing values; switches the wizard into edit mode. */
+    initial?: WizardInitial;
     /** Enables the "Split" banner on the amount stage. */
     onsplit?: (amount: number) => void;
   } = $props();
 
   const pad = (n: number) => String(n).padStart(2, "0");
-  const now = new Date();
+  const seed = untrack(() => initial);
+  const editing = seed !== undefined;
+  const now = seed ? new Date(seed.transactedAt) : new Date();
 
-  let stage = $state(1);
-  let type = $state<TransactionType>("EXPENSE");
-  let tape = $state("");
-  let currency = $state<Currency>("CZK");
-  let categoryId = $state<number | null>(null);
-  let chosenSourceId = $state<number | null>(untrack(() => initialAccountId));
+  let stage = $state(editing ? stages.length : 1);
+  let type = $state<TransactionType>(seed?.type ?? "EXPENSE");
+  let tape = $state(seed ? String(seed.amount) : "");
+  let currency = $state<Currency>(seed?.currency ?? "CZK");
+  let categoryId = $state<number | null>(seed?.categoryId ?? null);
+  let chosenSourceId = $state<number | null>(
+    seed?.accountId ?? untrack(() => initialAccountId),
+  );
   const sourceId = $derived(
     chosenSourceId ?? accounts.find((a) => !a.isOut)?.id ?? null,
   );
-  let targetId = $state<number | null>(null);
-  let description = $state("");
+  let targetId = $state<number | null>(seed?.targetId ?? null);
+  let description = $state(seed?.description ?? "");
   let date = $state(
     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
   );
   let time = $state(`${pad(now.getHours())}:${pad(now.getMinutes())}`);
-  let recurring = $state(false);
-  let hidden = $state(false);
-  let important = $state(false);
+  let recurring = $state(seed?.recurring ?? false);
+  let hidden = $state(seed?.hidden ?? false);
+  let important = $state(seed?.important ?? false);
   let saving = $state(false);
   let heading = $state<HTMLElement>();
-  let reached = $state(1);
+  let reached = $state(editing ? stages.length : 1);
   let details = $state<ReturnType<typeof DetailsStage>>();
 
   const amount = $derived(evaluate(tape));
@@ -133,7 +141,7 @@
         <X size={18} aria-hidden="true" />
       </a>
       <h1 class="flex-1 text-center text-base font-bold text-surface-950-50">
-        Add Transaction
+        {editing ? "Edit Transaction" : "Add Transaction"}
       </h1>
       <span class="size-10" aria-hidden="true"></span>
     </header>
@@ -276,7 +284,11 @@
             class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-surface-950-50 px-6 font-bold text-surface-50-950 active:scale-95 disabled:opacity-40"
             disabled={!canAdvance || saving}
           >
-            {saving ? "Saving…" : stages[stage - 1].next}
+            {saving
+              ? "Saving…"
+              : editing
+                ? "Save changes"
+                : stages[stage - 1].next}
             <Check size={18} aria-hidden="true" />
           </button>
         {/if}
