@@ -186,6 +186,19 @@ describe.skipIf(!core)("core layer", () => {
         (x) => x.id === category.id,
       );
       expect(found).toMatchObject({ spent: 150, received: 900 });
+
+      // Per-month series: zero-filled, spending only, bounded by the range.
+      await tx(25, main.id, outside.id, new Date("2000-12-20T12:00:00Z"));
+      const range = { from: new Date("2000-12-01T00:00:00Z"), to };
+      const monthly = await c.categories.spendingByMonth(category.id, range);
+      expect(monthly.map((m) => m.spent)).toEqual([25, 0, 150]);
+      expect(monthly[0].monthStart).toEqual(range.from);
+      // Without `from` the series starts at the first month with spending.
+      expect(
+        (await c.categories.spendingByMonth(category.id, { to })).map(
+          (m) => m.spent,
+        ),
+      ).toEqual([25, 0, 150]);
     });
 
     it("rejects duplicate names", async () => {
