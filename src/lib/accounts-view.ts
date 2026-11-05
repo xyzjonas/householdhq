@@ -114,8 +114,8 @@ export function netWorthOf(accounts: AccountWithBalance[]): number {
 
 export interface Pillar extends Group {
   balance: number;
-  /** Share of the sum of all pillars, 0–100 */
-  share: number;
+  /** Share of the sum of the pillars counted in net worth, 0–100; `null` for excluded ones */
+  share: number | null;
 }
 
 export function buildPillars(accounts: AccountWithBalance[]): Pillar[] {
@@ -124,11 +124,19 @@ export function buildPillars(accounts: AccountWithBalance[]): Pillar[] {
       .filter((a) => a.type === g.type)
       .reduce((sum, a) => sum + a.balance, 0),
   );
-  const total = sums.reduce((sum, s) => sum + s, 0);
+  const counted = (g: Group) => !excludedFromNetWorth.includes(g.type);
+  const total = pillarGroups.reduce(
+    (sum, g, i) => (counted(g) ? sum + sums[i] : sum),
+    0,
+  );
   return pillarGroups.map((g, i) => ({
     ...g,
     balance: sums[i],
-    share: total > 0 ? (Math.max(sums[i], 0) / total) * 100 : 0,
+    share: !counted(g)
+      ? null
+      : total > 0
+        ? (Math.max(sums[i], 0) / total) * 100
+        : 0,
   }));
 }
 

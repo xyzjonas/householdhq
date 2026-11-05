@@ -42,12 +42,13 @@ describe("buildPillars", () => {
     expect(pillars.map((p) => p.balance)).toEqual([
       11_651, 2_450, 45_000, 120_800, 20_000,
     ]);
-    expect(pillars.reduce((s, p) => s + p.share, 0)).toBeCloseTo(100);
-    expect(pillars[3].share).toBeCloseTo(60.6, 0);
+    expect(pillars.reduce((s, p) => s + (p.share ?? 0), 0)).toBeCloseTo(100);
+    expect(pillars[4].share).toBeNull();
+    expect(pillars[3].share).toBeCloseTo(67.0, 0);
   });
 
   it("returns zero shares when nothing is held", () => {
-    expect(buildPillars([]).map((p) => p.share)).toEqual([0, 0, 0, 0, 0]);
+    expect(buildPillars([]).map((p) => p.share)).toEqual([0, 0, 0, 0, null]);
   });
 });
 

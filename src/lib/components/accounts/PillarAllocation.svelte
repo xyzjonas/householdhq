@@ -19,7 +19,9 @@
     class="flex h-3 w-full overflow-hidden rounded-full bg-surface-200-800"
   >
     {#each pillars as p (p.type)}
-      <span class={p.color} style:width="{p.share}%"></span>
+      {#if p.share !== null}
+        <span class={p.color} style:width="{p.share}%"></span>
+      {/if}
     {/each}
   </div>
 
@@ -35,11 +37,13 @@
         </div>
         <p class="text-xs text-surface-600-400">{p.subtitle}</p>
         <p class="mt-2 text-lg font-bold">{formatMoney(p.balance)}</p>
-        <p>
-          <span class="badge preset-tonal text-[11px] font-bold">
-            {p.share.toFixed(1)}%
-          </span>
-        </p>
+        {#if p.share !== null}
+          <p>
+            <span class="badge preset-tonal text-[11px] font-bold">
+              {p.share.toFixed(1)}%
+            </span>
+          </p>
+        {/if}
       </li>
     {/each}
   </ul>
