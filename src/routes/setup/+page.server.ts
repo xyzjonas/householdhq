@@ -37,6 +37,7 @@ export const actions: Actions = {
       if (e instanceof ConflictError) redirect(303, "/login");
       throw e;
     }
+    // Skipped automatically when accounts already exist in the database.
     await core.ensureDefaults();
 
     const session = await core.sessions.create(user.id);
