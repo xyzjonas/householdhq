@@ -6,6 +6,7 @@
   import TransactionList from "#lib/components/TransactionList.svelte";
   import { resolve } from "$app/paths";
   import { buildPillars } from "#lib/accounts-view.ts";
+  import { formatDate, formatMoney } from "#lib/format.ts";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -22,7 +23,9 @@
       featured
       label="Total liquid balance"
       amount={data.balances.liquid}
-      hint="Available to spend"
+      hint="Available to spend: {formatMoney(
+        data.availableToSpend,
+      )} until {formatDate(data.interval.end)}"
     />
     <BalanceCard
       label="Household net worth"
@@ -58,6 +61,16 @@
     </header>
     <PillarOverview {pillars} />
     <AccountList accounts={data.accounts.filter((a) => a.isPortfolio)} />
+  </section>
+
+  <section aria-labelledby="upcoming-heading" class="flex flex-col gap-4">
+    <h2 id="upcoming-heading" class="text-xl font-bold">
+      Upcoming until {formatDate(data.interval.end)}
+    </h2>
+    <TransactionList
+      transactions={data.upcoming}
+      empty="Nothing scheduled in this interval."
+    />
   </section>
 
   <section aria-labelledby="transactions-heading" class="flex flex-col gap-4">
