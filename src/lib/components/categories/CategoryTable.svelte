@@ -30,9 +30,7 @@
             <span class="flex items-center gap-3">
               <CategoryGlyph icon={item.icon} color={item.color} />
               <span class="min-w-0">
-                <span
-                  class="block truncate text-sm font-bold tracking-tight text-slate-900"
-                >
+                <span class="block truncate text-sm font-bold tracking-tight">
                   <a
                     href={resolve("/categories/[id]", { id: String(item.id) })}
                     class="after:absolute after:inset-0 hover:underline"
@@ -51,7 +49,7 @@
           <td
             class="px-4 py-3 text-right font-bold tabular-nums {item.isInflow
               ? 'text-emerald-600'
-              : 'text-slate-900'}"
+              : 'text-surface-950-50'}"
           >
             {item.isInflow ? "+" : ""}{formatMoney(item.amount)}
           </td>
@@ -60,7 +58,7 @@
               {formatMoney(item.budget)}
             {:else}
               <span
-                class="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500"
+                class="rounded-md bg-surface-100-900 px-1.5 py-0.5 text-[11px] font-semibold text-surface-600-400"
               >
                 No budget
               </span>
