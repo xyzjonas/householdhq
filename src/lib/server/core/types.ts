@@ -22,6 +22,12 @@ export type CategoryWithActivity = Category & {
   received: number;
 };
 
+/** Money spent in a category during the calendar month starting `monthStart`. */
+export interface MonthlySpend {
+  monthStart: Date;
+  spent: number;
+}
+
 /** Accounts are stored in the `Source` table. */
 export type Account = Source;
 export type AccountState = SourceState;

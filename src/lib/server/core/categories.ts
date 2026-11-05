@@ -6,6 +6,7 @@ import {
   NotFoundError,
   type Category,
   type CategoryWithActivity,
+  type MonthlySpend,
 } from "./types";
 
 function rethrow(e: unknown, name?: string | null): never {
@@ -58,6 +59,48 @@ export function categoriesRepo(db: Db) {
         spent: spent.get(c.id) ?? 0,
         received: received.get(c.id) ?? 0,
       }));
+    },
+
+    /**
+     * Money spent in a category per calendar month (UTC), zero-filled, for
+     * months in `[from, to)`. Without `from` the series starts at the
+     * category's first spending. Same definition of "spent" as
+     * `listWithActivity`.
+     */
+    async spendingByMonth(
+      id: number,
+      range: { from?: Date; to: Date },
+    ): Promise<MonthlySpend[]> {
+      const rows = await db.transaction.findMany({
+        where: {
+          categoryId: id,
+          cancelled: false,
+          source: { isOut: false },
+          target: { isOut: true },
+          transactedAt: { gte: range.from, lt: range.to },
+        },
+        select: { amount: true, transactedAt: true },
+      });
+      const key = (d: Date) => d.getUTCFullYear() * 12 + d.getUTCMonth();
+      const sums = new Map<number, number>();
+      for (const r of rows) {
+        if (!r.transactedAt) continue;
+        sums.set(
+          key(r.transactedAt),
+          (sums.get(key(r.transactedAt)) ?? 0) + r.amount,
+        );
+      }
+      const start = range.from
+        ? key(range.from)
+        : Math.min(...sums.keys(), key(range.to) - 1);
+      const months: MonthlySpend[] = [];
+      for (let k = start; k < key(range.to); k++) {
+        months.push({
+          monthStart: new Date(Date.UTC(Math.floor(k / 12), k % 12, 1)),
+          spent: sums.get(k) ?? 0,
+        });
+      }
+      return months;
     },
 
     async get(id: number): Promise<Category> {

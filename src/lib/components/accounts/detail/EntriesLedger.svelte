@@ -1,17 +1,15 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { SvelteURLSearchParams } from "svelte/reactivity";
-  import { Dialog, Pagination, Portal } from "@skeletonlabs/skeleton-svelte";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Plus from "@lucide/svelte/icons/plus";
   import Search from "@lucide/svelte/icons/search";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { PAGE_SIZE, signedFor } from "#lib/account-detail.ts";
-  import { toaster } from "#lib/toaster.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
+  import DeleteEntryDialog from "#lib/components/ledger/DeleteEntryDialog.svelte";
+  import EntryStatusBadge from "#lib/components/ledger/EntryStatusBadge.svelte";
+  import LedgerPagination from "#lib/components/ledger/LedgerPagination.svelte";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
   let {
@@ -179,21 +177,7 @@
             >
               {amount > 0 ? "+" : ""}{formatMoney(amount, t.currency)}
             </td>
-            <td class="py-3 pl-4">
-              <span
-                class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold {t.cancelled
-                  ? 'bg-red-50 text-red-700'
-                  : t.confirmed
-                    ? 'bg-slate-100 text-slate-700'
-                    : 'bg-amber-50 text-amber-700'}"
-              >
-                {t.cancelled
-                  ? "Cancelled"
-                  : t.confirmed
-                    ? "Completed"
-                    : "Pending"}
-              </span>
-            </td>
+            <td class="py-3 pl-4"><EntryStatusBadge entry={t} /></td>
             <td class="py-3 text-right whitespace-nowrap">
               <button
                 type="button"
@@ -220,88 +204,13 @@
     class="flex flex-wrap items-center justify-between gap-3 text-sm text-surface-600-400"
   >
     <p>Showing {first} to {last} of {total} entries</p>
-    <Pagination
-      count={total}
+    <LedgerPagination
+      {total}
       pageSize={PAGE_SIZE}
       page={filters.page}
-      onPageChange={(e) => go({ page: e.page })}
-      aria-label="Pagination"
-      class="flex items-center gap-1"
-    >
-      <Pagination.PrevTrigger class="btn-icon preset-tonal btn-icon-sm">
-        <ChevronLeft size={16} aria-hidden="true" />
-        <span class="sr-only">Previous</span>
-      </Pagination.PrevTrigger>
-      <Pagination.Context>
-        {#snippet children(pagination)}
-          {#each pagination().pages as item, i (i)}
-            {#if item.type === "page"}
-              <Pagination.Item
-                {...item}
-                class="btn-icon btn-icon-sm {item.value === filters.page
-                  ? 'preset-filled-surface-950-50'
-                  : 'preset-tonal'}"
-              >
-                {item.value}
-              </Pagination.Item>
-            {:else}
-              <Pagination.Ellipsis index={i}>&#8230;</Pagination.Ellipsis>
-            {/if}
-          {/each}
-        {/snippet}
-      </Pagination.Context>
-      <Pagination.NextTrigger class="btn-icon preset-tonal btn-icon-sm">
-        <ChevronRight size={16} aria-hidden="true" />
-        <span class="sr-only">Next</span>
-      </Pagination.NextTrigger>
-    </Pagination>
+      onpage={(page) => go({ page })}
+    />
   </footer>
 </section>
 
-<Dialog
-  open={deleting !== null}
-  onOpenChange={(e) => {
-    if (!e.open) deleting = null;
-  }}
->
-  <Portal>
-    <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
-    <Dialog.Positioner
-      class="fixed inset-0 z-50 flex items-center justify-center p-4"
-    >
-      <Dialog.Content
-        class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
-      >
-        <Dialog.Title class="text-lg font-bold">Delete entry?</Dialog.Title>
-        <Dialog.Description class="text-sm text-surface-600-400">
-          “{deleting?.description}” will be permanently removed from the
-          journal.
-        </Dialog.Description>
-        <form
-          method="POST"
-          action="?/delete"
-          class="flex justify-end gap-2"
-          use:enhance={() =>
-            async ({ result, update }) => {
-              const description = deleting?.description;
-              deleting = null;
-              if (result.type === "success") {
-                toaster.success({ title: `Deleted “${description}”` });
-              } else {
-                toaster.error({ title: "Could not delete the entry" });
-              }
-              await update();
-            }}
-        >
-          <input type="hidden" name="id" value={deleting?.id} />
-          <Dialog.CloseTrigger class="btn preset-tonal"
-            >Cancel</Dialog.CloseTrigger
-          >
-          <button type="submit" class="btn preset-filled-error-500">
-            Delete
-          </button>
-        </form>
-      </Dialog.Content>
-    </Dialog.Positioner>
-  </Portal>
-</Dialog>
+<DeleteEntryDialog bind:entry={deleting} />

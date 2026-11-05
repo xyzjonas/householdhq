@@ -34,7 +34,7 @@
 </script>
 
 <div
-  class="flex items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
+  class="flex min-h-24 items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
 >
   <div class="min-w-0">
     <p class="text-xs font-bold tracking-wider uppercase opacity-60">

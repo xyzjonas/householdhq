@@ -1,0 +1,150 @@
+<script lang="ts">
+  import { resolve } from "$app/paths";
+  import {
+    chartRanges,
+    type ChartRange,
+    type DetailView,
+  } from "#lib/category-detail.ts";
+  import { formatMoney } from "#lib/format.ts";
+
+  let {
+    series,
+    range,
+    categoryId,
+    queryFor,
+    color,
+  }: {
+    series: { monthStart: string; spent: number }[];
+    range: ChartRange;
+    categoryId: number;
+    queryFor: (changes: Partial<DetailView>) => string;
+    color: string | null;
+  } = $props();
+
+  const W = 480;
+  const H = 180;
+  const PAD = 8;
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    month: "short",
+    timeZone: "UTC",
+  });
+  const fmtYear = new Intl.DateTimeFormat("en-GB", {
+    month: "short",
+    year: "2-digit",
+    timeZone: "UTC",
+  });
+
+  const peak = $derived(Math.max(0, ...series.map((s) => s.spent)));
+  const step = $derived((W - PAD * 2) / Math.max(series.length, 1));
+  const barWidth = $derived(Math.max(1, Math.min(32, step * 0.7)));
+  const bars = $derived(
+    series.map((s, i) => {
+      const d = new Date(s.monthStart);
+      const h = peak ? (s.spent / peak) * (H - 24) : 0;
+      return {
+        x: PAD + i * step + (step - barWidth) / 2,
+        y: H - h,
+        h,
+        cx: PAD + i * step + step / 2,
+        label: fmt.format(d),
+        full: fmtYear.format(d),
+        spent: s.spent,
+      };
+    }),
+  );
+  // Label at most ~8 months so a long history stays legible.
+  const every = $derived(Math.max(1, Math.ceil(series.length / 8)));
+  const total = $derived(series.reduce((sum, s) => sum + s.spent, 0));
+  const ariaLabel = $derived(
+    series.length
+      ? `Monthly spending, ${bars[0].full} to ${bars[bars.length - 1].full}: ` +
+          bars.map((b) => `${b.full} ${formatMoney(b.spent)}`).join(", ")
+      : "No spending history",
+  );
+</script>
+
+<section
+  aria-labelledby="spending-heading"
+  class="flex flex-col justify-between gap-4 card border border-surface-200-800 p-6"
+>
+  <header class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <h2 id="spending-heading" class="text-lg font-bold">Spending history</h2>
+      <p class="text-sm text-surface-600-400">
+        Monthly spending, {series.length}
+        {series.length === 1 ? "month" : "months"}
+      </p>
+    </div>
+    <nav aria-label="Chart range" class="flex gap-1">
+      {#each chartRanges as r (r.id)}
+        <a
+          href={resolve(`/categories/[id]?${queryFor({ range: r.id })}`, {
+            id: String(categoryId),
+          })}
+          data-sveltekit-reset="false"
+          aria-current={r.id === range ? "true" : undefined}
+          class="btn rounded-full text-xs btn-sm {r.id === range
+            ? 'preset-filled-surface-950-50'
+            : 'preset-tonal'}"
+        >
+          {r.label}
+        </a>
+      {/each}
+    </nav>
+  </header>
+
+  {#if series.length}
+    <svg
+      viewBox="0 0 {W} {H + 20}"
+      role="img"
+      aria-label={ariaLabel}
+      class="w-full text-emerald-700"
+      style:color
+    >
+      {#each bars as b, i (b.full)}
+        <rect
+          x={b.x}
+          y={b.y}
+          width={barWidth}
+          height={b.h}
+          rx="2"
+          fill="currentColor"
+          opacity={b.spent === 0 ? 0.25 : 1}
+        >
+          <title>{b.full}: {formatMoney(b.spent)}</title>
+        </rect>
+        {#if i % every === 0}
+          <text
+            x={b.cx}
+            y={H + 14}
+            text-anchor="middle"
+            class="fill-slate-500 text-[11px]"
+          >
+            {b.label}
+          </text>
+        {/if}
+      {/each}
+    </svg>
+
+    <dl class="grid grid-cols-3 gap-3 text-xs">
+      <div>
+        <dt class="font-bold tracking-wider uppercase opacity-60">Total</dt>
+        <dd class="text-sm font-bold">{formatMoney(total)}</dd>
+      </div>
+      <div>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          Highest month
+        </dt>
+        <dd class="text-sm font-bold">{formatMoney(peak)}</dd>
+      </div>
+      <div>
+        <dt class="font-bold tracking-wider uppercase opacity-60">Latest</dt>
+        <dd class="text-sm font-bold">
+          {formatMoney(series[series.length - 1].spent)}
+        </dd>
+      </div>
+    </dl>
+  {:else}
+    <p class="text-sm opacity-70">No spending recorded yet.</p>
+  {/if}
+</section>

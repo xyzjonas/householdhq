@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidateAll } from "$app/navigation";
   import { untrack } from "svelte";
   import { describeChanges } from "#lib/account-detail.ts";
   import { toaster } from "#lib/toaster.ts";
@@ -20,6 +21,8 @@
     Object.assign(current, changes);
     try {
       current = await patchAccount(account.id, changes);
+      // Header, chart etc. render the page data, so refresh it too.
+      await invalidateAll();
       for (const title of describeChanges(changes)) {
         toaster.success({ title });
       }
@@ -70,7 +73,7 @@
     />
     <AccountTypePicker value={current.type} onsave={(type) => save({ type })} />
     <div
-      class="flex items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
+      class="flex min-h-24 items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
     >
       <div class="min-w-0">
         <p class="text-xs font-bold tracking-wider uppercase opacity-60">

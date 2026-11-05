@@ -8,10 +8,15 @@
     label,
     value,
     onsave,
+    required = true,
+    placeholder = "",
   }: {
     label: string;
     value: string;
     onsave: (value: string) => Promise<void>;
+    /** Optional fields may be saved empty to clear them. */
+    required?: boolean;
+    placeholder?: string;
   } = $props();
 
   let editing = $state(false);
@@ -45,7 +50,7 @@
 </script>
 
 <div
-  class="flex items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
+  class="flex min-h-24 items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
 >
   {#if editing}
     <form class="flex w-full items-end gap-2" onsubmit={submit}>
@@ -58,7 +63,8 @@
           bind:value={draft}
           class="input"
           type="text"
-          required
+          {required}
+          {placeholder}
           disabled={saving}
           onkeydown={(e) => e.key === "Escape" && (editing = false)}
         />
@@ -86,7 +92,7 @@
         {label}
       </p>
       <p class="truncate text-base font-bold">
-        {value}
+        {value || "—"}
       </p>
     </div>
     <button
