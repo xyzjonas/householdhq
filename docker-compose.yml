@@ -19,6 +19,7 @@ services:
 
   # One-shot service: applies pending prisma migrations, then exits.
   migrate:
+    image: scotch3840/householdhq-v2-migrate:latest
     build:
       context: .
       target: migrate
