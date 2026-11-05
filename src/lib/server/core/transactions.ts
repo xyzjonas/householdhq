@@ -186,6 +186,24 @@ export function transactionsRepo(db: Db) {
       return tags.map((t) => t.name);
     },
 
+    /**
+     * Scheduled transactions still to happen: after `after` and before
+     * `before`, soonest first. Cancelled ones are left out.
+     */
+    async upcoming(
+      after: Date,
+      before: Date,
+    ): Promise<TransactionWithRelations[]> {
+      return db.transaction.findMany({
+        where: {
+          cancelled: false,
+          transactedAt: { gt: after, lt: before },
+        },
+        include,
+        orderBy: [{ transactedAt: "asc" }, { id: "asc" }],
+      });
+    },
+
     async get(id: number): Promise<TransactionWithRelations> {
       const tx = await db.transaction.findUnique({ where: { id }, include });
       if (!tx) throw new NotFoundError("Transaction", id);

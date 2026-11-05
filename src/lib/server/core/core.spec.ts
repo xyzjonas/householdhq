@@ -76,6 +76,20 @@ describe("settings", () => {
     expect(upsert.mock.calls[1][0].update).toEqual({});
   });
 
+  it("update accepts a fiscal interval start day and rejects bad ones", async () => {
+    const { repo, upsert } = fake();
+    await repo.update({ fiscalIntervalStartDay: 14 });
+    expect(upsert.mock.calls[0][0].update).toEqual({
+      fiscalIntervalStartDay: 14,
+    });
+    await expect(repo.update({ fiscalIntervalStartDay: 0 })).rejects.toThrow();
+    await expect(repo.update({ fiscalIntervalStartDay: 32 })).rejects.toThrow();
+    await expect(
+      repo.update({ fiscalIntervalStartDay: 1.5 }),
+    ).rejects.toThrow();
+    expect(upsert).toHaveBeenCalledTimes(1);
+  });
+
   it("update rejects invalid currencies", async () => {
     const { repo, upsert } = fake();
     await expect(repo.update({ currency: "EURO" })).rejects.toThrow();

@@ -129,6 +129,11 @@ export const SettingsInput = z.object({
     .trim()
     .toUpperCase()
     .regex(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO 4217 code"),
+  fiscalIntervalStartDay: z.coerce
+    .number()
+    .int("Day must be a whole number")
+    .min(1, "Day must be between 1 and 31")
+    .max(31, "Day must be between 1 and 31"),
 });
 export type SettingsInput = z.input<typeof SettingsInput>;
 export const SettingsPatch = SettingsInput.partial();
