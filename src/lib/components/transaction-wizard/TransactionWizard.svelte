@@ -3,12 +3,14 @@
   import { resolve } from "$app/paths";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import ArrowRight from "@lucide/svelte/icons/arrow-right";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
   import Check from "@lucide/svelte/icons/check";
   import X from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
   import AmountStage from "./AmountStage.svelte";
   import { evaluate } from "./calculator";
   import CategoryStage from "./CategoryStage.svelte";
+  import DeleteTransactionDialog from "./DeleteTransactionDialog.svelte";
   import DetailsStage from "./DetailsStage.svelte";
   import TransactionOverview from "./TransactionOverview.svelte";
   import TypeStage from "./TypeStage.svelte";
@@ -70,6 +72,7 @@
   let hidden = $state(seed?.hidden ?? false);
   let important = $state(seed?.important ?? false);
   let saving = $state(false);
+  let confirmingDelete = $state(false);
   let heading = $state<HTMLElement>();
   let reached = $state(editing ? stages.length : 1);
   let details = $state<ReturnType<typeof DetailsStage>>();
@@ -115,6 +118,17 @@
     goTo(2);
   }
 </script>
+
+{#snippet deleteButton()}
+  <button
+    type="button"
+    class="btn w-full preset-tonal-error"
+    onclick={() => (confirmingDelete = true)}
+  >
+    <Trash2 size={18} aria-hidden="true" />
+    Delete
+  </button>
+{/snippet}
 
 <form
   method="POST"
@@ -224,6 +238,9 @@
             bind:hidden
             bind:important
           />
+          {#if editing}
+            <div class="px-4 pt-4 lg:hidden">{@render deleteButton()}</div>
+          {/if}
         </section>
       </div>
     </div>
@@ -296,23 +313,30 @@
     </nav>
   </div>
 
-  <TransactionOverview
-    {stage}
-    {reached}
-    {type}
-    {amount}
-    {currency}
-    {category}
-    {accountName}
-    {targetName}
-    {description}
-    {date}
-    {time}
-    {recurring}
-    {hidden}
-    {important}
-  />
+  <div class="hidden lg:sticky lg:top-24 lg:flex lg:flex-col lg:gap-4">
+    <TransactionOverview
+      {stage}
+      {reached}
+      {type}
+      {amount}
+      {currency}
+      {category}
+      {accountName}
+      {targetName}
+      {description}
+      {date}
+      {time}
+      {recurring}
+      {hidden}
+      {important}
+    />
+    {#if editing}{@render deleteButton()}{/if}
+  </div>
 </form>
+
+{#if editing}
+  <DeleteTransactionDialog bind:open={confirmingDelete} {description} />
+{/if}
 
 <style scoped>
   .track {

@@ -77,7 +77,7 @@
 
 <aside
   aria-label="Transaction overview"
-  class="hidden flex-col gap-6 rounded-2xl border border-surface-200-800 bg-surface-50-950 p-6 lg:sticky lg:top-24 lg:flex"
+  class="hidden flex-col gap-6 rounded-2xl border border-surface-200-800 bg-surface-50-950 p-6 lg:flex"
 >
   <header class="flex flex-col gap-1">
     <h2

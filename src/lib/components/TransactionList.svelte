@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
-  import Trash2 from "@lucide/svelte/icons/trash-2";
+  import { resolve } from "$app/paths";
+  import Pencil from "@lucide/svelte/icons/pencil";
   import { formatDate, formatMoney } from "#lib/format.ts";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
@@ -37,16 +37,13 @@
       >
         {amount > 0 ? "+" : ""}{formatMoney(amount, t.currency)}
       </p>
-      <form method="POST" action="?/delete" use:enhance>
-        <input type="hidden" name="id" value={t.id} />
-        <button
-          type="submit"
-          class="btn-icon btn-icon-sm hover:preset-tonal-error"
-          aria-label="Delete {t.description}"
-        >
-          <Trash2 size={16} aria-hidden="true" />
-        </button>
-      </form>
+      <a
+        href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
+        class="btn-icon btn-icon-sm hover:preset-tonal"
+        aria-label="Edit {t.description}"
+      >
+        <Pencil size={16} aria-hidden="true" />
+      </a>
     </li>
   {:else}
     <li class="text-sm opacity-70">No transactions yet.</li>

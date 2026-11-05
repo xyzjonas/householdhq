@@ -71,4 +71,13 @@ export const actions: Actions = {
     }
     redirect(303, "/");
   },
+  delete: async ({ params }) => {
+    try {
+      await getCore().transactions.remove(parseId(params.id));
+    } catch (e) {
+      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      throw e;
+    }
+    redirect(303, "/");
+  },
 };
