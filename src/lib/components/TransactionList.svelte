@@ -4,7 +4,7 @@
   import Repeat from "@lucide/svelte/icons/repeat";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
-  import { formatDate, formatMoney } from "#lib/format.ts";
+  import { formatDateWithYear, formatMoney } from "#lib/format.ts";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
   let {
@@ -73,7 +73,7 @@
           class="mt-1 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs font-medium text-surface-500"
         >
           <time class="shrink-0" datetime={t.transactedAt?.toISOString()}>
-            {formatDate(t.transactedAt)}
+            {formatDateWithYear(t.transactedAt)}
           </time>
           {#if t.category}
             <span aria-hidden="true" class="text-surface-300">•</span>
