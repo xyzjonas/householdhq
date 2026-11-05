@@ -1,24 +1,11 @@
 import { redirect } from "@sveltejs/kit";
-import type { Handle, ServerInit } from "@sveltejs/kit/hooks";
-import { building } from "$app/env";
+import type { Handle } from "@sveltejs/kit/hooks";
 import { getCore } from "#lib/server/index.ts";
 import {
   SESSION_COOKIE,
   clearSessionCookie,
   setSessionCookie,
 } from "#lib/server/auth.ts";
-
-/** Make sure a fresh database has the default bank and expense accounts. */
-export const init: ServerInit = async () => {
-  if (building) return;
-  try {
-    if (await getCore().ensureDefaults()) {
-      console.info("Created default bank and expense accounts");
-    }
-  } catch (e) {
-    console.error("Could not ensure default accounts", e);
-  }
-};
 
 /** Served to everyone, including before setup and without a session. */
 const ASSET_PATHS = new Set([

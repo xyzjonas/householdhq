@@ -23,7 +23,7 @@ export function createCore(db: Db) {
     transactions: transactionsRepo(db),
     users: usersRepo(db),
     sessions: sessionsRepo(db),
-    /** Idempotent first-run setup of the default accounts. */
+    /** Creates the default accounts, but only on a database without any accounts. */
     ensureDefaults: () => ensureDefaultAccounts(db),
     disconnect: () => db.$disconnect(),
   };
