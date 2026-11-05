@@ -71,7 +71,9 @@ ci:
 build:
   npm run build
 
-# build the production image
+image := "scotch3840/householdhq-v2"
+
+# build the production image (tagged as `image` via docker-compose.yml)
 docker-build:
   docker compose build app
 
@@ -85,6 +87,8 @@ down:
 logs:
   docker compose logs -f
 
-# push the image to Docker Hub
+# build the hardened image and push it to Docker Hub (latest + commit sha)
 docker: docker-build
-  docker push scotch3840/householdhq:latest
+  docker tag {{image}}:latest {{image}}:$(git rev-parse --short HEAD)
+  docker push {{image}}:latest
+  docker push {{image}}:$(git rev-parse --short HEAD)

@@ -4,9 +4,17 @@ build
 .git
 .github
 .vscode
+.agents
+.claude
 .env
+.env.*
+!.env.example
+*.sql
+*.md
 test-results
 playwright-report
+e2e
 docs
 Dockerfile
 docker-compose.yml
+justfile

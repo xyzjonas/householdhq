@@ -30,10 +30,20 @@ services:
     restart: "no"
 
   app:
+    image: scotch3840/householdhq-v2:latest
     build:
       context: .
       target: runtime
     restart: unless-stopped
+    # hardening: immutable rootfs, no privileges, no capabilities
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
     environment:
       DATABASE_URL: mysql://home:home@db:3306/home
       # Served over plain http by default. Behind a TLS proxy that sends
