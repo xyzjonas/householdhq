@@ -189,7 +189,9 @@
             bind:currency
             {category}
             {onsplit}
+            active={stage === 2}
             onchangecategory={() => goTo(3)}
+            onadvance={() => canAdvance && goTo(3)}
           />
         </section>
         <section class="panel" inert={stage !== 3} aria-label={stages[2].title}>
