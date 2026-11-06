@@ -1,6 +1,6 @@
 import { error, fail } from "@sveltejs/kit";
 import { getCore } from "#lib/server/index.ts";
-import { NotFoundError } from "#lib/server/core/index.ts";
+import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import {
   monthKey,
   monthRange,
@@ -85,6 +85,7 @@ export const actions: Actions = {
       await getCore().transactions.remove(id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      if (e instanceof ConflictError) return fail(409, { message: e.message });
       throw e;
     }
     return { deleted: id };

@@ -9,6 +9,7 @@ import {
   type TransactionStatus,
 } from "./schemas";
 import {
+  ConflictError,
   NotFoundError,
   type Page,
   type TransactionWithRelations,
@@ -269,6 +270,20 @@ export function transactionsRepo(db: Db) {
     },
 
     async remove(id: number): Promise<void> {
+      // Fuel and service entries own their transaction: removing it alone
+      // would leave the entry without its cost.
+      const owner = await db.transaction.findUnique({
+        where: { id },
+        select: {
+          fuelEntry: { select: { vehicleId: true } },
+          serviceEntry: { select: { vehicleId: true } },
+        },
+      });
+      if (owner?.fuelEntry || owner?.serviceEntry) {
+        throw new ConflictError(
+          "This transaction belongs to a vehicle entry; delete the entry on the vehicle page instead",
+        );
+      }
       try {
         await db.transaction.delete({ where: { id } });
       } catch (e) {

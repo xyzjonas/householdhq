@@ -8,6 +8,7 @@ import { sessionsRepo } from "./sessions";
 import { settingsRepo } from "./settings";
 import { transactionsRepo } from "./transactions";
 import { usersRepo } from "./users";
+import { vehiclesRepo } from "./vehicles";
 
 export { createPrismaClient } from "./prisma";
 export { DEFAULT_BANK_ACCOUNT, DEFAULT_EXPENSE_ACCOUNT } from "./bootstrap";
@@ -31,6 +32,8 @@ export function createCore(db: Db) {
     ledger: ledgerRepo(db, transactions),
     /** Balance checkpoints (frozen balances) and their adjustments. */
     checkpoints: checkpointsRepo(db, settings),
+    /** Vehicles with their fuel and service journals and service components. */
+    vehicles: vehiclesRepo(db, settings),
     users: usersRepo(db),
     sessions: sessionsRepo(db),
     settings,

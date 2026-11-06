@@ -11,9 +11,48 @@ import type {
   Tag,
   Transaction,
   User,
+  Vehicle,
+  VehicleComponent,
+  VehicleFuelEntry,
+  VehicleServiceEntry,
 } from "@prisma/client";
 
-export type { AppSettings, Category, SourceType, Tag };
+export type {
+  AppSettings,
+  Category,
+  SourceType,
+  Tag,
+  Vehicle,
+  VehicleComponent,
+};
+
+/** The part of an entry's transaction the vehicle pages show. */
+export type EntryTransaction = Pick<
+  Transaction,
+  "id" | "transactedAt" | "description" | "amount" | "currency"
+>;
+
+export type FuelEntry = VehicleFuelEntry & {
+  transaction: EntryTransaction;
+  /** The full tank this fill-up is measured against. */
+  previousFullTankFuelEntry: Pick<
+    VehicleFuelEntry,
+    "id" | "fueledAt" | "odometer" | "isFullTank"
+  > | null;
+};
+
+export type ServiceEntry = VehicleServiceEntry & {
+  transaction: EntryTransaction;
+  components: VehicleComponent[];
+};
+
+/** A vehicle with its fuel and service journals, newest first. */
+export type VehicleDetail = Vehicle & {
+  category: Category | null;
+  fuelCategory: Category | null;
+  fuelEntries: FuelEntry[];
+  serviceEntries: ServiceEntry[];
+};
 
 /** A category with its activity within a date range. */
 export type CategoryWithActivity = Category & {

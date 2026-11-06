@@ -118,6 +118,111 @@ export const TransactionFilter = z.object({
 });
 export type TransactionFilter = z.input<typeof TransactionFilter>;
 
+export const vehicleServiceTypes = [
+  "REGULAR_MAINTENANCE",
+  "DEFECT",
+  "FEES",
+  "UPGRADE",
+] as const;
+export const VehicleServiceType = z.enum(vehicleServiceTypes);
+export type VehicleServiceType = z.infer<typeof VehicleServiceType>;
+
+const optionalNumber = z.number().nonnegative().nullable();
+const optionalDate = z.coerce.date().nullable();
+const optionalId = z.number().int().positive().nullable();
+
+const vehicleShape = {
+  name: z.string().trim().min(1),
+  brand: z.string().trim().min(1),
+  model: z.string().trim().min(1),
+  vin: z.string().trim().min(1),
+  registration: z.string().trim().min(1),
+  color: optionalText,
+  icon: optionalText,
+  fuelType: optionalText,
+  purchasePrice: optionalNumber,
+  purchasedAt: optionalDate,
+  mass: optionalNumber,
+  engineSize: optionalNumber,
+  maxPower: optionalNumber,
+  dateOfFabrication: optionalDate,
+  dateFirstRegistered: optionalDate,
+  defaultFuelTransactionTitle: z.string().trim().min(1),
+  /** Category of service entries' transactions. */
+  categoryId: optionalId,
+  /** Category of fuel entries' transactions. */
+  fuelCategoryId: optionalId,
+};
+export const VehicleInput = z.object({
+  ...vehicleShape,
+  purchasePrice: optionalNumber.optional(),
+  purchasedAt: optionalDate.optional(),
+  mass: optionalNumber.optional(),
+  engineSize: optionalNumber.optional(),
+  maxPower: optionalNumber.optional(),
+  dateOfFabrication: optionalDate.optional(),
+  dateFirstRegistered: optionalDate.optional(),
+  defaultFuelTransactionTitle:
+    vehicleShape.defaultFuelTransactionTitle.default("Fuel"),
+  categoryId: optionalId.optional(),
+  fuelCategoryId: optionalId.optional(),
+});
+export type VehicleInput = z.input<typeof VehicleInput>;
+export const VehiclePatch = z.object(vehicleShape).partial();
+export type VehiclePatch = z.input<typeof VehiclePatch>;
+
+const fuelEntryShape = {
+  fueledAt: z.coerce.date(),
+  odometer: z.number().nonnegative(),
+  fuelAmount: z.number().positive(),
+  unitPrice: z.number().nonnegative(),
+  isFullTank: z.boolean(),
+  /**
+   * The full tank this one is measured against. Omitted: pick the latest
+   * earlier full tank; `null`: there is none.
+   */
+  previousFullTankFuelEntryId: z.number().int().positive().nullable(),
+};
+export const FuelEntryInput = z.object({
+  ...fuelEntryShape,
+  isFullTank: fuelEntryShape.isFullTank.default(true),
+  previousFullTankFuelEntryId:
+    fuelEntryShape.previousFullTankFuelEntryId.optional(),
+});
+export type FuelEntryInput = z.input<typeof FuelEntryInput>;
+export const FuelEntryPatch = z.object(fuelEntryShape).partial();
+export type FuelEntryPatch = z.input<typeof FuelEntryPatch>;
+
+const serviceEntryShape = {
+  type: VehicleServiceType,
+  title: z.string().trim().min(1),
+  servicedAt: z.coerce.date(),
+  odometer: optionalNumber,
+  description: optionalText,
+  /** What the service cost: the amount of its transaction. */
+  price: optionalNumber,
+  componentIds: z.array(z.number().int().positive()),
+};
+export const ServiceEntryInput = z.object({
+  ...serviceEntryShape,
+  odometer: optionalNumber.optional(),
+  price: optionalNumber.optional(),
+  componentIds: serviceEntryShape.componentIds.default([]),
+});
+export type ServiceEntryInput = z.input<typeof ServiceEntryInput>;
+export const ServiceEntryPatch = z.object(serviceEntryShape).partial();
+export type ServiceEntryPatch = z.input<typeof ServiceEntryPatch>;
+
+export const VehicleComponentInput = z.object({
+  name: z.string().trim().min(1),
+  icon: optionalText,
+  color: optionalText,
+  description: optionalText,
+});
+export type VehicleComponentInput = z.input<typeof VehicleComponentInput>;
+export const VehicleComponentPatch = VehicleComponentInput.partial();
+export type VehicleComponentPatch = z.input<typeof VehicleComponentPatch>;
+
 export const CheckpointInput = z.object({
   /** The balance the account really has. */
   amount: z.number().finite(),

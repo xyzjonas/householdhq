@@ -93,6 +93,7 @@ export const actions: Actions = {
       await getCore().transactions.remove(id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      if (e instanceof ConflictError) return fail(409, { message: e.message });
       throw e;
     }
     return { deleted: id };

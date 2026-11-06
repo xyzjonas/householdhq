@@ -1,5 +1,5 @@
 import { error, redirect } from "@sveltejs/kit";
-import { NotFoundError } from "#lib/server/core/index.ts";
+import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { getCore } from "#lib/server/index.ts";
 import {
   loadWizardData,
@@ -76,6 +76,7 @@ export const actions: Actions = {
       await getCore().transactions.remove(parseId(params.id));
     } catch (e) {
       if (e instanceof NotFoundError) error(404, "Transaction not found");
+      if (e instanceof ConflictError) error(409, e.message);
       throw e;
     }
     redirect(303, "/");
