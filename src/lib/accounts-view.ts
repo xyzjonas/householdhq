@@ -1,6 +1,7 @@
 import type { AccountWithBalance, SourceType } from "#lib/server/core/types.ts";
 
-export type TabId = "all" | "bank" | "savings" | "investments" | "retirement";
+export type TabId =
+  "all" | "bank" | "savings" | "investments" | "retirement" | "external";
 export type SortId = "position" | "balance";
 
 export interface Tab {
@@ -14,6 +15,7 @@ export const tabs: Tab[] = [
   { id: "savings", label: "Savings & Vaults" },
   { id: "investments", label: "Investments" },
   { id: "retirement", label: "Retirement" },
+  { id: "external", label: "External" },
 ];
 
 export const sortOptions: { id: SortId; label: string }[] = [
@@ -21,8 +23,16 @@ export const sortOptions: { id: SortId; label: string }[] = [
   { id: "balance", label: "Balance (high to low)" },
 ];
 
+/** Section key: an account type, or `OUT` for accounts outside the household. */
+export type GroupKey = SourceType | "OUT";
+
+/** The section an account is listed under: "out" accounts get their own. */
+export function groupKeyOf(account: AccountWithBalance): GroupKey {
+  return account.isOut ? "OUT" : account.type;
+}
+
 export interface Group {
-  type: SourceType;
+  type: GroupKey;
   title: string;
   tab: Exclude<TabId, "all"> | null;
   /** Tailwind classes for the pillar dot / bar segment */
@@ -98,17 +108,29 @@ export const groups: Group[] = [
     color: "bg-[#f70063]",
     accent: "#f70063",
   },
+  {
+    type: "OUT",
+    title: "External accounts",
+    subtitle: "Outside the household",
+    scope: "Expenses & external parties",
+    badge: "border-[#94a3b8]/40 bg-[#94a3b8]/15 text-surface-900-100",
+    tab: "external",
+    color: "bg-[#94a3b8]",
+    accent: "#94a3b8",
+  },
 ];
 
-/** The pillars shown in the allocation card (debts are not a pillar). */
-export const pillarGroups = groups.filter((g) => g.type !== "DEBT");
+/** The pillars shown in the allocation card (debts and external are not). */
+export const pillarGroups = groups.filter(
+  (g) => g.type !== "DEBT" && g.type !== "OUT",
+);
 
 /** Account types left out of the net worth (e.g. locked-in retirement funds). */
 export const excludedFromNetWorth: readonly SourceType[] = ["RETIREMENT"];
 
 export function netWorthOf(accounts: AccountWithBalance[]): number {
   return accounts
-    .filter((a) => !excludedFromNetWorth.includes(a.type))
+    .filter((a) => !a.isOut && !excludedFromNetWorth.includes(a.type))
     .reduce((sum, a) => sum + a.balance, 0);
 }
 
@@ -121,10 +143,11 @@ export interface Pillar extends Group {
 export function buildPillars(accounts: AccountWithBalance[]): Pillar[] {
   const sums = pillarGroups.map((g) =>
     accounts
-      .filter((a) => a.type === g.type)
+      .filter((a) => groupKeyOf(a) === g.type)
       .reduce((sum, a) => sum + a.balance, 0),
   );
-  const counted = (g: Group) => !excludedFromNetWorth.includes(g.type);
+  const counted = (g: Group) =>
+    !excludedFromNetWorth.includes(g.type as SourceType);
   const total = pillarGroups.reduce(
     (sum, g, i) => (counted(g) ? sum + sums[i] : sum),
     0,
@@ -147,7 +170,10 @@ function matchesTab(group: Group, tab: TabId): boolean {
 export function countForTab(accounts: AccountWithBalance[], tab: TabId) {
   return groups
     .filter((g) => matchesTab(g, tab))
-    .reduce((n, g) => n + accounts.filter((a) => a.type === g.type).length, 0);
+    .reduce(
+      (n, g) => n + accounts.filter((a) => groupKeyOf(a) === g.type).length,
+      0,
+    );
 }
 
 const sorters: Record<
@@ -175,7 +201,9 @@ export function buildSections(
     .map((group) => {
       const inGroup = accounts
         .filter(
-          (a) => a.type === group.type && a.name.toLowerCase().includes(needle),
+          (a) =>
+            groupKeyOf(a) === group.type &&
+            a.name.toLowerCase().includes(needle),
         )
         .sort(sorters[sort]);
       return {
