@@ -65,6 +65,8 @@
   const go = (changes: Record<string, string | number | undefined>) =>
     goto(
       resolve(`/accounts/[id]?${query(changes)}`, { id: String(accountId) }),
+      // A filter/page change, not a navigation: keep scroll position and focus.
+      { reset: false },
     );
 
   function counterparty(t: TransactionWithRelations) {

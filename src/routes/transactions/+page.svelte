@@ -15,7 +15,10 @@
   const last = $derived(Math.min(data.total, data.view.page * data.view.size));
 
   const toPage = (page: number) =>
-    goto(resolve(`/transactions?${viewQuery(data.view, { page })}`));
+    goto(resolve(`/transactions?${viewQuery(data.view, { page })}`), {
+      // Paging, not a navigation: keep scroll position and focus.
+      reset: false,
+    });
 </script>
 
 <svelte:head><title>Transactions · Household HQ</title></svelte:head>

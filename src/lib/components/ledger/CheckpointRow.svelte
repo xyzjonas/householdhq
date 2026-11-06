@@ -6,7 +6,7 @@
     $props();
 </script>
 
-<tr class="border-b border-surface-100-900 bg-sky-50/40 last:border-0">
+<tr class="border-b border-surface-100-900 last:border-0">
   <td class="py-3 pr-4 text-xs font-medium whitespace-nowrap">
     <time datetime={checkpoint.created.toISOString()}>
       {formatDate(checkpoint.created)}
