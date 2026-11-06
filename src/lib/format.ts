@@ -16,6 +16,26 @@ export function formatDate(date: Date | string | null): string {
   }).format(new Date(date));
 }
 
+/** "6 Nov 2026, 14:30" */
+export function formatDateTime(date: Date | string | null): string {
+  if (!date) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+}
+
+/** 1234.5 -> "1 234,5"; `unit` is appended when given. */
+export function formatNumber(value: number, unit?: string): string {
+  const text = new Intl.NumberFormat("cs-CZ", {
+    maximumFractionDigits: 2,
+  }).format(value);
+  return unit ? `${text} ${unit}` : text;
+}
+
 /** Like {@link formatDate}, but adds the year when it isn't the current one. */
 export function formatDateWithYear(
   date: Date | string | null,

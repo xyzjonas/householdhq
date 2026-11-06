@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateWithYear, formatMoney } from "./format";
+import {
+  formatDate,
+  formatDateTime,
+  formatDateWithYear,
+  formatMoney,
+  formatNumber,
+} from "./format";
 
 describe("formatMoney", () => {
   it("formats CZK with the Kč symbol", () => {
@@ -18,6 +24,28 @@ describe("formatDate", () => {
 
   it("formats day and month", () => {
     expect(formatDate("2026-11-22T12:00:00Z")).toBe("22 Nov");
+  });
+});
+
+describe("formatDateTime", () => {
+  it("handles missing dates", () => {
+    expect(formatDateTime(null)).toBe("");
+  });
+
+  it("includes the year and the time", () => {
+    const text = formatDateTime(new Date(2026, 10, 6, 14, 30));
+    expect(text).toContain("6 Nov 2026");
+    expect(text).toContain("14:30");
+  });
+});
+
+describe("formatNumber", () => {
+  it("groups digits and appends the unit", () => {
+    expect(formatNumber(12345.5, "km").replace(/\s/g, " ")).toBe("12 345,5 km");
+  });
+
+  it("has no unit by default", () => {
+    expect(formatNumber(7)).toBe("7");
   });
 });
 
