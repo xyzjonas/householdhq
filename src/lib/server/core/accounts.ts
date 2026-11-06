@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { balanceOf as balance } from "./balance";
 import type { Db } from "./prisma";
 import { AccountInput, AccountPatch } from "./schemas";
 import {
@@ -11,38 +12,8 @@ import {
 } from "./types";
 
 export function accountsRepo(db: Db) {
-  /**
-   * Balance = latest recorded state + confirmed transactions since then
-   * (incoming minus outgoing). Same rule the legacy app used.
-   */
-  async function balanceOf(
-    account: Account,
-    asOf: Date = new Date(),
-  ): Promise<number> {
-    const state = await db.sourceState.findFirst({
-      where: { sourceId: account.id, created: { lte: asOf } },
-      orderBy: { created: "desc" },
-    });
-    const since: Prisma.TransactionWhereInput = {
-      cancelled: false,
-      transactedAt: state ? { gte: state.created, lte: asOf } : { lte: asOf },
-    };
-    const [incoming, outgoing] = await Promise.all([
-      db.transaction.aggregate({
-        _sum: { amount: true },
-        where: { ...since, targetId: account.id },
-      }),
-      db.transaction.aggregate({
-        _sum: { amount: true },
-        where: { ...since, sourceId: account.id },
-      }),
-    ]);
-    return (
-      (state?.amount ?? 0) +
-      (incoming._sum.amount ?? 0) -
-      (outgoing._sum.amount ?? 0)
-    );
-  }
+  const balanceOf = (account: Account, asOf?: Date) =>
+    balance(db, account.id, asOf);
 
   const order: Prisma.SourceOrderByWithRelationInput[] = [
     { position: "asc" },

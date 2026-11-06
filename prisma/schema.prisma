@@ -37,6 +37,7 @@ model Category {
   transactions Transaction[]
   vehicle      Vehicle?      @relation("VehicleCategory")
   fuelVehicle  Vehicle?      @relation("VehicleFuelCategory")
+  mankoSetting AppSettings[] @relation("MankoCategory")
 
   @@map("category")
 }
@@ -282,12 +283,16 @@ model VehicleComponent {
 }
 
 model AppSettings {
-  id                     Int      @id @default(1) // Singleton - always ID 1
-  currency               String   @default("USD")
+  id                     Int       @id @default(1) // Singleton - always ID 1
+  currency               String    @default("USD")
   // day of the month on which a fiscal interval (e.g. payday to payday) starts; 1 = calendar month
-  fiscalIntervalStartDay Int      @default(1)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  fiscalIntervalStartDay Int       @default(1)
+  // category of the adjustment transactions created along with account checkpoints
+  mankoCategoryId        Int?
+  mankoCategory          Category? @relation("MankoCategory", fields: [mankoCategoryId], references: [id], onDelete: SetNull)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
+  @@index([mankoCategoryId])
   @@map("app_settings")
 }
