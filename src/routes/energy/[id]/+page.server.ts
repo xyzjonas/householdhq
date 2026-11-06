@@ -6,7 +6,7 @@ import {
   MeterReadingInput,
   NotFoundError,
 } from "#lib/server/core/index.ts";
-import { parseChartMode } from "#lib/energy.ts";
+import { meterStats, monthlyConsumption, parseChartMode } from "#lib/energy.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
 function meterId(params: { id: string }): number {
@@ -21,7 +21,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
     .catch((e: unknown) =>
       e instanceof NotFoundError ? error(404, e.message) : Promise.reject(e),
     );
-  return { meter, mode: parseChartMode(url.searchParams.get("view")) };
+  const now = new Date();
+  return {
+    meter,
+    mode: parseChartMode(url.searchParams.get("view")),
+    months: monthlyConsumption(meter.readings, now),
+    stats: meterStats(meter.readings, now),
+  };
 };
 
 export const actions: Actions = {

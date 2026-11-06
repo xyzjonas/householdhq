@@ -10,15 +10,16 @@ export interface SeriesPoint {
   value: number;
 }
 
-export type ChartMode = "increments" | "readings";
+export type ChartMode = "monthly" | "yoy" | "readings";
 
 export const chartModes: { id: ChartMode; label: string }[] = [
-  { id: "increments", label: "Consumption" },
+  { id: "monthly", label: "Monthly" },
+  { id: "yoy", label: "Year over year" },
   { id: "readings", label: "Readings" },
 ];
 
 export function parseChartMode(value: string | null): ChartMode {
-  return value === "readings" ? "readings" : "increments";
+  return value === "yoy" || value === "readings" ? value : "monthly";
 }
 
 const number = new Intl.NumberFormat("cs-CZ", { maximumFractionDigits: 2 });
@@ -39,18 +40,134 @@ export function readingSeries(readings: ReadingLike[]): SeriesPoint[] {
 }
 
 /**
- * What was consumed between consecutive readings, oldest first, dated at the
- * later reading. A reading below its predecessor is a meter reset or swap and
- * says nothing about consumption, so it is skipped.
+ * Consumption between `from` and `to`, assuming the counter advanced evenly
+ * between two consecutive readings. This is what makes irregularly spaced
+ * readings comparable: a month's figure is cut out of the segments it overlaps.
+ *
+ * `null` when the readings don't cover the whole range, or when it overlaps a
+ * segment where the counter went down (meter swap/reset: unknown consumption).
  */
-export function incrementSeries(readings: ReadingLike[]): SeriesPoint[] {
+export function consumedBetween(
+  readings: ReadingLike[],
+  from: Date,
+  to: Date,
+): number | null {
   const sorted = chronological(readings);
-  const points: SeriesPoint[] = [];
-  for (let i = 1; i < sorted.length; i++) {
-    const value = sorted[i].value - sorted[i - 1].value;
-    if (value >= 0) points.push({ at: sorted[i].at, value });
+  if (sorted.length < 2 || to <= from) return null;
+  const start = from.getTime();
+  const end = to.getTime();
+  if (start < sorted[0].at.getTime()) return null;
+  if (end > sorted[sorted.length - 1].at.getTime()) return null;
+
+  let total = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const t0 = sorted[i].at.getTime();
+    const t1 = sorted[i + 1].at.getTime();
+    const overlap = Math.min(end, t1) - Math.max(start, t0);
+    if (overlap <= 0 || t1 === t0) continue;
+    const delta = sorted[i + 1].value - sorted[i].value;
+    if (delta < 0) return null;
+    total += (delta * overlap) / (t1 - t0);
   }
-  return points;
+  return total;
+}
+
+export interface MonthStat {
+  monthStart: Date;
+  /** `null` when it can't be told from the readings. */
+  consumption: number | null;
+  /** The readings end inside the month; only the part up to them counts. */
+  partial: boolean;
+}
+
+const startOfMonth = (d: Date, offset = 0) =>
+  new Date(d.getFullYear(), d.getMonth() + offset, 1);
+
+/** Consumption of every calendar month from the first reading up to `now`. */
+export function monthlyConsumption(
+  readings: ReadingLike[],
+  now: Date = new Date(),
+): MonthStat[] {
+  const sorted = chronological(readings);
+  if (sorted.length < 2) return [];
+  const last = sorted[sorted.length - 1].at;
+  const months: MonthStat[] = [];
+  for (
+    let monthStart = startOfMonth(sorted[0].at);
+    monthStart <= now;
+    monthStart = startOfMonth(monthStart, 1)
+  ) {
+    const monthEnd = startOfMonth(monthStart, 1);
+    const partial = last > monthStart && last < monthEnd;
+    months.push({
+      monthStart,
+      consumption: consumedBetween(
+        readings,
+        monthStart,
+        partial ? last : monthEnd,
+      ),
+      partial,
+    });
+  }
+  return months;
+}
+
+export const monthKey = (d: Date) => d.getFullYear() * 12 + d.getMonth();
+
+export interface MeterStats {
+  /** The calendar month before `now`. */
+  lastMonth: MonthStat | null;
+  lastMonthPerDay: number | null;
+  /** The same month a year before {@link lastMonth}. */
+  sameMonthLastYear: MonthStat | null;
+  /** Last month vs. the same month a year earlier, as a fraction. */
+  yearOverYear: number | null;
+  /** The (up to) 12 complete months before the current one. */
+  year: { total: number; average: number; months: number } | null;
+}
+
+export function meterStats(
+  readings: ReadingLike[],
+  now: Date = new Date(),
+): MeterStats {
+  const months = monthlyConsumption(readings, now);
+  const byKey = new Map(months.map((m) => [monthKey(m.monthStart), m]));
+  const lastStart = startOfMonth(now, -1);
+  const lastMonth = byKey.get(monthKey(lastStart)) ?? null;
+  const sameMonthLastYear =
+    byKey.get(monthKey(startOfMonth(lastStart, -12))) ?? null;
+
+  const days = new Date(
+    lastStart.getFullYear(),
+    lastStart.getMonth() + 1,
+    0,
+  ).getDate();
+  const current = lastMonth?.consumption ?? null;
+  const previous = sameMonthLastYear?.consumption ?? null;
+
+  const window = months
+    .filter(
+      (m) =>
+        !m.partial &&
+        m.consumption !== null &&
+        monthKey(m.monthStart) >= monthKey(lastStart) - 11 &&
+        monthKey(m.monthStart) <= monthKey(lastStart),
+    )
+    .map((m) => m.consumption as number);
+  const total = window.reduce((sum, v) => sum + v, 0);
+
+  return {
+    lastMonth,
+    lastMonthPerDay: current === null ? null : current / days,
+    sameMonthLastYear,
+    yearOverYear:
+      current !== null && previous !== null && previous > 0
+        ? current / previous - 1
+        : null,
+    year: window.length
+      ? { total, average: total / window.length, months: window.length }
+      : null,
+  };
 }
 
 /** Consumption since the previous reading, per reading id (newest first in, any order out). */

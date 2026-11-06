@@ -25,10 +25,14 @@ test.describe("energy", () => {
       await expect(page.getByText("Reading added").first()).toBeVisible();
     }
     await expect(page.getByText("130,5 kWh").first()).toBeVisible();
-    await expect(page.getByRole("img", { name: /^Consumption/ })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Monthly consumption" }),
+    ).toBeVisible();
+    await expect(page.getByText("Latest reading")).toBeVisible();
 
     await page.getByRole("link", { name: "Readings", exact: true }).click();
     await expect(page).toHaveURL(/view=readings/);
+    await expect(page.getByRole("img", { name: /^Readings/ })).toBeVisible();
 
     await page
       .getByRole("button", { name: /^Delete reading from/ })

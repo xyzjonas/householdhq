@@ -2,22 +2,17 @@
   import { resolve } from "$app/paths";
   import EnergyChart from "#lib/components/energy/EnergyChart.svelte";
   import MeterDialog from "#lib/components/energy/MeterDialog.svelte";
+  import MeterStats from "#lib/components/energy/MeterStats.svelte";
   import MeterGlyph from "#lib/components/energy/MeterGlyph.svelte";
   import ReadingDialog from "#lib/components/energy/ReadingDialog.svelte";
   import ReadingsTimeline from "#lib/components/energy/ReadingsTimeline.svelte";
-  import { formatReading } from "#lib/energy.ts";
   import { meterFallbackColor } from "#lib/meter-icons.ts";
   import type { PageProps } from "./$types";
 
   let { data, form }: PageProps = $props();
 
   const meter = $derived(data.meter);
-  const latest = $derived(meter.readings[0]);
   const color = $derived(meter.color ?? meterFallbackColor);
-  const updated = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
 </script>
 
 <svelte:head><title>{meter.name} · Household HQ</title></svelte:head>
@@ -57,50 +52,16 @@
     </div>
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-2">
-    <section
-      aria-labelledby="latest-heading"
-      class="flex flex-col justify-between gap-6 card border border-surface-200-800 p-6"
-    >
-      <div class="flex flex-col gap-2">
-        <h2
-          id="latest-heading"
-          class="text-xs font-bold tracking-wider uppercase opacity-60"
-        >
-          Latest reading
-        </h2>
-        <p class="text-4xl font-extrabold tracking-tight">
-          {latest ? formatReading(latest.value, meter.unit) : "—"}
-        </p>
-      </div>
-      <dl
-        class="grid grid-cols-2 gap-3 border-t border-surface-200-800 pt-4 text-sm"
-      >
-        <div class="flex flex-col gap-1">
-          <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-            Last updated
-          </dt>
-          <dd class="font-bold">
-            {latest ? updated.format(latest.meteredAt) : "—"}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-            Readings
-          </dt>
-          <dd class="font-bold">{meter.readings.length}</dd>
-        </div>
-      </dl>
-    </section>
+  <MeterStats latest={meter.readings[0]} stats={data.stats} unit={meter.unit} />
 
-    <EnergyChart
-      readings={meter.readings}
-      unit={meter.unit}
-      {color}
-      mode={data.mode}
-      meterId={meter.id}
-    />
-  </div>
+  <EnergyChart
+    readings={meter.readings}
+    months={data.months}
+    unit={meter.unit}
+    {color}
+    mode={data.mode}
+    meterId={meter.id}
+  />
 
   <section
     aria-labelledby="readings-heading"

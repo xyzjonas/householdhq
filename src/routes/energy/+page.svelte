@@ -27,20 +27,20 @@
     <MeterDialog message={form?.message} />
   </header>
 
-  <section
+  <ul
     aria-label="Meters"
-    class="flex flex-col gap-1 card border border-surface-200-800 p-3"
+    class="flex flex-col overflow-hidden card border border-surface-200-800"
   >
     {#each data.meters as meter (meter.id)}
       <MeterRow {meter} />
     {:else}
-      <div class="flex flex-col items-center gap-2 p-10 text-center">
+      <li class="flex flex-col items-center gap-2 p-10 text-center">
         <Gauge size={32} class="opacity-40" aria-hidden="true" />
         <h2 class="text-lg font-bold">No meters yet</h2>
         <p class="text-sm text-surface-600-400">
           Add your first meter to start tracking readings.
         </p>
-      </div>
+      </li>
     {/each}
-  </section>
+  </ul>
 </div>
