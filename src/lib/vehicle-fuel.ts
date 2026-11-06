@@ -127,3 +127,56 @@ export function priceBounds(values: number[]): { min: number; max: number } {
       : Math.max((high - low) * 0.12, 0.15);
   return { min: Math.max(low - padding, 0), max: high + padding };
 }
+
+export interface YearFill extends FuelPoint {
+  fuelAmount: number;
+}
+
+export interface YearSummary {
+  year: number;
+  fillUps: number;
+  /** Fuel bought so far this year. */
+  spent: number;
+  /** `spent` spread over the months elapsed, the current one included. */
+  monthlyAverage: number;
+  /** Kilometres between the last fill-up before the year (else its first) and the latest. */
+  distance: number;
+  /** Fuel cost per kilometre driven; null while no distance is known. */
+  costPerKm: number | null;
+}
+
+/**
+ * Fuel spending of the calendar year of `now`, up to `now`. A fill-up pays
+ * for the distance since the one before it, so the per-km cost leaves out the
+ * fill-up the distance is measured from.
+ */
+export function yearSummary(
+  entries: YearFill[],
+  now = new Date(),
+): YearSummary {
+  const year = now.getFullYear();
+  const sorted = chronological(entries);
+  const yearStart = new Date(year, 0, 1).getTime();
+  const inYear = sorted.filter(
+    (e) => time(e) >= yearStart && time(e) <= now.getTime(),
+  );
+  const cost = (list: YearFill[]) =>
+    list.reduce((sum, e) => sum + e.fuelAmount * e.unitPrice, 0);
+
+  const spent = cost(inYear);
+  const before = sorted.filter((e) => time(e) < yearStart).at(-1);
+  const baseline = before ?? inYear[0];
+  const latest = inYear.at(-1);
+  const distance =
+    baseline && latest ? Math.max(latest.odometer - baseline.odometer, 0) : 0;
+  const paying = inYear.filter((e) => e !== baseline);
+
+  return {
+    year,
+    fillUps: inYear.length,
+    spent,
+    monthlyAverage: spent / (now.getMonth() + 1),
+    distance,
+    costPerKm: distance > 0 ? cost(paying) / distance : null,
+  };
+}

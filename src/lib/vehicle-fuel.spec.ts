@@ -8,6 +8,7 @@ import {
   odometerGrowth,
   priceBounds,
   unitPrices,
+  yearSummary,
   type FuelPoint,
 } from "./vehicle-fuel";
 
@@ -153,5 +154,51 @@ describe("priceBounds", () => {
     const flat = priceBounds([40, 40]);
     expect(flat.max).toBeGreaterThan(flat.min);
     expect(priceBounds([0.1, 0.1]).min).toBe(0);
+  });
+});
+
+describe("yearSummary", () => {
+  const now = new Date(2026, 3, 15); // April: four months elapsed
+  const f = (at: Date, odometer: number, fuelAmount: number) => ({
+    fueledAt: at,
+    odometer,
+    fuelAmount,
+    unitPrice: 40,
+  });
+
+  it("sums this year's fuel and spreads it over the elapsed months", () => {
+    const s = yearSummary(
+      [
+        f(new Date(2025, 11, 20), 1000, 50), // last year: the baseline
+        f(new Date(2026, 0, 10), 1500, 40),
+        f(new Date(2026, 2, 10), 2000, 30),
+        f(new Date(2026, 5, 1), 9999, 99), // still to come
+      ],
+      now,
+    );
+    expect(s.fillUps).toBe(2);
+    expect(s.spent).toBe(2800);
+    expect(s.monthlyAverage).toBe(700);
+    expect(s.distance).toBe(1000);
+    // Both fill-ups paid for distance driven after the baseline.
+    expect(s.costPerKm).toBe(2.8);
+  });
+
+  it("measures from the first fill-up when none precedes the year", () => {
+    const s = yearSummary(
+      [f(new Date(2026, 0, 10), 1000, 40), f(new Date(2026, 1, 10), 1500, 25)],
+      now,
+    );
+    expect(s.distance).toBe(500);
+    // The first fill-up's fuel was burnt before the baseline reading.
+    expect(s.costPerKm).toBe(2);
+  });
+
+  it("has no cost per km without a distance", () => {
+    expect(
+      yearSummary([f(new Date(2026, 1, 1), 1000, 40)], now).costPerKm,
+    ).toBe(null);
+    const empty = yearSummary([], now);
+    expect(empty).toMatchObject({ fillUps: 0, spent: 0, costPerKm: null });
   });
 });

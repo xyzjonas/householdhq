@@ -1,15 +1,15 @@
 <script lang="ts">
   import { formatMoney, formatNumber } from "#lib/format.ts";
-  import { averageUnitPrice, odometerGrowth } from "#lib/vehicle-fuel.ts";
-  import type { FuelEntry } from "#lib/server/core/types.ts";
+  import { yearSummary, type YearFill } from "#lib/vehicle-fuel.ts";
 
-  let { entries, currency }: { entries: FuelEntry[]; currency: string } =
+  let { entries, currency }: { entries: YearFill[]; currency: string } =
     $props();
 
-  const spent = $derived(
-    entries.reduce((sum, e) => sum + e.transaction.amount, 0),
-  );
-  const litres = $derived(entries.reduce((sum, e) => sum + e.fuelAmount, 0));
+  const summary = $derived(yearSummary(entries));
+  const perKm = new Intl.NumberFormat("cs-CZ", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 </script>
 
 <section
@@ -21,14 +21,14 @@
       id="fuel-summary-heading"
       class="text-xs font-bold tracking-wider uppercase opacity-60"
     >
-      Total spent on fuel
+      Spent on fuel in {summary.year}
     </h2>
     <p class="text-4xl font-extrabold tracking-tight">
-      {formatMoney(spent, currency)}
+      {formatMoney(summary.spent, currency)}
     </p>
     <p class="text-sm text-surface-600-400">
-      {entries.length}
-      {entries.length === 1 ? "fill-up" : "fill-ups"} recorded
+      So far this year · {summary.fillUps}
+      {summary.fillUps === 1 ? "fill-up" : "fill-ups"}
     </p>
   </div>
 
@@ -37,23 +37,25 @@
   >
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Distance
-      </dt>
-      <dd class="font-bold">{formatNumber(odometerGrowth(entries), "km")}</dd>
-    </div>
-    <div class="flex flex-col gap-1">
-      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Fuel
-      </dt>
-      <dd class="font-bold">{formatNumber(litres, "L")}</dd>
-    </div>
-    <div class="flex flex-col gap-1">
-      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Average price
+        Monthly average
       </dt>
       <dd class="font-bold">
-        {formatNumber(averageUnitPrice(entries))}
-        {currency} / L
+        {formatMoney(summary.monthlyAverage, currency)}
+      </dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
+        Average price per km
+      </dt>
+      <dd class="font-bold">
+        {summary.costPerKm === null
+          ? "—"
+          : `${perKm.format(summary.costPerKm)} ${currency} / km`}
+        <span class="block text-xs font-medium opacity-60">
+          {summary.distance > 0
+            ? `Over ${formatNumber(summary.distance, "km")} driven`
+            : "Needs two fill-ups"}
+        </span>
       </dd>
     </div>
   </dl>
