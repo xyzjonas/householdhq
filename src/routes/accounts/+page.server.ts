@@ -4,9 +4,9 @@ import { getCore } from "#lib/server/index.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-  const accounts = await getCore().accounts.listWithBalances();
-  // "Out" accounts are external (expenses etc.), not part of the household.
-  return { accounts: accounts.filter((a) => !a.isOut) };
+  // "Out" accounts are external (expenses etc.); the view lists them in their
+  // own section and keeps them out of the household totals.
+  return { accounts: await getCore().accounts.listWithBalances() };
 };
 
 export const actions: Actions = {

@@ -52,6 +52,32 @@ describe("buildPillars", () => {
   });
 });
 
+describe("external accounts", () => {
+  const withOut = [
+    ...accounts,
+    { ...acc("Groceries", "ACCOUNT", -900, 9), isOut: true },
+  ];
+
+  it("lists them in their own section, not under their type", () => {
+    const sections = buildSections(withOut, {
+      tab: "all",
+      sort: "position",
+      query: "",
+    });
+    const out = sections.find((s) => s.group.type === "OUT");
+    expect(out?.accounts.map((a) => a.name)).toEqual(["Groceries"]);
+    expect(
+      sections.find((s) => s.group.type === "ACCOUNT")?.accounts,
+    ).toHaveLength(1);
+    expect(countForTab(withOut, "external")).toBe(1);
+  });
+
+  it("keeps them out of pillars and net worth", () => {
+    expect(buildPillars(withOut)).toEqual(buildPillars(accounts));
+    expect(netWorthOf(withOut)).toBe(netWorthOf(accounts));
+  });
+});
+
 describe("tabs", () => {
   it("counts accounts per tab", () => {
     expect(countForTab(accounts, "all")).toBe(7);
