@@ -138,6 +138,22 @@
             .join(", ")}`,
   );
 
+  const figures = $derived.by(() => {
+    if (mode === "readings") {
+      return [
+        ["Min", series.length ? Math.min(...values) : null],
+        ["Latest", series.length ? values[values.length - 1] : null],
+        ["Peak", series.length ? peak : null],
+      ] as const;
+    }
+    const current = window.map((m) => m.consumption).filter((v) => v !== null);
+    return [
+      ["Total", current.length ? current.reduce((a, b) => a + b, 0) : null],
+      ["Highest month", current.length ? Math.max(...current) : null],
+      ["Latest", current.length ? current[current.length - 1] : null],
+    ] as const;
+  });
+
   const heading = {
     monthly: "Monthly consumption",
     yoy: "Year over year",
@@ -266,6 +282,18 @@
         </span>
       </p>
     {/if}
+    <dl class="grid grid-cols-3 gap-3 text-xs">
+      {#each figures as [label, value] (label)}
+        <div>
+          <dt class="font-bold tracking-wider uppercase opacity-60">
+            {label}
+          </dt>
+          <dd class="text-sm font-bold">
+            {value === null ? "—" : formatReading(value, unit)}
+          </dd>
+        </div>
+      {/each}
+    </dl>
   {:else}
     <p class="text-sm opacity-70">{emptyText}</p>
   {/if}

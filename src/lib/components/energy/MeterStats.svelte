@@ -38,80 +38,98 @@
 </script>
 
 <section
-  aria-label="Consumption summary"
-  class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+  aria-labelledby="latest-heading"
+  class="flex flex-col justify-between gap-6 card border border-surface-200-800 p-6"
 >
-  <article class="flex flex-col gap-2 card border border-surface-200-800 p-5">
-    <h2 class="text-xs font-bold tracking-wider uppercase opacity-60">
+  <div class="flex flex-col gap-2">
+    <h2
+      id="latest-heading"
+      class="text-xs font-bold tracking-wider uppercase opacity-60"
+    >
       Latest reading
     </h2>
-    <p class="text-2xl font-extrabold tracking-tight">
+    <p class="text-4xl font-extrabold tracking-tight">
       {latest ? formatReading(latest.value, unit) : "—"}
     </p>
-    <p class="text-xs text-surface-600-400">
-      {latest ? updated.format(latest.meteredAt) : "No readings yet"}
+    <p class="text-sm text-surface-600-400">
+      {latest ? `Read ${updated.format(latest.meteredAt)}` : "No readings yet"}
     </p>
-  </article>
-
-  <article class="flex flex-col gap-2 card border border-surface-200-800 p-5">
-    <h2 class="text-xs font-bold tracking-wider uppercase opacity-60">
-      Last month
-    </h2>
-    <p class="text-2xl font-extrabold tracking-tight">
-      {lastConsumption === null ? "—" : formatReading(lastConsumption, unit)}
-    </p>
-    <p class="text-xs text-surface-600-400">
-      {#if stats.lastMonth && stats.lastMonthPerDay !== null}
-        {monthFmt.format(stats.lastMonth.monthStart)} · {formatReading(
-          stats.lastMonthPerDay,
-          unit,
-        )}/day{stats.lastMonth.partial ? " · so far" : ""}
-      {:else}
-        Needs readings around both ends of the month
-      {/if}
-    </p>
-  </article>
-
-  <article class="flex flex-col gap-2 card border border-surface-200-800 p-5">
-    <h2 class="text-xs font-bold tracking-wider uppercase opacity-60">
-      Same month last year
-    </h2>
-    <p class="text-2xl font-extrabold tracking-tight">
-      {previousConsumption === null
-        ? "—"
-        : formatReading(previousConsumption, unit)}
-    </p>
-    <p class="text-xs">
-      {#if yoy !== null}
+    {#if yoy !== null}
+      <p>
         <span
-          class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-bold {up
+          class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold {up
             ? 'border-red-100 bg-red-50 text-red-700'
             : 'border-emerald-100 bg-emerald-50 text-emerald-700'}"
         >
           <Trend size={14} aria-hidden="true" />
-          {yoy > 0 ? "+" : ""}{percent.format(yoy)} this year
+          {yoy > 0 ? "+" : ""}{percent.format(yoy)} vs same month last year
         </span>
-      {:else}
-        <span class="text-surface-600-400">No year-ago month to compare</span>
-      {/if}
-    </p>
-  </article>
+      </p>
+    {/if}
+  </div>
 
-  <article class="flex flex-col gap-2 card border border-surface-200-800 p-5">
-    <h2 class="text-xs font-bold tracking-wider uppercase opacity-60">
-      Last 12 months
-    </h2>
-    <p class="text-2xl font-extrabold tracking-tight">
-      {stats.year ? formatReading(stats.year.total, unit) : "—"}
-    </p>
-    <p class="text-xs text-surface-600-400">
-      {#if stats.year}
-        {formatReading(stats.year.average, unit)}/month avg · {stats.year
-          .months}
-        {stats.year.months === 1 ? "month" : "months"} counted
-      {:else}
-        No complete month yet
-      {/if}
-    </p>
-  </article>
+  <dl
+    class="grid grid-cols-2 gap-3 border-t border-surface-200-800 pt-4 text-sm"
+  >
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
+        Last month
+      </dt>
+      <dd class="font-bold">
+        {lastConsumption === null ? "—" : formatReading(lastConsumption, unit)}
+        <span class="block text-xs font-medium opacity-60">
+          {#if stats.lastMonth && stats.lastMonthPerDay !== null}
+            {monthFmt.format(stats.lastMonth.monthStart)} · {formatReading(
+              stats.lastMonthPerDay,
+              unit,
+            )}/day{stats.lastMonth.partial ? " · so far" : ""}
+          {:else}
+            Needs readings around the month
+          {/if}
+        </span>
+      </dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
+        Same month last year
+      </dt>
+      <dd class="font-bold">
+        {previousConsumption === null
+          ? "—"
+          : formatReading(previousConsumption, unit)}
+        <span class="block text-xs font-medium opacity-60">
+          {stats.sameMonthLastYear
+            ? monthFmt.format(stats.sameMonthLastYear.monthStart)
+            : "No year-ago month yet"}
+        </span>
+      </dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
+        Last 12 months
+      </dt>
+      <dd class="font-bold">
+        {stats.year ? formatReading(stats.year.total, unit) : "—"}
+        <span class="block text-xs font-medium opacity-60">
+          {#if stats.year}
+            {stats.year.months}
+            {stats.year.months === 1 ? "complete month" : "complete months"}
+          {:else}
+            No complete month yet
+          {/if}
+        </span>
+      </dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
+        Monthly average
+      </dt>
+      <dd class="font-bold">
+        {stats.year ? formatReading(stats.year.average, unit) : "—"}
+        <span class="block text-xs font-medium opacity-60">
+          Over the same months
+        </span>
+      </dd>
+    </div>
+  </dl>
 </section>

@@ -52,16 +52,21 @@
     </div>
   </header>
 
-  <MeterStats latest={meter.readings[0]} stats={data.stats} unit={meter.unit} />
-
-  <EnergyChart
-    readings={meter.readings}
-    months={data.months}
-    unit={meter.unit}
-    {color}
-    mode={data.mode}
-    meterId={meter.id}
-  />
+  <div class="grid gap-6 lg:grid-cols-2">
+    <MeterStats
+      latest={meter.readings[0]}
+      stats={data.stats}
+      unit={meter.unit}
+    />
+    <EnergyChart
+      readings={meter.readings}
+      months={data.months}
+      unit={meter.unit}
+      {color}
+      mode={data.mode}
+      meterId={meter.id}
+    />
+  </div>
 
   <section
     aria-labelledby="readings-heading"
