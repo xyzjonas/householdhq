@@ -133,9 +133,12 @@ describe.skipIf(!core)("core layer", () => {
     categories: [] as number[],
     transactions: [] as number[],
     users: [] as number[],
+    vehicles: [] as number[],
   };
 
   afterAll(async () => {
+    // Vehicles first: they own transactions that cannot be removed alone.
+    for (const id of ids.vehicles) await c.vehicles.remove(id).catch(() => {});
     for (const id of ids.transactions)
       await c.transactions.remove(id).catch(() => {});
     for (const id of ids.accounts) await c.accounts.remove(id).catch(() => {});
@@ -565,6 +568,236 @@ describe.skipIf(!core)("core layer", () => {
 
     it("validates input", async () => {
       await expect(c.categories.create({ name: "  " })).rejects.toThrow();
+    });
+  });
+
+  describe("vehicles", () => {
+    /** A vehicle whose fuel and service costs are filed in their own categories. */
+    async function setup(suffix: string) {
+      const bank = await c.accounts.create({
+        name: `${run}-${suffix}-bank`,
+        isDisponible: true,
+      });
+      const out = await c.accounts.create({
+        name: `${run}-${suffix}-out`,
+        type: "OUT",
+        isOut: true,
+      });
+      const fuelCategory = await c.categories.create({
+        name: `${run}-${suffix}-fuel`,
+      });
+      const category = await c.categories.create({
+        name: `${run}-${suffix}-service`,
+      });
+      ids.accounts.push(bank.id, out.id);
+      ids.categories.push(fuelCategory.id, category.id);
+      const vehicle = await c.vehicles.create({
+        name: `${run} ${suffix}`,
+        brand: "Skoda",
+        model: "Octavia",
+        vin: `${run}-${suffix}-vin`,
+        registration: `${run}-${suffix}`,
+        fuelCategoryId: fuelCategory.id,
+        categoryId: category.id,
+      });
+      ids.vehicles.push(vehicle.id);
+      return { vehicle, fuelCategory, category };
+    }
+
+    it("creates, updates and rejects duplicate VIN or registration", async () => {
+      const { vehicle } = await setup("crud");
+      expect(vehicle.defaultFuelTransactionTitle).toBe("Fuel");
+
+      const renamed = await c.vehicles.update(vehicle.id, {
+        name: "Renamed",
+        mass: 1350,
+        purchasedAt: null,
+      });
+      expect(renamed).toMatchObject({ name: "Renamed", mass: 1350 });
+      expect(renamed.vin).toBe(vehicle.vin);
+
+      await expect(
+        c.vehicles.create({
+          name: "Copy",
+          brand: "Skoda",
+          model: "Octavia",
+          vin: vehicle.vin,
+          registration: `${run}-other`,
+        }),
+      ).rejects.toBeInstanceOf(ConflictError);
+      await expect(c.vehicles.get(2_000_000_000)).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
+      await expect(
+        c.vehicles.update(vehicle.id, { vin: "" }),
+      ).rejects.toThrow();
+    });
+
+    it("records fill-ups with their transaction and links full tanks", async () => {
+      const { vehicle, fuelCategory } = await setup("fuel");
+      const day = (d: number) => new Date(Date.UTC(2026, 0, d, 12));
+
+      const first = await c.vehicles.fuel.create(vehicle.id, {
+        fueledAt: day(1),
+        odometer: 1000,
+        fuelAmount: 40,
+        unitPrice: 38.5,
+      });
+      expect(first.transaction.amount).toBe(1540);
+      expect(first.transaction.description).toBe("Fuel");
+      expect(first.previousFullTankFuelEntryId).toBeNull();
+
+      const tx = await c.transactions.get(first.transactionId);
+      expect(tx.category?.id).toBe(fuelCategory.id);
+      expect(tx.confirmed).toBe(true);
+
+      const partial = await c.vehicles.fuel.create(vehicle.id, {
+        fueledAt: day(5),
+        odometer: 1300,
+        fuelAmount: 10,
+        unitPrice: 40,
+        isFullTank: false,
+      });
+      const third = await c.vehicles.fuel.create(vehicle.id, {
+        fueledAt: day(10),
+        odometer: 1600,
+        fuelAmount: 35,
+        unitPrice: 41,
+      });
+      // The partial fill-up is no full tank, so the third follows the first.
+      expect(partial.previousFullTankFuelEntryId).toBe(first.id);
+      expect(third.previousFullTankFuelEntryId).toBe(first.id);
+
+      // A fill-up cannot be measured against a newer or a partial one.
+      await expect(
+        c.vehicles.fuel.update(vehicle.id, first.id, {
+          previousFullTankFuelEntryId: third.id,
+        }),
+      ).rejects.toBeInstanceOf(ConflictError);
+      await expect(
+        c.vehicles.fuel.update(vehicle.id, third.id, {
+          previousFullTankFuelEntryId: partial.id,
+        }),
+      ).rejects.toBeInstanceOf(ConflictError);
+
+      // Editing the cost updates the transaction too.
+      const edited = await c.vehicles.fuel.update(vehicle.id, third.id, {
+        fuelAmount: 30,
+        unitPrice: 40,
+      });
+      expect(edited.transaction.amount).toBe(1200);
+      expect(edited.previousFullTankFuelEntryId).toBe(first.id);
+
+      // The transaction belongs to the entry.
+      await expect(
+        c.transactions.remove(first.transactionId),
+      ).rejects.toBeInstanceOf(ConflictError);
+
+      // Deleting a fill-up re-points the ones measured against it.
+      const second = await c.vehicles.fuel.create(vehicle.id, {
+        fueledAt: day(12),
+        odometer: 1900,
+        fuelAmount: 30,
+        unitPrice: 40,
+      });
+      expect(second.previousFullTankFuelEntryId).toBe(third.id);
+      await c.vehicles.fuel.remove(vehicle.id, third.id);
+      const left = await c.vehicles.fuel.list(vehicle.id);
+      expect(left.map((e) => e.id)).toEqual([second.id, partial.id, first.id]);
+      expect(left[0].previousFullTankFuelEntryId).toBe(first.id);
+      await expect(
+        c.transactions.get(third.transactionId),
+      ).rejects.toBeInstanceOf(NotFoundError);
+    });
+
+    it("records services with components and keeps the transaction in step", async () => {
+      const { vehicle, category } = await setup("service");
+      const component = await c.vehicles.components.create({
+        name: `${run}-brakes`,
+        color: "#ef4444",
+      });
+      await expect(
+        c.vehicles.components.create({ name: `${run}-brakes` }),
+      ).rejects.toBeInstanceOf(ConflictError);
+
+      const service = await c.vehicles.service.create(vehicle.id, {
+        type: "REGULAR_MAINTENANCE",
+        title: "Brake pads",
+        servicedAt: new Date(Date.UTC(2026, 0, 3, 9)),
+        odometer: 5000,
+        price: 3200,
+        componentIds: [component.id],
+      });
+      expect(service.transaction).toMatchObject({
+        amount: 3200,
+        description: "Service: Brake pads",
+      });
+      expect(service.components.map((x) => x.id)).toEqual([component.id]);
+      const tx = await c.transactions.get(service.transactionId);
+      expect(tx.category?.id).toBe(category.id);
+
+      const edited = await c.vehicles.service.update(vehicle.id, service.id, {
+        title: "Brake discs",
+        price: 4100,
+        componentIds: [],
+      });
+      expect(edited.components).toEqual([]);
+      expect(edited.transaction).toMatchObject({
+        amount: 4100,
+        description: "Service: Brake discs",
+      });
+
+      await c.vehicles.service.remove(vehicle.id, service.id);
+      expect(await c.vehicles.service.list(vehicle.id)).toEqual([]);
+      await expect(
+        c.transactions.get(service.transactionId),
+      ).rejects.toBeInstanceOf(NotFoundError);
+
+      await c.vehicles.components.remove(component.id);
+      expect(
+        (await c.vehicles.components.list()).some((x) => x.id === component.id),
+      ).toBe(false);
+    });
+
+    it("deleting a vehicle removes its entries and their transactions", async () => {
+      const { vehicle } = await setup("remove");
+      const fill = await c.vehicles.fuel.create(vehicle.id, {
+        fueledAt: new Date(Date.UTC(2026, 0, 1)),
+        odometer: 100,
+        fuelAmount: 10,
+        unitPrice: 40,
+      });
+      const next = await c.vehicles.fuel.create(vehicle.id, {
+        fueledAt: new Date(Date.UTC(2026, 0, 2)),
+        odometer: 500,
+        fuelAmount: 20,
+        unitPrice: 40,
+      });
+      expect(next.previousFullTankFuelEntryId).toBe(fill.id);
+      const service = await c.vehicles.service.create(vehicle.id, {
+        type: "FEES",
+        title: "Highway sticker",
+        servicedAt: new Date(Date.UTC(2026, 0, 3)),
+        price: 1500,
+      });
+
+      await c.vehicles.remove(vehicle.id);
+
+      await expect(c.vehicles.get(vehicle.id)).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
+      for (const id of [
+        fill.transactionId,
+        next.transactionId,
+        service.transactionId,
+      ]) {
+        await expect(c.transactions.get(id)).rejects.toBeInstanceOf(
+          NotFoundError,
+        );
+      }
+      await expect(c.vehicles.remove(vehicle.id)).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
     });
   });
 });
