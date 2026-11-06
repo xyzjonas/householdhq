@@ -147,6 +147,10 @@ export const SettingsInput = z.object({
     .number()
     .int("Please choose a category")
     .positive("Please choose a category"),
+  defaultOutAccountId: z.coerce
+    .number()
+    .int("Please choose an account")
+    .positive("Please choose an account"),
 });
 export type SettingsInput = z.input<typeof SettingsInput>;
 export const SettingsPatch = SettingsInput.partial();

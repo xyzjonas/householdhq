@@ -151,8 +151,10 @@
             <dd class={account ? "font-semibold" : "placeholder-text"}>
               {account ?? "Not chosen"}
             </dd>
-            {#if type === "TRANSFER"}
-              <dt class="text-surface-600-400">To</dt>
+            {#if type !== "INCOME"}
+              <dt class="text-surface-600-400">
+                {type === "TRANSFER" ? "To" : "Paid to"}
+              </dt>
               <dd class={targetName ? "font-semibold" : "placeholder-text"}>
                 {targetName ?? "Not chosen"}
               </dd>

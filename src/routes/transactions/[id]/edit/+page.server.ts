@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ params }) => {
       categoryId: tx.categoryId,
       // The wizard's "account" is the owned side of the transaction.
       accountId: tx.source.isOut ? tx.targetId : tx.sourceId,
-      targetId: type === "TRANSFER" ? tx.targetId : null,
+      targetId: type === "INCOME" ? null : tx.targetId,
       description: tx.description === "N/A" ? "" : tx.description,
       transactedAt: (tx.transactedAt ?? tx.created).toISOString(),
       recurring: tx.recurring > 0,

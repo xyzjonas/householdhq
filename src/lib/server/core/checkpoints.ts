@@ -1,5 +1,4 @@
 import { balanceOf, roundMoney } from "./balance";
-import { DEFAULT_EXPENSE_ACCOUNT } from "./bootstrap";
 import type { Db } from "./prisma";
 import { CheckpointInput } from "./schemas";
 import type { settingsRepo } from "./settings";
@@ -65,7 +64,8 @@ export function checkpointsRepo(
         CheckpointInput.parse(input);
       const amount = roundMoney(rawAmount);
       await requireAccount(accountId);
-      const { currency, mankoCategoryId } = await settings.get();
+      const { currency, mankoCategoryId, defaultOutAccountId } =
+        await settings.get();
 
       return db.$transaction(async (tx) => {
         const difference = roundMoney(
@@ -74,12 +74,14 @@ export function checkpointsRepo(
 
         let adjustment: TransactionWithRelations | null = null;
         if (difference !== 0) {
-          // Money the books can't explain comes from / goes to an external account.
+          // Money the books can't explain comes from / goes to the default
+          // out account (any external account if that one is gone).
           const external =
-            (await tx.source.findFirst({
-              where: { isOut: true, name: DEFAULT_EXPENSE_ACCOUNT },
-              orderBy: { id: "asc" },
-            })) ??
+            (defaultOutAccountId
+              ? await tx.source.findFirst({
+                  where: { id: defaultOutAccountId, isOut: true },
+                })
+              : null) ??
             (await tx.source.findFirst({
               where: { isOut: true },
               orderBy: [{ position: "asc" }, { id: "asc" }],

@@ -49,9 +49,12 @@ describe("ensureDefaultAccounts", () => {
 
 describe("settings", () => {
   const fake = () => {
-    const upsert = vi
-      .fn()
-      .mockResolvedValue({ id: 1, currency: "EUR", mankoCategoryId: 7 });
+    const upsert = vi.fn().mockResolvedValue({
+      id: 1,
+      currency: "EUR",
+      mankoCategoryId: 7,
+      defaultOutAccountId: 3,
+    });
     const db = { appSettings: { upsert } } as unknown as Db;
     return { repo: settingsRepo(db), upsert };
   };
@@ -90,6 +93,29 @@ describe("settings", () => {
       repo.update({ fiscalIntervalStartDay: 1.5 }),
     ).rejects.toThrow();
     expect(upsert).toHaveBeenCalledTimes(1);
+  });
+
+  it("update only accepts an existing external account as the default out account", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const findUnique = vi.fn();
+    const repo = settingsRepo({
+      appSettings: { upsert },
+      source: { findUnique },
+    } as unknown as Db);
+
+    findUnique.mockResolvedValueOnce(null);
+    await expect(
+      repo.update({ defaultOutAccountId: 9 }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+    findUnique.mockResolvedValueOnce({ id: 1, name: "Bank", isOut: false });
+    await expect(
+      repo.update({ defaultOutAccountId: 1 }),
+    ).rejects.toBeInstanceOf(ConflictError);
+    expect(upsert).not.toHaveBeenCalled();
+
+    findUnique.mockResolvedValueOnce({ id: 2, name: "Expenses", isOut: true });
+    await repo.update({ defaultOutAccountId: 2 });
+    expect(upsert.mock.calls[0][0].update).toEqual({ defaultOutAccountId: 2 });
   });
 
   it("update rejects invalid currencies", async () => {

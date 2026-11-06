@@ -1,7 +1,11 @@
 <script lang="ts">
   import { formatMoney } from "#lib/format.ts";
   import ToggleRow from "./ToggleRow.svelte";
-  import type { TransactionType, WizardAccount } from "./types";
+  import {
+    isExpenseLike,
+    type TransactionType,
+    type WizardAccount,
+  } from "./types";
 
   let {
     type,
@@ -36,6 +40,7 @@
   }
 
   const owned = $derived(accounts.filter((a) => !a.isOut));
+  const outside = $derived(accounts.filter((a) => a.isOut));
   const targets = $derived(owned.filter((a) => a.id !== sourceId));
   const source = $derived(owned.find((a) => a.id === sourceId));
   const accountLabel = $derived(
@@ -69,6 +74,17 @@
         <select class="select" name="targetId" bind:value={targetId} required>
           <option value={null} disabled>Choose account</option>
           {#each targets as a (a.id)}
+            <option value={a.id}>{a.name}</option>
+          {/each}
+        </select>
+      </label>
+    {/if}
+
+    {#if isExpenseLike(type)}
+      <label class="label">
+        <span class="wizard-label label-text">Paid to</span>
+        <select class="select" name="targetId" bind:value={targetId}>
+          {#each outside as a (a.id)}
             <option value={a.id}>{a.name}</option>
           {/each}
         </select>
