@@ -4,6 +4,7 @@ import { categoriesRepo } from "./categories";
 import { checkpointsRepo } from "./checkpoints";
 import type { Db } from "./prisma";
 import { ledgerRepo } from "./ledger";
+import { metersRepo } from "./meters";
 import { sessionsRepo } from "./sessions";
 import { settingsRepo } from "./settings";
 import { transactionsRepo } from "./transactions";
@@ -34,6 +35,8 @@ export function createCore(db: Db) {
     checkpoints: checkpointsRepo(db, settings),
     /** Vehicles with their fuel and service journals and service components. */
     vehicles: vehiclesRepo(db, settings),
+    /** Utility meters (electricity, water, …) and their readings. */
+    meters: metersRepo(db),
     users: usersRepo(db),
     sessions: sessionsRepo(db),
     settings,
