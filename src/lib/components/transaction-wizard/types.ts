@@ -1,6 +1,10 @@
 export type TransactionType = "EXPENSE" | "INCOME" | "TRANSFER" | "HIDDEN";
 export type Currency = "CZK" | "EUR" | "USD";
 
+/** Expenses and hidden transactions are paid to an external account. */
+export const isExpenseLike = (type: TransactionType) =>
+  type === "EXPENSE" || type === "HIDDEN";
+
 export const currencies: Currency[] = ["CZK", "EUR", "USD"];
 
 export interface WizardAccount {

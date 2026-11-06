@@ -49,7 +49,12 @@ describe("ensureDefaultAccounts", () => {
 
 describe("settings", () => {
   const fake = () => {
-    const upsert = vi.fn().mockResolvedValue({ id: 1, currency: "EUR" });
+    const upsert = vi.fn().mockResolvedValue({
+      id: 1,
+      currency: "EUR",
+      mankoCategoryId: 7,
+      defaultOutAccountId: 3,
+    });
     const db = { appSettings: { upsert } } as unknown as Db;
     return { repo: settingsRepo(db), upsert };
   };
@@ -88,6 +93,29 @@ describe("settings", () => {
       repo.update({ fiscalIntervalStartDay: 1.5 }),
     ).rejects.toThrow();
     expect(upsert).toHaveBeenCalledTimes(1);
+  });
+
+  it("update only accepts an existing external account as the default out account", async () => {
+    const upsert = vi.fn().mockResolvedValue({});
+    const findUnique = vi.fn();
+    const repo = settingsRepo({
+      appSettings: { upsert },
+      source: { findUnique },
+    } as unknown as Db);
+
+    findUnique.mockResolvedValueOnce(null);
+    await expect(
+      repo.update({ defaultOutAccountId: 9 }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+    findUnique.mockResolvedValueOnce({ id: 1, name: "Bank", isOut: false });
+    await expect(
+      repo.update({ defaultOutAccountId: 1 }),
+    ).rejects.toBeInstanceOf(ConflictError);
+    expect(upsert).not.toHaveBeenCalled();
+
+    findUnique.mockResolvedValueOnce({ id: 2, name: "Expenses", isOut: true });
+    await repo.update({ defaultOutAccountId: 2 });
+    expect(upsert.mock.calls[0][0].update).toEqual({ defaultOutAccountId: 2 });
   });
 
   it("update rejects invalid currencies", async () => {
@@ -314,6 +342,88 @@ describe.skipIf(!core)("core layer", () => {
 
       const accounts = await c.accounts.listWithBalances();
       expect(accounts.find((a) => a.id === bank.id)?.balance).toBe(850);
+    });
+
+    it("checkpoints freeze the balance and book the difference as manko", async () => {
+      const bank = await c.accounts.create({ name: `${run}-cp-bank` });
+      const out = await c.accounts.create({
+        name: `${run}-cp-out`,
+        type: "OUT",
+        isOut: true,
+      });
+      ids.accounts.push(bank.id, out.id);
+      const income = await c.transactions.create({
+        description: `${run} salary`,
+        amount: 500,
+        sourceId: out.id,
+        targetId: bank.id,
+        transactedAt: new Date(Date.now() - 60_000),
+      });
+      ids.transactions.push(income.id);
+
+      const suggestion = await c.checkpoints.suggest(bank.id);
+      expect(suggestion.balance).toBe(500);
+      expect(suggestion.previous).toBeNull();
+
+      const settings = await c.settings.get();
+      expect(settings.mankoCategoryId).not.toBeNull();
+
+      // 80 less than the books say -> money out of the account
+      const { checkpoint, adjustment } = await c.checkpoints.create(bank.id, {
+        amount: 420,
+      });
+      if (adjustment) ids.transactions.push(adjustment.id);
+      expect(checkpoint.amount).toBe(420);
+      expect(adjustment).toMatchObject({
+        amount: 80,
+        sourceId: bank.id,
+        categoryId: settings.mankoCategoryId,
+      });
+      expect(await c.accounts.balanceAt(bank.id, new Date())).toBe(420);
+
+      // later transactions build on the checkpoint
+      const later = await c.transactions.create({
+        description: `${run} later`,
+        amount: 20,
+        sourceId: bank.id,
+        targetId: out.id,
+        transactedAt: new Date(Date.now() + 1_000),
+      });
+      ids.transactions.push(later.id);
+      expect(
+        await c.accounts.balanceAt(bank.id, new Date(Date.now() + 2_000)),
+      ).toBe(400);
+
+      // a matching value needs no adjustment
+      const exact = await c.checkpoints.create(bank.id, { amount: 420 });
+      expect(exact.adjustment).toBeNull();
+
+      const journal = await c.ledger.forAccount(bank.id, { limit: 10 });
+      const kinds = journal.items.map((e) => e.kind);
+      expect(kinds.filter((k) => k === "checkpoint")).toHaveLength(2);
+      expect(journal.total).toBe(5);
+      // narrowed views only list transactions
+      const searched = await c.ledger.forAccount(bank.id, {
+        search: `${run}`,
+      });
+      expect(searched.items.every((e) => e.kind === "transaction")).toBe(true);
+    });
+
+    it("manko category can be changed and falls back to N/A", async () => {
+      const cat = await c.categories.create({ name: `${run}-manko` });
+      ids.categories.push(cat.id);
+      const original = (await c.settings.get()).mankoCategoryId;
+      try {
+        expect(
+          (await c.settings.update({ mankoCategoryId: cat.id }))
+            .mankoCategoryId,
+        ).toBe(cat.id);
+        await expect(
+          c.settings.update({ mankoCategoryId: 2_000_000_000 }),
+        ).rejects.toBeInstanceOf(NotFoundError);
+      } finally {
+        if (original) await c.settings.update({ mankoCategoryId: original });
+      }
     });
 
     it("lists with filters, paginates and updates", async () => {

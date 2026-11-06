@@ -11,19 +11,26 @@
   import DeleteEntryDialog from "#lib/components/ledger/DeleteEntryDialog.svelte";
   import EntryStatusBadge from "#lib/components/ledger/EntryStatusBadge.svelte";
   import LedgerPagination from "#lib/components/ledger/LedgerPagination.svelte";
-  import type { TransactionWithRelations } from "#lib/server/core/types.ts";
+  import CheckpointRow from "#lib/components/ledger/CheckpointRow.svelte";
+  import CheckpointDialog from "./CheckpointDialog.svelte";
+  import type {
+    LedgerEntry,
+    TransactionWithRelations,
+  } from "#lib/server/core/types.ts";
 
   let {
     accountId,
     accountName,
     entries,
+    suggestedCheckpoint,
     total,
     categories,
     filters,
   }: {
     accountId: number;
     accountName: string;
-    entries: TransactionWithRelations[];
+    entries: LedgerEntry[];
+    suggestedCheckpoint: number;
     total: number;
     categories: { id: number; name: string }[];
     filters: {
@@ -58,6 +65,8 @@
   const go = (changes: Record<string, string | number | undefined>) =>
     goto(
       resolve(`/accounts/[id]?${query(changes)}`, { id: String(accountId) }),
+      // A filter/page change, not a navigation: keep scroll position and focus.
+      { reset: false },
     );
 
   function counterparty(t: TransactionWithRelations) {
@@ -129,6 +138,7 @@
           value={filters.search}
         />
       </div>
+      <CheckpointDialog {accountName} suggested={suggestedCheckpoint} />
       <a
         href={resolve(`/transactions/new?account=${accountId}`)}
         class="btn rounded-full bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800"
@@ -156,47 +166,54 @@
         </tr>
       </thead>
       <tbody>
-        {#each entries as t (t.id)}
-          {@const amount = signedFor(t, accountId)}
-          <tr class="border-b border-surface-100-900 last:border-0">
-            <td class="py-3 pr-4 text-xs font-medium whitespace-nowrap">
-              <time datetime={t.transactedAt?.toISOString()}>
-                {formatDate(t.transactedAt)}
-              </time>
-            </td>
-            <td class="py-3 pr-4">
-              <p class="text-sm font-bold">{t.description}</p>
-              <p class="text-xs text-surface-500">{counterparty(t)}</p>
-            </td>
-            <td class="py-3 pr-4 text-xs font-semibold">
-              {#if t.category}
-                <span class="badge preset-tonal">{t.category.name}</span>
-              {/if}
-            </td>
-            <td
-              class="py-3 text-right text-sm font-bold whitespace-nowrap tabular-nums"
-            >
-              {amount > 0 ? "+" : ""}{formatMoney(amount, t.currency)}
-            </td>
-            <td class="py-3 pl-4"><EntryStatusBadge entry={t} /></td>
-            <td class="py-3 text-right whitespace-nowrap">
-              <a
-                href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
-                class="btn-icon btn-icon-sm hover:preset-tonal"
-                aria-label="Edit {t.description}"
+        {#each entries as entry (entry.kind === "checkpoint" ? `c${entry.checkpoint.id}` : `t${entry.transaction.id}`)}
+          {#if entry.kind === "checkpoint"}
+            <CheckpointRow checkpoint={entry.checkpoint} />
+          {:else}
+            {@const t = entry.transaction}
+            {@const amount = signedFor(t, accountId)}
+            <tr class="border-b border-surface-100-900 last:border-0">
+              <td class="py-3 pr-4 text-xs font-medium whitespace-nowrap">
+                <time datetime={t.transactedAt?.toISOString()}>
+                  {formatDate(t.transactedAt)}
+                </time>
+              </td>
+              <td class="py-3 pr-4">
+                <p class="text-sm font-bold">{t.description}</p>
+                <p class="text-xs text-surface-500">{counterparty(t)}</p>
+              </td>
+              <td class="py-3 pr-4 text-xs font-semibold">
+                {#if t.category}
+                  <span class="badge preset-tonal">{t.category.name}</span>
+                {/if}
+              </td>
+              <td
+                class="py-3 text-right text-sm font-bold whitespace-nowrap tabular-nums"
               >
-                <Pencil size={16} aria-hidden="true" />
-              </a>
-              <button
-                type="button"
-                class="btn-icon btn-icon-sm hover:preset-tonal-error"
-                aria-label="Delete {t.description}"
-                onclick={() => (deleting = t)}
-              >
-                <Trash2 size={16} aria-hidden="true" />
-              </button>
-            </td>
-          </tr>
+                {amount > 0 ? "+" : ""}{formatMoney(amount, t.currency)}
+              </td>
+              <td class="py-3 pl-4"><EntryStatusBadge entry={t} /></td>
+              <td class="py-3 text-right whitespace-nowrap">
+                <a
+                  href={resolve("/transactions/[id]/edit", {
+                    id: String(t.id),
+                  })}
+                  class="btn-icon btn-icon-sm hover:preset-tonal"
+                  aria-label="Edit {t.description}"
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </a>
+                <button
+                  type="button"
+                  class="btn-icon btn-icon-sm hover:preset-tonal-error"
+                  aria-label="Delete {t.description}"
+                  onclick={() => (deleting = t)}
+                >
+                  <Trash2 size={16} aria-hidden="true" />
+                </button>
+              </td>
+            </tr>
+          {/if}
         {:else}
           <tr>
             <td colspan="6" class="py-8 text-center text-sm opacity-70">

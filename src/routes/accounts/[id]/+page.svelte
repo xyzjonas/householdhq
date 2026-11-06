@@ -57,6 +57,7 @@
     accountId={data.account.id}
     accountName={data.account.name}
     entries={data.entries}
+    suggestedCheckpoint={data.suggestedCheckpoint}
     total={data.total}
     categories={data.categories}
     filters={data.filters}

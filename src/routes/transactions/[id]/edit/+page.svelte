@@ -11,6 +11,7 @@
   accounts={data.accounts}
   categories={data.categories}
   suggestions={data.suggestions}
+  defaultOutAccountId={data.defaultOutAccountId}
   initial={data.transaction}
   action="?/update"
   errors={form?.errors ?? []}

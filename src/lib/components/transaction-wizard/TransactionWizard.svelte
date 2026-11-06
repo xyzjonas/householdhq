@@ -15,6 +15,7 @@
   import TransactionOverview from "./TransactionOverview.svelte";
   import TypeStage from "./TypeStage.svelte";
   import {
+    isExpenseLike,
     stages,
     type Currency,
     type TransactionType,
@@ -29,6 +30,7 @@
     suggestions = [],
     errors = [],
     initialAccountId = null,
+    defaultOutAccountId = null,
     initial,
     action,
     onsplit,
@@ -41,6 +43,8 @@
     errors?: string[];
     /** Account to pre-select as the source. */
     initialAccountId?: number | null;
+    /** External account expenses are paid to unless another is picked. */
+    defaultOutAccountId?: number | null;
     /** Existing values; switches the wizard into edit mode. */
     initial?: WizardInitial;
     /** Form action to post to; defaults to the page's default action. */
@@ -55,7 +59,8 @@
   const now = seed ? new Date(seed.transactedAt) : new Date();
 
   let stage = $state(editing ? stages.length : 1);
-  let type = $state<TransactionType>(seed?.type ?? "EXPENSE");
+  const initialType: TransactionType = seed?.type ?? "EXPENSE";
+  let type = $state<TransactionType>(initialType);
   let tape = $state(seed ? String(seed.amount) : "");
   let currency = $state<Currency>(seed?.currency ?? "CZK");
   let categoryId = $state<number | null>(seed?.categoryId ?? null);
@@ -65,7 +70,14 @@
   const sourceId = $derived(
     chosenSourceId ?? accounts.find((a) => !a.isOut)?.id ?? null,
   );
-  let targetId = $state<number | null>(seed?.targetId ?? null);
+  // Expenses are paid to the default out account unless another is chosen.
+  let targetId = $state<number | null>(
+    seed
+      ? seed.targetId
+      : isExpenseLike(initialType)
+        ? untrack(() => defaultOutAccountId)
+        : null,
+  );
   let description = $state(seed?.description ?? "");
   let date = $state(
     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
@@ -117,7 +129,7 @@
   function setType(next: TransactionType) {
     // "Hidden" is both a type and a flag; keep the two in sync.
     hidden = next === "HIDDEN";
-    if (next !== "TRANSFER") targetId = null;
+    targetId = isExpenseLike(next) ? defaultOutAccountId : null;
     goTo(2);
   }
 </script>

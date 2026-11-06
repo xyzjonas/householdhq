@@ -118,6 +118,14 @@ export const TransactionFilter = z.object({
 });
 export type TransactionFilter = z.input<typeof TransactionFilter>;
 
+export const CheckpointInput = z.object({
+  /** The balance the account really has. */
+  amount: z.number().finite(),
+  /** Defaults to now. */
+  at: z.coerce.date().optional(),
+});
+export type CheckpointInput = z.input<typeof CheckpointInput>;
+
 export const UserInput = z.object({
   email: z.email().trim().toLowerCase(),
   password: z.string().min(8),
@@ -135,6 +143,14 @@ export const SettingsInput = z.object({
     .int("Day must be a whole number")
     .min(1, "Day must be between 1 and 31")
     .max(31, "Day must be between 1 and 31"),
+  mankoCategoryId: z.coerce
+    .number()
+    .int("Please choose a category")
+    .positive("Please choose a category"),
+  defaultOutAccountId: z.coerce
+    .number()
+    .int("Please choose an account")
+    .positive("Please choose an account"),
 });
 export type SettingsInput = z.input<typeof SettingsInput>;
 export const SettingsPatch = SettingsInput.partial();

@@ -37,6 +37,7 @@ model Category {
   transactions Transaction[]
   vehicle      Vehicle?      @relation("VehicleCategory")
   fuelVehicle  Vehicle?      @relation("VehicleFuelCategory")
+  mankoSetting AppSettings[] @relation("MankoCategory")
 
   @@map("category")
 }
@@ -77,6 +78,7 @@ model Source {
   isDisponible    Boolean       @default(false) // mark 'source' as disponible (available to spend)
   isPortfolio     Boolean       @default(false) // mark 'source' as a part of the portfolio
   states          SourceState[]
+  defaultOutOf    AppSettings[] @relation("DefaultOutAccount")
   color           String?
   position        Int           @default(999) // position in the listing
   type            SourceType    @default(ACCOUNT)
@@ -282,12 +284,20 @@ model VehicleComponent {
 }
 
 model AppSettings {
-  id                     Int      @id @default(1) // Singleton - always ID 1
-  currency               String   @default("USD")
+  id                     Int       @id @default(1) // Singleton - always ID 1
+  currency               String    @default("USD")
   // day of the month on which a fiscal interval (e.g. payday to payday) starts; 1 = calendar month
-  fiscalIntervalStartDay Int      @default(1)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  fiscalIntervalStartDay Int       @default(1)
+  // category of the adjustment transactions created along with account checkpoints
+  mankoCategoryId        Int?
+  mankoCategory          Category? @relation("MankoCategory", fields: [mankoCategoryId], references: [id], onDelete: SetNull)
+  // external account that expenses (and checkpoint adjustments) are paid to by default
+  defaultOutAccountId    Int?
+  defaultOutAccount      Source?   @relation("DefaultOutAccount", fields: [defaultOutAccountId], references: [id], onDelete: SetNull)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
+  @@index([mankoCategoryId])
+  @@index([defaultOutAccountId])
   @@map("app_settings")
 }

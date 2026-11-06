@@ -5,10 +5,11 @@ import { getCore } from "#lib/server/index.ts";
 /** Reference data the transaction wizard needs, shared by create and edit. */
 export async function loadWizardData() {
   const core = getCore();
-  const [accounts, categories, recent] = await Promise.all([
+  const [accounts, categories, recent, settings] = await Promise.all([
     core.accounts.listWithBalances(),
     core.categories.list(),
     core.transactions.list({ limit: 50 }),
+    core.settings.get(),
   ]);
   const suggestions = [
     ...new Set(
@@ -29,6 +30,8 @@ export async function loadWizardData() {
       icon,
     })),
     suggestions,
+    /** Where expenses are paid to unless the user picks another account. */
+    defaultOutAccountId: settings.defaultOutAccountId,
   };
 }
 
@@ -74,13 +77,25 @@ export async function parseTransactionForm(request: Request) {
     parsed.data;
 
   const core = getCore();
-  const outside = (await core.accounts.list()).find((a) => a.isOut);
+  const accounts = await core.accounts.list();
+  const { defaultOutAccountId } = await core.settings.get();
+  // The external counterpart: the configured default, else any external account.
+  const outside =
+    accounts.find((a) => a.id === defaultOutAccountId && a.isOut) ??
+    accounts.find((a) => a.isOut);
   let sourceId = accountId;
   let target = outside?.id;
   if (type === "INCOME") [sourceId, target] = [outside?.id ?? NaN, accountId];
   if (type === "TRANSFER") {
     if (targetId === undefined || targetId === accountId) {
       return failure(values, ["Choose two different accounts"]);
+    }
+    target = targetId;
+  }
+  if ((type === "EXPENSE" || type === "HIDDEN") && targetId !== undefined) {
+    // The user may pay to another external account than the default.
+    if (!accounts.some((a) => a.id === targetId && a.isOut)) {
+      return failure(values, ["Choose an external account to pay to"]);
     }
     target = targetId;
   }

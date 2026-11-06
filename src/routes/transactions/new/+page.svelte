@@ -18,5 +18,6 @@
   categories={data.categories}
   suggestions={data.suggestions}
   {initialAccountId}
+  defaultOutAccountId={data.defaultOutAccountId}
   errors={form?.errors ?? []}
 />

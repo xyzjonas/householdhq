@@ -1,6 +1,6 @@
 import { error, fail } from "@sveltejs/kit";
 import { getCore } from "#lib/server/index.ts";
-import { NotFoundError } from "#lib/server/core/index.ts";
+import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { PAGE_SIZE, monthRange } from "#lib/account-detail.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -25,20 +25,21 @@ export const load: PageServerLoad = async ({ params, url }) => {
   const pageParam = Number(url.searchParams.get("page"));
   const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
-  const [balance, trajectory, categories, entries] = await Promise.all([
-    core.accounts.balanceAt(id, new Date()),
-    core.accounts.trajectory(id),
-    core.categories.list(),
-    core.transactions.list({
-      accountId: id,
-      from: month.from,
-      to: month.to,
-      categoryId,
-      search: search || undefined,
-      limit: PAGE_SIZE,
-      offset: (page - 1) * PAGE_SIZE,
-    }),
-  ]);
+  const [balance, trajectory, categories, entries, suggestion] =
+    await Promise.all([
+      core.accounts.balanceAt(id, new Date()),
+      core.accounts.trajectory(id),
+      core.categories.list(),
+      core.ledger.forAccount(id, {
+        from: month.from,
+        to: month.to,
+        categoryId,
+        search: search || undefined,
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
+      }),
+      core.checkpoints.suggest(id),
+    ]);
 
   const { points, projectedMonthEnd } = trajectory;
   const previous = points.length > 1 ? points[points.length - 2].balance : null;
@@ -55,12 +56,36 @@ export const load: PageServerLoad = async ({ params, url }) => {
     })),
     categories: categories.map(({ id, name }) => ({ id, name })),
     entries: entries.items,
+    /** The balance the transactions add up to: the checkpoint dialog's default. */
+    suggestedCheckpoint: suggestion.balance,
     total: entries.total,
     filters: { month: month.key, categoryId, search, page },
   };
 };
 
 export const actions: Actions = {
+  checkpoint: async ({ params, request }) => {
+    const id = Number(params.id);
+    const raw = String((await request.formData()).get("amount") ?? "")
+      .trim()
+      .replace(/\s/g, "")
+      .replace(",", ".");
+    const amount = raw === "" ? NaN : Number(raw);
+    if (!Number.isFinite(amount)) {
+      return fail(400, { message: "Please enter the current balance." });
+    }
+    try {
+      const { adjustment } = await getCore().checkpoints.create(id, {
+        amount,
+      });
+      return { checkpointed: true, adjustment: adjustment?.amount ?? 0 };
+    } catch (e) {
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      if (e instanceof ConflictError) return fail(409, { message: e.message });
+      throw e;
+    }
+  },
+
   delete: async ({ request }) => {
     const id = Number((await request.formData()).get("id"));
     if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });

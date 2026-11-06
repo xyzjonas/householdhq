@@ -34,6 +34,23 @@ export type Account = Source;
 export type AccountState = SourceState;
 export type AccountWithBalance = Account & { balance: number };
 
+/** One row of an account's journal: a transaction or a balance checkpoint. */
+export type LedgerEntry =
+  | { kind: "transaction"; at: Date; transaction: TransactionWithRelations }
+  | { kind: "checkpoint"; at: Date; checkpoint: AccountState };
+
+export interface CheckpointSuggestion {
+  /** Balance according to the previous checkpoint and the transactions since. */
+  balance: number;
+  previous: AccountState | null;
+}
+
+export interface CheckpointResult {
+  checkpoint: AccountState;
+  /** The "manko" transaction covering the difference; null when there was none. */
+  adjustment: TransactionWithRelations | null;
+}
+
 export interface AccountTrajectory {
   /** Closing balance per calendar month, oldest first. */
   points: { monthStart: Date; balance: number }[];

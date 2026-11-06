@@ -2,6 +2,8 @@
   import { resolve } from "$app/paths";
   import CurrencyForm from "#lib/components/settings/CurrencyForm.svelte";
   import FiscalIntervalForm from "#lib/components/settings/FiscalIntervalForm.svelte";
+  import DefaultOutAccountForm from "#lib/components/settings/DefaultOutAccountForm.svelte";
+  import MankoCategoryForm from "#lib/components/settings/MankoCategoryForm.svelte";
   import ThemeForm from "#lib/components/settings/ThemeForm.svelte";
   import type { PageProps } from "./$types";
 
@@ -33,6 +35,20 @@
     startDay={data.settings.fiscalIntervalStartDay}
     message={form && "intervalMessage" in form ? form.intervalMessage : ""}
     saved={form !== null && "intervalSaved" in form}
+  />
+
+  <MankoCategoryForm
+    categoryId={data.settings.mankoCategoryId}
+    categories={data.categories}
+    message={form && "mankoMessage" in form ? form.mankoMessage : ""}
+    saved={form !== null && "mankoSaved" in form}
+  />
+
+  <DefaultOutAccountForm
+    accountId={data.settings.defaultOutAccountId}
+    accounts={data.outAccounts}
+    message={form && "defaultOutMessage" in form ? form.defaultOutMessage : ""}
+    saved={form !== null && "defaultOutSaved" in form}
   />
 
   <ThemeForm />
