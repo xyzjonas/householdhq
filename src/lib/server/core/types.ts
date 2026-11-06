@@ -5,6 +5,8 @@
 import type {
   AppSettings,
   Category,
+  Meter,
+  MeterState,
   Source,
   SourceState,
   SourceType,
@@ -20,6 +22,7 @@ import type {
 export type {
   AppSettings,
   Category,
+  Meter,
   SourceType,
   Tag,
   Vehicle,
@@ -53,6 +56,12 @@ export type VehicleDetail = Vehicle & {
   fuelEntries: FuelEntry[];
   serviceEntries: ServiceEntry[];
 };
+
+/** A reading of a meter (electricity, water, …) at a point in time. */
+export type MeterReading = MeterState;
+
+/** A meter with its readings, newest first. */
+export type MeterWithReadings = Meter & { readings: MeterReading[] };
 
 /** A category with its activity within a date range. */
 export type CategoryWithActivity = Category & {

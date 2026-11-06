@@ -260,3 +260,22 @@ export const SettingsInput = z.object({
 export type SettingsInput = z.input<typeof SettingsInput>;
 export const SettingsPatch = SettingsInput.partial();
 export type SettingsPatch = z.input<typeof SettingsPatch>;
+
+const meterShape = {
+  name: z.string().trim().min(1),
+  unit: z.string().trim().min(1),
+  meterNumber: optionalText,
+  icon: optionalText,
+  color: optionalText,
+};
+export const MeterInput = z.object(meterShape);
+export type MeterInput = z.input<typeof MeterInput>;
+export const MeterPatch = z.object(meterShape).partial();
+export type MeterPatch = z.input<typeof MeterPatch>;
+
+export const MeterReadingInput = z.object({
+  value: z.number().finite(),
+  /** Defaults to now. */
+  meteredAt: z.coerce.date().optional(),
+});
+export type MeterReadingInput = z.input<typeof MeterReadingInput>;

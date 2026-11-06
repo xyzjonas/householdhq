@@ -208,6 +208,48 @@ describe.skipIf(!core)("core layer", () => {
     });
   });
 
+  describe("meters", () => {
+    it("records readings newest first and edits the meter", async () => {
+      const meter = await c.meters.create({
+        name: `${run}-meter`,
+        unit: "kWh",
+        meterNumber: " ",
+      });
+      try {
+        expect(meter.meterNumber).toBeNull();
+        await c.meters.addReading(meter.id, {
+          value: 100,
+          meteredAt: new Date("2026-01-01T10:00:00Z"),
+        });
+        const newer = await c.meters.addReading(meter.id, {
+          value: 130.5,
+          meteredAt: new Date("2026-02-01T10:00:00Z"),
+        });
+
+        const loaded = await c.meters.get(meter.id);
+        expect(loaded.readings.map((r) => r.value)).toEqual([130.5, 100]);
+        expect(
+          (await c.meters.list()).find((m) => m.id === meter.id)?.readings,
+        ).toHaveLength(2);
+
+        const updated = await c.meters.update(meter.id, { unit: "MWh" });
+        expect(updated.unit).toBe("MWh");
+
+        await c.meters.removeReading(newer.id);
+        expect((await c.meters.get(meter.id)).readings).toHaveLength(1);
+        await expect(c.meters.removeReading(newer.id)).rejects.toBeInstanceOf(
+          NotFoundError,
+        );
+        await expect(
+          c.meters.addReading(meter.id + 100000, { value: 1 }),
+        ).rejects.toBeInstanceOf(NotFoundError);
+      } finally {
+        await db!.meterState.deleteMany({ where: { meterId: meter.id } });
+        await db!.meter.delete({ where: { id: meter.id } });
+      }
+    });
+  });
+
   describe("categories", () => {
     it("creates, reads, updates and deletes", async () => {
       const created = await c.categories.create({ name: `${run}-cat` });
