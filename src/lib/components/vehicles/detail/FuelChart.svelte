@@ -2,25 +2,20 @@
   import { areaPath, chartPoints, linePath } from "#lib/account-detail.ts";
   import { formatNumber } from "#lib/format.ts";
   import {
-    averageUnitPrice,
     distanceByMonth,
     distanceByYear,
     fuelChartModes,
-    odometerGrowth,
     unitPrices,
     type ChartPoint,
     type FuelChartMode,
     type FuelPoint,
   } from "#lib/vehicle-fuel.ts";
-  import { fallbackVehicleColor } from "#lib/vehicle-icons.ts";
 
   let {
     entries,
-    color = null,
     currency,
   }: {
     entries: FuelPoint[];
-    color?: string | null;
     currency: string;
   } = $props();
 
@@ -67,35 +62,21 @@
   const minPoint = $derived(points[values.indexOf(min)]);
   const peakPoint = $derived(points[values.indexOf(peak)]);
   const last = $derived(points[points.length - 1]);
-  // Label at most ~8 points and dot at most ~24 so a long history stays legible.
+  const lastValue = $derived(values[values.length - 1]);
+  // Dot and label every point while they fit, thin out a long history.
+  const dots = $derived(series.length <= 12);
   const every = $derived(Math.max(1, Math.ceil(series.length / 8)));
-  const dots = $derived(series.length <= 24);
 
-  const summary = $derived.by(() => {
-    if (mode === "price") {
-      return {
-        label: "Average unit price",
-        value: `${priceFmt.format(averageUnitPrice(entries))} ${currency}/L`,
-      };
-    }
-    if (mode === "yearly") {
-      return {
-        label: "Total distance",
-        value: formatNumber(
-          values.reduce((sum, v) => sum + v, 0),
-          "km",
-        ),
-      };
-    }
-    return {
-      label: "Odometer growth",
-      value: formatNumber(odometerGrowth(entries), "km"),
-    };
-  });
-
+  const subtitle = $derived(
+    mode === "price"
+      ? "Unit price of every fill-up"
+      : mode === "yearly"
+        ? "Distance driven per year"
+        : "Odometer at the start of each month",
+  );
   const ariaLabel = $derived(
     series.length
-      ? `${fuelChartModes.find((m) => m.id === mode)?.label}: ` +
+      ? `${fuelChartModes.find((m) => m.id === mode)?.label}, ${series[0].label} to ${series[series.length - 1].label}: ` +
           series.map((s) => `${s.label} ${format(s.value)}`).join(", ")
       : "No fuel data",
   );
@@ -103,15 +84,12 @@
 
 <section
   aria-labelledby="fuel-chart-heading"
-  class="flex flex-col gap-4 card border border-surface-200-800 p-6"
-  style="--vehicle: {color ?? fallbackVehicleColor}"
+  class="flex flex-col justify-between gap-4 card border border-surface-200-800 p-6"
 >
-  <header class="flex flex-wrap items-start justify-between gap-3">
+  <header class="flex flex-col gap-3">
     <div>
-      <h3 id="fuel-chart-heading" class="text-lg font-bold">Fuel statistics</h3>
-      <p class="text-sm text-surface-600-400">
-        {fuelChartModes.find((m) => m.id === mode)?.label}
-      </p>
+      <h2 id="fuel-chart-heading" class="text-lg font-bold">Fuel statistics</h2>
+      <p class="text-sm text-surface-600-400">{subtitle}</p>
     </div>
     <div class="flex flex-wrap gap-1" role="group" aria-label="Chart type">
       {#each fuelChartModes as m (m.id)}
@@ -129,12 +107,12 @@
     </div>
   </header>
 
-  {#if series.length > 1}
+  {#if series.length}
     <svg
       viewBox="0 0 {W} {H + 20}"
       role="img"
       aria-label={ariaLabel}
-      class="w-full text-(--vehicle)"
+      class="w-full text-emerald-700"
     >
       <defs>
         <linearGradient id="fuel-fill" x1="0" y1="0" x2="0" y2="1">
@@ -160,9 +138,7 @@
             fill="currentColor"
             class="stroke-white dark:stroke-slate-900"
             stroke-width="2"
-          >
-            <title>{p.label}: {format(p.balance)}</title>
-          </circle>
+          />
         {/if}
         {#if i % every === 0}
           <text
@@ -203,10 +179,8 @@
         <dd class="text-sm font-bold">{format(min)}</dd>
       </div>
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">
-          {summary.label}
-        </dt>
-        <dd class="text-sm font-bold">{summary.value}</dd>
+        <dt class="font-bold tracking-wider uppercase opacity-60">Latest</dt>
+        <dd class="text-sm font-bold">{format(lastValue)}</dd>
       </div>
       <div>
         <dt class="font-bold tracking-wider uppercase opacity-60">Peak</dt>
@@ -214,8 +188,6 @@
       </div>
     </dl>
   {:else}
-    <p class="py-8 text-center text-sm opacity-70">
-      Not enough fill-ups to chart yet.
-    </p>
+    <p class="text-sm opacity-70">Not enough fill-ups to chart yet.</p>
   {/if}
 </section>
