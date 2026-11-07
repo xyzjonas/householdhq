@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { shiftCheckpoints } from "./balance";
 import type { Db } from "./prisma";
 import {
   TransactionFilter,
@@ -236,27 +237,35 @@ export function transactionsRepo(db: Db) {
       const { tags, categoryId, sourceId, targetId, transactedAt, ...data } =
         TransactionPatch.parse(input);
       try {
-        return await db.transaction.update({
-          where: { id },
-          data: {
-            ...data,
-            ...(transactedAt
-              ? { transactedAt, confirmed: transactedAt <= new Date() }
-              : {}),
-            ...(sourceId ? { source: { connect: { id: sourceId } } } : {}),
-            ...(targetId ? { target: { connect: { id: targetId } } } : {}),
-            ...(categoryId !== undefined
-              ? {
-                  category: categoryId
-                    ? { connect: { id: categoryId } }
-                    : { disconnect: true },
-                }
-              : {}),
-            ...(tags
-              ? { tags: { set: [], connectOrCreate: tagLinks(tags) } }
-              : {}),
-          },
-          include,
+        // The edit and the checkpoint corrections land together or not at all.
+        return await db.$transaction(async (tx) => {
+          const before = await tx.transaction.findUniqueOrThrow({
+            where: { id },
+          });
+          const updated = await tx.transaction.update({
+            where: { id },
+            data: {
+              ...data,
+              ...(transactedAt
+                ? { transactedAt, confirmed: transactedAt <= new Date() }
+                : {}),
+              ...(sourceId ? { source: { connect: { id: sourceId } } } : {}),
+              ...(targetId ? { target: { connect: { id: targetId } } } : {}),
+              ...(categoryId !== undefined
+                ? {
+                    category: categoryId
+                      ? { connect: { id: categoryId } }
+                      : { disconnect: true },
+                  }
+                : {}),
+              ...(tags
+                ? { tags: { set: [], connectOrCreate: tagLinks(tags) } }
+                : {}),
+            },
+            include,
+          });
+          await shiftCheckpoints(tx, before, updated);
+          return updated;
         });
       } catch (e) {
         if (
