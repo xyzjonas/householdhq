@@ -72,14 +72,40 @@ export function ledgerRepo(
      * interleaved by timestamp (a checkpoint sorts after transactions sharing
      * its timestamp, as it includes them). Checkpoints are left out of
      * filtered views that cannot match them (category, search, ...) and of
-     * non-date sorts.
+     * non-date sorts. With `checkpointsOnly` only the checkpoints are listed.
      */
     async forAccount(
       accountId: number,
       input: TransactionFilter = {},
+      options: { checkpointsOnly?: boolean } = {},
     ): Promise<Page<LedgerEntry>> {
       const filter = TransactionFilter.parse({ ...input, accountId });
       const sort = filter.sort ?? "date-desc";
+
+      if (options.checkpointsOnly) {
+        const where = {
+          sourceId: accountId,
+          created: { gte: filter.from, lt: filter.to },
+        };
+        const dir = sort === "date-asc" ? "asc" : "desc";
+        const [total, checkpoints] = await Promise.all([
+          db.sourceState.count({ where }),
+          db.sourceState.findMany({
+            where,
+            orderBy: [{ created: dir }, { id: dir }],
+            skip: filter.offset,
+            take: filter.limit,
+          }),
+        ]);
+        return {
+          total,
+          items: checkpoints.map((checkpoint) => ({
+            kind: "checkpoint" as const,
+            at: checkpoint.created,
+            checkpoint,
+          })),
+        };
+      }
       const withCheckpoints =
         (sort === "date-desc" || sort === "date-asc") &&
         narrowingFilters.every((key) => filter[key] === undefined);

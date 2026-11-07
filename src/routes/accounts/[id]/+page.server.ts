@@ -25,19 +25,29 @@ export const load: PageServerLoad = async ({ params, url }) => {
   const pageParam = Number(url.searchParams.get("page"));
   const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
+  const hideUpcoming = url.searchParams.get("upcoming") === "hide";
+  const checkpointsOnly = url.searchParams.get("states") === "only";
+  const now = new Date();
+  // `to` is exclusive: capping it at "now" drops everything scheduled later.
+  const to = hideUpcoming && now < month.to ? now : month.to;
+
   const [balance, trajectory, categories, entries, suggestion] =
     await Promise.all([
-      core.accounts.balanceAt(id, new Date()),
+      core.accounts.balanceAt(id, now),
       core.accounts.trajectory(id),
       core.categories.list(),
-      core.ledger.forAccount(id, {
-        from: month.from,
-        to: month.to,
-        categoryId,
-        search: search || undefined,
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-      }),
+      core.ledger.forAccount(
+        id,
+        {
+          from: month.from,
+          to,
+          categoryId,
+          search: search || undefined,
+          limit: PAGE_SIZE,
+          offset: (page - 1) * PAGE_SIZE,
+        },
+        { checkpointsOnly },
+      ),
       core.checkpoints.suggest(id),
     ]);
 
@@ -59,7 +69,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
     /** The balance the transactions add up to: the checkpoint dialog's default. */
     suggestedCheckpoint: suggestion.balance,
     total: entries.total,
-    filters: { month: month.key, categoryId, search, page },
+    filters: {
+      month: month.key,
+      categoryId,
+      search,
+      page,
+      hideUpcoming,
+      checkpointsOnly,
+    },
   };
 };
 
@@ -84,6 +101,19 @@ export const actions: Actions = {
       if (e instanceof ConflictError) return fail(409, { message: e.message });
       throw e;
     }
+  },
+
+  deleteCheckpoint: async ({ params, request }) => {
+    const accountId = Number(params.id);
+    const id = Number((await request.formData()).get("id"));
+    if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
+    try {
+      await getCore().checkpoints.remove(accountId, id);
+    } catch (e) {
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      throw e;
+    }
+    return { deletedCheckpoint: id };
   },
 
   delete: async ({ request }) => {

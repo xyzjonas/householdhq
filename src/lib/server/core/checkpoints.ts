@@ -51,6 +51,18 @@ export function checkpointsRepo(
     },
 
     /**
+     * Deletes one of the account's checkpoints. Its manko adjustment stays: it
+     * is an ordinary transaction, so the balance keeps adding up without the
+     * checkpoint, which only stops being a reconciliation point.
+     */
+    async remove(accountId: number, id: number): Promise<void> {
+      const { count } = await db.sourceState.deleteMany({
+        where: { id, sourceId: accountId },
+      });
+      if (count === 0) throw new NotFoundError("Checkpoint", id);
+    },
+
+    /**
      * Freezes the account's balance at `amount`. When that differs from what
      * the transactions add up to, a "manko" transaction in the configured
      * category (see settings) covers the difference, so the journal still
