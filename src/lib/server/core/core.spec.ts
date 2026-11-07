@@ -389,6 +389,60 @@ describe.skipIf(!core)("core layer", () => {
       expect(accounts.find((a) => a.id === bank.id)?.balance).toBe(850);
     });
 
+    it("editing a transaction before a checkpoint moves the checkpoint", async () => {
+      const bank = await c.accounts.create({ name: `${run}-re-bank` });
+      const out = await c.accounts.create({
+        name: `${run}-re-out`,
+        type: "OUT",
+        isOut: true,
+      });
+      ids.accounts.push(bank.id, out.id);
+      const day = (n: number) => new Date(Date.UTC(2026, 5, n));
+
+      const first = await c.transactions.create({
+        description: `${run} first`,
+        amount: 5000,
+        sourceId: bank.id,
+        targetId: out.id,
+        transactedAt: day(12),
+      });
+      await c.checkpoints.create(bank.id, { amount: 10000, at: day(13) });
+      const later = await c.transactions.create({
+        description: `${run} later`,
+        amount: 5000,
+        sourceId: bank.id,
+        targetId: out.id,
+        transactedAt: day(14),
+      });
+      ids.transactions.push(first.id, later.id);
+      expect((await c.checkpoints.suggest(bank.id, day(15))).balance).toBe(
+        5000,
+      );
+
+      // partial refund: the first spend was really only 1000
+      await c.transactions.update(first.id, { amount: 1000 });
+      const [checkpoint] = await c.checkpoints.list(bank.id);
+      expect(checkpoint.amount).toBe(14000);
+      expect((await c.checkpoints.suggest(bank.id, day(15))).balance).toBe(
+        9000,
+      );
+
+      // moving it behind the checkpoint takes it out of the checkpoint again
+      await c.transactions.update(first.id, { transactedAt: day(14) });
+      expect((await c.checkpoints.list(bank.id))[0].amount).toBe(15000);
+
+      // re-pointing it to another account moves it for both accounts
+      const other = await c.accounts.create({ name: `${run}-re-other` });
+      ids.accounts.push(other.id);
+      await c.checkpoints.create(other.id, { amount: 100, at: day(13) });
+      await c.transactions.update(first.id, {
+        transactedAt: day(12),
+        sourceId: other.id,
+      });
+      expect((await c.checkpoints.list(other.id))[0].amount).toBe(-900);
+      expect((await c.checkpoints.list(bank.id))[0].amount).toBe(15000);
+    });
+
     it("checkpoints freeze the balance and book the difference as manko", async () => {
       const bank = await c.accounts.create({ name: `${run}-cp-bank` });
       const out = await c.accounts.create({

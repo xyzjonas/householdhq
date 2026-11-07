@@ -55,3 +55,61 @@ export async function balanceOf(
 export function roundMoney(value: number): number {
   return Math.round(value * 100) / 100;
 }
+
+/** The parts of a transaction that decide how it moves account balances. */
+export type BalanceEffect = {
+  amount: number;
+  sourceId: number;
+  targetId: number;
+  transactedAt: Date | null;
+  cancelled: boolean;
+};
+
+/** Anything that can move checkpoints: the Prisma client or a transaction of it. */
+export type CheckpointWriter = Pick<Prisma.TransactionClient, "sourceState">;
+
+/** How `t` changes `accountId`'s balance as captured by a checkpoint at `at`. */
+function effectOn(t: BalanceEffect, accountId: number, at: Date): number {
+  // Mirrors balanceOf: only dated, non-cancelled transactions up to the
+  // checkpoint's timestamp are part of its amount.
+  if (t.cancelled || !t.transactedAt || t.transactedAt > at) return 0;
+  return (
+    (t.targetId === accountId ? t.amount : 0) -
+    (t.sourceId === accountId ? t.amount : 0)
+  );
+}
+
+/**
+ * Keeps checkpoints truthful when a transaction changes. A checkpoint freezes
+ * the balance after everything up to its timestamp, so when a transaction at
+ * or before it changes (amount, accounts, date), every checkpoint of the
+ * accounts involved - before and after the change - is moved by the
+ * difference. Later transactions then keep building on the right balance.
+ */
+export async function shiftCheckpoints(
+  db: CheckpointWriter,
+  before: BalanceEffect,
+  after: BalanceEffect,
+): Promise<void> {
+  const accountIds = new Set([
+    before.sourceId,
+    before.targetId,
+    after.sourceId,
+    after.targetId,
+  ]);
+  for (const sourceId of accountIds) {
+    const checkpoints = await db.sourceState.findMany({ where: { sourceId } });
+    for (const { id, created, amount } of checkpoints) {
+      const delta = roundMoney(
+        effectOn(after, sourceId, created) -
+          effectOn(before, sourceId, created),
+      );
+      if (delta !== 0) {
+        await db.sourceState.update({
+          where: { id },
+          data: { amount: roundMoney(amount + delta) },
+        });
+      }
+    }
+  }
+}
