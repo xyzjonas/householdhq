@@ -20,15 +20,31 @@ export interface NavItem {
     | "/energy"
     | "/settings";
   icon: Component;
+  /** Shown directly in the mobile bar; everything else goes under "More". */
+  primary?: true;
 }
 
 export const navItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Accounts", href: "/accounts", icon: Wallet },
-  { label: "Categories", href: "/categories", icon: Tags },
-  { label: "Transactions", href: "/transactions", icon: Receipt },
+  { label: "Dashboard", href: "/", icon: LayoutDashboard, primary: true },
+  { label: "Accounts", href: "/accounts", icon: Wallet, primary: true },
+  { label: "Categories", href: "/categories", icon: Tags, primary: true },
+  {
+    label: "Transactions",
+    href: "/transactions",
+    icon: Receipt,
+    primary: true,
+  },
   { label: "Vehicles", href: "/vehicles", icon: Car },
   { label: "Energy", href: "/energy", icon: Zap },
   { label: "Analytics", icon: ChartColumn },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
+
+export const primaryNavItems = navItems.filter((item) => item.primary);
+export const moreNavItems = navItems.filter((item) => !item.primary);
+
+/** Whether `pathname` is the item's page or one nested below it. */
+export function isActive(href: string, pathname: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
