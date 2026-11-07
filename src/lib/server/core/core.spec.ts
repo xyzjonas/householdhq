@@ -452,6 +452,31 @@ describe.skipIf(!core)("core layer", () => {
         search: `${run}`,
       });
       expect(searched.items.every((e) => e.kind === "transaction")).toBe(true);
+
+      // "states only" lists just the checkpoints, paginated
+      const states = await c.ledger.forAccount(
+        bank.id,
+        { limit: 1 },
+        { checkpointsOnly: true },
+      );
+      expect(states.total).toBe(2);
+      expect(states.items).toHaveLength(1);
+      expect(states.items[0].kind).toBe("checkpoint");
+
+      // a checkpoint can be deleted, but only through its own account
+      await expect(
+        c.checkpoints.remove(out.id, exact.checkpoint.id),
+      ).rejects.toBeInstanceOf(NotFoundError);
+      await c.checkpoints.remove(bank.id, exact.checkpoint.id);
+      await expect(
+        c.checkpoints.remove(bank.id, exact.checkpoint.id),
+      ).rejects.toBeInstanceOf(NotFoundError);
+      const remaining = await c.ledger.forAccount(
+        bank.id,
+        {},
+        { checkpointsOnly: true },
+      );
+      expect(remaining.total).toBe(1);
     });
 
     it("manko category can be changed and falls back to N/A", async () => {
