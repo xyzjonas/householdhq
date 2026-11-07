@@ -6,6 +6,7 @@
   import Plus from "@lucide/svelte/icons/plus";
   import Search from "@lucide/svelte/icons/search";
   import Trash2 from "@lucide/svelte/icons/trash-2";
+  import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { PAGE_SIZE, signedFor } from "#lib/account-detail.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
   import DeleteEntryDialog from "#lib/components/ledger/DeleteEntryDialog.svelte";
@@ -38,10 +39,15 @@
       categoryId?: number;
       search: string;
       page: number;
+      hideUpcoming: boolean;
+      checkpointsOnly: boolean;
     };
   } = $props();
 
   let deleting = $state<TransactionWithRelations | null>(null);
+  let deletingCheckpoint = $state<{ id: number; description: string } | null>(
+    null,
+  );
 
   const first = $derived(total === 0 ? 0 : (filters.page - 1) * PAGE_SIZE + 1);
   const last = $derived(Math.min(total, filters.page * PAGE_SIZE));
@@ -53,6 +59,8 @@
       month: filters.month,
       category: filters.categoryId,
       q: filters.search || undefined,
+      upcoming: filters.hideUpcoming ? "hide" : undefined,
+      states: filters.checkpointsOnly ? "only" : undefined,
       page: undefined,
       ...changes,
     };
@@ -125,6 +133,29 @@
           <option value={c.id}>{c.name}</option>
         {/each}
       </select>
+      <Switch
+        checked={filters.hideUpcoming}
+        onCheckedChange={(e) =>
+          go({ upcoming: e.checked ? "hide" : undefined })}
+        class="flex items-center gap-2"
+      >
+        <Switch.Control>
+          <Switch.Thumb />
+        </Switch.Control>
+        <Switch.Label class="text-sm font-medium">Hide upcoming</Switch.Label>
+        <Switch.HiddenInput />
+      </Switch>
+      <Switch
+        checked={filters.checkpointsOnly}
+        onCheckedChange={(e) => go({ states: e.checked ? "only" : undefined })}
+        class="flex items-center gap-2"
+      >
+        <Switch.Control>
+          <Switch.Thumb />
+        </Switch.Control>
+        <Switch.Label class="text-sm font-medium">States only</Switch.Label>
+        <Switch.HiddenInput />
+      </Switch>
       <div class="field-group grid-cols-[auto_1fr]">
         <span class="label preset-tonal">
           <Search size={16} aria-hidden="true" />
@@ -168,7 +199,15 @@
       <tbody>
         {#each entries as entry (entry.kind === "checkpoint" ? `c${entry.checkpoint.id}` : `t${entry.transaction.id}`)}
           {#if entry.kind === "checkpoint"}
-            <CheckpointRow checkpoint={entry.checkpoint} />
+            {@const c = entry.checkpoint}
+            <CheckpointRow
+              checkpoint={c}
+              ondelete={() =>
+                (deletingCheckpoint = {
+                  id: c.id,
+                  description: `Checkpoint ${formatMoney(c.amount)} · ${formatDate(c.created)}`,
+                })}
+            />
           {:else}
             {@const t = entry.transaction}
             {@const amount = signedFor(t, accountId)}
@@ -239,3 +278,8 @@
 </section>
 
 <DeleteEntryDialog bind:entry={deleting} />
+<DeleteEntryDialog
+  bind:entry={deletingCheckpoint}
+  action="?/deleteCheckpoint"
+  noun="checkpoint"
+/>
