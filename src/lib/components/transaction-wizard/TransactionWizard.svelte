@@ -83,7 +83,8 @@
     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
   );
   let time = $state(`${pad(now.getHours())}:${pad(now.getMinutes())}`);
-  let recurring = $state(seed?.recurring ?? false);
+  let recurring = $state((seed?.recurring ?? 0) > 0);
+  let recurringMonths = $state(seed?.recurring || 1);
   let hidden = $state(seed?.hidden ?? false);
   let important = $state(seed?.important ?? false);
   let saving = $state(false);
@@ -251,6 +252,7 @@
             bind:date
             bind:time
             bind:recurring
+            bind:recurringMonths
             bind:hidden
             bind:important
           />
@@ -343,6 +345,7 @@
       {date}
       {time}
       {recurring}
+      {recurringMonths}
       {hidden}
       {important}
     />

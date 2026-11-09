@@ -17,6 +17,7 @@
     date = $bindable(),
     time = $bindable(),
     recurring = $bindable(),
+    recurringMonths = $bindable(),
     hidden = $bindable(),
     important = $bindable(),
   }: {
@@ -29,6 +30,7 @@
     date: string;
     time: string;
     recurring: boolean;
+    recurringMonths: number;
     hidden: boolean;
     important: boolean;
   } = $props();
@@ -123,9 +125,26 @@
     <ToggleRow
       name="recurring"
       label="Recurring transaction"
-      description="Repeat every month"
+      description="Repeat every few months"
       bind:checked={recurring}
     />
+    {#if recurring}
+      <li class="border-b border-surface-200-800 py-3">
+        <label class="label">
+          <span class="wizard-label label-text">Repeat every (months)</span>
+          <input
+            class="input"
+            type="number"
+            name="recurringMonths"
+            inputmode="numeric"
+            min="1"
+            step="1"
+            bind:value={recurringMonths}
+            required
+          />
+        </label>
+      </li>
+    {/if}
     <ToggleRow
       name="isHidden"
       label="Hidden transaction"

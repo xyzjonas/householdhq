@@ -48,7 +48,7 @@ export const load: PageServerLoad = async ({ params }) => {
       targetId: type === "INCOME" ? null : tx.targetId,
       description: tx.description === "N/A" ? "" : tx.description,
       transactedAt: (tx.transactedAt ?? tx.created).toISOString(),
-      recurring: tx.recurring > 0,
+      recurring: tx.recurring,
       hidden: tx.isHidden,
       important: tx.isImportant,
     },

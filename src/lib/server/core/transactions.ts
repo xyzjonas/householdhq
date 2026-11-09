@@ -97,6 +97,7 @@ const orderBy: Record<
   "amount-asc": [{ amount: "asc" }, { id: "asc" }],
 };
 
+
 export function transactionsRepo(db: Db) {
   function buildWhere(f: Filter): Prisma.TransactionWhereInput {
     const and: Prisma.TransactionWhereInput[] = [];
@@ -244,19 +245,31 @@ export function transactionsRepo(db: Db) {
     async create(input: TransactionInput): Promise<TransactionWithRelations> {
       const { tags, categoryId, sourceId, targetId, transactedAt, ...data } =
         TransactionInput.parse(input);
-      const when = transactedAt ?? new Date();
-      return db.transaction.create({
-        data: {
-          ...data,
-          transactedAt: when,
-          confirmed: when <= new Date(),
-          source: { connect: { id: sourceId } },
-          target: { connect: { id: targetId } },
-          category: categoryId ? { connect: { id: categoryId } } : undefined,
-          tags: { connectOrCreate: tagLinks(tags) },
-        },
-        include,
+      const now = new Date();
+      const when = transactedAt ?? now;
+      const row = (at: Date) => ({
+        ...data,
+        transactedAt: at,
+        confirmed: at <= now,
+        source: { connect: { id: sourceId } },
+        target: { connect: { id: targetId } },
+        category: categoryId ? { connect: { id: categoryId } } : undefined,
+        tags: { connectOrCreate: tagLinks(tags) },
       });
+      // A recurring transaction that already happened gets its upcoming
+      // occurrence scheduled right away.
+      if (data.recurring > 0 && when <= now) {
+        const next = nextOccurrence(when, data.recurring, now);
+        return db.$transaction(async (tx) => {
+          const created = await tx.transaction.create({
+            data: row(when),
+            include,
+          });
+          await tx.transaction.create({ data: row(next) });
+          return created;
+        });
+      }
+      return db.transaction.create({ data: row(when), include });
     },
 
     async update(
