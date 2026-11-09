@@ -27,23 +27,25 @@
         <li aria-hidden="true">›</li>
         <li><a class="anchor" href={resolve("/categories")}>Categories</a></li>
         <li aria-hidden="true">›</li>
-        <li aria-current="page">
+        <li aria-current="page" class="min-w-0 wrap-anywhere">
           {data.category.id} ({data.category.name})
         </li>
       </ol>
     </nav>
     <h1
-      class="flex flex-wrap items-center gap-3 text-2xl font-extrabold tracking-tight"
+      class="flex flex-wrap items-center gap-3 text-2xl font-extrabold tracking-tight wrap-anywhere"
     >
       <CategoryGlyph icon={data.category.icon} color={data.category.color} />
       {data.category.name}
     </h1>
     {#if data.category.description}
-      <p class="text-sm text-surface-600-400">{data.category.description}</p>
+      <p class="text-sm wrap-anywhere text-surface-600-400">
+        {data.category.description}
+      </p>
     {/if}
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-2">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
     <SpendingHero
       month={data.month}
       previousMonth={data.previousMonth}

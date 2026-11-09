@@ -21,30 +21,34 @@
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
-    <div class="flex flex-col gap-2">
+    <div class="flex min-w-0 flex-col gap-2">
       <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
         <ol class="flex gap-2">
           <li><a class="anchor" href={resolve("/")}>Home</a></li>
           <li aria-hidden="true">›</li>
           <li><a class="anchor" href={resolve("/tags")}>Tags</a></li>
           <li aria-hidden="true">›</li>
-          <li aria-current="page">{data.tag.id} ({data.tag.name})</li>
+          <li aria-current="page" class="min-w-0 wrap-anywhere">
+            {data.tag.id} ({data.tag.name})
+          </li>
         </ol>
       </nav>
       <h1
-        class="flex flex-wrap items-center gap-3 text-2xl font-extrabold tracking-tight"
+        class="flex flex-wrap items-center gap-3 text-2xl font-extrabold tracking-tight wrap-anywhere"
       >
         <CategoryGlyph icon={data.tag.icon} color={data.tag.color} />
         {data.tag.name}
       </h1>
       {#if data.tag.description}
-        <p class="text-sm text-surface-600-400">{data.tag.description}</p>
+        <p class="text-sm wrap-anywhere text-surface-600-400">
+          {data.tag.description}
+        </p>
       {/if}
     </div>
     <DeleteTagDialog name={data.tag.name} />
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-2">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
     <SpendingHero
       month={data.month}
       previousMonth={data.previousMonth}

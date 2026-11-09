@@ -13,7 +13,7 @@
   const groupOf = (type: SourceType) => groups.find((g) => g.type === type);
 </script>
 
-<ul class="grid gap-3 sm:grid-cols-2">
+<ul class="grid grid-cols-1 gap-3 sm:grid-cols-2">
   {#each accounts as account (account.id)}
     {@const group = groupOf(account.type)}
     <li

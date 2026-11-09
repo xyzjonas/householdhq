@@ -21,7 +21,7 @@
       {items.length}
       {items.length === 1 ? "category has" : "categories have"} no budget
     </p>
-    <p class="text-xs text-slate-500">
+    <p class="text-xs wrap-break-word text-slate-500">
       {preview.join(", ")}{items.length > preview.length ? ", …" : ""}
     </p>
   </section>

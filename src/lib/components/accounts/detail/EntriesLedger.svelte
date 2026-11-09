@@ -89,7 +89,7 @@
   class="flex flex-col gap-5 card border border-surface-200-800 p-6"
 >
   <header class="flex flex-wrap items-start justify-between gap-4">
-    <div>
+    <div class="min-w-0">
       <h2
         id="entries-heading"
         class="flex items-center gap-2 text-lg font-bold"
@@ -101,7 +101,7 @@
           {total} recorded
         </span>
       </h2>
-      <p class="text-sm text-surface-600-400">
+      <p class="text-sm wrap-anywhere text-surface-600-400">
         Chronological transaction journal for {accountName}
       </p>
     </div>
@@ -109,7 +109,7 @@
     <form
       role="search"
       method="GET"
-      class="flex flex-wrap items-center gap-3"
+      class="flex max-w-full flex-wrap items-center gap-3"
       onsubmit={(e) => {
         e.preventDefault();
         const q = new FormData(e.currentTarget).get("q");
@@ -125,7 +125,7 @@
           e.currentTarget.value && go({ month: e.currentTarget.value })}
       />
       <select
-        class="select w-auto"
+        class="select w-auto max-w-full"
         aria-label="Category"
         value={filters.categoryId ?? ""}
         onchange={(e) => go({ category: e.currentTarget.value || undefined })}
@@ -182,7 +182,7 @@
     </form>
   </header>
 
-  <div class="overflow-x-auto">
+  <div class="relative overflow-x-auto">
     <table class="w-full border-collapse text-left">
       <thead>
         <tr

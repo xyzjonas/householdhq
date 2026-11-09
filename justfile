@@ -57,6 +57,7 @@ test:
 
 # end-to-end tests (needs a migrated + seeded database)
 e2e: db migrate seed
+  npm run db:seed:long
   npm run test:e2e
 
 # everything CI runs, except e2e

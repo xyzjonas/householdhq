@@ -19,11 +19,13 @@
         <li aria-hidden="true">›</li>
         <li><a class="anchor" href={resolve("/accounts")}>Accounts</a></li>
         <li aria-hidden="true">›</li>
-        <li aria-current="page">{data.account.id} ({data.account.name})</li>
+        <li aria-current="page" class="min-w-0 wrap-anywhere">
+          {data.account.id} ({data.account.name})
+        </li>
       </ol>
     </nav>
     <h1
-      class="flex flex-wrap items-center gap-3 text-2xl font-extrabold tracking-tight"
+      class="flex flex-wrap items-center gap-3 text-2xl font-extrabold tracking-tight wrap-anywhere"
     >
       <span
         class="size-3 rounded-full bg-emerald-600"
@@ -39,7 +41,7 @@
     </h1>
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-2">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
     <BalanceHero
       balance={data.balance}
       delta={data.delta}
