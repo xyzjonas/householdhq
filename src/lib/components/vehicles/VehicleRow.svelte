@@ -29,7 +29,7 @@
             {vehicle.name}
           </a>
         </h2>
-        <p class="text-xs text-surface-600-400">
+        <p class="text-xs wrap-break-word text-surface-600-400">
           {vehicle.brand}
           {vehicle.model}
           {#if year}
