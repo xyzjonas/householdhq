@@ -139,12 +139,19 @@ test.describe(`no horizontal overflow at ${WIDTH}px`, () => {
       } else {
         await page.goto(spec.list);
         await page.waitForLoadState("networkidle");
-        const hrefs = await page
-          .locator("main a[href]")
-          .evaluateAll((links) =>
-            links.map((a) => a.getAttribute("href") ?? ""),
-          );
-        const detail = hrefs.find((h) => spec.href.test(h));
+        // Prefer the record seeded with very long text (`db:seed:long`).
+        const links = await page.locator("main a[href]").evaluateAll((els) =>
+          els.map((a) => ({
+            href: a.getAttribute("href") ?? "",
+            long: (
+              a.closest("li, article, tr")?.textContent ??
+              a.textContent ??
+              ""
+            ).includes("LONG"),
+          })),
+        );
+        const matching = links.filter((l) => spec.href.test(l.href));
+        const detail = (matching.find((l) => l.long) ?? matching[0])?.href;
         expect(
           detail,
           `no link matching ${spec.href} on ${spec.list}`,
