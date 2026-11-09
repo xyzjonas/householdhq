@@ -102,7 +102,9 @@
         <li aria-hidden="true">›</li>
         <li><a class="anchor" href={resolve("/vehicles")}>Vehicles</a></li>
         <li aria-hidden="true">›</li>
-        <li aria-current="page">{vehicle.id} ({vehicle.name})</li>
+        <li aria-current="page" class="min-w-0 wrap-anywhere">
+          {vehicle.id} ({vehicle.name})
+        </li>
       </ol>
     </nav>
 
@@ -114,7 +116,9 @@
             {vehicle.name}
           </h1>
           <div class="flex flex-wrap items-center gap-2">
-            <span class="badge preset-tonal text-[11px] font-bold">
+            <span
+              class="badge max-w-full preset-tonal text-[11px] font-bold wrap-anywhere whitespace-normal"
+            >
               {vehicle.brand}
               {vehicle.model}
             </span>
