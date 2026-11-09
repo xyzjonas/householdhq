@@ -1,6 +1,7 @@
 <script lang="ts">
   import "./layout.css";
   import Toaster from "#lib/components/Toaster.svelte";
+  import UpdateBanner from "#lib/components/UpdateBanner.svelte";
   import AppShell from "#lib/components/AppShell.svelte";
   import type { LayoutProps } from "./$types";
 
@@ -21,4 +22,5 @@
   {@render children()}
 {/if}
 
+<UpdateBanner />
 <Toaster />
