@@ -97,7 +97,6 @@ const orderBy: Record<
   "amount-asc": [{ amount: "asc" }, { id: "asc" }],
 };
 
-
 export function transactionsRepo(db: Db) {
   function buildWhere(f: Filter): Prisma.TransactionWhereInput {
     const and: Prisma.TransactionWhereInput[] = [];
