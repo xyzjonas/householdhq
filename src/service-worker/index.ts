@@ -7,11 +7,14 @@ const ASSETS = new Set<string>([...immutable, ...assets].map((a) => a.path));
 
 sw.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((cache) => cache.addAll([...ASSETS]))
-      .then(() => sw.skipWaiting()),
+    caches.open(CACHE).then((cache) => cache.addAll([...ASSETS])),
   );
+});
+
+// A new version waits until the user accepts the update prompt (see
+// `pwa-update.svelte.ts`), so open pages never run against swapped-out assets.
+sw.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") void sw.skipWaiting();
 });
 
 sw.addEventListener("activate", (event) => {
