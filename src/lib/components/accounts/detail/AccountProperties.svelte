@@ -65,7 +65,7 @@
     </div>
   </header>
 
-  <div class="grid gap-4 md:grid-cols-3">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <InlineField
       label="Account name"
       value={current.name}
@@ -100,7 +100,7 @@
     </div>
   </div>
 
-  <div class="grid gap-4 md:grid-cols-3">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <ToggleTile
       label="Expense account"
       description="Mark this account as an expense one · Enabled in outgoing budget models"
