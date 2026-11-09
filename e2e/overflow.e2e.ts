@@ -27,6 +27,8 @@ const PAGES: PageSpec[] = [
   { name: "/transactions", url: "/transactions" },
   { name: "/transactions/new", url: "/transactions/new" },
   { name: "/settings", url: "/settings" },
+  { name: "/tags", url: "/tags" },
+  { name: "/tags/[id]", list: "/tags", href: /^\/tags\/\d+$/ },
   { name: "/accounts/[id]", list: "/accounts", href: /^\/accounts\/\d+$/ },
   {
     name: "/categories/[id]",

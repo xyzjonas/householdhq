@@ -40,7 +40,7 @@
           </p>
         </div>
         {#if item.subtitle}
-          <p class="text-xs text-slate-400">{item.subtitle}</p>
+          <p class="text-xs wrap-anywhere text-slate-400">{item.subtitle}</p>
         {/if}
       </article>
     </li>

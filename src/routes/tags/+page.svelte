@@ -48,7 +48,7 @@
     </div>
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
     <CategoriesDirectory {items} singular="tag" plural="tags">
       {#snippet children(visible)}
         <TagTable items={visible} monthLabel={label} />
