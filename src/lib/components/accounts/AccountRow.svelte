@@ -9,7 +9,7 @@
 </script>
 
 <article
-  class="relative flex flex-col items-start justify-between gap-4 card border border-surface-200-800 p-5 transition-colors hover:border-surface-400-600 lg:flex-row lg:items-center"
+  class="relative flex flex-col items-stretch justify-between gap-4 card border border-surface-200-800 p-5 transition-colors hover:border-surface-400-600 lg:flex-row lg:items-center"
 >
   <div class="flex min-w-0 items-center gap-4">
     <AccountIcon {account} />
@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <div class="text-right lg:ml-auto">
+  <div class="self-start text-right lg:ml-auto lg:self-auto">
     <p class="text-xl font-extrabold">{formatMoney(account.balance)}</p>
     <p class="text-xs text-surface-600-400">Current balance</p>
   </div>
