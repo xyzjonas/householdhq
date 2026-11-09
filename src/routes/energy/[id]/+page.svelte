@@ -26,7 +26,9 @@
           <li aria-hidden="true">›</li>
           <li><a class="anchor" href={resolve("/energy")}>Energy</a></li>
           <li aria-hidden="true">›</li>
-          <li aria-current="page">{meter.id} ({meter.name})</li>
+          <li aria-current="page" class="min-w-0 wrap-anywhere">
+            {meter.id} ({meter.name})
+          </li>
         </ol>
       </nav>
       <h1
