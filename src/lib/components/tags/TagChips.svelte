@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { chipClass, chipInteractiveClass } from "#lib/components/chip.ts";
   import type { Tag } from "#lib/server/core/types.ts";
 
   let { tags }: { tags: Pick<Tag, "id" | "name">[] } = $props();
@@ -11,7 +12,7 @@
       <li>
         <a
           href={resolve("/tags/[id]", { id: String(tag.id) })}
-          class="badge preset-tonal text-[11px] hover:preset-filled-surface-950-50"
+          class="{chipClass} {chipInteractiveClass}"
         >
           {tag.name}
         </a>

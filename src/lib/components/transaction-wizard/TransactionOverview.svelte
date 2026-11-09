@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Chip from "#lib/components/Chip.svelte";
   import { categoryIcon, fallbackColor } from "./category-icons";
   import {
     transactionTypes,
@@ -181,7 +182,7 @@
             <dt class="text-surface-600-400">Tags</dt>
             <dd class="flex flex-wrap gap-1.5">
               {#each tags as tag (tag)}
-                <span class="badge preset-tonal">{tag}</span>
+                <Chip>{tag}</Chip>
               {:else}
                 <span class="placeholder-text">None</span>
               {/each}
@@ -189,7 +190,7 @@
             <dt class="text-surface-600-400">Flags</dt>
             <dd class="flex flex-wrap gap-1.5">
               {#each flags as f (f)}
-                <span class="badge preset-tonal">{f}</span>
+                <Chip>{f}</Chip>
               {:else}
                 <span class="placeholder-text">None</span>
               {/each}

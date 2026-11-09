@@ -9,6 +9,7 @@
   import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { PAGE_SIZE, signedFor } from "#lib/account-detail.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
+  import Chip from "#lib/components/Chip.svelte";
   import TagChips from "#lib/components/tags/TagChips.svelte";
   import DeleteEntryDialog from "#lib/components/ledger/DeleteEntryDialog.svelte";
   import EntryStatusBadge from "#lib/components/ledger/EntryStatusBadge.svelte";
@@ -227,7 +228,7 @@
               </td>
               <td class="py-3 pr-4 text-xs font-semibold">
                 {#if t.category}
-                  <span class="badge preset-tonal">{t.category.name}</span>
+                  <Chip>{t.category.name}</Chip>
                 {/if}
               </td>
               <td

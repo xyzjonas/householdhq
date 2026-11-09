@@ -1,5 +1,6 @@
 <script lang="ts">
   import { TagsInput } from "@skeletonlabs/skeleton-svelte";
+  import { chipClass, chipInteractiveClass } from "#lib/components/chip.ts";
   import Plus from "@lucide/svelte/icons/plus";
   import X from "@lucide/svelte/icons/x";
 
@@ -37,7 +38,7 @@
         <TagsInput.Control class="input flex h-auto flex-wrap gap-2 py-2">
           {#each tagsInput().value as tag, index (tag)}
             <TagsInput.Item value={tag} {index}>
-              <TagsInput.ItemPreview class="badge gap-1 preset-tonal">
+              <TagsInput.ItemPreview class={chipClass}>
                 <TagsInput.ItemText>{tag}</TagsInput.ItemText>
                 <TagsInput.ItemDeleteTrigger
                   class="grid size-4 place-items-center rounded-full hover:bg-surface-500/20"
@@ -68,7 +69,7 @@
         <li>
           <button
             type="button"
-            class="badge gap-1 preset-outlined-surface-300-700 hover:preset-tonal"
+            class="{chipClass} {chipInteractiveClass}"
             onclick={() => (value = [...value, name])}
           >
             <Plus size={12} aria-hidden="true" />

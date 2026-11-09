@@ -4,6 +4,7 @@
   import Repeat from "@lucide/svelte/icons/repeat";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
   import TagChips from "#lib/components/tags/TagChips.svelte";
+  import Chip from "#lib/components/Chip.svelte";
   import ConfirmTransactionButton from "#lib/components/ConfirmTransactionButton.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import { formatDateWithYear, formatMoney } from "#lib/format.ts";
@@ -99,11 +100,7 @@
           </time>
           {#if t.category}
             <span aria-hidden="true" class="text-surface-300">•</span>
-            <span
-              class="shrink-0 rounded bg-surface-500/15 px-1.5 text-xs font-semibold"
-            >
-              {t.category.name}
-            </span>
+            <Chip>{t.category.name}</Chip>
           {/if}
           <span aria-hidden="true" class="text-surface-300">•</span>
           <span class="min-w-0">{t.source.name} → {t.target.name}</span>
