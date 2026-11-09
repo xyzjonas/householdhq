@@ -267,6 +267,23 @@ describe.skipIf(!core)("core layer", () => {
       );
     });
 
+    it("moves transactions to another category when deleting", async () => {
+      const doomed = await c.categories.create({ name: `${run}-doomed` });
+      const heir = await c.categories.create({ name: `${run}-heir` });
+      ids.categories.push(heir.id);
+      await expect(
+        c.categories.remove(doomed.id, { reassignTo: doomed.id }),
+      ).rejects.toBeInstanceOf(ConflictError);
+
+      await c.categories.remove(doomed.id, { reassignTo: heir.id });
+      await expect(c.categories.get(doomed.id)).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
+      await expect(
+        c.categories.remove(doomed.id, { reassignTo: heir.id }),
+      ).rejects.toBeInstanceOf(NotFoundError);
+    });
+
     it("sums spending and income per category within a range", async () => {
       const category = await c.categories.create({ name: `${run}-act` });
       ids.categories.push(category.id);
