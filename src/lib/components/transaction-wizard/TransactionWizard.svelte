@@ -25,12 +25,14 @@
     type WizardAccount,
     type WizardCategory,
     type WizardInitial,
+    type WizardTag,
   } from "./types";
 
   let {
     accounts,
     categories,
     suggestions = [],
+    tagOptions = [],
     errors = [],
     initialAccountId = null,
     defaultOutAccountId = null,
@@ -42,6 +44,8 @@
     categories: WizardCategory[];
     /** Previously used descriptions offered as autocomplete. */
     suggestions?: string[];
+    /** The existing tags offered in the tag picker. */
+    tagOptions?: WizardTag[];
     /** Server side validation messages to surface after a failed submit. */
     errors?: string[];
     /** Account to pre-select as the source. */
@@ -90,12 +94,23 @@
   let recurringMonths = $state(seed?.recurring || 1);
   let hidden = $state(seed?.hidden ?? false);
   let important = $state(seed?.important ?? false);
+  let tags = $state<string[]>(seed?.tags ?? []);
   let saving = $state(false);
   let confirmingDelete = $state(false);
   let heading = $state<HTMLElement>();
   let reached = $state(editing ? stages.length : 1);
   let details = $state<ReturnType<typeof DetailsStage>>();
 
+  /** The chosen tags with their configured colours (new tags have none). */
+  const chosenTags = $derived(
+    tags.map(
+      (name): WizardTag =>
+        tagOptions.find((o) => o.name.toLowerCase() === name.toLowerCase()) ?? {
+          name,
+          color: null,
+        },
+    ),
+  );
   const amount = $derived(evaluate(tape));
   const category = $derived(categories.find((c) => c.id === categoryId));
   const accountName = $derived(accounts.find((a) => a.id === sourceId)?.name);
@@ -259,6 +274,7 @@
             {type}
             {accounts}
             {suggestions}
+            {tagOptions}
             bind:sourceId={() => sourceId, (id) => (chosenSourceId = id)}
             bind:targetId
             bind:description
@@ -268,6 +284,7 @@
             bind:recurringMonths
             bind:hidden
             bind:important
+            bind:tags
           />
           {#if editing}
             <div class="px-4 pt-4 lg:hidden">{@render deleteButton()}</div>
@@ -361,6 +378,7 @@
       {recurringMonths}
       {hidden}
       {important}
+      tags={chosenTags}
     />
     {#if editing}{@render deleteButton()}{/if}
   </div>

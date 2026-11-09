@@ -29,6 +29,14 @@ export interface WizardInitial {
   recurring: number;
   hidden: boolean;
   important: boolean;
+  /** Names of the tags on the transaction. */
+  tags: string[];
+}
+
+/** An existing tag offered by the tag picker. */
+export interface WizardTag {
+  name: string;
+  color: string | null;
 }
 
 export interface WizardCategory {

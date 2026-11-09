@@ -26,6 +26,16 @@ export type CategoryInput = z.infer<typeof CategoryInput>;
 export const CategoryPatch = CategoryInput.partial();
 export type CategoryPatch = z.infer<typeof CategoryPatch>;
 
+export const TagInput = z.object({
+  name: z.string().trim().min(1),
+  description: optionalText,
+  icon: optionalText,
+  color: optionalText,
+});
+export type TagInput = z.infer<typeof TagInput>;
+export const TagPatch = TagInput.partial();
+export type TagPatch = z.infer<typeof TagPatch>;
+
 // Patch schemas are built from default-free shapes: zod's `.partial()` would
 // keep `.default()` values and silently reset omitted fields on update.
 const accountShape = {

@@ -3,6 +3,8 @@
   import BurnConcentration from "#lib/components/categories/BurnConcentration.svelte";
   import CreateCategoryDialog from "#lib/components/categories/CreateCategoryDialog.svelte";
   import CategoriesDirectory from "#lib/components/categories/CategoriesDirectory.svelte";
+  import CategoryCards from "#lib/components/categories/CategoryCards.svelte";
+  import CategoryTable from "#lib/components/categories/CategoryTable.svelte";
   import MonthSwitcher from "#lib/components/categories/MonthSwitcher.svelte";
   import RunRateCard from "#lib/components/categories/RunRateCard.svelte";
   import UnbudgetedAdvisory from "#lib/components/categories/UnbudgetedAdvisory.svelte";
@@ -54,7 +56,12 @@
       <div class="lg:hidden">
         <RunRateCard rate={runRate(items)} monthLabel={label} />
       </div>
-      <CategoriesDirectory {items} monthLabel={label} />
+      <CategoriesDirectory {items}>
+        {#snippet children(visible)}
+          <CategoryTable items={visible} monthLabel={label} />
+          <CategoryCards items={visible} />
+        {/snippet}
+      </CategoriesDirectory>
     </div>
     <aside aria-label="Spending insights" class="flex flex-col gap-6">
       <BurnConcentration slices={burnConcentration(items)} />

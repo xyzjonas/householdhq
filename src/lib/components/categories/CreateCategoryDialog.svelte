@@ -3,7 +3,19 @@
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Plus from "@lucide/svelte/icons/plus";
 
-  let { message = "" }: { message?: string } = $props();
+  let {
+    message = "",
+    noun = "category",
+    example = "Groceries",
+  }: {
+    message?: string;
+    /** What is being created, lowercase ("category", "tag"). */
+    noun?: string;
+    /** Placeholder suggestion for the name field. */
+    example?: string;
+  } = $props();
+
+  const Noun = $derived(noun[0].toUpperCase() + noun.slice(1));
 
   let open = $state(false);
   let submitting = $state(false);
@@ -12,7 +24,7 @@
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Dialog.Trigger class="btn preset-filled-surface-950-50">
     <Plus size={16} aria-hidden="true" />
-    <span>New category</span>
+    <span>New {noun}</span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -22,9 +34,9 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">New category</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold">New {noun}</Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
-          Give the category a name. It will show up in the directory right away.
+          Give the {noun} a name. It will show up in the directory right away.
         </Dialog.Description>
         <form
           method="POST"
@@ -40,7 +52,7 @@
           }}
         >
           <label class="label">
-            <span class="label-text">Category name</span>
+            <span class="label-text">{Noun} name</span>
             <input
               class="input"
               name="name"
@@ -48,7 +60,7 @@
               required
               maxlength="100"
               autocomplete="off"
-              placeholder="e.g. Groceries"
+              placeholder="e.g. {example}"
             />
           </label>
           {#if message}
@@ -63,7 +75,7 @@
               class="btn preset-filled-surface-950-50"
               disabled={submitting}
             >
-              Create category
+              Create {noun}
             </button>
           </div>
         </form>

@@ -9,6 +9,8 @@
   import { Switch } from "@skeletonlabs/skeleton-svelte";
   import { PAGE_SIZE, signedFor } from "#lib/account-detail.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
+  import Chip from "#lib/components/Chip.svelte";
+  import TagChips from "#lib/components/tags/TagChips.svelte";
   import DeleteEntryDialog from "#lib/components/ledger/DeleteEntryDialog.svelte";
   import EntryStatusBadge from "#lib/components/ledger/EntryStatusBadge.svelte";
   import LedgerPagination from "#lib/components/ledger/LedgerPagination.svelte";
@@ -220,10 +222,13 @@
               <td class="py-3 pr-4">
                 <p class="text-sm font-bold">{t.description}</p>
                 <p class="text-xs text-surface-500">{counterparty(t)}</p>
+                {#if t.tags.length}
+                  <div class="mt-1"><TagChips tags={t.tags} /></div>
+                {/if}
               </td>
               <td class="py-3 pr-4 text-xs font-semibold">
                 {#if t.category}
-                  <span class="badge preset-tonal">{t.category.name}</span>
+                  <Chip>{t.category.name}</Chip>
                 {/if}
               </td>
               <td

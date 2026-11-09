@@ -14,24 +14,29 @@
   } from "#lib/category-detail.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
   import { monthLabel } from "#lib/categories-view.ts";
+  import TagChips from "#lib/components/tags/TagChips.svelte";
   import DeleteEntryDialog from "#lib/components/ledger/DeleteEntryDialog.svelte";
   import EntryStatusBadge from "#lib/components/ledger/EntryStatusBadge.svelte";
   import LedgerPagination from "#lib/components/ledger/LedgerPagination.svelte";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
   let {
-    categoryId,
-    categoryName,
+    name,
+    route,
+    id,
     entries,
     total,
     view,
     queryFor,
   }: {
-    categoryId: number;
-    categoryName: string;
+    /** Name of the category or tag the entries belong to. */
+    name: string;
     entries: TransactionWithRelations[];
     total: number;
     view: DetailView;
+    /** The detail page these entries belong to. */
+    route: "/categories/[id]" | "/tags/[id]";
+    id: number;
     /** Query string of this view with some fields replaced. */
     queryFor: (changes: Partial<DetailView>) => string;
   } = $props();
@@ -43,13 +48,10 @@
   const scope = $derived(view.all ? "all time" : monthLabel(view.month));
 
   const go = (changes: Partial<DetailView>) =>
-    goto(
-      resolve(`/categories/[id]?${queryFor(changes)}`, {
-        id: String(categoryId),
-      }),
-      // A filter change, not a navigation: keep scroll position and focus.
-      { reset: false },
-    );
+    // A filter change, not a navigation: keep scroll position and focus.
+    goto(resolve(`${route}?${queryFor(changes)}`, { id: String(id) }), {
+      reset: false,
+    });
 </script>
 
 <section
@@ -70,7 +72,7 @@
         </span>
       </h2>
       <p class="text-sm text-surface-600-400">
-        {categoryName} transactions · {scope}
+        {name} transactions · {scope}
       </p>
     </div>
 
@@ -149,6 +151,9 @@
               <p class="text-xs text-surface-500">
                 {t.source.name} → {t.target.name}
               </p>
+              {#if t.tags.length}
+                <div class="mt-1"><TagChips tags={t.tags} /></div>
+              {/if}
             </td>
             <td
               class="py-3 text-right text-sm font-bold whitespace-nowrap tabular-nums {flowOf(

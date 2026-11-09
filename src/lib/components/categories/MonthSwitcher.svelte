@@ -8,12 +8,19 @@
     month,
     previous,
     next,
-  }: { month: string; previous: string; next: string } = $props();
+    route = "/categories",
+  }: {
+    month: string;
+    previous: string;
+    next: string;
+    /** The directory page the switcher navigates. */
+    route?: "/categories" | "/tags";
+  } = $props();
 </script>
 
 <nav aria-label="Fiscal month" class="flex items-center gap-1">
   <a
-    href="{resolve('/categories')}?month={previous}"
+    href={resolve(`${route}?month=${previous}`)}
     class="btn-icon preset-tonal"
     aria-label="Previous month: {monthLabel(previous)}"
   >
@@ -23,7 +30,7 @@
     {monthLabel(month)}
   </span>
   <a
-    href="{resolve('/categories')}?month={next}"
+    href={resolve(`${route}?month=${next}`)}
     class="btn-icon preset-tonal"
     aria-label="Next month: {monthLabel(next)}"
   >

@@ -17,6 +17,7 @@
   accounts={data.accounts}
   categories={data.categories}
   suggestions={data.suggestions}
+  tagOptions={data.tags}
   {initialAccountId}
   defaultOutAccountId={data.defaultOutAccountId}
   errors={form?.errors ?? []}

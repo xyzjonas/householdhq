@@ -1,15 +1,14 @@
-import type { Category } from "#lib/server/core/types.ts";
+import type { Category, Tag } from "#lib/server/core/types.ts";
 
 export type CategoryChanges = Partial<
   Pick<Category, "name" | "description" | "icon" | "color">
 >;
 
-/** PATCH a subset of the category's properties; resolves to the saved category. */
-export async function patchCategory(
-  id: number,
-  changes: CategoryChanges,
-): Promise<Category> {
-  const res = await fetch(`/api/categories/${id}`, {
+/** Tags have the same editable properties as categories. */
+export type TagChanges = CategoryChanges;
+
+async function patch<T>(url: string, changes: CategoryChanges): Promise<T> {
+  const res = await fetch(url, {
     method: "PATCH",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(changes),
@@ -21,4 +20,17 @@ export async function patchCategory(
     throw new Error(body?.message ?? `Update failed (${res.status})`);
   }
   return res.json();
+}
+
+/** PATCH a subset of the category's properties; resolves to the saved category. */
+export function patchCategory(
+  id: number,
+  changes: CategoryChanges,
+): Promise<Category> {
+  return patch(`/api/categories/${id}`, changes);
+}
+
+/** PATCH a subset of the tag's properties; resolves to the saved tag. */
+export function patchTag(id: number, changes: TagChanges): Promise<Tag> {
+  return patch(`/api/tags/${id}`, changes);
 }

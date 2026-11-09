@@ -1,16 +1,19 @@
 <script lang="ts">
   import { formatMoney } from "#lib/format.ts";
+  import TagPicker from "./TagPicker.svelte";
   import ToggleRow from "./ToggleRow.svelte";
   import {
     isExpenseLike,
     type TransactionType,
     type WizardAccount,
+    type WizardTag,
   } from "./types";
 
   let {
     type,
     accounts,
     suggestions,
+    tagOptions,
     sourceId = $bindable(),
     targetId = $bindable(),
     description = $bindable(),
@@ -20,10 +23,13 @@
     recurringMonths = $bindable(),
     hidden = $bindable(),
     important = $bindable(),
+    tags = $bindable(),
   }: {
     type: TransactionType;
     accounts: WizardAccount[];
     suggestions: string[];
+    /** The existing tags. */
+    tagOptions: WizardTag[];
     sourceId: number | null;
     targetId: number | null;
     description: string;
@@ -33,6 +39,8 @@
     recurringMonths: number;
     hidden: boolean;
     important: boolean;
+    /** Names of the tags on the transaction. */
+    tags: string[];
   } = $props();
 
   let descriptionInput = $state<HTMLInputElement>();
@@ -108,6 +116,11 @@
         {#each suggestions as s (s)}<option value={s}></option>{/each}
       </datalist>
     </label>
+
+    <div class="label">
+      <span class="wizard-label label-text" aria-hidden="true">Tags</span>
+      <TagPicker bind:value={tags} options={tagOptions} />
+    </div>
 
     <div class="grid grid-cols-2 gap-3">
       <label class="label">

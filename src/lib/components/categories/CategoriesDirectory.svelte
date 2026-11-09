@@ -1,21 +1,31 @@
-<script lang="ts">
+<script lang="ts" generics="T extends CategoryItem">
+  import type { Snippet } from "svelte";
   import { Tabs } from "@skeletonlabs/skeleton-svelte";
   import Search from "@lucide/svelte/icons/search";
   import {
     countForFilter,
     filterItems,
-    filters,
+    filtersFor,
     sortItems,
     sortOptions,
     type CategoryItem,
     type FilterId,
     type SortId,
   } from "#lib/categories-view.ts";
-  import CategoryCards from "./CategoryCards.svelte";
-  import CategoryTable from "./CategoryTable.svelte";
 
-  let { items, monthLabel }: { items: CategoryItem[]; monthLabel: string } =
-    $props();
+  let {
+    items,
+    singular = "category",
+    plural = "categories",
+    children,
+  }: {
+    items: T[];
+    /** What the items are called, lowercase ("category" / "categories"). */
+    singular?: string;
+    plural?: string;
+    /** Renders the filtered, sorted items (table on desktop, cards on mobile). */
+    children: Snippet<[T[]]>;
+  } = $props();
 
   let filter = $state<FilterId>("all");
   let sort = $state<SortId>("spend");
@@ -27,14 +37,16 @@
 </script>
 
 <section aria-labelledby="directory-heading" class="flex flex-col gap-4">
-  <h2 id="directory-heading" class="sr-only">Category directory</h2>
+  <h2 id="directory-heading" class="sr-only">
+    {singular[0].toUpperCase() + singular.slice(1)} directory
+  </h2>
 
   <Tabs value={filter} onValueChange={(e) => (filter = e.value as FilterId)}>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <Tabs.List
         class="flex gap-2 overflow-x-auto border-0 lg:mb-0! lg:border-b-0! lg:pb-0!"
       >
-        {#each filters as f (f.id)}
+        {#each filtersFor(plural) as f (f.id)}
           <Tabs.Trigger
             value={f.id}
             class="btn min-h-12 rounded-full text-xs font-semibold whitespace-nowrap lg:min-h-0 {filter ===
@@ -55,8 +67,8 @@
           <input
             class="input"
             type="search"
-            placeholder="Search category or note"
-            aria-label="Search categories"
+            placeholder="Search {singular} or note"
+            aria-label="Search {plural}"
             bind:value={query}
           />
         </div>
@@ -72,6 +84,5 @@
     </div>
   </Tabs>
 
-  <CategoryTable items={visible} {monthLabel} />
-  <CategoryCards items={visible} />
+  {@render children(visible)}
 </section>

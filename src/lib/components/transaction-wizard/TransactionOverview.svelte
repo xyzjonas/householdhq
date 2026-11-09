@@ -1,10 +1,12 @@
 <script lang="ts">
+  import Chip from "#lib/components/Chip.svelte";
   import { categoryIcon, fallbackColor } from "./category-icons";
   import {
     transactionTypes,
     type Currency,
     type TransactionType,
     type WizardCategory,
+    type WizardTag,
   } from "./types";
 
   let {
@@ -23,6 +25,7 @@
     recurringMonths,
     hidden,
     important,
+    tags,
   }: {
     /** Stage currently shown in the carousel. */
     stage: number;
@@ -41,6 +44,7 @@
     recurringMonths: number;
     hidden: boolean;
     important: boolean;
+    tags: WizardTag[];
   } = $props();
 
   const money = new Intl.NumberFormat("cs-CZ", {
@@ -176,10 +180,18 @@
             <dd class={when ? "font-semibold" : "placeholder-text"}>
               {when ?? "Not set"}
             </dd>
+            <dt class="text-surface-600-400">Tags</dt>
+            <dd class="flex flex-wrap gap-1.5">
+              {#each tags as tag (tag.name)}
+                <Chip color={tag.color}>{tag.name}</Chip>
+              {:else}
+                <span class="placeholder-text">None</span>
+              {/each}
+            </dd>
             <dt class="text-surface-600-400">Flags</dt>
             <dd class="flex flex-wrap gap-1.5">
               {#each flags as f (f)}
-                <span class="badge preset-tonal">{f}</span>
+                <Chip>{f}</Chip>
               {:else}
                 <span class="placeholder-text">None</span>
               {/each}

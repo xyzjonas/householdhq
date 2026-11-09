@@ -7,6 +7,7 @@ import { ledgerRepo } from "./ledger";
 import { metersRepo } from "./meters";
 import { sessionsRepo } from "./sessions";
 import { settingsRepo } from "./settings";
+import { tagsRepo } from "./tags";
 import { transactionsRepo } from "./transactions";
 import { usersRepo } from "./users";
 import { vehiclesRepo } from "./vehicles";
@@ -28,6 +29,8 @@ export function createCore(db: Db) {
   return {
     accounts: accountsRepo(db),
     categories: categoriesRepo(db),
+    /** Free-form labels, orthogonal to categories, many per transaction. */
+    tags: tagsRepo(db),
     transactions,
     /** Account journals: transactions interleaved with balance checkpoints. */
     ledger: ledgerRepo(db, transactions),

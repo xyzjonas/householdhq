@@ -5,11 +5,12 @@ import { getCore } from "#lib/server/index.ts";
 /** Reference data the transaction wizard needs, shared by create and edit. */
 export async function loadWizardData() {
   const core = getCore();
-  const [accounts, categories, recent, settings] = await Promise.all([
+  const [accounts, categories, recent, settings, tags] = await Promise.all([
     core.accounts.listWithBalances(),
     core.categories.list(),
     core.transactions.list({ limit: 50 }),
     core.settings.get(),
+    core.tags.list(),
   ]);
   const suggestions = [
     ...new Set(
@@ -30,6 +31,8 @@ export async function loadWizardData() {
       icon,
     })),
     suggestions,
+    /** The existing tags. */
+    tags: tags.map(({ name, color }) => ({ name, color })),
     /** Where expenses are paid to unless the user picks another account. */
     defaultOutAccountId: settings.defaultOutAccountId,
   };
@@ -70,9 +73,20 @@ const failure = (values: Record<string, string>, errors: string[]) =>
  * transaction creation and updates. Returns a `fail()` result on bad input.
  */
 export async function parseTransactionForm(request: Request) {
+  const formData = await request.formData();
   const values = Object.fromEntries(
-    [...(await request.formData())].filter(([, v]) => typeof v === "string"),
+    [...formData].filter(([, v]) => typeof v === "string"),
   ) as Record<string, string>;
+  // The one field that repeats: a transaction has any number of tags.
+  const tags = [
+    ...new Set(
+      formData
+        .getAll("tags")
+        .filter((v): v is string => typeof v === "string")
+        .map((v) => v.trim())
+        .filter(Boolean),
+    ),
+  ];
   const parsed = Form.safeParse(values);
   if (!parsed.success) {
     return failure(
@@ -133,5 +147,6 @@ export async function parseTransactionForm(request: Request) {
     recurring: recurring ? recurringMonths : 0,
     isHidden: rest.isHidden || type === "HIDDEN",
     isImportant: rest.isImportant,
+    tags,
   };
 }
