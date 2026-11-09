@@ -47,11 +47,22 @@
     <li
       class="flex items-center gap-3 border-b border-surface-200-800 px-4 py-3 transition-colors duration-150 last:border-b-0 hover:bg-surface-500/10"
     >
-      <CategoryGlyph
-        icon={t.category?.icon}
-        color={t.category?.color}
-        compact
-      />
+      {#if t.category}
+        <a
+          href={resolve("/categories/[id]", { id: String(t.category.id) })}
+          class="shrink-0 rounded-full transition-opacity hover:opacity-75"
+          aria-label="Open category {t.category.name}"
+          title={t.category.name}
+        >
+          <CategoryGlyph
+            icon={t.category.icon}
+            color={t.category.color}
+            compact
+          />
+        </a>
+      {:else}
+        <CategoryGlyph icon={null} color={null} compact />
+      {/if}
 
       <div class="min-w-0 flex-1">
         <h3 class="flex min-w-0 items-center gap-1.5">
