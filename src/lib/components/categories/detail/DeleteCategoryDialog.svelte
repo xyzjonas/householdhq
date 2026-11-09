@@ -61,7 +61,11 @@
             return async ({ result, update }) => {
               submitting = false;
               if (result.type === "redirect") {
-                toaster.success({ title: "Category deleted" });
+                toaster.success({
+                  title: needsTarget
+                    ? `Category deleted · ${transactionCount} ${noun} moved`
+                    : "Category deleted",
+                });
               } else if (result.type === "failure") {
                 toaster.error({
                   title:
