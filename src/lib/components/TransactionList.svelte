@@ -107,7 +107,11 @@
         {formatSigned(amount, t.currency)}
       </p>
       {#if isDue(t)}
-        <ConfirmTransactionButton id={t.id} description={t.description} />
+        <ConfirmTransactionButton
+          id={t.id}
+          description={t.description}
+          recurring={t.recurring > 0}
+        />
       {/if}
       <a
         href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
