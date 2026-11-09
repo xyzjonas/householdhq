@@ -42,13 +42,6 @@ const PAGES: PageSpec[] = [
   },
 ];
 
-/**
- * Pages that still overflow. Fixing a page means deleting its entry here, so
- * the check starts guarding it.
- */
-const KNOWN_OVERFLOW = new Set<string>([
-]);
-
 async function findOverflow(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const limit = window.innerWidth;
@@ -136,7 +129,6 @@ test.describe(`no horizontal overflow at ${WIDTH}px`, () => {
 
   for (const spec of PAGES) {
     test(spec.name, async ({ page }) => {
-      test.fixme(KNOWN_OVERFLOW.has(spec.name), "still overflows at 375px");
       await login(page);
 
       let url: string;
