@@ -324,6 +324,12 @@ describe.skipIf(!core)("core layer", () => {
           (m) => m.spent,
         ),
       ).toEqual([25, 0, 150]);
+      // Income series: incoming money only.
+      expect(
+        (
+          await c.categories.spendingByMonth(category.id, range, "received")
+        ).map((m) => m.spent),
+      ).toEqual([0, 0, 900]);
     });
 
     it("rejects duplicate names", async () => {

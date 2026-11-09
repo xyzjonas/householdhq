@@ -40,8 +40,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
       ? undefined
       : monthRange(shiftMonth(month, 1 - Number(range))).from;
 
-  const [series, entries] = await Promise.all([
+  const [series, incomeSeries, entries] = await Promise.all([
     core.categories.spendingByMonth(id, { from: chartFrom, to }),
+    core.categories.spendingByMonth(id, { from: chartFrom, to }, "received"),
     core.transactions.list({
       categoryId: id,
       ...(all ? {} : { from, to }),
@@ -68,6 +69,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
     average: averageSpend(series),
     monthEntryCount: monthEntries.total,
     series: series.map((s) => ({
+      monthStart: s.monthStart.toISOString(),
+      spent: s.spent,
+    })),
+    incomeSeries: incomeSeries.map((s) => ({
       monthStart: s.monthStart.toISOString(),
       spent: s.spent,
     })),

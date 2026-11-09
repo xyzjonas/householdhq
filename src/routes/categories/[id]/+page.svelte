@@ -55,6 +55,7 @@
     />
     <SpendingChart
       series={data.series}
+      incomeSeries={data.incomeSeries}
       range={data.view.range}
       categoryId={data.category.id}
       {queryFor}

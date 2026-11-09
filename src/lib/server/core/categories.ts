@@ -66,19 +66,22 @@ export function categoriesRepo(db: Db) {
      * Money spent in a category per calendar month (UTC), zero-filled, for
      * months in `[from, to)`. Without `from` the series starts at the
      * category's first spending. Same definition of "spent" as
-     * `listWithActivity`.
+     * `listWithActivity`. With `flow: "received"` it sums incoming money
+     * instead (reported in the same `spent` field).
      */
     async spendingByMonth(
       id: number,
       range: { from?: Date; to: Date },
+      flow: "spent" | "received" = "spent",
     ): Promise<MonthlySpend[]> {
+      const outgoing = flow === "spent";
       const rows = await db.transaction.findMany({
         where: {
           categoryId: id,
           cancelled: false,
           confirmed: true,
-          source: { isOut: false },
-          target: { isOut: true },
+          source: { isOut: !outgoing },
+          target: { isOut: outgoing },
           transactedAt: { gte: range.from, lt: range.to },
         },
         select: { amount: true, transactedAt: true },

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { SegmentedControl } from "@skeletonlabs/skeleton-svelte";
   import {
     chartRanges,
     type ChartRange,
@@ -7,19 +8,45 @@
   } from "#lib/category-detail.ts";
   import { formatMoney } from "#lib/format.ts";
 
+  type Series = { monthStart: string; spent: number }[];
+  type Mode = "out" | "in";
+
   let {
-    series,
+    series: spendingSeries,
+    incomeSeries,
     range,
     categoryId,
     queryFor,
     color,
   }: {
-    series: { monthStart: string; spent: number }[];
+    series: Series;
+    incomeSeries: Series;
     range: ChartRange;
     categoryId: number;
     queryFor: (changes: Partial<DetailView>) => string;
     color: string | null;
   } = $props();
+
+  const modes: { id: Mode; label: string }[] = [
+    { id: "out", label: "Spending" },
+    { id: "in", label: "Income" },
+  ];
+  const copy = {
+    out: {
+      title: "Spending history",
+      noun: "spending",
+      empty: "No spending recorded yet.",
+    },
+    in: {
+      title: "Income history",
+      noun: "income",
+      empty: "No income recorded yet.",
+    },
+  };
+
+  let mode = $state<Mode>("out");
+  const series = $derived(mode === "out" ? spendingSeries : incomeSeries);
+  const text = $derived(copy[mode]);
 
   const W = 480;
   const H = 180;
@@ -57,21 +84,21 @@
   const total = $derived(series.reduce((sum, s) => sum + s.spent, 0));
   const ariaLabel = $derived(
     series.length
-      ? `Monthly spending, ${bars[0].full} to ${bars[bars.length - 1].full}: ` +
+      ? `Monthly ${text.noun}, ${bars[0].full} to ${bars[bars.length - 1].full}: ` +
           bars.map((b) => `${b.full} ${formatMoney(b.spent)}`).join(", ")
-      : "No spending history",
+      : `No ${text.noun} history`,
   );
 </script>
 
 <section
-  aria-labelledby="spending-heading"
+  aria-labelledby="chart-heading"
   class="flex flex-col justify-between gap-4 card border border-surface-200-800 p-6"
 >
   <header class="flex flex-wrap items-start justify-between gap-3">
     <div>
-      <h2 id="spending-heading" class="text-lg font-bold">Spending history</h2>
+      <h2 id="chart-heading" class="text-lg font-bold">{text.title}</h2>
       <p class="text-sm text-surface-600-400">
-        Monthly spending, {series.length}
+        Monthly {text.noun}, {series.length}
         {series.length === 1 ? "month" : "months"}
       </p>
     </div>
@@ -145,6 +172,22 @@
       </div>
     </dl>
   {:else}
-    <p class="text-sm opacity-70">No spending recorded yet.</p>
+    <p class="text-sm opacity-70">{text.empty}</p>
   {/if}
+
+  <SegmentedControl
+    value={mode}
+    onValueChange={(e) => (mode = e.value as Mode)}
+    class="w-full"
+  >
+    <SegmentedControl.Control class="w-full">
+      <SegmentedControl.Indicator />
+      {#each modes as m (m.id)}
+        <SegmentedControl.Item value={m.id} class="flex-1 justify-center">
+          <SegmentedControl.ItemText>{m.label}</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      {/each}
+    </SegmentedControl.Control>
+  </SegmentedControl>
 </section>
