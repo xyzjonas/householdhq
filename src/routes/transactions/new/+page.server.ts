@@ -1,4 +1,3 @@
-import { redirect } from "@sveltejs/kit";
 import { getCore } from "#lib/server/index.ts";
 import {
   loadWizardData,
@@ -12,7 +11,8 @@ export const actions: Actions = {
   default: async ({ request }) => {
     const input = await parseTransactionForm(request);
     if ("status" in input) return input;
-    await getCore().transactions.create(input);
-    redirect(303, "/");
+    const { next } = await getCore().transactions.createScheduled(input);
+    // The client toasts the outcome, then navigates home.
+    return { created: true, nextAt: next?.transactedAt?.toISOString() ?? null };
   },
 };

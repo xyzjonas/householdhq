@@ -20,6 +20,7 @@
     date,
     time,
     recurring,
+    recurringMonths,
     hidden,
     important,
   }: {
@@ -37,6 +38,7 @@
     date: string;
     time: string;
     recurring: boolean;
+    recurringMonths: number;
     hidden: boolean;
     important: boolean;
   } = $props();
@@ -60,7 +62,10 @@
   const account = $derived(detailsReached ? accountName : undefined);
   const flags = $derived(
     [
-      recurring && "Recurring",
+      recurring &&
+        (recurringMonths === 1
+          ? "Every month"
+          : `Every ${recurringMonths} months`),
       hidden && "Hidden",
       important && "Important",
     ].filter((f): f is string => !!f),

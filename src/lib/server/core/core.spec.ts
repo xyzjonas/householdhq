@@ -612,6 +612,36 @@ describe.skipIf(!core)("core layer", () => {
       }
     });
 
+    it("schedules the next occurrence of a completed recurring transaction", async () => {
+      const [a, b] = await Promise.all([
+        c.accounts.create({ name: `${run}-ra` }),
+        c.accounts.create({ name: `${run}-rb` }),
+      ]);
+      ids.accounts.push(a.id, b.id);
+      const past = new Date();
+      past.setDate(1);
+      past.setMonth(past.getMonth() - 1);
+      const tx = await c.transactions.create({
+        description: `${run} rent`,
+        amount: 9,
+        sourceId: a.id,
+        targetId: b.id,
+        transactedAt: past,
+        recurring: 1,
+      });
+      const { items } = await c.transactions.list({
+        accountId: a.id,
+        sort: "date-asc",
+      });
+      ids.transactions.push(...items.map((t) => t.id));
+      expect(items).toHaveLength(2);
+      expect(items[0].id).toBe(tx.id);
+      expect(items[0].confirmed).toBe(true);
+      expect(items[1].confirmed).toBe(false);
+      expect(items[1].recurring).toBe(1);
+      expect(items[1].transactedAt!.getTime()).toBeGreaterThan(Date.now());
+    });
+
     it("lists with filters, paginates and updates", async () => {
       const [a, b] = await Promise.all([
         c.accounts.create({ name: `${run}-a` }),

@@ -242,21 +242,47 @@ export function transactionsRepo(db: Db) {
     },
 
     async create(input: TransactionInput): Promise<TransactionWithRelations> {
+      return (await this.createScheduled(input)).transaction;
+    },
+
+    /**
+     * Like `create`, but also reports the upcoming occurrence that got
+     * scheduled when a recurring transaction was recorded as already happened.
+     */
+    async createScheduled(input: TransactionInput): Promise<{
+      transaction: TransactionWithRelations;
+      next: TransactionWithRelations | null;
+    }> {
       const { tags, categoryId, sourceId, targetId, transactedAt, ...data } =
         TransactionInput.parse(input);
-      const when = transactedAt ?? new Date();
-      return db.transaction.create({
-        data: {
-          ...data,
-          transactedAt: when,
-          confirmed: when <= new Date(),
-          source: { connect: { id: sourceId } },
-          target: { connect: { id: targetId } },
-          category: categoryId ? { connect: { id: categoryId } } : undefined,
-          tags: { connectOrCreate: tagLinks(tags) },
-        },
-        include,
+      const now = new Date();
+      const when = transactedAt ?? now;
+      const row = (at: Date) => ({
+        ...data,
+        transactedAt: at,
+        confirmed: at <= now,
+        source: { connect: { id: sourceId } },
+        target: { connect: { id: targetId } },
+        category: categoryId ? { connect: { id: categoryId } } : undefined,
+        tags: { connectOrCreate: tagLinks(tags) },
       });
+      if (data.recurring > 0 && when <= now) {
+        const at = nextOccurrence(when, data.recurring, now);
+        return db.$transaction(async (tx) => ({
+          transaction: await tx.transaction.create({
+            data: row(when),
+            include,
+          }),
+          next: await tx.transaction.create({ data: row(at), include }),
+        }));
+      }
+      return {
+        transaction: await db.transaction.create({
+          data: row(when),
+          include,
+        }),
+        next: null,
+      };
     },
 
     async update(

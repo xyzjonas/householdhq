@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import ArrowRight from "@lucide/svelte/icons/arrow-right";
@@ -7,6 +8,8 @@
   import Check from "@lucide/svelte/icons/check";
   import X from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
+  import { formatDate } from "#lib/format.ts";
+  import { toaster } from "#lib/toaster.ts";
   import AmountStage from "./AmountStage.svelte";
   import { evaluate } from "./calculator";
   import CategoryStage from "./CategoryStage.svelte";
@@ -83,7 +86,8 @@
     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
   );
   let time = $state(`${pad(now.getHours())}:${pad(now.getMinutes())}`);
-  let recurring = $state(seed?.recurring ?? false);
+  let recurring = $state((seed?.recurring ?? 0) > 0);
+  let recurringMonths = $state(seed?.recurring || 1);
   let hidden = $state(seed?.hidden ?? false);
   let important = $state(seed?.important ?? false);
   let saving = $state(false);
@@ -155,8 +159,18 @@
       return;
     }
     saving = true;
-    return async ({ update }) => {
-      await update({ reset: false });
+    return async ({ result, update }) => {
+      if (result.type === "success" && result.data?.created) {
+        const nextAt = result.data.nextAt as string | null;
+        toaster.success({
+          title: nextAt
+            ? `Transaction created and next one scheduled for ${formatDate(nextAt)}`
+            : "Transaction created",
+        });
+        await goto(resolve("/"));
+      } else {
+        await update({ reset: false });
+      }
       saving = false;
     };
   }}
@@ -251,6 +265,7 @@
             bind:date
             bind:time
             bind:recurring
+            bind:recurringMonths
             bind:hidden
             bind:important
           />
@@ -343,6 +358,7 @@
       {date}
       {time}
       {recurring}
+      {recurringMonths}
       {hidden}
       {important}
     />

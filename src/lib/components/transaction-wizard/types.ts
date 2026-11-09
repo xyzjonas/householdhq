@@ -25,7 +25,8 @@ export interface WizardInitial {
   description: string;
   /** ISO timestamp. */
   transactedAt: string;
-  recurring: boolean;
+  /** Repeat every n months; 0 when not recurring. */
+  recurring: number;
   hidden: boolean;
   important: boolean;
 }

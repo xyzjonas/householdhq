@@ -51,6 +51,13 @@ const Form = z.object({
   description: z.string().trim().optional(),
   transactedAt: z.coerce.date("Pick a valid date and time"),
   recurring: flag,
+  recurringMonths: z.preprocess(
+    (v) => (v === "" || v === undefined ? 1 : v),
+    z.coerce
+      .number("Repeat period must be a number")
+      .int("Repeat period must be a whole number of months")
+      .min(1, "Repeat period must be at least 1 month"),
+  ),
   isHidden: flag,
   isImportant: flag,
 });
@@ -73,8 +80,15 @@ export async function parseTransactionForm(request: Request) {
       Object.values(z.flattenError(parsed.error).fieldErrors).flat(),
     );
   }
-  const { type, accountId, targetId, description, recurring, ...rest } =
-    parsed.data;
+  const {
+    type,
+    accountId,
+    targetId,
+    description,
+    recurring,
+    recurringMonths,
+    ...rest
+  } = parsed.data;
 
   const core = getCore();
   const accounts = await core.accounts.list();
@@ -116,7 +130,7 @@ export async function parseTransactionForm(request: Request) {
     description: description || category?.name,
     sourceId,
     targetId: target,
-    recurring: recurring ? 1 : 0,
+    recurring: recurring ? recurringMonths : 0,
     isHidden: rest.isHidden || type === "HIDDEN",
     isImportant: rest.isImportant,
   };
