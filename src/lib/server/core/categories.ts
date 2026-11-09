@@ -66,22 +66,34 @@ export function categoriesRepo(db: Db) {
      * Money spent in a category per calendar month (UTC), zero-filled, for
      * months in `[from, to)`. Without `from` the series starts at the
      * category's first spending. Same definition of "spent" as
-     * `listWithActivity`. With `flow: "received"` it sums incoming money
-     * instead (reported in the same `spent` field).
+     * `listWithActivity`. With `flow: "received"` or `"transferred"` it sums
+     * incoming money or money moved between accounts instead (reported in
+     * the same `spent` field).
      */
     async spendingByMonth(
       id: number,
       range: { from?: Date; to: Date },
-      flow: "spent" | "received" = "spent",
+      flow: "spent" | "received" | "transferred" = "spent",
     ): Promise<MonthlySpend[]> {
-      const outgoing = flow === "spent";
+      // Same split as `flowOf` on the client.
+      const direction: Prisma.TransactionWhereInput =
+        flow === "transferred"
+          ? {
+              OR: [
+                { source: { isOut: false }, target: { isOut: false } },
+                { source: { isOut: true }, target: { isOut: true } },
+              ],
+            }
+          : {
+              source: { isOut: flow === "received" },
+              target: { isOut: flow === "spent" },
+            };
       const rows = await db.transaction.findMany({
         where: {
           categoryId: id,
           cancelled: false,
           confirmed: true,
-          source: { isOut: !outgoing },
-          target: { isOut: outgoing },
+          ...direction,
           transactedAt: { gte: range.from, lt: range.to },
         },
         select: { amount: true, transactedAt: true },

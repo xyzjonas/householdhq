@@ -9,11 +9,12 @@
   import { formatMoney } from "#lib/format.ts";
 
   type Series = { monthStart: string; spent: number }[];
-  type Mode = "out" | "in";
+  type Mode = "out" | "in" | "transfer";
 
   let {
     series: spendingSeries,
     incomeSeries,
+    transferSeries,
     range,
     categoryId,
     queryFor,
@@ -21,6 +22,7 @@
   }: {
     series: Series;
     incomeSeries: Series;
+    transferSeries: Series;
     range: ChartRange;
     categoryId: number;
     queryFor: (changes: Partial<DetailView>) => string;
@@ -30,8 +32,9 @@
   const modes: { id: Mode; label: string }[] = [
     { id: "out", label: "Spending" },
     { id: "in", label: "Income" },
+    { id: "transfer", label: "Transferred" },
   ];
-  const copy = {
+  const copy: Record<Mode, { title: string; noun: string; empty: string }> = {
     out: {
       title: "Spending history",
       noun: "spending",
@@ -42,10 +45,20 @@
       noun: "income",
       empty: "No income recorded yet.",
     },
+    transfer: {
+      title: "Transfer history",
+      noun: "transfers",
+      empty: "No transfers recorded yet.",
+    },
   };
 
   let mode = $state<Mode>("out");
-  const series = $derived(mode === "out" ? spendingSeries : incomeSeries);
+  const seriesByMode = $derived({
+    out: spendingSeries,
+    in: incomeSeries,
+    transfer: transferSeries,
+  });
+  const series = $derived(seriesByMode[mode]);
   const text = $derived(copy[mode]);
 
   const W = 480;
