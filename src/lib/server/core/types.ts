@@ -71,6 +71,16 @@ export type CategoryWithActivity = Category & {
   received: number;
 };
 
+/** A tag with its activity within a date range. */
+export type TagWithActivity = Tag & {
+  /** Money moved from household accounts to external ("out") accounts. */
+  spent: number;
+  /** Money received from external accounts. */
+  received: number;
+  /** Completed transactions carrying the tag in the range, whatever their flow. */
+  entries: number;
+};
+
 /** Money spent (or received, see `spendingByMonth`) in a category during the calendar month starting `monthStart`. */
 export interface MonthlySpend {
   monthStart: Date;

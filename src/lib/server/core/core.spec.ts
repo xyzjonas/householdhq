@@ -131,6 +131,7 @@ describe.skipIf(!core)("core layer", () => {
   const ids = {
     accounts: [] as number[],
     categories: [] as number[],
+    tags: [] as number[],
     transactions: [] as number[],
     users: [] as number[],
     vehicles: [] as number[],
@@ -144,6 +145,7 @@ describe.skipIf(!core)("core layer", () => {
     for (const id of ids.accounts) await c.accounts.remove(id).catch(() => {});
     for (const id of ids.categories)
       await c.categories.remove(id).catch(() => {});
+    for (const id of ids.tags) await c.tags.remove(id).catch(() => {});
     for (const id of ids.users) await c.users.remove(id).catch(() => {});
     await c.disconnect();
   });
@@ -347,6 +349,135 @@ describe.skipIf(!core)("core layer", () => {
       await expect(
         c.categories.create({ name: `${run}-dup` }),
       ).rejects.toBeInstanceOf(ConflictError);
+    });
+  });
+
+  describe("tags", () => {
+    it("creates, reads, updates and deletes", async () => {
+      const created = await c.tags.create({ name: `${run}-tag` });
+      ids.tags.push(created.id);
+      expect((await c.tags.get(created.id)).name).toBe(`${run}-tag`);
+
+      const updated = await c.tags.update(created.id, { color: "#fff" });
+      expect(updated.color).toBe("#fff");
+      expect((await c.tags.list()).map((t) => t.id)).toContain(created.id);
+
+      await c.tags.remove(created.id);
+      await expect(c.tags.get(created.id)).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
+      await expect(
+        c.tags.update(created.id, { color: "#000" }),
+      ).rejects.toBeInstanceOf(NotFoundError);
+    });
+
+    it("rejects duplicate names", async () => {
+      const first = await c.tags.create({ name: `${run}-tagdup` });
+      ids.tags.push(first.id);
+      await expect(
+        c.tags.create({ name: `${run}-tagdup` }),
+      ).rejects.toBeInstanceOf(ConflictError);
+    });
+
+    it("sums activity and monthly series over overlapping tags", async () => {
+      const main = await c.accounts.create({ name: `${run}-tag-main` });
+      const outside = await c.accounts.create({
+        name: `${run}-tag-out`,
+        isOut: true,
+        type: "OUT",
+      });
+      ids.accounts.push(main.id, outside.id);
+      const tx = async (
+        amount: number,
+        sourceId: number,
+        targetId: number,
+        transactedAt: Date,
+        tags: string[],
+      ) => {
+        const t = await c.transactions.create({
+          description: `${run}-tag`,
+          amount,
+          sourceId,
+          targetId,
+          transactedAt,
+          tags,
+        });
+        ids.transactions.push(t.id);
+        return t;
+      };
+      const trip = `${run}-trip`;
+      const food = `${run}-food-tag`;
+      const from = new Date("2002-02-01T00:00:00Z");
+      const to = new Date("2002-03-01T00:00:00Z");
+      const inRange = new Date("2002-02-10T12:00:00Z");
+      await tx(100, main.id, outside.id, inRange, [trip, food]);
+      await tx(40, main.id, outside.id, inRange, [food]);
+      await tx(500, outside.id, main.id, inRange, [trip]);
+      await tx(25, main.id, outside.id, new Date("2002-01-20T12:00:00Z"), [
+        trip,
+      ]);
+      await tx(999, main.id, outside.id, new Date("2002-03-01T00:00:00Z"), [
+        trip,
+      ]);
+
+      const tags = await c.tags.listWithActivity({ from, to });
+      const byName = (name: string) => tags.find((t) => t.name === name)!;
+      ids.tags.push(byName(trip).id, byName(food).id);
+      // A transaction counts towards each of its tags.
+      expect(byName(trip)).toMatchObject({
+        spent: 100,
+        received: 500,
+        entries: 2,
+      });
+      expect(byName(food)).toMatchObject({
+        spent: 140,
+        received: 0,
+        entries: 2,
+      });
+
+      const range = { from: new Date("2002-01-01T00:00:00Z"), to };
+      expect(
+        (await c.tags.spendingByMonth(byName(trip).id, range)).map(
+          (m) => m.spent,
+        ),
+      ).toEqual([25, 100]);
+      expect(
+        (await c.tags.spendingByMonth(byName(trip).id, range, "received")).map(
+          (m) => m.spent,
+        ),
+      ).toEqual([0, 500]);
+    });
+
+    it("detaches a deleted tag but keeps its transactions and children", async () => {
+      const parent = await c.tags.create({ name: `${run}-parent` });
+      const child = await c.tags.create({ name: `${run}-child` });
+      ids.tags.push(parent.id, child.id);
+      await db!.tag.update({
+        where: { id: child.id },
+        data: { parentId: parent.id },
+      });
+      const main = await c.accounts.create({ name: `${run}-tagdel-main` });
+      const outside = await c.accounts.create({
+        name: `${run}-tagdel-out`,
+        isOut: true,
+        type: "OUT",
+      });
+      ids.accounts.push(main.id, outside.id);
+      const t = await c.transactions.create({
+        description: `${run}-tagdel`,
+        amount: 5,
+        sourceId: main.id,
+        targetId: outside.id,
+        tags: [parent.name, child.name],
+      });
+      ids.transactions.push(t.id);
+
+      await c.tags.remove(parent.id);
+
+      expect((await c.tags.get(child.id)).parentId).toBeNull();
+      expect((await c.transactions.get(t.id)).tags.map((x) => x.name)).toEqual([
+        child.name,
+      ]);
     });
   });
 
