@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { Switch } from "@skeletonlabs/skeleton-svelte";
+  import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
   import Search from "@lucide/svelte/icons/search";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -160,6 +161,13 @@
             </td>
             <td class="py-3 pl-4"><EntryStatusBadge entry={t} /></td>
             <td class="py-3 text-right whitespace-nowrap">
+              <a
+                href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
+                class="btn-icon btn-icon-sm hover:preset-tonal"
+                aria-label="Edit {t.description}"
+              >
+                <Pencil size={16} aria-hidden="true" />
+              </a>
               <button
                 type="button"
                 class="btn-icon btn-icon-sm hover:preset-tonal-error"
