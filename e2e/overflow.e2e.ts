@@ -53,7 +53,6 @@ const KNOWN_OVERFLOW = new Set<string>([
   "/vehicles",
   "/transactions/new",
   "/accounts/[id]",
-  "/categories/[id]",
   "/energy/[id]",
   "/vehicles/[id]",
   "/transactions/[id]/edit",
