@@ -12,7 +12,8 @@
     month,
     previousMonth,
     nextMonth,
-    categoryId,
+    route,
+    id,
     queryFor,
     spent,
     delta,
@@ -22,7 +23,10 @@
     month: string;
     previousMonth: string;
     nextMonth: string;
-    categoryId: number;
+    /** The detail page these links point back to. */
+    route: "/categories/[id]" | "/tags/[id]";
+    id: number;
+    /** Query string of this view with some fields replaced. */
     queryFor: (changes: Partial<DetailView>) => string;
     spent: number;
     /** Change versus the previous month; `null` when there is none. */
@@ -50,12 +54,9 @@
       </h2>
       <nav aria-label="Month" class="flex items-center gap-1">
         <a
-          href={resolve(
-            `/categories/[id]?${queryFor({ month: previousMonth })}`,
-            {
-              id: String(categoryId),
-            },
-          )}
+          href={resolve(`${route}?${queryFor({ month: previousMonth })}`, {
+            id: String(id),
+          })}
           class="btn-icon preset-tonal"
           aria-label="Previous month: {monthLabel(previousMonth)}"
         >
@@ -68,8 +69,8 @@
           {monthLabel(month)}
         </span>
         <a
-          href={resolve(`/categories/[id]?${queryFor({ month: nextMonth })}`, {
-            id: String(categoryId),
+          href={resolve(`${route}?${queryFor({ month: nextMonth })}`, {
+            id: String(id),
           })}
           class="btn-icon preset-tonal"
           aria-label="Next month: {monthLabel(nextMonth)}"

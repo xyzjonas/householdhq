@@ -5,6 +5,7 @@
   import CategoryProperties from "#lib/components/categories/detail/CategoryProperties.svelte";
   import SpendingChart from "#lib/components/categories/detail/SpendingChart.svelte";
   import SpendingHero from "#lib/components/categories/detail/SpendingHero.svelte";
+  import { patchCategory } from "#lib/categories-client.ts";
   import { viewQuery, type DetailView } from "#lib/category-detail.ts";
   import type { PageProps } from "./$types";
 
@@ -46,7 +47,8 @@
       month={data.month}
       previousMonth={data.previousMonth}
       nextMonth={data.nextMonth}
-      categoryId={data.category.id}
+      route="/categories/[id]"
+      id={data.category.id}
       {queryFor}
       spent={data.spent}
       delta={data.delta}
@@ -58,22 +60,24 @@
       incomeSeries={data.incomeSeries}
       transferSeries={data.transferSeries}
       range={data.view.range}
-      categoryId={data.category.id}
+      route="/categories/[id]"
+      id={data.category.id}
       {queryFor}
       color={data.category.color}
     />
   </div>
 
   {#key data.category.id}
-    <CategoryProperties category={data.category} />
+    <CategoryProperties category={data.category} patch={patchCategory} />
   {/key}
 
   <CategoryEntries
-    categoryName={data.category.name}
+    name={data.category.name}
     entries={data.entries}
     total={data.total}
     view={data.view}
-    categoryId={data.category.id}
+    route="/categories/[id]"
+    id={data.category.id}
     {queryFor}
   />
 </div>

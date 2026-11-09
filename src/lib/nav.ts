@@ -4,6 +4,7 @@ import ChartColumn from "@lucide/svelte/icons/chart-column";
 import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
 import Receipt from "@lucide/svelte/icons/receipt";
 import Settings from "@lucide/svelte/icons/settings";
+import Tag from "@lucide/svelte/icons/tag";
 import Tags from "@lucide/svelte/icons/tags";
 import Wallet from "@lucide/svelte/icons/wallet";
 import Zap from "@lucide/svelte/icons/zap";
@@ -15,6 +16,7 @@ export interface NavItem {
     | "/"
     | "/accounts"
     | "/categories"
+    | "/tags"
     | "/transactions"
     | "/vehicles"
     | "/energy"
@@ -34,6 +36,7 @@ export const navItems: NavItem[] = [
     icon: Receipt,
     primary: true,
   },
+  { label: "Tags", href: "/tags", icon: Tag },
   { label: "Vehicles", href: "/vehicles", icon: Car },
   { label: "Energy", href: "/energy", icon: Zap },
   { label: "Analytics", icon: ChartColumn },

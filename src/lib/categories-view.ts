@@ -25,8 +25,11 @@ export interface CategoryItem {
 export type FilterId = "all" | "spending" | "inflows" | "inactive";
 export type SortId = "spend" | "name";
 
-export const filters: { id: FilterId; label: string }[] = [
-  { id: "all", label: "All categories" },
+/** Directory tabs; `plural` names the listed things ("categories", "tags"). */
+export const filtersFor = (
+  plural: string,
+): { id: FilterId; label: string }[] => [
+  { id: "all", label: `All ${plural}` },
   { id: "spending", label: "Spending" },
   { id: "inflows", label: "Inflows" },
   { id: "inactive", label: "No activity" },
@@ -91,10 +94,10 @@ function matchesFilter(i: CategoryItem, f: FilterId): boolean {
 }
 
 /** Case-insensitive match on name and subtitle. */
-export function filterItems(
-  items: CategoryItem[],
+export function filterItems<T extends CategoryItem>(
+  items: T[],
   opts: { filter: FilterId; query: string },
-): CategoryItem[] {
+): T[] {
   const q = opts.query.trim().toLowerCase();
   return items.filter(
     (i) =>
@@ -105,7 +108,10 @@ export function filterItems(
   );
 }
 
-export function sortItems(items: CategoryItem[], sort: SortId): CategoryItem[] {
+export function sortItems<T extends CategoryItem>(
+  items: T[],
+  sort: SortId,
+): T[] {
   return [...items].sort(
     sort === "name"
       ? (a, b) => a.name.localeCompare(b.name)

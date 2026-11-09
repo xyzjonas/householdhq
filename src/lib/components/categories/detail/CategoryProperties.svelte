@@ -3,17 +3,24 @@
   import { untrack } from "svelte";
   import { describeChanges } from "#lib/category-detail.ts";
   import { toaster } from "#lib/toaster.ts";
-  import {
-    patchCategory,
-    type CategoryChanges,
-  } from "#lib/categories-client.ts";
+  import type { CategoryChanges } from "#lib/categories-client.ts";
   import InlineField from "#lib/components/accounts/detail/InlineField.svelte";
   import type { Category } from "#lib/server/core/types.ts";
   import CategoryIconPicker from "./CategoryIconPicker.svelte";
 
-  let { category }: { category: Category } = $props();
+  let {
+    category,
+    noun = "Category",
+    patch,
+  }: {
+    /** The category or tag being edited; both have the same properties. */
+    category: Category;
+    noun?: "Category" | "Tag";
+    /** Persists a partial update; resolves to the saved record. */
+    patch: (id: number, changes: CategoryChanges) => Promise<Category>;
+  } = $props();
 
-  // The page re-keys this component per category, so the initial value is enough.
+  // The page re-keys this component per record, so the initial value is enough.
   let current = $state<Category>(untrack(() => ({ ...category })));
 
   /** Apply optimistically, roll back when the server refuses. */
@@ -21,7 +28,7 @@
     const before = { ...current };
     Object.assign(current, changes);
     try {
-      current = await patchCategory(category.id, changes);
+      current = await patch(category.id, changes);
       // Header, chart etc. render the page data, so refresh it too.
       await invalidateAll();
       for (const title of describeChanges(changes)) {
@@ -48,16 +55,16 @@
 >
   <header class="flex flex-col gap-1">
     <h2 id="properties-heading" class="text-lg font-bold">
-      Category configuration & properties
+      {noun} configuration & properties
     </h2>
     <p class="text-sm text-surface-600-400">
-      Changes are saved as soon as you make them · Category ID: {category.id}
+      Changes are saved as soon as you make them · {noun} ID: {category.id}
     </p>
   </header>
 
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
     <InlineField
-      label="Category name"
+      label="{noun} name"
       value={current.name}
       onsave={(name) => save({ name })}
     />
@@ -65,7 +72,7 @@
       label="Description"
       value={current.description ?? ""}
       required={false}
-      placeholder="What belongs in this category"
+      placeholder="What belongs in this {noun.toLowerCase()}"
       onsave={(description) => save({ description })}
     />
     <CategoryIconPicker

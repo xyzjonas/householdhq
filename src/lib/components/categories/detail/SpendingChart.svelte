@@ -16,7 +16,8 @@
     incomeSeries,
     transferSeries,
     range,
-    categoryId,
+    route,
+    id,
     queryFor,
     color,
   }: {
@@ -24,7 +25,10 @@
     incomeSeries: Series;
     transferSeries: Series;
     range: ChartRange;
-    categoryId: number;
+    /** The detail page these links point back to. */
+    route: "/categories/[id]" | "/tags/[id]";
+    id: number;
+    /** Query string of this view with some fields replaced. */
     queryFor: (changes: Partial<DetailView>) => string;
     color: string | null;
   } = $props();
@@ -118,8 +122,8 @@
     <nav aria-label="Chart range" class="flex gap-1">
       {#each chartRanges as r (r.id)}
         <a
-          href={resolve(`/categories/[id]?${queryFor({ range: r.id })}`, {
-            id: String(categoryId),
+          href={resolve(`${route}?${queryFor({ range: r.id })}`, {
+            id: String(id),
           })}
           data-sveltekit-reset="false"
           aria-current={r.id === range ? "true" : undefined}
