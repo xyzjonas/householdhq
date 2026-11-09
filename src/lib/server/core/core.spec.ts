@@ -275,6 +275,10 @@ describe.skipIf(!core)("core layer", () => {
         c.categories.remove(doomed.id, { reassignTo: doomed.id }),
       ).rejects.toBeInstanceOf(ConflictError);
 
+      await expect(
+        c.categories.remove(doomed.id, { reassignTo: heir.id, tagId: -1 }),
+      ).rejects.toBeInstanceOf(NotFoundError);
+
       await c.categories.remove(doomed.id, { reassignTo: heir.id });
       await expect(c.categories.get(doomed.id)).rejects.toBeInstanceOf(
         NotFoundError,

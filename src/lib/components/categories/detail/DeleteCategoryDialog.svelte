@@ -8,17 +8,21 @@
     name,
     transactionCount,
     others,
+    tags,
   }: {
     name: string;
     /** Transactions currently filed under the category. */
     transactionCount: number;
     /** Categories the transactions can move to. */
     others: { id: number; name: string }[];
+    /** Tags that can be put on the moved transactions. */
+    tags: { id: number; name: string }[];
   } = $props();
 
   let open = $state(false);
   let submitting = $state(false);
   let reassignTo = $state("");
+  let tagId = $state("");
 
   const needsTarget = $derived(transactionCount > 0);
   const noun = $derived(
@@ -93,6 +97,18 @@
                 {/each}
               </select>
             </label>
+            {#if tags.length > 0}
+              <label class="label">
+                <span class="label-text">Tag moved transactions (optional)</span
+                >
+                <select class="select" name="tagId" bind:value={tagId}>
+                  <option value="">No tag</option>
+                  {#each tags as tag (tag.id)}
+                    <option value={tag.id}>{tag.name}</option>
+                  {/each}
+                </select>
+              </label>
+            {/if}
           {/if}
           <div class="flex justify-end gap-2">
             <Dialog.CloseTrigger class="btn preset-tonal"

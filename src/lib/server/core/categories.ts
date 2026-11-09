@@ -105,14 +105,15 @@ export function categoriesRepo(db: Db) {
 
     /**
      * Delete a category. With `reassignTo`, its transactions (and the manko
-     * setting, if it points here) move to that category first, atomically.
-     * With `reassignTo`, categories linked to a vehicle can't be deleted.
+     * setting, if it points here) move to that category first, atomically,
+     * and `tagId` additionally tags every moved transaction. With
+     * `reassignTo`, categories linked to a vehicle can't be deleted.
      */
     async remove(
       id: number,
-      options: { reassignTo?: number } = {},
+      options: { reassignTo?: number; tagId?: number } = {},
     ): Promise<void> {
-      const { reassignTo } = options;
+      const { reassignTo, tagId } = options;
       if (reassignTo === undefined) {
         try {
           await db.category.delete({ where: { id } });
@@ -124,12 +125,15 @@ export function categoriesRepo(db: Db) {
       if (reassignTo === id) {
         throw new ConflictError("Choose a different category to move to");
       }
-      const [category, target, vehicle] = await Promise.all([
+      const [category, target, tag, vehicle] = await Promise.all([
         db.category.findUnique({ where: { id }, select: { id: true } }),
         db.category.findUnique({
           where: { id: reassignTo },
           select: { id: true },
         }),
+        tagId === undefined
+          ? null
+          : db.tag.findUnique({ where: { id: tagId }, select: { id: true } }),
         db.vehicle.findFirst({
           where: { OR: [{ categoryId: id }, { fuelCategoryId: id }] },
           select: { name: true },
@@ -137,22 +141,33 @@ export function categoriesRepo(db: Db) {
       ]);
       if (!category) throw new NotFoundError("Category", id);
       if (!target) throw new NotFoundError("Category", reassignTo);
+      if (tagId !== undefined && !tag) throw new NotFoundError("Tag", tagId);
       if (vehicle) {
         throw new ConflictError(
           `This category is used by the vehicle '${vehicle.name}'`,
         );
       }
-      await db.$transaction([
-        db.transaction.updateMany({
+      await db.$transaction(async (tx) => {
+        if (tagId !== undefined) {
+          const moved = await tx.transaction.findMany({
+            where: { categoryId: id },
+            select: { id: true },
+          });
+          await tx.tag.update({
+            where: { id: tagId },
+            data: { transactions: { connect: moved } },
+          });
+        }
+        await tx.transaction.updateMany({
           where: { categoryId: id },
           data: { categoryId: reassignTo },
-        }),
-        db.appSettings.updateMany({
+        });
+        await tx.appSettings.updateMany({
           where: { mankoCategoryId: id },
           data: { mankoCategoryId: reassignTo },
-        }),
-        db.category.delete({ where: { id } }),
-      ]);
+        });
+        await tx.category.delete({ where: { id } });
+      });
     },
   };
 }

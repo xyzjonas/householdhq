@@ -86,5 +86,6 @@
     name={data.category.name}
     transactionCount={data.lifetimeCount}
     others={data.otherCategories}
+    tags={data.tags}
   />
 </div>
