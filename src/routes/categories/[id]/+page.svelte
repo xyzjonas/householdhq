@@ -3,6 +3,7 @@
   import CategoryEntries from "#lib/components/categories/detail/CategoryEntries.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import CategoryProperties from "#lib/components/categories/detail/CategoryProperties.svelte";
+  import DeleteCategoryDialog from "#lib/components/categories/detail/DeleteCategoryDialog.svelte";
   import SpendingChart from "#lib/components/categories/detail/SpendingChart.svelte";
   import SpendingHero from "#lib/components/categories/detail/SpendingHero.svelte";
   import { patchCategory } from "#lib/categories-client.ts";
@@ -79,5 +80,11 @@
     route="/categories/[id]"
     id={data.category.id}
     {queryFor}
+  />
+
+  <DeleteCategoryDialog
+    name={data.category.name}
+    transactionCount={data.lifetimeCount}
+    others={data.otherCategories}
   />
 </div>

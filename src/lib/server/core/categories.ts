@@ -103,12 +103,56 @@ export function categoriesRepo(db: Db) {
       }
     },
 
-    async remove(id: number): Promise<void> {
-      try {
-        await db.category.delete({ where: { id } });
-      } catch (e) {
-        rethrow(e, String(id));
+    /**
+     * Delete a category. With `reassignTo`, its transactions (and the manko
+     * setting, if it points here) move to that category first, atomically.
+     * With `reassignTo`, categories linked to a vehicle can't be deleted.
+     */
+    async remove(
+      id: number,
+      options: { reassignTo?: number } = {},
+    ): Promise<void> {
+      const { reassignTo } = options;
+      if (reassignTo === undefined) {
+        try {
+          await db.category.delete({ where: { id } });
+        } catch (e) {
+          rethrow(e, String(id));
+        }
+        return;
       }
+      if (reassignTo === id) {
+        throw new ConflictError("Choose a different category to move to");
+      }
+      const [category, target, vehicle] = await Promise.all([
+        db.category.findUnique({ where: { id }, select: { id: true } }),
+        db.category.findUnique({
+          where: { id: reassignTo },
+          select: { id: true },
+        }),
+        db.vehicle.findFirst({
+          where: { OR: [{ categoryId: id }, { fuelCategoryId: id }] },
+          select: { name: true },
+        }),
+      ]);
+      if (!category) throw new NotFoundError("Category", id);
+      if (!target) throw new NotFoundError("Category", reassignTo);
+      if (vehicle) {
+        throw new ConflictError(
+          `This category is used by the vehicle '${vehicle.name}'`,
+        );
+      }
+      await db.$transaction([
+        db.transaction.updateMany({
+          where: { categoryId: id },
+          data: { categoryId: reassignTo },
+        }),
+        db.appSettings.updateMany({
+          where: { mankoCategoryId: id },
+          data: { mankoCategoryId: reassignTo },
+        }),
+        db.category.delete({ where: { id } }),
+      ]);
     },
   };
 }
