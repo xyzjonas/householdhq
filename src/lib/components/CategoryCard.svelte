@@ -83,7 +83,7 @@
     <span class="flex items-center gap-1.5">
       {#if selected}
         <span
-          class="grid size-5 place-items-center rounded-full bg-slate-900 text-white"
+          class="grid size-5 place-items-center rounded-full bg-surface-950-50 text-surface-50-950"
         >
           <Check size={12} aria-hidden="true" />
         </span>
@@ -96,12 +96,14 @@
 
   <span class="min-w-0">
     <span
-      class="block truncate text-sm font-bold tracking-tight text-slate-900"
+      class="block truncate text-sm font-bold tracking-tight text-surface-950-50"
     >
       {name}
     </span>
     {#if subtitle}
-      <span class="block truncate text-[11px] text-slate-500">{subtitle}</span>
+      <span class="block truncate text-[11px] text-surface-600-400"
+        >{subtitle}</span
+      >
     {/if}
   </span>
 
@@ -109,15 +111,15 @@
     <span class="flex flex-col gap-1">
       {#if spentAmount !== undefined && capAmount}
         <span
-          class="flex items-center justify-between text-[11px] font-medium text-slate-500 tabular-nums"
+          class="flex items-center justify-between text-[11px] font-medium text-surface-600-400 tabular-nums"
         >
           <span>{formatMoney(spentAmount)}</span>
-          <span class="text-slate-400">/ {formatMoney(capAmount)}</span>
+          <span class="text-surface-500">/ {formatMoney(capAmount)}</span>
         </span>
       {/if}
       {#if percentage !== undefined}
         <span
-          class="block h-1.5 w-full overflow-hidden rounded-full bg-slate-200/90"
+          class="block h-1.5 w-full overflow-hidden rounded-full bg-surface-200-800"
           role="progressbar"
           aria-label="Budget used"
           aria-valuemin={0}
@@ -136,17 +138,23 @@
 
 <style scoped>
   .cat-card {
-    background-color: rgb(248 250 252 / 0.8);
-    border-color: #e2e8f0;
+    background-color: light-dark(
+      rgb(248 250 252 / 0.8),
+      rgb(255 255 255 / 0.04)
+    );
+    border-color: light-dark(#e2e8f0, rgb(255 255 255 / 0.1));
   }
   .cat-card:hover:not(.selected):not(.disabled) {
-    background-color: #fff;
-    border-color: #cbd5e1;
+    background-color: light-dark(#fff, rgb(255 255 255 / 0.08));
+    border-color: light-dark(#cbd5e1, rgb(255 255 255 / 0.2));
     box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.08);
   }
   .cat-card.selected {
-    background-color: rgb(239 246 255 / 0.6);
-    border-color: #0f172a;
+    background-color: light-dark(
+      rgb(239 246 255 / 0.6),
+      rgb(255 255 255 / 0.1)
+    );
+    border-color: light-dark(#0f172a, #f1f5f9);
     box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.08);
   }
   .cat-card.disabled {
@@ -158,7 +166,11 @@
     outline-offset: 2px;
   }
   .icon {
-    background-color: color-mix(in srgb, var(--cat) 15%, white);
+    background-color: color-mix(
+      in srgb,
+      var(--cat) 15%,
+      light-dark(white, transparent)
+    );
     color: var(--cat);
   }
   .pct.ok {

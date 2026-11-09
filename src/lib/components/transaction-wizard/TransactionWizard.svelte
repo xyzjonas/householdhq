@@ -184,7 +184,7 @@
     <!-- Not a submit button, so Enter in a field still saves normally. -->
     <button
       type="button"
-      class="btn h-12 w-full rounded-xl border border-blue-100/80 bg-blue-50/90 text-sm font-bold text-emerald-800 active:scale-[0.98] disabled:opacity-40"
+      class="btn h-12 w-full rounded-xl border border-emerald-600/25 bg-emerald-600/15 text-sm font-bold text-emerald-800 active:scale-[0.98] disabled:opacity-40 dark:text-emerald-300"
       disabled={!canAdvance || !fitsReceipt || saving}
       onclick={itemizeAfterSaving}
     >
@@ -415,7 +415,7 @@
         {:else}
           <button
             type="submit"
-            class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-surface-950-50 px-6 font-bold text-surface-50-950 active:scale-95 disabled:opacity-40"
+            class="cta flex h-14 items-center justify-center gap-2 rounded-full bg-[#006c48] px-6 font-bold text-white shadow-sm active:scale-95 disabled:opacity-40"
             disabled={!canAdvance || saving}
           >
             {saving
