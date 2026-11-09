@@ -33,6 +33,32 @@ export interface WizardInitial {
   tags: string[];
 }
 
+/**
+ * An itemization in progress: the receipt's original transaction (already
+ * reduced by every item split off so far) and the items persisted so far.
+ */
+export interface ItemizeContext {
+  parent: {
+    id: number;
+    /** What is left on the original transaction. */
+    amount: number;
+    currency: Currency;
+    categoryId: number | null;
+    accountId: number;
+    targetId: number | null;
+    description: string;
+    /** ISO timestamp. */
+    transactedAt: string;
+    hidden: boolean;
+  };
+  items: {
+    id: number;
+    amount: number;
+    description: string;
+    categoryId: number | null;
+  }[];
+}
+
 /** An existing tag offered by the tag picker. */
 export interface WizardTag {
   name: string;

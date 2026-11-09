@@ -6,6 +6,7 @@
   import ArrowRight from "@lucide/svelte/icons/arrow-right";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import Check from "@lucide/svelte/icons/check";
+  import Receipt from "@lucide/svelte/icons/receipt";
   import X from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
   import { formatDate } from "#lib/format.ts";
@@ -17,10 +18,12 @@
   import DetailsStage from "./DetailsStage.svelte";
   import TransactionOverview from "./TransactionOverview.svelte";
   import TypeStage from "./TypeStage.svelte";
+  import ItemizePanel from "./ItemizePanel.svelte";
   import {
     isExpenseLike,
     stages,
     type Currency,
+    type ItemizeContext,
     type TransactionType,
     type WizardAccount,
     type WizardCategory,
@@ -37,6 +40,7 @@
     initialAccountId = null,
     defaultOutAccountId = null,
     initial,
+    itemize,
     action,
     onsplit,
   }: {
@@ -54,6 +58,8 @@
     defaultOutAccountId?: number | null;
     /** Existing values; switches the wizard into edit mode. */
     initial?: WizardInitial;
+    /** A receipt being itemized: the new transaction is split off its parent. */
+    itemize?: ItemizeContext;
     /** Form action to post to; defaults to the page's default action. */
     action?: string;
     /** Enables the "Split" banner on the amount stage. */
@@ -63,16 +69,20 @@
   const pad = (n: number) => String(n).padStart(2, "0");
   const seed = untrack(() => initial);
   const editing = seed !== undefined;
-  const now = seed ? new Date(seed.transactedAt) : new Date();
+  const split = untrack(() => itemize)?.parent;
+  const itemizing = split !== undefined;
+  // Items share the receipt's details; the type stage has nothing to ask.
+  const firstStage = itemizing ? 2 : 1;
+  const now = new Date(seed?.transactedAt ?? split?.transactedAt ?? Date.now());
 
-  let stage = $state(editing ? stages.length : 1);
+  let stage = $state(editing ? stages.length : firstStage);
   const initialType: TransactionType = seed?.type ?? "EXPENSE";
   let type = $state<TransactionType>(initialType);
   let tape = $state(seed ? String(seed.amount) : "");
-  let currency = $state<Currency>(seed?.currency ?? "CZK");
+  let currency = $state<Currency>(seed?.currency ?? split?.currency ?? "CZK");
   let categoryId = $state<number | null>(seed?.categoryId ?? null);
   let chosenSourceId = $state<number | null>(
-    seed?.accountId ?? untrack(() => initialAccountId),
+    seed?.accountId ?? split?.accountId ?? untrack(() => initialAccountId),
   );
   const sourceId = $derived(
     chosenSourceId ?? accounts.find((a) => !a.isOut)?.id ?? null,
@@ -81,9 +91,10 @@
   let targetId = $state<number | null>(
     seed
       ? seed.targetId
-      : isExpenseLike(initialType)
-        ? untrack(() => defaultOutAccountId)
-        : null,
+      : (split?.targetId ??
+          (isExpenseLike(initialType)
+            ? untrack(() => defaultOutAccountId)
+            : null)),
   );
   let description = $state(seed?.description ?? "");
   let date = $state(
@@ -92,13 +103,13 @@
   let time = $state(`${pad(now.getHours())}:${pad(now.getMinutes())}`);
   let recurring = $state((seed?.recurring ?? 0) > 0);
   let recurringMonths = $state(seed?.recurring || 1);
-  let hidden = $state(seed?.hidden ?? false);
+  let hidden = $state(seed?.hidden ?? split?.hidden ?? false);
   let important = $state(seed?.important ?? false);
   let tags = $state<string[]>(seed?.tags ?? []);
   let saving = $state(false);
   let confirmingDelete = $state(false);
   let heading = $state<HTMLElement>();
-  let reached = $state(editing ? stages.length : 1);
+  let reached = $state(editing ? stages.length : firstStage);
   let details = $state<ReturnType<typeof DetailsStage>>();
 
   /** The chosen tags with their configured colours (new tags have none). */
@@ -120,9 +131,16 @@
     return Number.isNaN(d.getTime()) ? "" : d.toISOString();
   });
 
+  /** An item must leave something on the receipt's original transaction. */
+  const fitsReceipt = $derived(!split || amount < split.amount);
+  /** Recurring transactions can't be itemized; they would repeat the split. */
+  const canItemize = $derived(
+    !editing && type === "EXPENSE" && !recurring && amount > 0,
+  );
+
   const canAdvance = $derived(
     stage === 2
-      ? amount > 0
+      ? amount > 0 && fitsReceipt
       : stage === 3
         ? categoryId !== null
         : stage === 4
@@ -134,7 +152,7 @@
   );
 
   async function goTo(next: number) {
-    if (next < 1 || next > stages.length) return;
+    if (next < firstStage || next > stages.length) return;
     // Entering the category stage settles any pending formula on the tape.
     if (next >= 3 && stage <= 2) tape = amount > 0 ? String(amount) : "";
     stage = next;
@@ -200,7 +218,11 @@
         <X size={18} aria-hidden="true" />
       </a>
       <h1 class="flex-1 text-center text-base font-bold text-surface-950-50">
-        {editing ? "Edit Transaction" : "Add Transaction"}
+        {editing
+          ? "Edit Transaction"
+          : itemizing
+            ? "Itemize Receipt"
+            : "Add Transaction"}
       </h1>
       <span class="size-10" aria-hidden="true"></span>
     </header>
@@ -251,11 +273,17 @@
           <TypeStage bind:value={type} onchange={setType} />
         </section>
         <section class="panel" inert={stage !== 2} aria-label={stages[1].title}>
+          {#if itemize}
+            <div class="mb-4">
+              <ItemizePanel {itemize} {categories} {amount} />
+            </div>
+          {/if}
           <AmountStage
             bind:tape
             bind:currency
             {category}
             {onsplit}
+            lockCurrency={itemizing}
             active={stage === 2}
             onchangecategory={() => goTo(3)}
             onadvance={() => canAdvance && goTo(3)}
@@ -296,15 +324,23 @@
     <input type="hidden" name="amount" value={amount} />
     <input type="hidden" name="currency" value={currency} />
     <input type="hidden" name="transactedAt" value={transactedAt} />
+    {#if itemize}
+      <input type="hidden" name="parent" value={itemize.parent.id} />
+      <input
+        type="hidden"
+        name="items"
+        value={itemize.items.map((i) => i.id).join(",")}
+      />
+    {/if}
 
     <nav
       aria-label="Wizard steps"
-      class="dock fixed inset-x-0 bottom-0 z-20 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
+      class="dock fixed inset-x-0 bottom-0 z-20 flex flex-col-reverse gap-3 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
     >
       <div
-        class="mx-auto flex max-w-[390px] items-center justify-between gap-3 lg:max-w-none"
+        class="mx-auto flex w-full max-w-[390px] items-center justify-between gap-3 lg:max-w-none"
       >
-        {#if stage === 1}
+        {#if stage === firstStage}
           <a
             href={resolve("/")}
             class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
@@ -353,11 +389,26 @@
               ? "Saving…"
               : editing
                 ? "Save changes"
-                : stages[stage - 1].next}
+                : itemizing
+                  ? "Finish"
+                  : stages[stage - 1].next}
             <Check size={18} aria-hidden="true" />
           </button>
         {/if}
       </div>
+      <!-- After the main button in the DOM so Enter still submits that one;
+           the reversed column shows it above. -->
+      {#if stage === stages.length && canItemize}
+        <button
+          type="submit"
+          formaction="?/itemize"
+          class="mx-auto flex w-full max-w-[390px] items-center justify-center gap-2 rounded-xl border border-blue-100/80 bg-blue-50/90 py-3 text-xs font-bold text-emerald-800 active:scale-[0.98] disabled:opacity-40 lg:max-w-none"
+          disabled={!canAdvance || !fitsReceipt || saving}
+        >
+          <Receipt size={16} aria-hidden="true" />
+          Save &amp; Itemize
+        </button>
+      {/if}
     </nav>
   </div>
 

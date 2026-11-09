@@ -71,4 +71,58 @@ test.describe("add record wizard", () => {
       page.getByRole("button", { name: "Confirm & Save" }),
     ).toBeEnabled();
   });
+
+  test("itemizes a receipt into several transactions", async ({ page }) => {
+    const key = (name: string) =>
+      page.getByRole("button", { name, exact: true });
+    const pick = (name: string) =>
+      page
+        .getByRole("group", { name: "Category" })
+        .getByText(name, { exact: true })
+        .click();
+    const enter = async (digits: string[]) => {
+      for (const d of digits) await key(d).click();
+    };
+
+    // The receipt itself: 1000.
+    // Expense is preselected, so clicking is what moves on to the amount.
+    await page.getByText("Money you spent", { exact: true }).click();
+    await enter(["1", "0", "0", "0"]);
+    await key("Category").click();
+    await pick("Groceries");
+    await page.getByRole("button", { name: "Save & Itemize" }).click();
+
+    // Back on the amount stage with the receipt as the original.
+    await expect(page).toHaveURL(/\/transactions\/new\?parent=\d+$/);
+    await expect(
+      page.getByRole("heading", { name: /Amount & calculator/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Receipt allocation" }),
+    ).toContainText("Original");
+
+    // An item can't swallow the whole original.
+    await enter(["1", "0", "0", "0"]);
+    await expect(key("Category")).toBeDisabled();
+    for (let i = 0; i < 4; i++) {
+      await key("Backspace (hold to clear)").click();
+    }
+
+    // Item #1: 400, itemize further.
+    await enter(["4", "0", "0"]);
+    await key("Category").click();
+    await pick("Groceries");
+    await page.getByRole("button", { name: "Save & Itemize" }).click();
+    await expect(page).toHaveURL(/parent=\d+&items=\d+$/);
+    const panel = page.getByRole("region", { name: "Receipt allocation" });
+    await expect(panel).toContainText("Saved");
+    await expect(panel).toContainText("600 Kč");
+
+    // Item #2: 100, then finish back on the dashboard.
+    await enter(["1", "0", "0"]);
+    await key("Category").click();
+    await pick("Groceries");
+    await page.getByRole("button", { name: "Finish" }).click();
+    await expect(page).toHaveURL("/");
+  });
 });

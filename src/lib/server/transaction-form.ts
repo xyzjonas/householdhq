@@ -1,5 +1,7 @@
 import { fail } from "@sveltejs/kit";
 import { z } from "zod";
+import type { ItemizeContext } from "#lib/components/transaction-wizard/types.ts";
+import { NotFoundError } from "#lib/server/core/index.ts";
 import { getCore } from "#lib/server/index.ts";
 
 /** Reference data the transaction wizard needs, shared by create and edit. */
@@ -148,5 +150,72 @@ export async function parseTransactionForm(request: Request) {
     isHidden: rest.isHidden || type === "HIDDEN",
     isImportant: rest.isImportant,
     tags,
+  };
+}
+
+const positiveId = z.coerce.number().int().positive();
+
+/**
+ * The itemizer carries its state in two arguments: `parent` (the receipt's
+ * original transaction) and `items` (comma separated ids of the transactions
+ * split off it so far). Anything malformed is ignored.
+ */
+export function parseItemizeRefs(
+  parent: FormDataEntryValue | null,
+  items: FormDataEntryValue | null,
+) {
+  const parentId = positiveId.safeParse(parent);
+  const itemIds = String(items ?? "")
+    .split(",")
+    .map((id) => positiveId.safeParse(id))
+    .flatMap((r) => (r.success ? [r.data] : []));
+  return {
+    parentId: parentId.success ? parentId.data : null,
+    itemIds: [...new Set(itemIds)],
+  };
+}
+
+/** The itemization described by the page's arguments, if there is a valid one. */
+export async function loadItemize(
+  parent: string | null,
+  items: string | null,
+): Promise<ItemizeContext | null> {
+  const refs = parseItemizeRefs(parent, items);
+  if (refs.parentId === null) return null;
+  const { transactions } = getCore();
+  const find = (id: number) =>
+    transactions.get(id).catch((e: unknown) => {
+      if (e instanceof NotFoundError) return null;
+      throw e;
+    });
+  const [tx, ...rows] = await Promise.all(
+    [refs.parentId, ...refs.itemIds].map(find),
+  );
+  // Only expenses paid from an owned account can be itemized.
+  if (!tx || tx.source.isOut || !tx.target.isOut) return null;
+  return {
+    parent: {
+      id: tx.id,
+      amount: tx.amount,
+      currency: tx.currency as ItemizeContext["parent"]["currency"],
+      categoryId: tx.categoryId,
+      accountId: tx.sourceId,
+      targetId: tx.targetId,
+      description: tx.description === "N/A" ? "" : tx.description,
+      transactedAt: (tx.transactedAt ?? tx.created).toISOString(),
+      hidden: tx.isHidden,
+    },
+    items: rows.flatMap((row) =>
+      row
+        ? [
+            {
+              id: row.id,
+              amount: row.amount,
+              description: row.description === "N/A" ? "" : row.description,
+              categoryId: row.categoryId,
+            },
+          ]
+        : [],
+    ),
   };
 }
