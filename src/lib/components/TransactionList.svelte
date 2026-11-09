@@ -3,6 +3,7 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import Repeat from "@lucide/svelte/icons/repeat";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
+  import ConfirmTransactionButton from "#lib/components/ConfirmTransactionButton.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import { formatDateWithYear, formatMoney } from "#lib/format.ts";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
@@ -15,6 +16,15 @@
     /** Shown instead of the rows when there are none. */
     empty?: string;
   } = $props();
+
+  const now = new Date();
+
+  /** Pending and already due: waiting for the user to confirm it happened. */
+  function isDue(t: TransactionWithRelations): boolean {
+    return (
+      !t.confirmed && !t.cancelled && !!t.transactedAt && t.transactedAt <= now
+    );
+  }
 
   /** Money leaving an owned account is negative, money arriving positive. */
   function signed(t: TransactionWithRelations): number {
@@ -96,6 +106,13 @@
       >
         {formatSigned(amount, t.currency)}
       </p>
+      {#if isDue(t)}
+        <ConfirmTransactionButton
+          id={t.id}
+          description={t.description}
+          recurring={t.recurring > 0}
+        />
+      {/if}
       <a
         href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
         class="grid size-8 shrink-0 place-items-center rounded-full text-surface-400 transition-colors hover:bg-surface-500/15 hover:text-surface-950-50"

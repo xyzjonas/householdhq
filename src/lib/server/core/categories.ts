@@ -29,7 +29,7 @@ export function categoriesRepo(db: Db) {
 
     /**
      * All categories with the money spent / received in `[from, to)`.
-     * Cancelled transactions are ignored; transfers between household
+     * Cancelled and pending transactions are ignored; transfers between household
      * accounts are neither spending nor income.
      */
     async listWithActivity(range: {
@@ -39,6 +39,7 @@ export function categoriesRepo(db: Db) {
       const base = {
         categoryId: { not: null },
         cancelled: false,
+        confirmed: true,
         transactedAt: { gte: range.from, lt: range.to },
       } satisfies Prisma.TransactionWhereInput;
       const totals = async (where: Prisma.TransactionWhereInput) => {
@@ -75,6 +76,7 @@ export function categoriesRepo(db: Db) {
         where: {
           categoryId: id,
           cancelled: false,
+          confirmed: true,
           source: { isOut: false },
           target: { isOut: true },
           transactedAt: { gte: range.from, lt: range.to },

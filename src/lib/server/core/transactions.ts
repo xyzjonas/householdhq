@@ -38,6 +38,36 @@ function toBooleanQuery(query: string): string {
     .join(" ");
 }
 
+/** `date` moved by whole months, clamped to the end of shorter months. */
+function addMonths(date: Date, months: number): Date {
+  const result = new Date(date);
+  const day = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + months);
+  const lastDay = new Date(
+    result.getFullYear(),
+    result.getMonth() + 1,
+    0,
+  ).getDate();
+  result.setDate(Math.min(day, lastDay));
+  return result;
+}
+
+/**
+ * First occurrence of a schedule (`due` plus whole multiples of
+ * `everyMonths`) that lies after `now`, so confirming a stale transaction
+ * doesn't schedule its successor in the past.
+ */
+export function nextOccurrence(
+  due: Date,
+  everyMonths: number,
+  now: Date,
+): Date {
+  let next = addMonths(due, everyMonths);
+  for (let n = 2; next <= now; n++) next = addMonths(due, n * everyMonths);
+  return next;
+}
+
 type Filter = ReturnType<typeof TransactionFilter.parse>;
 
 const flowWhere: Record<TransactionFlow, Prisma.TransactionWhereInput> = {
@@ -189,17 +219,16 @@ export function transactionsRepo(db: Db) {
     },
 
     /**
-     * Scheduled transactions still to happen: after `after` and before
-     * `before`, soonest first. Cancelled ones are left out.
+     * Transactions still to happen: everything pending that is due before
+     * `before`, soonest first. Overdue ones stay until they are confirmed;
+     * cancelled ones are left out.
      */
-    async upcoming(
-      after: Date,
-      before: Date,
-    ): Promise<TransactionWithRelations[]> {
+    async upcoming(before: Date): Promise<TransactionWithRelations[]> {
       return db.transaction.findMany({
         where: {
           cancelled: false,
-          transactedAt: { gt: after, lt: before },
+          confirmed: false,
+          transactedAt: { lt: before },
         },
         include,
         orderBy: [{ transactedAt: "asc" }, { id: "asc" }],
@@ -246,8 +275,13 @@ export function transactionsRepo(db: Db) {
             where: { id },
             data: {
               ...data,
+              // Moving a completed transaction into the future makes it
+              // pending again; a pending one never completes by date alone.
               ...(transactedAt
-                ? { transactedAt, confirmed: transactedAt <= new Date() }
+                ? {
+                    transactedAt,
+                    confirmed: before.confirmed && transactedAt <= new Date(),
+                  }
                 : {}),
               ...(sourceId ? { source: { connect: { id: sourceId } } } : {}),
               ...(targetId ? { target: { connect: { id: targetId } } } : {}),
@@ -265,6 +299,73 @@ export function transactionsRepo(db: Db) {
             include,
           });
           await shiftCheckpoints(tx, before, updated);
+          return updated;
+        });
+      } catch (e) {
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === "P2025"
+        ) {
+          throw new NotFoundError("Transaction", id);
+        }
+        throw e;
+      }
+    },
+
+    /**
+     * Completes a pending transaction that has come due: it is stamped with
+     * the moment of confirmation and starts counting towards balances and
+     * spending. A recurring one schedules its next occurrence, counted from
+     * the date it was due.
+     */
+    async confirm(id: number): Promise<TransactionWithRelations> {
+      try {
+        return await db.$transaction(async (tx) => {
+          const before = await tx.transaction.findUniqueOrThrow({
+            where: { id },
+            include: { tags: true },
+          });
+          if (before.cancelled) {
+            throw new ConflictError(
+              "A cancelled transaction can't be confirmed",
+            );
+          }
+          if (before.confirmed) {
+            throw new ConflictError("This transaction is already confirmed");
+          }
+          const due = before.transactedAt ?? before.created;
+          const now = new Date();
+          if (due > now) {
+            throw new ConflictError("This transaction is not due yet");
+          }
+          const updated = await tx.transaction.update({
+            where: { id },
+            data: { transactedAt: now, confirmed: true },
+            include,
+          });
+          await shiftCheckpoints(tx, before, updated);
+          if (before.recurring > 0) {
+            await tx.transaction.create({
+              data: {
+                description: before.description,
+                amount: before.amount,
+                currency: before.currency,
+                recurring: before.recurring,
+                isImportant: before.isImportant,
+                isHidden: before.isHidden,
+                transactedAt: nextOccurrence(due, before.recurring, now),
+                confirmed: false,
+                source: { connect: { id: before.sourceId } },
+                target: { connect: { id: before.targetId } },
+                category: before.categoryId
+                  ? { connect: { id: before.categoryId } }
+                  : undefined,
+                tags: {
+                  connectOrCreate: tagLinks(before.tags.map((t) => t.name)),
+                },
+              },
+            });
+          }
           return updated;
         });
       } catch (e) {
