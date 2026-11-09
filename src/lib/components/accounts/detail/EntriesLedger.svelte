@@ -109,7 +109,7 @@
     <form
       role="search"
       method="GET"
-      class="flex flex-wrap items-center gap-3"
+      class="flex max-w-full flex-wrap items-center gap-3"
       onsubmit={(e) => {
         e.preventDefault();
         const q = new FormData(e.currentTarget).get("q");
@@ -125,7 +125,7 @@
           e.currentTarget.value && go({ month: e.currentTarget.value })}
       />
       <select
-        class="select w-auto"
+        class="select w-auto max-w-full"
         aria-label="Category"
         value={filters.categoryId ?? ""}
         onchange={(e) => go({ category: e.currentTarget.value || undefined })}
@@ -182,7 +182,7 @@
     </form>
   </header>
 
-  <div class="overflow-x-auto">
+  <div class="relative overflow-x-auto">
     <table class="w-full border-collapse text-left">
       <thead>
         <tr
