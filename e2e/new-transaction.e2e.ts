@@ -101,6 +101,20 @@ test.describe("add record wizard", () => {
       page.getByRole("region", { name: "Receipt allocation" }),
     ).toContainText("Original");
 
+    // The edit wizard can bootstrap an itemization as well.
+    const parentId = /parent=(\d+)/.exec(page.url())?.[1];
+    await page.goto(`/transactions/${parentId}/edit`);
+    const itemize = page.getByRole("button", { name: "Save & Itemize" });
+    const remove = page.getByRole("button", { name: "Delete" });
+    expect((await itemize.boundingBox())?.height).toBe(
+      (await remove.boundingBox())?.height,
+    );
+    await itemize.click();
+    await expect(page).toHaveURL(new RegExp(`parent=${parentId}$`));
+    await expect(
+      page.getByRole("region", { name: "Receipt allocation" }),
+    ).toBeVisible();
+
     // An item can't swallow the whole original.
     await enter(["1", "0", "0", "0"]);
     await expect(key("Category")).toBeDisabled();

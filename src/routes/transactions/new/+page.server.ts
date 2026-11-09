@@ -4,7 +4,9 @@ import {
   loadItemize,
   loadWizardData,
   parseItemizeRefs,
+  itemizeUrl,
   parseTransactionForm,
+  wantsItemize,
 } from "#lib/server/transaction-form.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -69,22 +71,15 @@ async function persist(request: Request) {
 
 export const actions: Actions = {
   create: async ({ request }) => {
+    const itemize = await wantsItemize(request);
     const saved = await persist(request);
     if ("status" in saved) return saved;
+    // Loop back to the amount stage to split off another item.
+    if (itemize) redirect(303, itemizeUrl(saved.id, saved.itemIds));
     // The client toasts the outcome, then navigates home.
     return {
       created: true,
       nextAt: saved.next?.transactedAt?.toISOString() ?? null,
     };
-  },
-  /** Saves, then loops back to the amount stage to split off another item. */
-  itemize: async ({ request }) => {
-    const saved = await persist(request);
-    if ("status" in saved) return saved;
-    const items = saved.itemIds.join(",");
-    redirect(
-      303,
-      `/transactions/new?parent=${saved.id}${items ? `&items=${items}` : ""}`,
-    );
   },
 };

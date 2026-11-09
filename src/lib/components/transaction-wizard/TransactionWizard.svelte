@@ -134,9 +134,9 @@
   /** An item must leave something on the receipt's original transaction. */
   const fitsReceipt = $derived(!split || amount < split.amount);
   /** Recurring transactions can't be itemized; they would repeat the split. */
-  const canItemize = $derived(
-    !editing && type === "EXPENSE" && !recurring && amount > 0,
-  );
+  const canItemize = $derived(type === "EXPENSE" && !recurring && amount > 0);
+  /** What the next submit should do: just save, or save and itemize. */
+  let intent = $state<"save" | "itemize">("save");
 
   const canAdvance = $derived(
     stage === 2
@@ -163,6 +163,14 @@
     else heading?.focus();
   }
 
+  async function itemizeAfterSaving(e: MouseEvent) {
+    // currentTarget is gone once the handler yields.
+    const form = (e.currentTarget as HTMLButtonElement).form;
+    intent = "itemize";
+    await tick();
+    form?.requestSubmit();
+  }
+
   function setType(next: TransactionType) {
     // "Hidden" is both a type and a flag; keep the two in sync.
     hidden = next === "HIDDEN";
@@ -170,6 +178,21 @@
     goTo(2);
   }
 </script>
+
+{#snippet itemizeButton()}
+  {#if canItemize}
+    <!-- Not a submit button, so Enter in a field still saves normally. -->
+    <button
+      type="button"
+      class="btn h-12 w-full rounded-xl border border-blue-100/80 bg-blue-50/90 text-sm font-bold text-emerald-800 active:scale-[0.98] disabled:opacity-40"
+      disabled={!canAdvance || !fitsReceipt || saving}
+      onclick={itemizeAfterSaving}
+    >
+      <Receipt size={18} aria-hidden="true" />
+      Save &amp; Itemize
+    </button>
+  {/if}
+{/snippet}
 
 {#snippet deleteButton()}
   <button
@@ -205,6 +228,7 @@
         await update({ reset: false });
       }
       saving = false;
+      intent = "save";
     };
   }}
 >
@@ -315,7 +339,10 @@
             bind:tags
           />
           {#if editing}
-            <div class="px-4 pt-4 lg:hidden">{@render deleteButton()}</div>
+            <div class="flex flex-col gap-3 px-4 pt-4 lg:hidden">
+              {@render itemizeButton()}
+              {@render deleteButton()}
+            </div>
           {/if}
         </section>
       </div>
@@ -323,6 +350,7 @@
 
     <input type="hidden" name="amount" value={amount} />
     <input type="hidden" name="currency" value={currency} />
+    <input type="hidden" name="intent" value={intent} />
     <input type="hidden" name="transactedAt" value={transactedAt} />
     {#if itemize}
       <input type="hidden" name="parent" value={itemize.parent.id} />
@@ -335,8 +363,13 @@
 
     <nav
       aria-label="Wizard steps"
-      class="dock fixed inset-x-0 bottom-0 z-20 flex flex-col-reverse gap-3 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
+      class="dock fixed inset-x-0 bottom-0 z-20 flex flex-col gap-3 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
     >
+      {#if stage === stages.length && !editing && canItemize}
+        <div class="mx-auto w-full max-w-[390px] lg:max-w-none">
+          {@render itemizeButton()}
+        </div>
+      {/if}
       <div
         class="mx-auto flex w-full max-w-[390px] items-center justify-between gap-3 lg:max-w-none"
       >
@@ -396,19 +429,6 @@
           </button>
         {/if}
       </div>
-      <!-- After the main button in the DOM so Enter still submits that one;
-           the reversed column shows it above. -->
-      {#if stage === stages.length && canItemize}
-        <button
-          type="submit"
-          formaction="?/itemize"
-          class="mx-auto flex w-full max-w-[390px] items-center justify-center gap-2 rounded-xl border border-blue-100/80 bg-blue-50/90 py-3 text-xs font-bold text-emerald-800 active:scale-[0.98] disabled:opacity-40 lg:max-w-none"
-          disabled={!canAdvance || !fitsReceipt || saving}
-        >
-          <Receipt size={16} aria-hidden="true" />
-          Save &amp; Itemize
-        </button>
-      {/if}
     </nav>
   </div>
 
@@ -431,7 +451,10 @@
       {important}
       tags={chosenTags}
     />
-    {#if editing}{@render deleteButton()}{/if}
+    {#if editing}
+      {@render itemizeButton()}
+      {@render deleteButton()}
+    {/if}
   </div>
 </form>
 

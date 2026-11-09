@@ -153,6 +153,17 @@ export async function parseTransactionForm(request: Request) {
   };
 }
 
+/** Whether the wizard was submitted with "Save & Itemize". */
+export async function wantsItemize(request: Request) {
+  return (await request.clone().formData()).get("intent") === "itemize";
+}
+
+/** The amount stage that continues itemizing `parentId`'s receipt. */
+export function itemizeUrl(parentId: number, itemIds: number[]) {
+  const items = itemIds.length > 0 ? `&items=${itemIds.join(",")}` : "";
+  return `/transactions/new?parent=${parentId}${items}`;
+}
+
 const positiveId = z.coerce.number().int().positive();
 
 /**
