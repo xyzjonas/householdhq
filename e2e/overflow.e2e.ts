@@ -47,12 +47,10 @@ const PAGES: PageSpec[] = [
  * the check starts guarding it.
  */
 const KNOWN_OVERFLOW = new Set<string>([
-  "/transactions/new",
   "/accounts/[id]",
   "/categories/[id]",
   "/energy/[id]",
   "/vehicles/[id]",
-  "/transactions/[id]/edit",
 ]);
 
 async function findOverflow(page: Page): Promise<string[]> {
