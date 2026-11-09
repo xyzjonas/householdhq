@@ -3,6 +3,7 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import Repeat from "@lucide/svelte/icons/repeat";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
+  import TagChips from "#lib/components/tags/TagChips.svelte";
   import ConfirmTransactionButton from "#lib/components/ConfirmTransactionButton.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import { formatDateWithYear, formatMoney } from "#lib/format.ts";
@@ -107,6 +108,9 @@
           <span aria-hidden="true" class="text-surface-300">•</span>
           <span class="min-w-0">{t.source.name} → {t.target.name}</span>
         </p>
+        {#if t.tags.length}
+          <div class="mt-1.5"><TagChips tags={t.tags} /></div>
+        {/if}
       </div>
 
       <p

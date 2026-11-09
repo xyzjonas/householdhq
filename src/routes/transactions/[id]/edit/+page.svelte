@@ -11,6 +11,7 @@
   accounts={data.accounts}
   categories={data.categories}
   suggestions={data.suggestions}
+  tagOptions={data.tags}
   defaultOutAccountId={data.defaultOutAccountId}
   initial={data.transaction}
   action="?/update"

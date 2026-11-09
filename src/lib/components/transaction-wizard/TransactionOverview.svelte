@@ -23,6 +23,7 @@
     recurringMonths,
     hidden,
     important,
+    tags,
   }: {
     /** Stage currently shown in the carousel. */
     stage: number;
@@ -41,6 +42,7 @@
     recurringMonths: number;
     hidden: boolean;
     important: boolean;
+    tags: string[];
   } = $props();
 
   const money = new Intl.NumberFormat("cs-CZ", {
@@ -175,6 +177,14 @@
             <dt class="text-surface-600-400">When</dt>
             <dd class={when ? "font-semibold" : "placeholder-text"}>
               {when ?? "Not set"}
+            </dd>
+            <dt class="text-surface-600-400">Tags</dt>
+            <dd class="flex flex-wrap gap-1.5">
+              {#each tags as tag (tag)}
+                <span class="badge preset-tonal">{tag}</span>
+              {:else}
+                <span class="placeholder-text">None</span>
+              {/each}
             </dd>
             <dt class="text-surface-600-400">Flags</dt>
             <dd class="flex flex-wrap gap-1.5">

@@ -29,6 +29,8 @@ export interface WizardInitial {
   recurring: number;
   hidden: boolean;
   important: boolean;
+  /** Names of the tags on the transaction. */
+  tags: string[];
 }
 
 export interface WizardCategory {

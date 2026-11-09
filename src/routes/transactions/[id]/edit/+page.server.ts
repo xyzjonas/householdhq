@@ -51,6 +51,7 @@ export const load: PageServerLoad = async ({ params }) => {
       recurring: tx.recurring,
       hidden: tx.isHidden,
       important: tx.isImportant,
+      tags: tx.tags.map((t) => t.name),
     },
   };
 };

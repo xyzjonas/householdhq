@@ -31,6 +31,7 @@
     accounts,
     categories,
     suggestions = [],
+    tagOptions = [],
     errors = [],
     initialAccountId = null,
     defaultOutAccountId = null,
@@ -42,6 +43,8 @@
     categories: WizardCategory[];
     /** Previously used descriptions offered as autocomplete. */
     suggestions?: string[];
+    /** Names of the existing tags offered in the tag picker. */
+    tagOptions?: string[];
     /** Server side validation messages to surface after a failed submit. */
     errors?: string[];
     /** Account to pre-select as the source. */
@@ -90,6 +93,7 @@
   let recurringMonths = $state(seed?.recurring || 1);
   let hidden = $state(seed?.hidden ?? false);
   let important = $state(seed?.important ?? false);
+  let tags = $state<string[]>(seed?.tags ?? []);
   let saving = $state(false);
   let confirmingDelete = $state(false);
   let heading = $state<HTMLElement>();
@@ -259,6 +263,7 @@
             {type}
             {accounts}
             {suggestions}
+            {tagOptions}
             bind:sourceId={() => sourceId, (id) => (chosenSourceId = id)}
             bind:targetId
             bind:description
@@ -268,6 +273,7 @@
             bind:recurringMonths
             bind:hidden
             bind:important
+            bind:tags
           />
           {#if editing}
             <div class="px-4 pt-4 lg:hidden">{@render deleteButton()}</div>
@@ -361,6 +367,7 @@
       {recurringMonths}
       {hidden}
       {important}
+      {tags}
     />
     {#if editing}{@render deleteButton()}{/if}
   </div>
