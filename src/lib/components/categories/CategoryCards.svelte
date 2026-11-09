@@ -46,7 +46,7 @@
           </p>
         </div>
         {#if item.subtitle}
-          <p class="text-xs text-slate-400">{item.subtitle}</p>
+          <p class="text-xs wrap-break-word text-slate-400">{item.subtitle}</p>
         {/if}
         <BudgetMeter pct={item.consumptionPct} status={item.status} />
       </article>
