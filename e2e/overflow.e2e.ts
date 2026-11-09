@@ -76,10 +76,16 @@ async function findOverflow(page: Page): Promise<string[]> {
       }
       return false;
     };
-    const sticksOut = (el: Element) => {
+    // Where the element's content ends: text that does not wrap overflows
+    // the element's box without enlarging it, so use scrollWidth as well.
+    const rightOf = (el: Element) => {
       const r = el.getBoundingClientRect();
-      return r.width > 0 && r.right > limit + 1 && !contained(el);
+      return clips(el) ? r.right : Math.max(r.right, r.left + el.scrollWidth);
     };
+    const sticksOut = (el: Element) =>
+      el.getBoundingClientRect().width > 0 &&
+      rightOf(el) > limit + 1 &&
+      !contained(el);
     const path = (el: Element) => {
       const parts: string[] = [];
       for (let n: Element | null = el; n && n !== document.body;) {
@@ -94,10 +100,7 @@ async function findOverflow(page: Page): Promise<string[]> {
       .filter(
         (el) => sticksOut(el) && ![...el.children].some((c) => sticksOut(c)),
       )
-      .map(
-        (el) =>
-          `${path(el)} (right=${Math.round(el.getBoundingClientRect().right)})`,
-      )
+      .map((el) => `${path(el)} (right=${Math.round(rightOf(el))})`)
       .slice(0, 15);
   });
 }
