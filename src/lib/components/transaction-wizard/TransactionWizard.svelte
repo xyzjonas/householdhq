@@ -25,6 +25,7 @@
     type WizardAccount,
     type WizardCategory,
     type WizardInitial,
+    type WizardTag,
   } from "./types";
 
   let {
@@ -43,8 +44,8 @@
     categories: WizardCategory[];
     /** Previously used descriptions offered as autocomplete. */
     suggestions?: string[];
-    /** Names of the existing tags offered in the tag picker. */
-    tagOptions?: string[];
+    /** The existing tags offered in the tag picker. */
+    tagOptions?: WizardTag[];
     /** Server side validation messages to surface after a failed submit. */
     errors?: string[];
     /** Account to pre-select as the source. */
@@ -100,6 +101,16 @@
   let reached = $state(editing ? stages.length : 1);
   let details = $state<ReturnType<typeof DetailsStage>>();
 
+  /** The chosen tags with their configured colours (new tags have none). */
+  const chosenTags = $derived(
+    tags.map(
+      (name): WizardTag =>
+        tagOptions.find((o) => o.name.toLowerCase() === name.toLowerCase()) ?? {
+          name,
+          color: null,
+        },
+    ),
+  );
   const amount = $derived(evaluate(tape));
   const category = $derived(categories.find((c) => c.id === categoryId));
   const accountName = $derived(accounts.find((a) => a.id === sourceId)?.name);
@@ -367,7 +378,7 @@
       {recurringMonths}
       {hidden}
       {important}
-      {tags}
+      tags={chosenTags}
     />
     {#if editing}{@render deleteButton()}{/if}
   </div>

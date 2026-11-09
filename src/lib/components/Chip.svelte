@@ -1,8 +1,15 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { chipClass } from "./chip";
+  import { chipClass, chipStyle } from "./chip";
 
-  let { children }: { children: Snippet } = $props();
+  let {
+    color = null,
+    children,
+  }: {
+    /** Configured colour (hex) to tint the chip with. */
+    color?: string | null;
+    children: Snippet;
+  } = $props();
 </script>
 
-<span class={chipClass}>{@render children()}</span>
+<span class={chipClass} style={chipStyle(color)}>{@render children()}</span>

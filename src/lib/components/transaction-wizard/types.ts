@@ -33,6 +33,12 @@ export interface WizardInitial {
   tags: string[];
 }
 
+/** An existing tag offered by the tag picker. */
+export interface WizardTag {
+  name: string;
+  color: string | null;
+}
+
 export interface WizardCategory {
   id: number;
   name: string;

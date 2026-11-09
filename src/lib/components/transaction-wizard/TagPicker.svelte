@@ -1,6 +1,11 @@
 <script lang="ts">
   import { TagsInput } from "@skeletonlabs/skeleton-svelte";
-  import { chipClass, chipInteractiveClass } from "#lib/components/chip.ts";
+  import {
+    chipClass,
+    chipInteractiveClass,
+    chipStyle,
+  } from "#lib/components/chip.ts";
+  import type { WizardTag } from "./types";
   import Plus from "@lucide/svelte/icons/plus";
   import X from "@lucide/svelte/icons/x";
 
@@ -10,16 +15,18 @@
   }: {
     /** Names of the chosen tags. */
     value: string[];
-    /** Names of all existing tags, offered as suggestions. */
-    options: string[];
+    /** All existing tags, offered as suggestions. */
+    options: WizardTag[];
   } = $props();
 
   const MAX_SUGGESTIONS = 12;
 
   const has = (name: string) =>
     value.some((v) => v.toLowerCase() === name.toLowerCase());
+  const colorOf = (name: string) =>
+    options.find((o) => o.name.toLowerCase() === name.toLowerCase())?.color;
   const suggestions = $derived(
-    options.filter((o) => !has(o)).slice(0, MAX_SUGGESTIONS),
+    options.filter((o) => !has(o.name)).slice(0, MAX_SUGGESTIONS),
   );
 </script>
 
@@ -38,7 +45,10 @@
         <TagsInput.Control class="input flex h-auto flex-wrap gap-2 py-2">
           {#each tagsInput().value as tag, index (tag)}
             <TagsInput.Item value={tag} {index}>
-              <TagsInput.ItemPreview class={chipClass}>
+              <TagsInput.ItemPreview
+                class="{chipClass} text-surface-950-50"
+                style={chipStyle(colorOf(tag))}
+              >
                 <TagsInput.ItemText>{tag}</TagsInput.ItemText>
                 <TagsInput.ItemDeleteTrigger
                   class="grid size-4 place-items-center rounded-full hover:bg-surface-500/20"
@@ -65,11 +75,12 @@
 
   {#if suggestions.length}
     <ul class="flex flex-wrap gap-1.5" aria-label="Existing tags">
-      {#each suggestions as name (name)}
+      {#each suggestions as { name, color } (name)}
         <li>
           <button
             type="button"
-            class="{chipClass} {chipInteractiveClass}"
+            class="{chipClass} {chipInteractiveClass} text-surface-950-50"
+            style={chipStyle(color)}
             onclick={() => (value = [...value, name])}
           >
             <Plus size={12} aria-hidden="true" />

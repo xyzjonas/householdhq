@@ -6,6 +6,7 @@
     type Currency,
     type TransactionType,
     type WizardCategory,
+    type WizardTag,
   } from "./types";
 
   let {
@@ -43,7 +44,7 @@
     recurringMonths: number;
     hidden: boolean;
     important: boolean;
-    tags: string[];
+    tags: WizardTag[];
   } = $props();
 
   const money = new Intl.NumberFormat("cs-CZ", {
@@ -181,8 +182,8 @@
             </dd>
             <dt class="text-surface-600-400">Tags</dt>
             <dd class="flex flex-wrap gap-1.5">
-              {#each tags as tag (tag)}
-                <Chip>{tag}</Chip>
+              {#each tags as tag (tag.name)}
+                <Chip color={tag.color}>{tag.name}</Chip>
               {:else}
                 <span class="placeholder-text">None</span>
               {/each}

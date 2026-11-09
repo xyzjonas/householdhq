@@ -1,9 +1,13 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { chipClass, chipInteractiveClass } from "#lib/components/chip.ts";
+  import {
+    chipClass,
+    chipInteractiveClass,
+    chipStyle,
+  } from "#lib/components/chip.ts";
   import type { Tag } from "#lib/server/core/types.ts";
 
-  let { tags }: { tags: Pick<Tag, "id" | "name">[] } = $props();
+  let { tags }: { tags: Pick<Tag, "id" | "name" | "color">[] } = $props();
 </script>
 
 {#if tags.length}
@@ -13,6 +17,7 @@
         <a
           href={resolve("/tags/[id]", { id: String(tag.id) })}
           class="{chipClass} {chipInteractiveClass}"
+          style={chipStyle(tag.color)}
         >
           {tag.name}
         </a>

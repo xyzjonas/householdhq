@@ -6,6 +6,7 @@
     isExpenseLike,
     type TransactionType,
     type WizardAccount,
+    type WizardTag,
   } from "./types";
 
   let {
@@ -27,8 +28,8 @@
     type: TransactionType;
     accounts: WizardAccount[];
     suggestions: string[];
-    /** Names of the existing tags. */
-    tagOptions: string[];
+    /** The existing tags. */
+    tagOptions: WizardTag[];
     sourceId: number | null;
     targetId: number | null;
     description: string;

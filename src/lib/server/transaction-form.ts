@@ -31,8 +31,8 @@ export async function loadWizardData() {
       icon,
     })),
     suggestions,
-    /** Names of the existing tags. */
-    tags: tags.map((t) => t.name),
+    /** The existing tags. */
+    tags: tags.map(({ name, color }) => ({ name, color })),
     /** Where expenses are paid to unless the user picks another account. */
     defaultOutAccountId: settings.defaultOutAccountId,
   };
