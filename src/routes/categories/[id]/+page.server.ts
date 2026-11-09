@@ -100,12 +100,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
     tags: allTags.map((t) => ({ name: t.name, color: t.color })),
     otherCategories: allCategories
       .filter((c) => c.id !== id)
-      .map((c) => ({
-        id: c.id,
-        name: c.name,
-        color: c.color,
-        icon: c.icon,
-      })),
+      .map((c) => ({ id: c.id, name: c.name })),
     view: { month, range, all, search, page },
   };
 };

@@ -3,12 +3,8 @@
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { toaster } from "#lib/toaster.ts";
-  import CategoryStage from "#lib/components/transaction-wizard/CategoryStage.svelte";
   import TagPicker from "#lib/components/transaction-wizard/TagPicker.svelte";
-  import type {
-    WizardCategory,
-    WizardTag,
-  } from "#lib/components/transaction-wizard/types.ts";
+  import type { WizardTag } from "#lib/components/transaction-wizard/types.ts";
 
   let {
     name,
@@ -20,23 +16,21 @@
     /** Transactions currently filed under the category. */
     transactionCount: number;
     /** Categories the transactions can move to. */
-    others: WizardCategory[];
+    others: { id: number; name: string }[];
     /** Existing tags, offered by the tag picker. */
     tags: WizardTag[];
   } = $props();
 
   let open = $state(false);
   let submitting = $state(false);
-  let reassignTo = $state<number | null>(null);
+  let reassignTo = $state("");
   let tagNames = $state<string[]>([]);
 
   const needsTarget = $derived(transactionCount > 0);
   const noun = $derived(
     transactionCount === 1 ? "transaction" : "transactions",
   );
-  const blocked = $derived(
-    needsTarget && (others.length === 0 || reassignTo === null),
-  );
+  const blocked = $derived(needsTarget && (others.length === 0 || !reassignTo));
 </script>
 
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
@@ -50,7 +44,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       <Dialog.Content
-        class="flex max-h-full w-full max-w-3xl flex-col gap-4 overflow-y-auto card bg-surface-50-950 p-6 shadow-xl"
+        class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
         <Dialog.Title class="text-lg font-bold">
           Delete “{name}”?
@@ -91,13 +85,20 @@
           }}
         >
           {#if needsTarget}
-            <section class="flex flex-col gap-2">
-              <h3 class="label-text">Move transactions to</h3>
-              <CategoryStage categories={others} bind:value={reassignTo} />
-              {#if reassignTo !== null}
-                <input type="hidden" name="reassignTo" value={reassignTo} />
-              {/if}
-            </section>
+            <label class="label">
+              <span class="label-text">Move transactions to</span>
+              <select
+                class="select"
+                name="reassignTo"
+                required
+                bind:value={reassignTo}
+              >
+                <option value="" disabled>Select a category…</option>
+                {#each others as other (other.id)}
+                  <option value={other.id}>{other.name}</option>
+                {/each}
+              </select>
+            </label>
             <section class="flex flex-col gap-2">
               <h3 class="label-text">Tags for the moved transactions</h3>
               <TagPicker bind:value={tagNames} options={tags} />
