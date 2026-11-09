@@ -71,7 +71,7 @@ export type CategoryWithActivity = Category & {
   received: number;
 };
 
-/** Money spent in a category during the calendar month starting `monthStart`. */
+/** Money spent (or received, see `spendingByMonth`) in a category during the calendar month starting `monthStart`. */
 export interface MonthlySpend {
   monthStart: Date;
   spent: number;

@@ -324,6 +324,21 @@ describe.skipIf(!core)("core layer", () => {
           (m) => m.spent,
         ),
       ).toEqual([25, 0, 150]);
+      // Income series: incoming money only.
+      expect(
+        (
+          await c.categories.spendingByMonth(category.id, range, "received")
+        ).map((m) => m.spent),
+      ).toEqual([0, 0, 900]);
+      // Transfer series: money moved between two household accounts.
+      const savings = await c.accounts.create({ name: `${run}-act-savings` });
+      ids.accounts.push(savings.id);
+      await tx(300, main.id, savings.id, inRange);
+      expect(
+        (
+          await c.categories.spendingByMonth(category.id, range, "transferred")
+        ).map((m) => m.spent),
+      ).toEqual([0, 0, 300]);
     });
 
     it("rejects duplicate names", async () => {
