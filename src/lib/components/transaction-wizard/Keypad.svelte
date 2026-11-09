@@ -85,9 +85,9 @@
     justify-content: center;
     padding-block: 0.875rem;
     border-radius: 0.75rem;
-    border: 1px solid light-dark(#e2e8f0, #334155);
-    background: light-dark(#fff, #1e293b);
-    color: light-dark(#1e293b, #f1f5f9);
+    border: 1px solid light-dark(#e2e8f0, rgb(255 255 255 / 0.12));
+    background: light-dark(#fff, rgb(255 255 255 / 0.07));
+    color: light-dark(#1e293b, #f5f5f5);
     font-size: 1.25rem;
     font-weight: 600;
     box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.05);
@@ -99,7 +99,7 @@
   }
   .key:active {
     transform: scale(0.95);
-    background: light-dark(#e2e8f0, #475569);
+    background: light-dark(#e2e8f0, rgb(255 255 255 / 0.16));
   }
   .key:focus-visible {
     outline: 2px solid #059669;
