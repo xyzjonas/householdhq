@@ -12,10 +12,15 @@ export const load: PageServerLoad = async () => {
   const [accounts, balances, recent, upcoming] = await Promise.all([
     core.accounts.listWithBalances(),
     core.accounts.balances(),
-    // Past transactions are shown regardless of the interval.
-    core.transactions.list({ to: new Date(now.getTime() + 1), limit: 20 }),
+    // Completed transactions are shown regardless of the interval; pending
+    // ones, overdue or not, wait in the upcoming section instead.
+    core.transactions.list({
+      status: "completed",
+      to: new Date(now.getTime() + 1),
+      limit: 20,
+    }),
     // Upcoming ones stop at the end of the current interval.
-    core.transactions.upcoming(now, interval.end),
+    core.transactions.upcoming(interval.end),
   ]);
   return {
     // "Out" accounts are external (expenses etc.), not part of the household.

@@ -71,6 +71,18 @@ export const actions: Actions = {
     }
     redirect(303, "/");
   },
+  confirm: async ({ params }) => {
+    try {
+      const confirmed = await getCore().transactions.confirm(
+        parseId(params.id),
+      );
+      return { scheduledNext: confirmed.recurring > 0 };
+    } catch (e) {
+      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      if (e instanceof ConflictError) error(409, e.message);
+      throw e;
+    }
+  },
   delete: async ({ params }) => {
     try {
       await getCore().transactions.remove(parseId(params.id));

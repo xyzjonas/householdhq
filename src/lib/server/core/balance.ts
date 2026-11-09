@@ -14,6 +14,10 @@ export type BalanceReader = Pick<
  *                   + non-cancelled transactions strictly after it, up to `asOf`
  *                     (incoming minus outgoing)
  *
+ * Pending transactions (not yet confirmed) have not happened, however overdue
+ * they are, so they only count when `asOf` lies in the future, as a
+ * projection of what is scheduled.
+ *
  * A checkpoint is the balance *after* everything that happened up to its own
  * timestamp, so transactions sharing that timestamp (like the adjustment
  * created together with it) are already part of the checkpoint's amount.
@@ -28,8 +32,10 @@ export async function balanceOf(
     where: { sourceId: accountId, created: { lte: asOf } },
     orderBy: [{ created: "desc" }, { id: "desc" }],
   });
+  const projecting = asOf > new Date();
   const since: Prisma.TransactionWhereInput = {
     cancelled: false,
+    ...(projecting ? {} : { confirmed: true }),
     transactedAt: checkpoint
       ? { gt: checkpoint.created, lte: asOf }
       : { lte: asOf },
@@ -63,6 +69,7 @@ export type BalanceEffect = {
   targetId: number;
   transactedAt: Date | null;
   cancelled: boolean;
+  confirmed: boolean;
 };
 
 /** Anything that can move checkpoints: the Prisma client or a transaction of it. */
@@ -70,9 +77,10 @@ export type CheckpointWriter = Pick<Prisma.TransactionClient, "sourceState">;
 
 /** How `t` changes `accountId`'s balance as captured by a checkpoint at `at`. */
 function effectOn(t: BalanceEffect, accountId: number, at: Date): number {
-  // Mirrors balanceOf: only dated, non-cancelled transactions up to the
-  // checkpoint's timestamp are part of its amount.
-  if (t.cancelled || !t.transactedAt || t.transactedAt > at) return 0;
+  // Mirrors balanceOf: only dated, confirmed, non-cancelled transactions up to
+  // the checkpoint's timestamp are part of its amount.
+  if (t.cancelled || !t.confirmed || !t.transactedAt || t.transactedAt > at)
+    return 0;
   return (
     (t.targetId === accountId ? t.amount : 0) -
     (t.sourceId === accountId ? t.amount : 0)

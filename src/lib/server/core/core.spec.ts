@@ -443,6 +443,68 @@ describe.skipIf(!core)("core layer", () => {
       expect((await c.checkpoints.list(bank.id))[0].amount).toBe(15000);
     });
 
+    it("keeps due transactions pending until confirmed", async () => {
+      const bank = await c.accounts.create({
+        name: `${run}-pend-bank`,
+        isDisponible: true,
+      });
+      const out = await c.accounts.create({
+        name: `${run}-pend-out`,
+        type: "OUT",
+        isOut: true,
+      });
+      ids.accounts.push(bank.id, out.id);
+      const hour = 3_600_000;
+      const scheduled = await c.transactions.create({
+        description: `${run} rent`,
+        amount: 100,
+        sourceId: bank.id,
+        targetId: out.id,
+        recurring: 1,
+        transactedAt: new Date(Date.now() + hour),
+      });
+      ids.transactions.push(scheduled.id);
+      expect(scheduled.confirmed).toBe(false);
+      await expect(c.transactions.confirm(scheduled.id)).rejects.toBeInstanceOf(
+        ConflictError,
+      );
+
+      // Once it is due it stays pending: not in the balance, still upcoming.
+      const due = await c.transactions.update(scheduled.id, {
+        transactedAt: new Date(Date.now() - hour),
+      });
+      expect(due.confirmed).toBe(false);
+      expect(await c.accounts.balanceAt(bank.id, new Date())).toBe(0);
+      expect(
+        await c.accounts.balanceAt(bank.id, new Date(Date.now() + 99 * hour)),
+      ).toBe(-100);
+      const farAway = new Date(Date.now() + 24 * hour * 400);
+      const upcoming = await c.transactions.upcoming(farAway);
+      expect(upcoming.map((t) => t.id)).toContain(scheduled.id);
+
+      const confirmed = await c.transactions.confirm(scheduled.id);
+      expect(confirmed.confirmed).toBe(true);
+      expect(confirmed.transactedAt!.getTime()).toBeGreaterThan(
+        due.transactedAt!.getTime(),
+      );
+      expect(await c.accounts.balanceAt(bank.id, new Date())).toBe(-100);
+      await expect(c.transactions.confirm(scheduled.id)).rejects.toBeInstanceOf(
+        ConflictError,
+      );
+
+      // The recurring one scheduled its successor a month after the due date.
+      const next = (await c.transactions.upcoming(farAway)).find(
+        (t) => t.description === scheduled.description,
+      );
+      expect(next).toBeDefined();
+      ids.transactions.push(next!.id);
+      expect(next!.confirmed).toBe(false);
+      expect(next!.transactedAt!.getTime()).toBeGreaterThan(Date.now());
+      await expect(
+        c.transactions.confirm(2_000_000_000),
+      ).rejects.toBeInstanceOf(NotFoundError);
+    });
+
     it("checkpoints freeze the balance and book the difference as manko", async () => {
       const bank = await c.accounts.create({ name: `${run}-cp-bank` });
       const out = await c.accounts.create({
