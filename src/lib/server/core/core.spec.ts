@@ -267,6 +267,42 @@ describe.skipIf(!core)("core layer", () => {
       );
     });
 
+    it("lists categories by recent usage, then all-time usage", async () => {
+      const main = await c.accounts.create({ name: `${run}-rank-main` });
+      const outside = await c.accounts.create({
+        name: `${run}-rank-out`,
+        type: "OUT",
+      });
+      ids.accounts.push(main.id, outside.id);
+      // Names sort the opposite way round to the expected ranking.
+      const unused = await c.categories.create({ name: `${run}-rank-a` });
+      const old = await c.categories.create({ name: `${run}-rank-b` });
+      const hot = await c.categories.create({ name: `${run}-rank-c` });
+      ids.categories.push(unused.id, old.id, hot.id);
+
+      const spend = async (categoryId: number, transactedAt: Date) => {
+        const t = await c.transactions.create({
+          description: `${run}-rank`,
+          amount: 1,
+          sourceId: main.id,
+          targetId: outside.id,
+          categoryId,
+          transactedAt,
+        });
+        ids.transactions.push(t.id);
+      };
+      const longAgo = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000);
+      // `old` has more transactions overall, but only `hot` is recent.
+      await spend(old.id, longAgo);
+      await spend(old.id, longAgo);
+      await spend(hot.id, new Date());
+
+      const order = (await c.categories.list())
+        .map((x) => x.id)
+        .filter((id) => [unused.id, old.id, hot.id].includes(id));
+      expect(order).toEqual([hot.id, old.id, unused.id]);
+    });
+
     it("moves transactions to another category when deleting", async () => {
       const doomed = await c.categories.create({ name: `${run}-doomed` });
       const heir = await c.categories.create({ name: `${run}-heir` });

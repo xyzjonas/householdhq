@@ -22,10 +22,53 @@ function rethrow(e: unknown, name?: string | null): never {
   throw e;
 }
 
+/** How far back "recent" usage looks when ranking categories. */
+export const RECENT_USAGE_DAYS = 90;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Order categories by how often they're used: transactions within the recent
+ * window first, then all-time transactions, then name. Unused categories end
+ * up last, alphabetically.
+ */
+export function rankCategories<T extends Pick<Category, "id" | "name">>(
+  categories: T[],
+  recent: ReadonlyMap<number, number>,
+  allTime: ReadonlyMap<number, number>,
+): T[] {
+  return [...categories].sort(
+    (a, b) =>
+      (recent.get(b.id) ?? 0) - (recent.get(a.id) ?? 0) ||
+      (allTime.get(b.id) ?? 0) - (allTime.get(a.id) ?? 0) ||
+      a.name.localeCompare(b.name),
+  );
+}
+
 export function categoriesRepo(db: Db) {
+  const counts = async (where: Prisma.TransactionWhereInput) => {
+    const rows = await db.transaction.groupBy({
+      by: ["categoryId"],
+      where: { ...where, categoryId: { not: null } },
+      _count: { _all: true },
+    });
+    return new Map(
+      rows.flatMap((r) =>
+        r.categoryId === null ? [] : [[r.categoryId, r._count._all] as const],
+      ),
+    );
+  };
+
   return {
-    list(): Promise<Category[]> {
-      return db.category.findMany({ orderBy: { name: "asc" } });
+    /** All categories, most used first (see `rankCategories`). */
+    async list(): Promise<Category[]> {
+      const since = new Date(Date.now() - RECENT_USAGE_DAYS * DAY_MS);
+      const [categories, recent, allTime] = await Promise.all([
+        db.category.findMany({ orderBy: { name: "asc" } }),
+        counts({ transactedAt: { gte: since } }),
+        counts({}),
+      ]);
+      return rankCategories(categories, recent, allTime);
     },
 
     /**
