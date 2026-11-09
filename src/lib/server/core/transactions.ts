@@ -53,6 +53,21 @@ function addMonths(date: Date, months: number): Date {
   return result;
 }
 
+/**
+ * First occurrence of a schedule (`due` plus whole multiples of
+ * `everyMonths`) that lies after `now`, so confirming a stale transaction
+ * doesn't schedule its successor in the past.
+ */
+export function nextOccurrence(
+  due: Date,
+  everyMonths: number,
+  now: Date,
+): Date {
+  let next = addMonths(due, everyMonths);
+  for (let n = 2; next <= now; n++) next = addMonths(due, n * everyMonths);
+  return next;
+}
+
 type Filter = ReturnType<typeof TransactionFilter.parse>;
 
 const flowWhere: Record<TransactionFlow, Prisma.TransactionWhereInput> = {
@@ -338,7 +353,7 @@ export function transactionsRepo(db: Db) {
                 recurring: before.recurring,
                 isImportant: before.isImportant,
                 isHidden: before.isHidden,
-                transactedAt: addMonths(due, before.recurring),
+                transactedAt: nextOccurrence(due, before.recurring, now),
                 confirmed: false,
                 source: { connect: { id: before.sourceId } },
                 target: { connect: { id: before.targetId } },
