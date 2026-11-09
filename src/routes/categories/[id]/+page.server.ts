@@ -97,10 +97,15 @@ export const load: PageServerLoad = async ({ params, url }) => {
     total: entries.total,
     /** Every transaction ever booked here, regardless of the view filters. */
     lifetimeCount: lifetime.total,
-    tags: allTags.map((t) => ({ id: t.id, name: t.name })),
+    tags: allTags.map((t) => ({ name: t.name, color: t.color })),
     otherCategories: allCategories
       .filter((c) => c.id !== id)
-      .map((c) => ({ id: c.id, name: c.name })),
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        color: c.color,
+        icon: c.icon,
+      })),
     view: { month, range, all, search, page },
   };
 };
@@ -110,17 +115,19 @@ export const actions: Actions = {
   removeCategory: async ({ params, request }) => {
     const id = Number(params.id);
     if (!Number.isInteger(id)) return fail(404, { message: "Not found" });
-    const formData = request.formData();
-    const raw = (await formData).get("reassignTo");
+    const formData = await request.formData();
+    const raw = formData.get("reassignTo");
     const reassignTo = raw === null || raw === "" ? NaN : Number(raw);
-    const rawTag = (await formData).get("tagId");
-    const tagId = rawTag === null || rawTag === "" ? NaN : Number(rawTag);
+    const tags = formData
+      .getAll("tags")
+      .map((t) => String(t).trim())
+      .filter(Boolean);
     const core = getCore();
     try {
       if (Number.isInteger(reassignTo)) {
         await core.categories.remove(id, {
           reassignTo,
-          tagId: Number.isInteger(tagId) ? tagId : undefined,
+          tags,
         });
       } else {
         // Nothing to migrate: only then may it go without a replacement.
