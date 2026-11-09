@@ -167,7 +167,7 @@
 <form
   method="POST"
   {action}
-  class="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[2fr_1fr] lg:items-start"
+  class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:items-start"
   use:enhance={({ cancel }) => {
     if (stage !== stages.length || !canAdvance) {
       cancel();
