@@ -69,8 +69,29 @@ async function findOverflow(page: Page): Promise<string[]> {
     // Content inside a clipping ancestor that fits the viewport is contained
     // (intentional scrollers such as tables and carousels).
     const contained = (el: Element) => {
+      // An absolutely positioned element is only clipped by ancestors at or
+      // above its containing block (e.g. an `sr-only` cell inside a scroller
+      // that is not `relative` escapes the scroller and widens the page).
+      const positioned = ["absolute", "fixed"].includes(
+        getComputedStyle(el).position,
+      );
+      let containingBlock: Element | null = null;
+      if (positioned) {
+        containingBlock = el.parentElement;
+        while (
+          containingBlock &&
+          getComputedStyle(containingBlock).position === "static"
+        ) {
+          containingBlock = containingBlock.parentElement;
+        }
+      }
+      let reached = !positioned;
       for (let p = el.parentElement; p; p = p.parentElement) {
         if (p === document.documentElement || p === document.body) break;
+        if (!reached) {
+          if (p !== containingBlock) continue;
+          reached = true;
+        }
         if (clips(p) && p.getBoundingClientRect().right <= limit + 1)
           return true;
       }
