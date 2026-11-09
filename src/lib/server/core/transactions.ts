@@ -243,6 +243,17 @@ export function transactionsRepo(db: Db) {
     },
 
     async create(input: TransactionInput): Promise<TransactionWithRelations> {
+      return (await this.createScheduled(input)).transaction;
+    },
+
+    /**
+     * Like `create`, but also reports the upcoming occurrence that got
+     * scheduled when a recurring transaction was recorded as already happened.
+     */
+    async createScheduled(input: TransactionInput): Promise<{
+      transaction: TransactionWithRelations;
+      next: TransactionWithRelations | null;
+    }> {
       const { tags, categoryId, sourceId, targetId, transactedAt, ...data } =
         TransactionInput.parse(input);
       const now = new Date();
@@ -256,20 +267,23 @@ export function transactionsRepo(db: Db) {
         category: categoryId ? { connect: { id: categoryId } } : undefined,
         tags: { connectOrCreate: tagLinks(tags) },
       });
-      // A recurring transaction that already happened gets its upcoming
-      // occurrence scheduled right away.
       if (data.recurring > 0 && when <= now) {
-        const next = nextOccurrence(when, data.recurring, now);
-        return db.$transaction(async (tx) => {
-          const created = await tx.transaction.create({
+        const at = nextOccurrence(when, data.recurring, now);
+        return db.$transaction(async (tx) => ({
+          transaction: await tx.transaction.create({
             data: row(when),
             include,
-          });
-          await tx.transaction.create({ data: row(next) });
-          return created;
-        });
+          }),
+          next: await tx.transaction.create({ data: row(at), include }),
+        }));
       }
-      return db.transaction.create({ data: row(when), include });
+      return {
+        transaction: await db.transaction.create({
+          data: row(when),
+          include,
+        }),
+        next: null,
+      };
     },
 
     async update(
