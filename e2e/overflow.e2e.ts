@@ -133,6 +133,7 @@ test.describe(`no horizontal overflow at ${WIDTH}px`, () => {
         url = spec.url;
       } else {
         await page.goto(spec.list);
+        await page.waitForLoadState("networkidle");
         const hrefs = await page
           .locator("main a[href]")
           .evaluateAll((links) =>
