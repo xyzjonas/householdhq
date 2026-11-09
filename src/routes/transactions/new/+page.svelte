@@ -13,12 +13,17 @@
 
 <svelte:head><title>New record · Household HQ</title></svelte:head>
 
-<TransactionWizard
-  accounts={data.accounts}
-  categories={data.categories}
-  suggestions={data.suggestions}
-  tagOptions={data.tags}
-  {initialAccountId}
-  defaultOutAccountId={data.defaultOutAccountId}
-  errors={form?.errors ?? []}
-/>
+<!-- Every itemizing round lands here with new arguments: start it afresh. -->
+{#key page.url.search}
+  <TransactionWizard
+    accounts={data.accounts}
+    categories={data.categories}
+    suggestions={data.suggestions}
+    tagOptions={data.tags}
+    {initialAccountId}
+    defaultOutAccountId={data.defaultOutAccountId}
+    itemize={data.itemize ?? undefined}
+    action="?/create"
+    errors={form?.errors ?? []}
+  />
+{/key}

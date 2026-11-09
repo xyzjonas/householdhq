@@ -19,6 +19,7 @@
     currency = $bindable(),
     category,
     active = true,
+    lockCurrency = false,
     onchangecategory,
     onadvance,
     onsplit,
@@ -28,6 +29,8 @@
     category: WizardCategory | undefined;
     /** Only the visible stage reacts to the physical keyboard. */
     active?: boolean;
+    /** Keeps the currency fixed, e.g. while itemizing a receipt. */
+    lockCurrency?: boolean;
     onchangecategory: () => void;
     /** Fired on Enter to move on to the next step. */
     onadvance?: () => void;
@@ -86,14 +89,22 @@
       >
         Total value
       </h3>
-      <button
-        type="button"
-        class="rounded-full bg-surface-100-900 px-3 py-1 text-xs font-bold text-surface-800-200 uppercase active:scale-95"
-        onclick={cycleCurrency}
-        aria-label="Currency {currency}, tap to change"
-      >
-        {currency}
-      </button>
+      {#if lockCurrency}
+        <span
+          class="rounded-full bg-surface-100-900 px-3 py-1 text-xs font-bold text-surface-800-200 uppercase"
+        >
+          {currency}
+        </span>
+      {:else}
+        <button
+          type="button"
+          class="rounded-full bg-surface-100-900 px-3 py-1 text-xs font-bold text-surface-800-200 uppercase active:scale-95"
+          onclick={cycleCurrency}
+          aria-label="Currency {currency}, tap to change"
+        >
+          {currency}
+        </button>
+      {/if}
     </div>
     <div class="flex items-center justify-between gap-2">
       <output

@@ -2,8 +2,10 @@ import { error, redirect } from "@sveltejs/kit";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { getCore } from "#lib/server/index.ts";
 import {
+  itemizeUrl,
   loadWizardData,
   parseTransactionForm,
+  wantsItemize,
 } from "#lib/server/transaction-form.ts";
 import type {
   Currency,
@@ -59,6 +61,7 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions: Actions = {
   update: async ({ request, params }) => {
     const id = parseId(params.id);
+    const itemize = await wantsItemize(request);
     const input = await parseTransactionForm(request);
     if ("status" in input) return input;
     try {
@@ -70,7 +73,8 @@ export const actions: Actions = {
       if (e instanceof NotFoundError) error(404, "Transaction not found");
       throw e;
     }
-    redirect(303, "/");
+    // The edited transaction becomes the receipt's original.
+    redirect(303, itemize ? itemizeUrl(id, []) : "/");
   },
   confirm: async ({ params }) => {
     try {
