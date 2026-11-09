@@ -65,7 +65,9 @@ export function vehiclesRepo(
   settings: ReturnType<typeof settingsRepo>,
 ) {
   async function requireVehicle(id: number) {
-    const vehicle = await db.vehicle.findUnique({ where: { id } });
+    const vehicle = await db.vehicle.findFirst({
+      where: { id, deletedAt: null },
+    });
     if (!vehicle) throw new NotFoundError("Vehicle", id);
     return vehicle;
   }
@@ -459,12 +461,15 @@ export function vehiclesRepo(
   return {
     /** Most recently changed first. */
     list(): Promise<Vehicle[]> {
-      return db.vehicle.findMany({ orderBy: { updatedAt: "desc" } });
+      return db.vehicle.findMany({
+        where: { deletedAt: null },
+        orderBy: { updatedAt: "desc" },
+      });
     },
 
     async get(id: number): Promise<VehicleDetail> {
-      const vehicle = await db.vehicle.findUnique({
-        where: { id },
+      const vehicle = await db.vehicle.findFirst({
+        where: { id, deletedAt: null },
         include: {
           category: true,
           fuelCategory: true,
@@ -499,9 +504,9 @@ export function vehiclesRepo(
     async update(id: number, input: VehiclePatch): Promise<Vehicle> {
       const data = VehiclePatch.parse(input);
       try {
+        await requireVehicle(id);
         return await db.vehicle.update({ where: { id }, data });
       } catch (e) {
-        if (isCode(e, "P2025")) throw new NotFoundError("Vehicle", id);
         if (isCode(e, "P2002")) {
           throw new ConflictError(
             `A vehicle with this ${uniqueField(e as Prisma.PrismaClientKnownRequestError)} already exists`,
@@ -512,46 +517,15 @@ export function vehiclesRepo(
     },
 
     /**
-     * Deletes the vehicle with its fuel and service entries and the
-     * transactions recorded for them. Other transactions in the vehicle's
-     * categories stay.
+     * Soft-deletes the vehicle: it is marked as deleted and disappears from
+     * the app, but it, its entries and their transactions stay in the
+     * database so an admin can restore it.
      */
     async remove(id: number): Promise<void> {
       await requireVehicle(id);
-      await db.$transaction(async (tx) => {
-        const [fuelEntries, serviceEntries] = await Promise.all([
-          tx.vehicleFuelEntry.findMany({
-            where: { vehicleId: id },
-            select: { transactionId: true },
-          }),
-          tx.vehicleServiceEntry.findMany({
-            where: { vehicleId: id },
-            select: { id: true, transactionId: true },
-          }),
-        ]);
-        // Fill-ups reference each other: untangle them before deleting.
-        await tx.vehicleFuelEntry.updateMany({
-          where: { vehicleId: id },
-          data: { previousFullTankFuelEntryId: null },
-        });
-        await tx.vehicleFuelEntry.deleteMany({ where: { vehicleId: id } });
-        for (const { id: serviceId } of serviceEntries) {
-          await tx.vehicleServiceEntry.update({
-            where: { id: serviceId },
-            data: { components: { set: [] } },
-          });
-        }
-        await tx.vehicleServiceEntry.deleteMany({ where: { vehicleId: id } });
-        await tx.transaction.deleteMany({
-          where: {
-            id: {
-              in: [...fuelEntries, ...serviceEntries].map(
-                (e) => e.transactionId,
-              ),
-            },
-          },
-        });
-        await tx.vehicle.delete({ where: { id } });
+      await db.vehicle.update({
+        where: { id },
+        data: { deletedAt: new Date() },
       });
     },
 

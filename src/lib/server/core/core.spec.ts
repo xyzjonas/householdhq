@@ -987,7 +987,7 @@ describe.skipIf(!core)("core layer", () => {
       ).toBe(false);
     });
 
-    it("deleting a vehicle removes its entries and their transactions", async () => {
+    it("deleting a vehicle hides it but keeps it and its entries in the database", async () => {
       const { vehicle } = await setup("remove");
       const fill = await c.vehicles.fuel.create(vehicle.id, {
         fueledAt: new Date(Date.UTC(2026, 0, 1)),
@@ -1014,14 +1014,19 @@ describe.skipIf(!core)("core layer", () => {
       await expect(c.vehicles.get(vehicle.id)).rejects.toBeInstanceOf(
         NotFoundError,
       );
+      expect((await c.vehicles.list()).some((v) => v.id === vehicle.id)).toBe(
+        false,
+      );
+      await expect(
+        c.vehicles.update(vehicle.id, { name: "Ghost" }),
+      ).rejects.toBeInstanceOf(NotFoundError);
+      // Nothing is lost: the row and its entries' transactions remain.
       for (const id of [
         fill.transactionId,
         next.transactionId,
         service.transactionId,
       ]) {
-        await expect(c.transactions.get(id)).rejects.toBeInstanceOf(
-          NotFoundError,
-        );
+        await expect(c.transactions.get(id)).resolves.toBeTruthy();
       }
       await expect(c.vehicles.remove(vehicle.id)).rejects.toBeInstanceOf(
         NotFoundError,
