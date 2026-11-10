@@ -34,6 +34,10 @@ just ci         # format:check, lint, typecheck, unit/core tests
 just e2e        # migrate + seed + Playwright (needs the database)
 ```
 
+## Localization
+
+English (base) and Czech. Translators edit `messages/<locale>.json`; see [docs/localization.md](docs/localization.md).
+
 ## Run with Docker
 
 ```bash
