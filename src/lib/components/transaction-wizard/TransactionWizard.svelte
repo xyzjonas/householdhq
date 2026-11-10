@@ -327,6 +327,7 @@
             {accounts}
             {suggestions}
             {tagOptions}
+            fallbackDescription={category?.name}
             bind:sourceId={() => sourceId, (id) => (chosenSourceId = id)}
             bind:targetId
             bind:description
