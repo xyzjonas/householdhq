@@ -1,5 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
+import { sequence } from "@sveltejs/kit/hooks";
 import type { Handle } from "@sveltejs/kit/hooks";
+import { paraglideMiddleware } from "#paraglide/server.js";
 import { getCore } from "#lib/server/index.ts";
 import { pickActiveHousehold } from "#lib/server/core/index.ts";
 import {
@@ -32,7 +34,7 @@ const isSuperuserPath = (path: string) =>
 // Once an admin exists this never goes back to false.
 let hasUsers = false;
 
-export const handle: Handle = async ({ event, resolve }) => {
+const auth: Handle = async ({ event, resolve }) => {
   const core = getCore();
   const { pathname } = event.url;
   const secure = event.url.protocol === "https:";
@@ -96,3 +98,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   return resolve(event);
 };
+
+/** Resolves the request's locale and renders `<html lang>` to match. */
+const i18n: Handle = ({ event, resolve }) =>
+  paraglideMiddleware(event.request, ({ locale }) => {
+    return resolve(event, {
+      transformPageChunk: ({ html }) =>
+        html.replace("%paraglide.lang%", locale),
+    });
+  });
+
+export const handle = sequence(i18n, auth);

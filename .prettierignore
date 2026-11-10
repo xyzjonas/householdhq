@@ -9,3 +9,5 @@ test-results
 playwright-report
 *.csv
 docs
+src/paraglide
+project.inlang

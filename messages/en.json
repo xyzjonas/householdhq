@@ -1,0 +1,6 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_language_title": "Language",
+  "settings_language_hint": "Stored in this browser only. Applied immediately.",
+  "settings_language_label": "Display language"
+}

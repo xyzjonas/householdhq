@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "prisma generate && vite build",
     "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo \"\"",
+    "prepare": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide && svelte-kit sync || echo \"\"",
     "postinstall": "prisma generate",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -21,7 +21,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:dev": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:long": "tsx prisma/seed-long.ts"
+    "db:seed:long": "tsx prisma/seed-long.ts",
+    "check:i18n": "inlang check --project ./project.inlang"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -48,13 +49,17 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.1",
     "vite": "^8.3.0",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.8",
+    "@inlang/cli": "^3.4.0",
+    "@typescript-eslint/parser": "^8.71.2"
   },
   "imports": {
     "#lib": "./src/lib/index.js",
-    "#lib/*": "./src/lib/*"
+    "#lib/*": "./src/lib/*",
+    "#paraglide/*": "./src/paraglide/*"
   },
   "dependencies": {
+    "@inlang/paraglide-js": "^3.2.1",
     "@lucide/svelte": "^1.68.0",
     "@prisma/adapter-mariadb": "^7.10.1",
     "@prisma/client": "^7.10.1",

@@ -4,6 +4,7 @@
   import FiscalIntervalForm from "#lib/components/settings/FiscalIntervalForm.svelte";
   import DefaultOutAccountForm from "#lib/components/settings/DefaultOutAccountForm.svelte";
   import MankoCategoryForm from "#lib/components/settings/MankoCategoryForm.svelte";
+  import LanguageForm from "#lib/components/settings/LanguageForm.svelte";
   import ThemeForm from "#lib/components/settings/ThemeForm.svelte";
   import type { PageProps } from "./$types";
 
@@ -52,4 +53,6 @@
   />
 
   <ThemeForm />
+
+  <LanguageForm />
 </div>

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "settings_language_title": "Jazyk",
+  "settings_language_hint": "Uloženo pouze v tomto prohlížeči. Projeví se okamžitě.",
+  "settings_language_label": "Jazyk rozhraní"
+}
