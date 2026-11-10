@@ -1,7 +1,13 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
+  import { intlLocale } from "#lib/i18n.ts";
   import TrendingDown from "@lucide/svelte/icons/trending-down";
   import TrendingUp from "@lucide/svelte/icons/trending-up";
-  import { formatReading, type MeterStats } from "#lib/energy.ts";
+  import {
+    formatPercent,
+    formatReading,
+    type MeterStats,
+  } from "#lib/energy.ts";
   import type { MeterReading } from "#lib/server/core/types.ts";
 
   let {
@@ -14,18 +20,15 @@
     unit: string;
   } = $props();
 
-  const monthFmt = new Intl.DateTimeFormat("en-GB", {
-    month: "long",
-    year: "numeric",
-  });
-  const updated = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-  const percent = new Intl.NumberFormat("en-GB", {
-    style: "percent",
-    maximumFractionDigits: 0,
-  });
+  const monthFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), { month: "long", year: "numeric" }),
+  );
+  const updated = $derived(
+    new Intl.DateTimeFormat(intlLocale(), {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+  );
 
   const lastConsumption = $derived(stats.lastMonth?.consumption ?? null);
   const previousConsumption = $derived(
@@ -46,13 +49,15 @@
       id="latest-heading"
       class="text-xs font-bold tracking-wider uppercase opacity-60"
     >
-      Latest reading
+      {m.energy_latest_reading()}
     </h2>
     <p class="text-4xl font-extrabold tracking-tight">
       {latest ? formatReading(latest.value, unit) : "—"}
     </p>
     <p class="text-sm text-surface-600-400">
-      {latest ? `Read ${updated.format(latest.meteredAt)}` : "No readings yet"}
+      {latest
+        ? m.energy_read_at({ date: updated.format(latest.meteredAt) })
+        : m.energy_no_readings()}
     </p>
     {#if yoy !== null}
       <p>
@@ -62,7 +67,9 @@
             : 'border-emerald-100 bg-emerald-50 text-emerald-700'}"
         >
           <Trend size={14} aria-hidden="true" />
-          {yoy > 0 ? "+" : ""}{percent.format(yoy)} vs same month last year
+          {m.energy_yoy_badge({
+            percent: (yoy > 0 ? "+" : "") + formatPercent(yoy),
+          })}
         </span>
       </p>
     {/if}
@@ -73,25 +80,25 @@
   >
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Last month
+        {m.energy_last_month()}
       </dt>
       <dd class="font-bold">
         {lastConsumption === null ? "—" : formatReading(lastConsumption, unit)}
         <span class="block text-xs font-medium opacity-60">
           {#if stats.lastMonth && stats.lastMonthPerDay !== null}
-            {monthFmt.format(stats.lastMonth.monthStart)} · {formatReading(
-              stats.lastMonthPerDay,
-              unit,
-            )}/day{stats.lastMonth.partial ? " · so far" : ""}
+            {m.energy_last_month_detail({
+              month: monthFmt.format(stats.lastMonth.monthStart),
+              perDay: formatReading(stats.lastMonthPerDay, unit),
+            })}{stats.lastMonth.partial ? ` · ${m.energy_so_far()}` : ""}
           {:else}
-            Needs readings around the month
+            {m.energy_needs_readings()}
           {/if}
         </span>
       </dd>
     </div>
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Same month last year
+        {m.energy_same_month_last_year()}
       </dt>
       <dd class="font-bold">
         {previousConsumption === null
@@ -100,34 +107,33 @@
         <span class="block text-xs font-medium opacity-60">
           {stats.sameMonthLastYear
             ? monthFmt.format(stats.sameMonthLastYear.monthStart)
-            : "No year-ago month yet"}
+            : m.energy_no_year_ago()}
         </span>
       </dd>
     </div>
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Last 12 months
+        {m.energy_last_12_months()}
       </dt>
       <dd class="font-bold">
         {stats.year ? formatReading(stats.year.total, unit) : "—"}
         <span class="block text-xs font-medium opacity-60">
           {#if stats.year}
-            {stats.year.months}
-            {stats.year.months === 1 ? "complete month" : "complete months"}
+            {m.energy_complete_months({ count: stats.year.months })}
           {:else}
-            No complete month yet
+            {m.energy_no_complete_month()}
           {/if}
         </span>
       </dd>
     </div>
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Monthly average
+        {m.energy_monthly_average()}
       </dt>
       <dd class="font-bold">
         {stats.year ? formatReading(stats.year.average, unit) : "—"}
         <span class="block text-xs font-medium opacity-60">
-          Over the same months
+          {m.energy_over_same_months()}
         </span>
       </dd>
     </div>

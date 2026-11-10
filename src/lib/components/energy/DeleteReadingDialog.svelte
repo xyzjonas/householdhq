@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import { toaster } from "#lib/toaster.ts";
@@ -23,9 +24,11 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">Delete reading?</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold"
+          >{m.energy_delete_title()}</Dialog.Title
+        >
         <Dialog.Description class="text-sm text-surface-600-400">
-          The reading of {reading?.label} will be permanently removed.
+          {m.energy_delete_text({ date: reading?.label ?? "" })}
         </Dialog.Description>
         <form
           method="POST"
@@ -35,19 +38,19 @@
             async ({ result, update }) => {
               reading = null;
               if (result.type === "success") {
-                toaster.success({ title: "Reading deleted" });
+                toaster.success({ title: m.energy_delete_done() });
               } else {
-                toaster.error({ title: "Could not delete the reading" });
+                toaster.error({ title: m.energy_delete_failed() });
               }
               await update();
             }}
         >
           <input type="hidden" name="id" value={reading?.id} />
           <Dialog.CloseTrigger class="btn preset-tonal"
-            >Cancel</Dialog.CloseTrigger
+            >{m.common_cancel()}</Dialog.CloseTrigger
           >
           <button type="submit" class="btn preset-filled-error-500">
-            Delete
+            {m.common_delete()}
           </button>
         </form>
       </Dialog.Content>

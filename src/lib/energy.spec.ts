@@ -142,9 +142,7 @@ describe("incrementById", () => {
 
 describe("formatting", () => {
   it("formats readings with their unit", () => {
-    expect(formatReading(1234.5, "kWh").replace(/\s/g, " ")).toBe(
-      "1 234,5 kWh",
-    );
+    expect(formatReading(1234.5, "kWh")).toBe("1,234.5 kWh");
   });
 
   it("falls back to the monthly chart", () => {

@@ -1,4 +1,6 @@
+import { intlLocale } from "#lib/i18n.ts";
 import type { MeterReading } from "#lib/server/core/types.ts";
+import { m } from "#paraglide/messages.js";
 
 /** The part of a reading the energy views need (survives JSON transport). */
 export type ReadingLike = Pick<MeterReading, "id" | "value"> & {
@@ -12,21 +14,30 @@ export interface SeriesPoint {
 
 export type ChartMode = "monthly" | "yoy" | "readings";
 
-export const chartModes: { id: ChartMode; label: string }[] = [
-  { id: "monthly", label: "Monthly" },
-  { id: "yoy", label: "Year over year" },
-  { id: "readings", label: "Readings" },
+export const chartModes = (): { id: ChartMode; label: string }[] => [
+  { id: "monthly", label: m.energy_mode_monthly() },
+  { id: "yoy", label: m.energy_mode_yoy() },
+  { id: "readings", label: m.energy_mode_readings() },
 ];
 
 export function parseChartMode(value: string | null): ChartMode {
   return value === "yoy" || value === "readings" ? value : "monthly";
 }
 
-const number = new Intl.NumberFormat("cs-CZ", { maximumFractionDigits: 2 });
-
-/** 1234.5, "kWh" -> "1 234,5 kWh" */
+/** 1234.5, "kWh" -> "1,234.5 kWh" (grouping and decimal mark follow the locale) */
 export function formatReading(value: number, unit: string): string {
+  const number = new Intl.NumberFormat(intlLocale(), {
+    maximumFractionDigits: 2,
+  });
   return `${number.format(value)} ${unit}`;
+}
+
+/** 0.256 -> "26%" */
+export function formatPercent(fraction: number): string {
+  return new Intl.NumberFormat(intlLocale(), {
+    style: "percent",
+    maximumFractionDigits: 0,
+  }).format(fraction);
 }
 
 const chronological = (readings: ReadingLike[]): SeriesPoint[] =>
@@ -131,7 +142,9 @@ export function meterStats(
   now: Date = new Date(),
 ): MeterStats {
   const months = monthlyConsumption(readings, now);
-  const byKey = new Map(months.map((m) => [monthKey(m.monthStart), m]));
+  const byKey = new Map(
+    months.map((month) => [monthKey(month.monthStart), month]),
+  );
   const lastStart = startOfMonth(now, -1);
   const lastMonth = byKey.get(monthKey(lastStart)) ?? null;
   const sameMonthLastYear =
@@ -147,13 +160,13 @@ export function meterStats(
 
   const window = months
     .filter(
-      (m) =>
-        !m.partial &&
-        m.consumption !== null &&
-        monthKey(m.monthStart) >= monthKey(lastStart) - 11 &&
-        monthKey(m.monthStart) <= monthKey(lastStart),
+      (month) =>
+        !month.partial &&
+        month.consumption !== null &&
+        monthKey(month.monthStart) >= monthKey(lastStart) - 11 &&
+        monthKey(month.monthStart) <= monthKey(lastStart),
     )
-    .map((m) => m.consumption as number);
+    .map((month) => month.consumption as number);
   const total = window.reduce((sum, v) => sum + v, 0);
 
   return {

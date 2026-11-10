@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import CalendarPlus from "@lucide/svelte/icons/calendar-plus";
@@ -24,7 +25,7 @@
 <Dialog {open} {onOpenChange}>
   <Dialog.Trigger class="btn rounded-full preset-filled-surface-950-50 text-xs">
     <CalendarPlus size={16} aria-hidden="true" />
-    <span>New reading</span>
+    <span>{m.energy_new_reading()}</span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -34,9 +35,11 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">New reading</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold"
+          >{m.energy_new_reading()}</Dialog.Title
+        >
         <Dialog.Description class="text-sm text-surface-600-400">
-          Record what the {meterName} meter shows right now, or backdate it.
+          {m.energy_reading_description({ meter: meterName })}
         </Dialog.Description>
         <form
           method="POST"
@@ -55,13 +58,13 @@
               submitting = false;
               if (result.type === "success") {
                 open = false;
-                toaster.success({ title: "Reading added" });
+                toaster.success({ title: m.energy_reading_added() });
               }
             };
           }}
         >
           <label class="label">
-            <span class="label-text">Metered at</span>
+            <span class="label-text">{m.energy_reading_metered_at()}</span>
             <input
               class="input"
               type="datetime-local"
@@ -71,7 +74,7 @@
             />
           </label>
           <label class="label">
-            <span class="label-text">Value ({unit})</span>
+            <span class="label-text">{m.energy_reading_value({ unit })}</span>
             <input
               class="input"
               type="text"
@@ -79,7 +82,7 @@
               name="value"
               required
               autocomplete="off"
-              placeholder="e.g. 12345.6"
+              placeholder={m.energy_reading_value_placeholder()}
             />
           </label>
           {#if message}
@@ -87,14 +90,14 @@
           {/if}
           <div class="flex justify-end gap-2">
             <Dialog.CloseTrigger class="btn preset-tonal"
-              >Cancel</Dialog.CloseTrigger
+              >{m.common_cancel()}</Dialog.CloseTrigger
             >
             <button
               type="submit"
               class="btn preset-filled-surface-950-50"
               disabled={submitting}
             >
-              Add reading
+              {m.energy_reading_submit()}
             </button>
           </div>
         </form>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Pencil from "@lucide/svelte/icons/pencil";
@@ -21,7 +22,9 @@
   } = $props();
 
   const editing = $derived(meter !== undefined);
-  const title = $derived(editing ? "Edit meter" : "New meter");
+  const title = $derived(
+    editing ? m.energy_meter_edit() : m.energy_meter_new(),
+  );
 
   let open = $state(false);
   let submitting = $state(false);
@@ -37,12 +40,12 @@
   {#if editing}
     <Dialog.Trigger class="btn rounded-full preset-tonal text-xs font-bold">
       <Pencil size={16} aria-hidden="true" />
-      <span>Edit meter</span>
+      <span>{m.energy_meter_edit()}</span>
     </Dialog.Trigger>
   {:else}
     <Dialog.Trigger class="btn preset-filled-surface-950-50">
       <Plus size={16} aria-hidden="true" />
-      <span>New meter</span>
+      <span>{m.energy_meter_new()}</span>
     </Dialog.Trigger>
   {/if}
   <Portal>
@@ -56,8 +59,8 @@
         <Dialog.Title class="text-lg font-bold">{title}</Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
           {editing
-            ? "Changes apply to the whole reading history."
-            : "Name the meter and the unit it counts in. Readings are added afterwards."}
+            ? m.energy_meter_edit_description()
+            : m.energy_meter_new_description()}
         </Dialog.Description>
         <form
           method="POST"
@@ -70,13 +73,13 @@
               submitting = false;
               if (result.type === "success" || result.type === "redirect") {
                 open = false;
-                if (editing) toaster.success({ title: "Meter saved" });
+                if (editing) toaster.success({ title: m.energy_meter_saved() });
               }
             };
           }}
         >
           <label class="label">
-            <span class="label-text">Meter name</span>
+            <span class="label-text">{m.energy_meter_name()}</span>
             <input
               class="input"
               name="name"
@@ -84,13 +87,13 @@
               required
               maxlength="100"
               autocomplete="off"
-              placeholder="e.g. Electricity"
+              placeholder={m.energy_meter_name_placeholder()}
               value={meter?.name ?? ""}
             />
           </label>
           <div class="grid grid-cols-2 gap-4">
             <label class="label">
-              <span class="label-text">Unit</span>
+              <span class="label-text">{m.energy_meter_unit_label()}</span>
               <input
                 class="input"
                 name="unit"
@@ -98,12 +101,12 @@
                 required
                 maxlength="20"
                 autocomplete="off"
-                placeholder="e.g. kWh"
+                placeholder={m.energy_meter_unit_placeholder()}
                 value={meter?.unit ?? ""}
               />
             </label>
             <label class="label">
-              <span class="label-text">Meter ID (optional)</span>
+              <span class="label-text">{m.energy_meter_id_optional()}</span>
               <input
                 class="input"
                 name="meterNumber"
@@ -115,7 +118,7 @@
             </label>
           </div>
           <label class="label">
-            <span class="label-text">Color</span>
+            <span class="label-text">{m.energy_meter_color()}</span>
             <input
               class="input h-10 cursor-pointer p-1"
               name="color"
@@ -124,10 +127,10 @@
             />
           </label>
           <fieldset class="flex flex-col gap-2">
-            <legend class="mb-2 label-text">Icon</legend>
+            <legend class="mb-2 label-text">{m.energy_meter_icon()}</legend>
             <input type="hidden" name="icon" value={icon ?? ""} />
             <ul class="grid grid-cols-7 gap-2">
-              {#each meterIcons as option (option.name)}
+              {#each meterIcons() as option (option.name)}
                 {@const selected = option.name === icon}
                 <li>
                   <button
@@ -151,14 +154,14 @@
           {/if}
           <div class="flex justify-end gap-2">
             <Dialog.CloseTrigger class="btn preset-tonal"
-              >Cancel</Dialog.CloseTrigger
+              >{m.common_cancel()}</Dialog.CloseTrigger
             >
             <button
               type="submit"
               class="btn preset-filled-surface-950-50"
               disabled={submitting}
             >
-              {editing ? "Save meter" : "Create meter"}
+              {editing ? m.energy_meter_save() : m.energy_meter_create()}
             </button>
           </div>
         </form>
