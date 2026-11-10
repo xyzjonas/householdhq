@@ -21,14 +21,20 @@ const userId = (form: FormData) => Number(form.get("id"));
 
 export const actions: Actions = {
   /** Creates the account with a random password and returns the invite link token. */
-  invite: async ({ request }) => {
+  invite: async ({ request, locals }) => {
     const email = String((await request.formData()).get("email") ?? "");
     const parsed = UserInput.shape.email.safeParse(email);
     if (!parsed.success) {
       return fail(400, { message: "Please enter a valid email address." });
     }
     try {
-      const { user, password } = await getCore().users.invite(parsed.data);
+      const core = getCore();
+      const { user, password } = await core.users.invite(parsed.data);
+      // Whoever is invited from within a household joins it; more households
+      // can be granted under /admin.
+      if (locals.household) {
+        await core.households.addMember(locals.household.id, user.id);
+      }
       return {
         invite: {
           email: user.email,
