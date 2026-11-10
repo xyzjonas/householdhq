@@ -1,5 +1,5 @@
 import type { RawDb } from "./prisma";
-import { HouseholdInput } from "./schemas";
+import { HouseholdInput, HouseholdPatch } from "./schemas";
 import {
   NotFoundError,
   type Household,
@@ -67,11 +67,12 @@ export function householdsRepo(db: RawDb) {
       return db.household.create({ data: HouseholdInput.parse(input) });
     },
 
-    async rename(id: number, input: HouseholdInput): Promise<Household> {
+    /** Changes the given properties only (name, icon, colour). */
+    async update(id: number, input: HouseholdPatch): Promise<Household> {
       await requireHousehold(id);
       return db.household.update({
         where: { id },
-        data: HouseholdInput.parse(input),
+        data: HouseholdPatch.parse(input),
       });
     },
 

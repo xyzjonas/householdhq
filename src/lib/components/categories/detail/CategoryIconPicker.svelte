@@ -73,90 +73,94 @@
 
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Portal>
-    <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
-    <Dialog.Positioner
-      class="fixed inset-0 z-50 flex items-center justify-center p-4"
-    >
-      <Dialog.Content
-        class="flex max-h-[85vh] w-full max-w-2xl flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
+    {#if open}
+      <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
+      <Dialog.Positioner
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        <header class="flex items-start justify-between gap-4">
-          <div>
-            <Dialog.Title class="text-lg font-bold">Choose icon</Dialog.Title>
-            <Dialog.Description class="text-sm text-surface-600-400">
-              Search by name, theme or what you spend on, e.g. “petrol”.
-            </Dialog.Description>
+        <Dialog.Content
+          class="flex max-h-[85vh] w-full max-w-2xl flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
+        >
+          <header class="flex items-start justify-between gap-4">
+            <div>
+              <Dialog.Title class="text-lg font-bold">Choose icon</Dialog.Title>
+              <Dialog.Description class="text-sm text-surface-600-400">
+                Search by name, theme or what you spend on, e.g. “petrol”.
+              </Dialog.Description>
+            </div>
+            <Dialog.CloseTrigger
+              class="btn-icon preset-tonal btn-icon-sm"
+              aria-label="Close"
+            >
+              <X size={16} aria-hidden="true" />
+            </Dialog.CloseTrigger>
+          </header>
+
+          <div class="field-group grid-cols-[auto_1fr]">
+            <span class="label preset-tonal">
+              <Search size={16} aria-hidden="true" />
+            </span>
+            <input
+              class="input"
+              type="search"
+              placeholder="Search icons"
+              aria-label="Search icons"
+              bind:value={query}
+            />
           </div>
-          <Dialog.CloseTrigger
-            class="btn-icon preset-tonal btn-icon-sm"
-            aria-label="Close"
-          >
-            <X size={16} aria-hidden="true" />
-          </Dialog.CloseTrigger>
-        </header>
 
-        <div class="field-group grid-cols-[auto_1fr]">
-          <span class="label preset-tonal">
-            <Search size={16} aria-hidden="true" />
-          </span>
-          <input
-            class="input"
-            type="search"
-            placeholder="Search icons"
-            aria-label="Search icons"
-            bind:value={query}
-          />
-        </div>
+          <div class="flex flex-col gap-5 overflow-y-auto pr-1">
+            {#each groups as { group, icons } (group)}
+              <section aria-label={group} class="flex flex-col gap-2">
+                <h3
+                  class="text-xs font-bold tracking-wider uppercase opacity-60"
+                >
+                  {group}
+                </h3>
+                <ul
+                  class="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2"
+                >
+                  {#each icons as icon (icon.name)}
+                    {@const selected = icon.name === value}
+                    <li>
+                      <button
+                        type="button"
+                        aria-pressed={selected}
+                        disabled={saving}
+                        title={icon.label}
+                        class="flex w-full flex-col items-center gap-1.5 rounded-xl border p-2.5 text-xs transition-colors {selected
+                          ? 'border-emerald-600 bg-emerald-50 text-emerald-900'
+                          : 'border-surface-200-800 hover:border-surface-400-600'}"
+                        onclick={() => choose(icon)}
+                      >
+                        <icon.component size={22} aria-hidden="true" />
+                        <span class="w-full truncate text-center font-medium">
+                          {icon.label}
+                        </span>
+                      </button>
+                    </li>
+                  {/each}
+                </ul>
+              </section>
+            {:else}
+              <p class="py-8 text-center text-sm opacity-70">
+                No icons match “{query}”.
+              </p>
+            {/each}
+          </div>
 
-        <div class="flex flex-col gap-5 overflow-y-auto pr-1">
-          {#each groups as { group, icons } (group)}
-            <section aria-label={group} class="flex flex-col gap-2">
-              <h3 class="text-xs font-bold tracking-wider uppercase opacity-60">
-                {group}
-              </h3>
-              <ul
-                class="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2"
-              >
-                {#each icons as icon (icon.name)}
-                  {@const selected = icon.name === value}
-                  <li>
-                    <button
-                      type="button"
-                      aria-pressed={selected}
-                      disabled={saving}
-                      title={icon.label}
-                      class="flex w-full flex-col items-center gap-1.5 rounded-xl border p-2.5 text-xs transition-colors {selected
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900'
-                        : 'border-surface-200-800 hover:border-surface-400-600'}"
-                      onclick={() => choose(icon)}
-                    >
-                      <icon.component size={22} aria-hidden="true" />
-                      <span class="w-full truncate text-center font-medium">
-                        {icon.label}
-                      </span>
-                    </button>
-                  </li>
-                {/each}
-              </ul>
-            </section>
-          {:else}
-            <p class="py-8 text-center text-sm opacity-70">
-              No icons match “{query}”.
-            </p>
-          {/each}
-        </div>
-
-        <footer class="flex justify-end">
-          <button
-            type="button"
-            class="btn preset-tonal text-xs"
-            disabled={saving || value === null}
-            onclick={() => choose(null)}
-          >
-            Use default icon
-          </button>
-        </footer>
-      </Dialog.Content>
-    </Dialog.Positioner>
+          <footer class="flex justify-end">
+            <button
+              type="button"
+              class="btn preset-tonal text-xs"
+              disabled={saving || value === null}
+              onclick={() => choose(null)}
+            >
+              Use default icon
+            </button>
+          </footer>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    {/if}
   </Portal>
 </Dialog>

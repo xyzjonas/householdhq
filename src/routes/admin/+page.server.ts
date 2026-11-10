@@ -6,6 +6,7 @@ import { encodeInvite } from "#lib/invite.ts";
 import {
   ConflictError,
   HouseholdInput,
+  HouseholdPatch,
   NotFoundError,
   UserInput,
 } from "#lib/server/core/index.ts";
@@ -52,27 +53,32 @@ export const actions: Actions = {
     return { action: "createHousehold", saved: true };
   },
 
-  renameHousehold: async ({ request }) => {
+  /** Name, icon and colour from the edit dialog. */
+  updateHousehold: async ({ request }) => {
     const form = await request.formData();
     const id = Id.safeParse(form.get("householdId"));
-    const parsed = HouseholdInput.safeParse({ name: form.get("name") ?? "" });
+    const parsed = HouseholdPatch.safeParse({
+      name: form.get("name") ?? "",
+      icon: String(form.get("icon") ?? "") || undefined,
+      color: String(form.get("color") ?? "") || undefined,
+    });
     if (!id.success || !parsed.success) {
       return fail(400, {
-        action: "renameHousehold",
+        action: "updateHousehold",
         householdId: id.success ? id.data : null,
         message: parsed.error?.issues[0]?.message ?? "Unknown household",
       });
     }
     try {
-      await getCore().households.rename(id.data, parsed.data);
+      await getCore().households.update(id.data, parsed.data);
     } catch (e) {
       return fail(400, {
-        action: "renameHousehold",
+        action: "updateHousehold",
         householdId: id.data,
         message: message(e),
       });
     }
-    return { action: "renameHousehold", householdId: id.data, saved: true };
+    return { action: "updateHousehold", householdId: id.data, saved: true };
   },
 
   addMember: async ({ request }) => {

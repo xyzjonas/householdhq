@@ -95,6 +95,17 @@ try {
       defaultFuelTransactionTitle: long("LONG fuel title"),
       categoryId: category.id,
     });
+
+    // A second household with an unbreakable name, for the admin page and the
+    // household title/switcher, with everyone from the first one in it.
+    const longHousehold = await core.households.create({
+      name: `LONG household ${UNBROKEN.slice(0, 80)}`,
+      icon: "car",
+      color: "#d9480f",
+    });
+    for (const member of household.members) {
+      await core.households.addMember(longHousehold.id, member.id);
+    }
     console.log(`seed-long: created long-text data (vehicle ${vehicle.id})`);
   }
 } finally {

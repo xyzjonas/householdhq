@@ -18,9 +18,9 @@ export async function login(
   await expect(page).toHaveURL(/\/$/);
 }
 
-/** A user's row in the administration tree (once per household they are in). */
+/** A user's row in the administration tables (once per household they are in). */
 export const userRow = (page: Page, email: string) =>
-  page.locator('[data-part="item"]').filter({ hasText: email });
+  page.getByRole("row").filter({ hasText: email });
 
 /**
  * Invites `email` from the administration page, into the household called

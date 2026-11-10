@@ -23,6 +23,10 @@ import {
   scopeArgs,
   scopeToHousehold,
 } from "./scope";
+import {
+  DEFAULT_HOUSEHOLD_COLOR,
+  DEFAULT_HOUSEHOLD_ICON,
+} from "../../household";
 
 const notFound = (promise: Promise<unknown>) =>
   expect(promise).rejects.toBeInstanceOf(NotFoundError);
@@ -705,6 +709,48 @@ describe.skipIf(!core)("household isolation", () => {
       expect(
         (await g.households.forUser(user.id)).map((h) => h.id).sort(),
       ).toEqual([a.householdId, b.householdId].sort());
+    });
+
+    it("gives households an icon and colour, defaulting to the app's", async () => {
+      const plain = await g.households.create({ name: `${run} plain` });
+      householdIds.push(plain.id);
+      expect(plain).toMatchObject({
+        icon: DEFAULT_HOUSEHOLD_ICON,
+        color: DEFAULT_HOUSEHOLD_COLOR,
+      });
+
+      const styled = await g.households.create({
+        name: `${run} styled`,
+        icon: "car",
+        color: "#AA00BB",
+      });
+      householdIds.push(styled.id);
+      expect(styled).toMatchObject({ icon: "car", color: "#aa00bb" });
+
+      // Changing one property leaves the others alone.
+      expect(
+        await g.households.update(styled.id, { name: `${run} renamed` }),
+      ).toMatchObject({
+        name: `${run} renamed`,
+        icon: "car",
+        color: "#aa00bb",
+      });
+      expect(
+        await g.households.update(styled.id, { color: "#112233" }),
+      ).toMatchObject({ icon: "car", color: "#112233" });
+      expect(
+        (await g.households.forUser(userIds[0])).every(
+          (h) => typeof h.icon === "string" && /^#/.test(h.color),
+        ),
+      ).toBe(true);
+
+      await expect(
+        g.households.update(styled.id, { color: "red" }),
+      ).rejects.toThrow();
+      await expect(
+        g.households.update(styled.id, { icon: "Not A Name" }),
+      ).rejects.toThrow();
+      await notFound(g.households.update(2_000_000_000, { name: "x" }));
     });
 
     it("rejects unknown households and users", async () => {

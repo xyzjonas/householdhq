@@ -33,9 +33,7 @@ test.describe("households", () => {
     await create.getByLabel("Name").fill(neighbours);
     await create.getByRole("button", { name: "Create household" }).click();
     await expect(create.getByRole("status")).toHaveText("Household created.");
-    await expect(
-      page.getByRole("group", { name: `Manage ${neighbours}` }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: neighbours })).toBeVisible();
 
     // The invite form offers every household; the invitee joins the chosen one.
     const link = await invite(page, neighbourEmail, neighbours);
@@ -46,6 +44,47 @@ test.describe("households", () => {
       page.getByRole("button", {
         name: `Remove ${neighbourEmail} from ${neighbours}`,
       }),
+    ).toBeVisible();
+  });
+
+  test("an admin edits a household's name and look", async ({ page }) => {
+    await login(page);
+    await page.goto("/admin");
+    await page.waitForLoadState("networkidle");
+    const region = page.getByRole("region", { name: neighbours, exact: true });
+    await region.getByRole("button", { name: `Edit ${neighbours}` }).click();
+
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Name").fill(`${neighbours} & co`);
+    await dialog.getByLabel("Pick color").fill("#ff0000");
+    await dialog.getByRole("button", { name: "Change icon" }).click();
+    const picker = page.getByRole("dialog").filter({ hasText: "Choose icon" });
+    await picker.getByRole("searchbox").fill("petrol");
+    await picker.getByRole("button", { name: "Fuel" }).first().click();
+    await dialog.getByRole("button", { name: "Save household" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: `${neighbours} & co` }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("region", { name: `${neighbours} & co` })
+        .locator('[style*="#ff0000"]'),
+    ).toHaveCount(1);
+
+    // Back to the original name so the other tests find it.
+    await page.getByRole("button", { name: `Edit ${neighbours} & co` }).click();
+    await page.getByRole("dialog").getByLabel("Name").fill(neighbours);
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Default" })
+      .click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Save household" })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: neighbours, exact: true }),
     ).toBeVisible();
   });
 
@@ -65,9 +104,14 @@ test.describe("households", () => {
     const neighbour = await (await browser.newContext()).newPage();
     await login(neighbour, neighbourEmail, neighbourPassword);
 
-    // Only the household's own name, and no way to switch.
-    await expect(neighbour.getByText(neighbours).first()).toBeVisible();
-    await expect(neighbour.getByLabel("Household")).toHaveCount(0);
+    // The household's name is the app's title (with the product name as a
+    // quiet mark above it), and there is nothing to switch to.
+    const main = neighbour.getByRole("complementary");
+    await expect(main.getByText("Household HQ")).toBeVisible();
+    await expect(main.getByRole("link", { name: neighbours })).toBeVisible();
+    await expect(
+      neighbour.getByRole("button", { name: "Switch household" }),
+    ).toHaveCount(0);
 
     await neighbour.goto("/accounts");
     await expect(
@@ -112,8 +156,8 @@ test.describe("households", () => {
     await login(page);
     await page.goto("/admin");
     await page.waitForLoadState("networkidle");
-    const home = page.getByRole("group", { name: "Manage Home" });
-    await home.getByLabel("Add an existing user").selectOption({
+    const home = page.getByRole("region", { name: "Home", exact: true });
+    await home.getByLabel("Add an existing user to Home").selectOption({
       label: neighbourEmail,
     });
     await home.getByRole("button", { name: "Add", exact: true }).click();
@@ -125,7 +169,9 @@ test.describe("households", () => {
 
     const neighbour = await (await browser.newContext()).newPage();
     await login(neighbour, neighbourEmail, neighbourPassword);
-    await expect(neighbour.getByLabel("Household").first()).toBeVisible();
+    await expect(
+      neighbour.getByRole("button", { name: "Switch household" }),
+    ).toBeVisible();
 
     // Switching posts a form and reloads; wait for that to finish.
     const switchTo = async (name: string) => {
@@ -134,10 +180,11 @@ test.describe("households", () => {
           new URL(r.url()).pathname === "/household/switch" &&
           r.request().method() === "POST",
       );
+      await neighbour.getByRole("button", { name: "Switch household" }).click();
       await neighbour
-        .getByLabel("Household")
-        .first()
-        .selectOption({ label: name });
+        .getByRole("dialog")
+        .getByRole("button", { name: new RegExp(`^${name}`) })
+        .click();
       await switched;
       await neighbour.waitForLoadState("networkidle");
     };

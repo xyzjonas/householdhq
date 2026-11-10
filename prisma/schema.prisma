@@ -29,6 +29,10 @@ model User {
 model Household {
   id        Int      @id @default(autoincrement())
   name      String
+  /// A name from the shared icon catalog (see `category-icon-catalog.ts`).
+  icon      String   @default("house")
+  /// `#rrggbb`
+  color     String   @default("#4f46e5")
   createdAt DateTime @default(now())
 
   memberships Membership[]

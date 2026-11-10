@@ -4,7 +4,8 @@
   import Plus from "@lucide/svelte/icons/plus";
   import LogOut from "@lucide/svelte/icons/log-out";
   import Search from "@lucide/svelte/icons/search";
-  import HouseholdSwitcher from "./HouseholdSwitcher.svelte";
+  import type { HouseholdSummary } from "#lib/household.ts";
+  import HouseholdTitle from "./HouseholdTitle.svelte";
   import NavItems from "./NavItems.svelte";
 
   let {
@@ -14,8 +15,8 @@
     children,
   }: {
     user: { email: string };
-    household: { id: number; name: string };
-    households: { id: number; name: string }[];
+    household: HouseholdSummary;
+    households: HouseholdSummary[];
     children: Snippet;
   } = $props();
 </script>
@@ -24,10 +25,7 @@
   <aside
     class="sticky top-0 hidden h-screen flex-col gap-8 border-r border-surface-200-800 bg-surface-50-950 p-6 lg:flex"
   >
-    <a href={resolve("/")} class="text-xl font-extrabold tracking-tight"
-      >Household HQ</a
-    >
-    <HouseholdSwitcher {household} {households} />
+    <HouseholdTitle {household} {households} />
     <nav aria-label="Main">
       <NavItems layout="sidebar" />
     </nav>
@@ -46,17 +44,9 @@
     <header
       class="sticky top-0 z-10 flex items-center gap-3 border-b border-surface-200-800 bg-surface-50-950/90 px-4 py-3 backdrop-blur lg:px-8"
     >
-      <a
-        href={resolve("/")}
-        class="text-lg font-extrabold tracking-tight lg:hidden"
-      >
-        Household HQ
-      </a>
-      {#if households.length > 1}
-        <div class="lg:hidden">
-          <HouseholdSwitcher {household} {households} />
-        </div>
-      {/if}
+      <div class="min-w-0 flex-1 sm:max-w-64 sm:flex-none lg:hidden">
+        <HouseholdTitle {household} {households} />
+      </div>
       <form
         role="search"
         class="ml-auto hidden max-w-sm flex-1 sm:block lg:ml-0"
@@ -79,7 +69,7 @@
         class="ml-auto btn preset-filled-surface-950-50 sm:ml-0"
       >
         <Plus size={16} aria-hidden="true" />
-        <span>Add record</span>
+        <span class="max-sm:sr-only">Add record</span>
       </a>
       <form method="POST" action={resolve("/logout")} class="lg:hidden">
         <button
