@@ -51,3 +51,32 @@ describe("visibleNavItems", () => {
     expect(labels({ isSuperuser: true })).toContain("admin");
   });
 });
+
+describe("visibleNavItems and modules", () => {
+  const keys = (enabled?: Parameters<typeof visibleNavItems>[2]) =>
+    visibleNavItems(navItems, { isSuperuser: false }, enabled).map(
+      (item) => item.key,
+    );
+
+  it("shows every module by default", () => {
+    expect(keys()).toEqual(
+      expect.arrayContaining(["accounts", "vehicles", "energy", "tags"]),
+    );
+  });
+
+  it("hides the items of disabled modules only", () => {
+    const shown = keys(["vehicles"]);
+    expect(shown).toContain("vehicles");
+    expect(shown).toContain("dashboard");
+    expect(shown).toContain("settings");
+    for (const hidden of [
+      "accounts",
+      "categories",
+      "transactions",
+      "tags",
+      "energy",
+    ]) {
+      expect(shown).not.toContain(hidden);
+    }
+  });
+});

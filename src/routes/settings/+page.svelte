@@ -6,6 +6,7 @@
   import DefaultOutAccountForm from "#lib/components/settings/DefaultOutAccountForm.svelte";
   import MankoCategoryForm from "#lib/components/settings/MankoCategoryForm.svelte";
   import LanguageForm from "#lib/components/settings/LanguageForm.svelte";
+  import ModulesForm from "#lib/components/settings/ModulesForm.svelte";
   import ThemeForm from "#lib/components/settings/ThemeForm.svelte";
   import type { PageProps } from "./$types";
 
@@ -59,6 +60,8 @@
     message={form && "defaultOutMessage" in form ? form.defaultOutMessage : ""}
     saved={form !== null && "defaultOutSaved" in form}
   />
+
+  <ModulesForm enabled={data.enabledModules} />
 
   <ThemeForm />
 

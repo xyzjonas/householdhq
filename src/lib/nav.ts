@@ -1,4 +1,5 @@
 import type { Component } from "svelte";
+import { MODULE_KEYS, type ModuleKey } from "#lib/modules.ts";
 import Car from "@lucide/svelte/icons/car";
 import ChartColumn from "@lucide/svelte/icons/chart-column";
 import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
@@ -30,6 +31,8 @@ export interface NavItem {
   icon: Component;
   /** Shown directly in the mobile bar; everything else goes under "More". */
   primary?: true;
+  /** Only listed while the household has this module enabled. */
+  module?: ModuleKey;
   /** Hidden entirely (not just disabled) for everyone else. */
   superuserOnly?: true;
 }
@@ -47,6 +50,7 @@ export const navItems: NavItem[] = [
     label: () => m.nav_accounts(),
     href: "/accounts",
     icon: Wallet,
+    module: "accounting",
     primary: true,
   },
   {
@@ -54,6 +58,7 @@ export const navItems: NavItem[] = [
     label: () => m.nav_categories(),
     href: "/categories",
     icon: Tags,
+    module: "accounting",
     primary: true,
   },
   {
@@ -61,16 +66,30 @@ export const navItems: NavItem[] = [
     label: () => m.nav_transactions(),
     href: "/transactions",
     icon: Receipt,
+    module: "accounting",
     primary: true,
   },
-  { key: "tags", label: () => m.nav_tags(), href: "/tags", icon: Tag },
+  {
+    key: "tags",
+    label: () => m.nav_tags(),
+    href: "/tags",
+    icon: Tag,
+    module: "accounting",
+  },
   {
     key: "vehicles",
     label: () => m.nav_vehicles(),
     href: "/vehicles",
     icon: Car,
+    module: "vehicles",
   },
-  { key: "energy", label: () => m.nav_energy(), href: "/energy", icon: Zap },
+  {
+    key: "energy",
+    label: () => m.nav_energy(),
+    href: "/energy",
+    icon: Zap,
+    module: "energy",
+  },
   { key: "analytics", label: () => m.nav_analytics(), icon: ChartColumn },
   {
     key: "admin",
@@ -87,12 +106,20 @@ export const navItems: NavItem[] = [
   },
 ];
 
-/** The items `user` is allowed to see. */
+/**
+ * The items `user` is allowed to see, minus those of modules the household has
+ * switched off. This only affects the navigation; the routes stay reachable.
+ */
 export function visibleNavItems(
   items: NavItem[],
   user: { isSuperuser: boolean } | undefined,
+  enabledModules: readonly ModuleKey[] = MODULE_KEYS,
 ): NavItem[] {
-  return items.filter((item) => !item.superuserOnly || user?.isSuperuser);
+  return items.filter(
+    (item) =>
+      (!item.superuserOnly || user?.isSuperuser) &&
+      (!item.module || enabledModules.includes(item.module)),
+  );
 }
 
 export const primaryNavItems = navItems.filter((item) => item.primary);
