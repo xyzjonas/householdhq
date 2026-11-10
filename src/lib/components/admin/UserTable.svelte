@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PublicUser } from "#lib/server/core/types.ts";
   import MemberActions from "./MemberActions.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let {
     users,
@@ -22,9 +23,13 @@
       class="bg-surface-100-900 text-xs tracking-wider text-surface-600-400 uppercase"
     >
       <tr>
-        <th scope="col" class="w-2/5 px-4 py-3 font-bold">User</th>
-        <th scope="col" class="px-4 py-3 font-bold">Role</th>
-        <th scope="col" class="px-4 py-3 text-right font-bold">Actions</th>
+        <th scope="col" class="w-2/5 px-4 py-3 font-bold"
+          >{m.admin_col_user()}</th
+        >
+        <th scope="col" class="px-4 py-3 font-bold">{m.admin_col_role()}</th>
+        <th scope="col" class="px-4 py-3 text-right font-bold"
+          >{m.admin_col_actions()}</th
+        >
       </tr>
     </thead>
     <tbody class="divide-y divide-surface-200-800">
@@ -38,11 +43,11 @@
               {user.email}
             </span>
             {#if user.id === currentUserId}
-              <span class="block text-xs text-slate-400">You</span>
+              <span class="block text-xs text-slate-400">{m.users_you()}</span>
             {/if}
           </th>
           <td class="px-4 py-3 text-slate-500">
-            {user.isSuperuser ? "Superuser" : "User"}
+            {user.isSuperuser ? m.users_role_superuser() : m.users_role_user()}
           </td>
           <td class="px-4 py-3">
             <div class="flex justify-end">
@@ -57,7 +62,7 @@
       {:else}
         <tr>
           <td colspan="3" class="px-4 py-8 text-center text-sm opacity-70">
-            Nobody belongs here yet.
+            {m.admin_nobody_here()}
           </td>
         </tr>
       {/each}

@@ -6,6 +6,7 @@
   import { buildSections } from "#lib/components/admin/sections.ts";
   import type { AdminFeedback } from "#lib/components/admin/types.ts";
   import type { PageProps } from "./$types";
+  import { m } from "#paraglide/messages.js";
 
   let { data, form }: PageProps = $props();
   const feedback = $derived(form as AdminFeedback | null);
@@ -15,30 +16,36 @@
   );
 </script>
 
-<svelte:head><title>Administration · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.admin_page_title({ app: m.common_app_name() })}</title
+  ></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex flex-col gap-2">
       {#if data.households.length > 0}
-        <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+        <nav
+          aria-label={m.common_breadcrumb()}
+          class="text-sm text-surface-600-400"
+        >
           <ol class="flex gap-2">
-            <li><a class="anchor" href={resolve("/")}>Home</a></li>
+            <li><a class="anchor" href={resolve("/")}>{m.common_home()}</a></li>
             <li aria-hidden="true">›</li>
             <li aria-current="page">
-              Administration ({data.households.length}
-              {data.households.length === 1 ? "household" : "households"}, {data
-                .users.length}
-              {data.users.length === 1 ? "user" : "users"})
+              {m.admin_breadcrumb_current({
+                households: m.admin_households_count({
+                  count: data.households.length,
+                }),
+                users: m.admin_users_count({ count: data.users.length }),
+              })}
             </li>
           </ol>
         </nav>
       {/if}
-      <h1 class="text-2xl font-extrabold tracking-tight">Administration</h1>
+      <h1 class="text-2xl font-extrabold tracking-tight">{m.admin_title()}</h1>
       <p class="max-w-2xl text-sm text-surface-600-400">
-        Households are completely separate: members only ever see the data of
-        the households they belong to. Invite people, manage their passwords and
-        decide who belongs where.
+        {m.admin_description()}
       </p>
     </div>
     <InviteUserDialog

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PublicUser } from "#lib/server/core/types.ts";
   import MemberActions from "./MemberActions.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let {
     users,
@@ -27,14 +28,14 @@
             {user.email}
           </h3>
           <p class="text-xs text-slate-500">
-            {user.isSuperuser ? "Superuser" : "User"}
-            {#if user.id === currentUserId}· You{/if}
+            {user.isSuperuser ? m.users_role_superuser() : m.users_role_user()}
+            {#if user.id === currentUserId}· {m.users_you()}{/if}
           </p>
         </div>
         <MemberActions {user} isSelf={user.id === currentUserId} {household} />
       </article>
     </li>
   {:else}
-    <li class="text-sm opacity-70">Nobody belongs here yet.</li>
+    <li class="text-sm opacity-70">{m.admin_nobody_here()}</li>
   {/each}
 </ul>

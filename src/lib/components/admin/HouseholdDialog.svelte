@@ -8,6 +8,7 @@
     type HouseholdSummary,
   } from "#lib/household.ts";
   import CategoryIconPicker from "../categories/detail/CategoryIconPicker.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let { household }: { household: HouseholdSummary } = $props();
 
@@ -31,7 +32,7 @@
 <Dialog {open} {onOpenChange}>
   <Dialog.Trigger class="btn preset-tonal btn-sm">
     <Pencil size={14} aria-hidden="true" />
-    <span>Edit<span class="sr-only"> {household.name}</span></span>
+    <span>{m.common_edit()}<span class="sr-only"> {household.name}</span></span>
   </Dialog.Trigger>
   <Portal>
     {#if open}
@@ -42,10 +43,11 @@
         <Dialog.Content
           class="flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-y-auto card bg-surface-50-950 p-6 shadow-xl"
         >
-          <Dialog.Title class="text-lg font-bold">Edit household</Dialog.Title>
+          <Dialog.Title class="text-lg font-bold"
+            >{m.admin_household_edit_title()}</Dialog.Title
+          >
           <Dialog.Description class="text-sm text-surface-600-400">
-            The name, icon and colour identify the household in the app header
-            and in the household switcher.
+            {m.admin_household_edit_description()}
           </Dialog.Description>
           <form
             method="POST"
@@ -58,7 +60,9 @@
                 submitting = false;
                 if (result.type === "success") open = false;
                 else if (result.type === "failure") {
-                  message = String(result.data?.message ?? "Could not save");
+                  message = String(
+                    result.data?.message ?? m.admin_household_save_failed(),
+                  );
                 }
                 await update({ reset: false });
               };
@@ -68,7 +72,7 @@
             <input type="hidden" name="icon" value={icon} />
             <input type="hidden" name="color" value={color} />
             <label class="label">
-              <span class="label-text">Name</span>
+              <span class="label-text">{m.admin_household_name_label()}</span>
               <input
                 class="input"
                 name="name"
@@ -91,7 +95,7 @@
                 <p
                   class="text-xs font-bold tracking-wider uppercase opacity-60"
                 >
-                  Color
+                  {m.admin_household_color()}
                 </p>
                 <p class="flex items-center gap-2 text-base font-bold">
                   <span
@@ -106,7 +110,7 @@
                 <label
                   class="btn cursor-pointer rounded-full preset-tonal text-xs"
                 >
-                  Pick color
+                  {m.admin_household_pick_color()}
                   <input
                     type="color"
                     class="sr-only"
@@ -120,7 +124,7 @@
                   disabled={color === DEFAULT_HOUSEHOLD_COLOR}
                   onclick={() => (color = DEFAULT_HOUSEHOLD_COLOR)}
                 >
-                  Default
+                  {m.admin_household_color_default()}
                 </button>
               </div>
             </div>
@@ -129,14 +133,14 @@
             {/if}
             <div class="flex justify-end gap-2">
               <Dialog.CloseTrigger class="btn preset-tonal"
-                >Cancel</Dialog.CloseTrigger
+                >{m.common_cancel()}</Dialog.CloseTrigger
               >
               <button
                 type="submit"
                 class="btn preset-filled-surface-950-50"
                 disabled={submitting}
               >
-                Save household
+                {m.admin_household_save()}
               </button>
             </div>
           </form>

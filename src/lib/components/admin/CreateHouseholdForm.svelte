@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import type { AdminFeedback } from "./types";
+  import { m } from "#paraglide/messages.js";
 
   let { feedback }: { feedback: AdminFeedback | null } = $props();
 
@@ -12,10 +13,9 @@
 
 <section class="flex flex-col gap-4 card bg-surface-50-950 p-6">
   <header class="flex flex-col gap-1">
-    <h2 class="text-lg font-bold">New household</h2>
+    <h2 class="text-lg font-bold">{m.admin_household_new_title()}</h2>
     <p class="text-sm text-surface-600-400">
-      A household is a separate space with its own accounts, categories, tags,
-      vehicles and meters. Nothing is shared between households.
+      {m.admin_household_new_description()}
     </p>
   </header>
   <form
@@ -31,14 +31,14 @@
     }}
   >
     <label class="label">
-      <span class="label-text">Name</span>
+      <span class="label-text">{m.admin_household_name_label()}</span>
       <input class="input" name="name" autocomplete="off" required />
     </label>
     {#if mine?.message}
       <p role="alert" class="text-sm text-error-600-400">{mine.message}</p>
     {:else if mine?.saved}
       <p role="status" class="text-sm text-success-600-400">
-        Household created.
+        {m.admin_household_created()}
       </p>
     {/if}
     <div class="flex justify-end">
@@ -47,7 +47,7 @@
         class="btn preset-filled-surface-950-50"
         disabled={submitting}
       >
-        Create household
+        {m.admin_household_create_submit()}
       </button>
     </div>
   </form>

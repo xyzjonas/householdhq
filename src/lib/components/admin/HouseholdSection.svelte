@@ -8,6 +8,7 @@
   import type { AdminFeedback } from "./types";
   import UserCards from "./UserCards.svelte";
   import UserTable from "./UserTable.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let {
     section,
@@ -52,8 +53,7 @@
           {section.title}
         </h2>
         <p class="text-xs text-slate-500">
-          {count}
-          {count === 1 ? "user" : "users"}
+          {m.admin_users_count({ count })}
         </p>
       </div>
     </div>
@@ -63,7 +63,7 @@
         <InviteUserDialog
           {households}
           defaultHouseholdId={household.id}
-          label="Invite to {household.name}"
+          label={m.admin_invite_to({ household: household.name })}
         />
       </div>
     {/if}
@@ -73,7 +73,7 @@
     users={section.users}
     {currentUserId}
     household={household && { id: household.id, name: household.name }}
-    caption="Users of {section.title}"
+    caption={m.admin_section_users_caption({ title: section.title })}
   />
   <UserCards
     users={section.users}
@@ -91,16 +91,16 @@
       <input type="hidden" name="householdId" value={household.id} />
       <label class="label min-w-0 flex-1">
         <span class="label-text block truncate">
-          Add an existing user to {household.name}
+          {m.admin_add_existing_label({ household: household.name })}
         </span>
         <select class="select" name="userId" required>
-          <option value="">Choose…</option>
+          <option value="">{m.admin_add_choose()}</option>
           {#each candidates as user (user.id)}
             <option value={user.id}>{user.email}</option>
           {/each}
         </select>
       </label>
-      <button type="submit" class="btn preset-tonal">Add</button>
+      <button type="submit" class="btn preset-tonal">{m.admin_add()}</button>
     </form>
   {/if}
 

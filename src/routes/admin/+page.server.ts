@@ -1,5 +1,6 @@
 import { fail } from "@sveltejs/kit";
 import { z } from "zod";
+import { m } from "#paraglide/messages.js";
 import { getCore } from "#lib/server/index.ts";
 import { setSessionCookie } from "#lib/server/auth.ts";
 import { encodeInvite } from "#lib/invite.ts";
@@ -66,7 +67,8 @@ export const actions: Actions = {
       return fail(400, {
         action: "updateHousehold",
         householdId: id.success ? id.data : null,
-        message: parsed.error?.issues[0]?.message ?? "Unknown household",
+        message:
+          parsed.error?.issues[0]?.message ?? m.admin_unknown_household(),
       });
     }
     try {
@@ -89,7 +91,7 @@ export const actions: Actions = {
       return fail(400, {
         action: "addMember",
         householdId: householdId.success ? householdId.data : null,
-        message: "Choose a user to add.",
+        message: m.admin_choose_user_to_add(),
       });
     }
     try {
@@ -109,7 +111,10 @@ export const actions: Actions = {
     const householdId = Id.safeParse(form.get("householdId"));
     const userId = Id.safeParse(form.get("userId"));
     if (!householdId.success || !userId.success) {
-      return fail(400, { action: "removeMember", message: "Unknown member." });
+      return fail(400, {
+        action: "removeMember",
+        message: m.admin_unknown_member(),
+      });
     }
     await getCore().households.removeMember(householdId.data, userId.data);
     return {
@@ -129,12 +134,12 @@ export const actions: Actions = {
       String(form.get("email") ?? ""),
     );
     if (!parsed.success) {
-      return fail(400, { message: "Please enter a valid email address." });
+      return fail(400, { message: m.users_invite_invalid_email() });
     }
     const chosen = String(form.get("householdId") ?? "");
     const householdId = chosen === "" ? null : Id.safeParse(chosen);
     if (householdId && !householdId.success) {
-      return fail(400, { message: "Please choose a household." });
+      return fail(400, { message: m.admin_invite_choose_household() });
     }
     const core = getCore();
     try {
@@ -161,7 +166,7 @@ export const actions: Actions = {
   reinvite: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
     if (id === locals.user?.id) {
-      return fail(400, { message: "Use a new password for your own account." });
+      return fail(400, { message: m.users_reinvite_self() });
     }
     try {
       const { user, password } = await getCore().users.reissueInvite(id);
@@ -208,7 +213,7 @@ export const actions: Actions = {
   remove: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
     if (id === locals.user?.id) {
-      return fail(400, { message: "You cannot delete your own account." });
+      return fail(400, { message: m.users_delete_self() });
     }
     try {
       await getCore().users.remove(id);
