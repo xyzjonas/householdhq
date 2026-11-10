@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { areaPath, chartPoints, linePath } from "#lib/account-detail.ts";
   import { formatMoney } from "#lib/format.ts";
+  import { intlLocale } from "#lib/i18n.ts";
 
   let {
     trajectory,
@@ -8,13 +10,13 @@
 
   const W = 480;
   const H = 180;
-  const monthFmt = new Intl.DateTimeFormat("en-GB", { month: "short" });
-  const series = $derived(
-    trajectory.map((p) => ({
+  const series = $derived.by(() => {
+    const monthFmt = new Intl.DateTimeFormat(intlLocale(), { month: "short" });
+    return trajectory.map((p) => ({
       label: monthFmt.format(new Date(p.monthStart)),
       balance: p.balance,
-    })),
-  );
+    }));
+  });
   const points = $derived(chartPoints(series, W, H));
   const balances = $derived(series.map((s) => s.balance));
   const min = $derived(Math.min(...balances));
@@ -26,9 +28,14 @@
   const lastSeries = $derived(series[series.length - 1]);
   const ariaLabel = $derived(
     series.length
-      ? `Closing balance by month, ${first.label} to ${lastSeries.label}: ` +
-          series.map((s) => `${s.label} ${formatMoney(s.balance)}`).join(", ")
-      : "No balance history",
+      ? m.accounts_chart_aria({
+          from: first.label,
+          to: lastSeries.label,
+          series: series
+            .map((s) => `${s.label} ${formatMoney(s.balance)}`)
+            .join(", "),
+        })
+      : m.accounts_chart_aria_empty(),
   );
 </script>
 
@@ -38,10 +45,10 @@
 >
   <header>
     <h2 id="trajectory-heading" class="text-lg font-bold">
-      Liquidity trajectory
+      {m.accounts_chart_heading()}
     </h2>
     <p class="text-sm text-surface-600-400">
-      Monthly closing balances, last {series.length} months
+      {m.accounts_chart_subtitle({ count: series.length })}
     </p>
   </header>
 
@@ -109,17 +116,23 @@
 
     <dl class="grid grid-cols-3 gap-3 text-xs">
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Min</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.accounts_chart_min()}
+        </dt>
         <dd class="text-sm font-bold">{formatMoney(min)}</dd>
       </div>
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Now</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.accounts_chart_now()}
+        </dt>
         <dd class="text-sm font-bold">
           {formatMoney(lastSeries.balance)}
         </dd>
       </div>
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Peak</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.accounts_chart_peak()}
+        </dt>
         <dd class="text-sm font-bold">{formatMoney(peak)}</dd>
       </div>
     </dl>

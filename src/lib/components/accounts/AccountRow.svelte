@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
+  import { accountTypeLabel } from "#lib/account-types.ts";
   import { formatMoney } from "#lib/format.ts";
   import type { AccountWithBalance } from "#lib/server/core/types.ts";
   import AccountIcon from "./AccountIcon.svelte";
@@ -24,27 +26,33 @@
           </a>
         </h4>
         <span class="badge preset-tonal text-[11px] font-bold">
-          Pos #{account.position}
+          {m.accounts_row_position({ position: account.position })}
         </span>
         <span
           class="badge preset-tonal text-[11px] font-bold tracking-wide uppercase"
         >
-          {account.type.toLowerCase()}
+          {accountTypeLabel(account.type)}
         </span>
       </div>
       <p class="flex flex-wrap gap-1.5">
         <FlagBadge
-          label="Disponible"
+          label={m.accounts_flag_disponible()}
           on={account.isDisponible}
           tone="emerald"
         />
-        <FlagBadge label="In portfolio" on={account.isPortfolio} tone="blue" />
+        <FlagBadge
+          label={m.accounts_flag_in_portfolio()}
+          on={account.isPortfolio}
+          tone="blue"
+        />
       </p>
     </div>
   </div>
 
   <div class="self-start text-right lg:ml-auto lg:self-auto">
     <p class="text-xl font-extrabold">{formatMoney(account.balance)}</p>
-    <p class="text-xs text-surface-600-400">Current balance</p>
+    <p class="text-xs text-surface-600-400">
+      {m.accounts_row_current_balance()}
+    </p>
   </div>
 </article>

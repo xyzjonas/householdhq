@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { AccountWithBalance, SourceType } from "#lib/server/core/types.ts";
 
 export type TabId =
@@ -10,17 +11,57 @@ export interface Tab {
 }
 
 export const tabs: Tab[] = [
-  { id: "all", label: "All accounts" },
-  { id: "bank", label: "Bank & Cash" },
-  { id: "savings", label: "Savings & Vaults" },
-  { id: "investments", label: "Investments" },
-  { id: "retirement", label: "Retirement" },
-  { id: "external", label: "External" },
+  {
+    id: "all",
+    get label() {
+      return m.accounts_tab_all();
+    },
+  },
+  {
+    id: "bank",
+    get label() {
+      return m.accounts_tab_bank();
+    },
+  },
+  {
+    id: "savings",
+    get label() {
+      return m.accounts_tab_savings();
+    },
+  },
+  {
+    id: "investments",
+    get label() {
+      return m.accounts_tab_investments();
+    },
+  },
+  {
+    id: "retirement",
+    get label() {
+      return m.accounts_tab_retirement();
+    },
+  },
+  {
+    id: "external",
+    get label() {
+      return m.accounts_tab_external();
+    },
+  },
 ];
 
 export const sortOptions: { id: SortId; label: string }[] = [
-  { id: "position", label: "Position" },
-  { id: "balance", label: "Balance (high to low)" },
+  {
+    id: "position",
+    get label() {
+      return m.accounts_sort_position();
+    },
+  },
+  {
+    id: "balance",
+    get label() {
+      return m.accounts_sort_balance();
+    },
+  },
 ];
 
 /** Section key: an account type, or `OUT` for accounts outside the household. */
@@ -46,13 +87,22 @@ export interface Group {
   badge: string;
 }
 
-/** Display order of the directory sections. */
+/**
+ * Display order of the directory sections. Texts are getters so they are read
+ * (in the active locale) when used, not when this module loads.
+ */
 export const groups: Group[] = [
   {
     type: "ACCOUNT",
-    title: "Daily banking",
-    subtitle: "Checking",
-    scope: "Daily transaction rails",
+    get title() {
+      return m.accounts_group_account_title();
+    },
+    get subtitle() {
+      return m.accounts_group_account_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_account_scope();
+    },
     badge: "border-[#2391ff]/40 bg-[#2391ff]/15 text-surface-900-100",
     tab: "bank",
     color: "bg-[#2391ff]",
@@ -60,9 +110,15 @@ export const groups: Group[] = [
   },
   {
     type: "CASH",
-    title: "Physical cash",
-    subtitle: "Hotovost",
-    scope: "Physical custody",
+    get title() {
+      return m.accounts_group_cash_title();
+    },
+    get subtitle() {
+      return m.accounts_group_cash_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_cash_scope();
+    },
     badge: "border-[#fff83f]/40 bg-[#fff83f]/15 text-surface-900-100",
     tab: "bank",
     color: "bg-[#fff83f]",
@@ -70,9 +126,15 @@ export const groups: Group[] = [
   },
   {
     type: "SAVINGS",
-    title: "Savings & vaults",
-    subtitle: "Spoření",
-    scope: "Emergency & sinking funds",
+    get title() {
+      return m.accounts_group_savings_title();
+    },
+    get subtitle() {
+      return m.accounts_group_savings_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_savings_scope();
+    },
     badge: "border-[#00ff9c]/40 bg-[#00ff9c]/15 text-surface-900-100",
     tab: "savings",
     color: "bg-[#00ff9c]",
@@ -80,9 +142,15 @@ export const groups: Group[] = [
   },
   {
     type: "INVESTMENT",
-    title: "Investments",
-    subtitle: "Investice",
-    scope: "Core portfolios",
+    get title() {
+      return m.accounts_group_investment_title();
+    },
+    get subtitle() {
+      return m.accounts_group_investment_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_investment_scope();
+    },
     badge: "border-[#ffcd54]/40 bg-[#ffcd54]/15 text-surface-900-100",
     tab: "investments",
     color: "bg-[#ffcd54]",
@@ -90,9 +158,15 @@ export const groups: Group[] = [
   },
   {
     type: "RETIREMENT",
-    title: "Retirement",
-    subtitle: "Důchod",
-    scope: "Long-term, outside net worth",
+    get title() {
+      return m.accounts_group_retirement_title();
+    },
+    get subtitle() {
+      return m.accounts_group_retirement_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_retirement_scope();
+    },
     badge: "border-[#b678ff]/40 bg-[#b678ff]/15 text-surface-900-100",
     tab: "retirement",
     color: "bg-[#b678ff]",
@@ -100,9 +174,15 @@ export const groups: Group[] = [
   },
   {
     type: "DEBT",
-    title: "Debts",
-    subtitle: "Liabilities",
-    scope: "Loans & credit",
+    get title() {
+      return m.accounts_group_debt_title();
+    },
+    get subtitle() {
+      return m.accounts_group_debt_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_debt_scope();
+    },
     badge: "border-[#f70063]/40 bg-[#f70063]/15 text-surface-900-100",
     tab: null,
     color: "bg-[#f70063]",
@@ -110,9 +190,15 @@ export const groups: Group[] = [
   },
   {
     type: "OUT",
-    title: "External accounts",
-    subtitle: "Outside the household",
-    scope: "Expenses & external parties",
+    get title() {
+      return m.accounts_group_out_title();
+    },
+    get subtitle() {
+      return m.accounts_group_out_subtitle();
+    },
+    get scope() {
+      return m.accounts_group_out_scope();
+    },
     badge: "border-[#94a3b8]/40 bg-[#94a3b8]/15 text-surface-900-100",
     tab: "external",
     color: "bg-[#94a3b8]",

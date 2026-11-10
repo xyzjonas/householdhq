@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import Minus from "@lucide/svelte/icons/minus";
   import Plus from "@lucide/svelte/icons/plus";
 
@@ -42,13 +43,13 @@
 
 <div
   role="group"
-  aria-label="Position in summary"
+  aria-label={m.accounts_stepper_group()}
   class="inline-flex items-center gap-1 rounded-base border border-surface-200-800 bg-surface-100-900/70 p-1"
 >
   <button
     type="button"
     class="btn-icon preset-tonal btn-icon-sm"
-    aria-label="Move up in summary"
+    aria-label={m.accounts_stepper_up()}
     disabled={display <= min}
     onclick={() => step(-1)}
   >
@@ -57,14 +58,14 @@
   <output
     class="min-w-12 px-2 text-center text-lg font-extrabold tabular-nums"
     aria-live="polite"
-    aria-label="Position"
+    aria-label={m.accounts_stepper_position()}
   >
     {display}
   </output>
   <button
     type="button"
     class="btn-icon preset-tonal btn-icon-sm"
-    aria-label="Move down in summary"
+    aria-label={m.accounts_stepper_down()}
     onclick={() => step(1)}
   >
     <Plus size={16} aria-hidden="true" />

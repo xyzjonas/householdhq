@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { SvelteURLSearchParams } from "svelte/reactivity";
@@ -94,15 +95,15 @@
         id="entries-heading"
         class="flex items-center gap-2 text-lg font-bold"
       >
-        Entries
+        {m.accounts_entries_heading()}
         <span
           class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800"
         >
-          {total} recorded
+          {m.accounts_entries_recorded({ count: total })}
         </span>
       </h2>
       <p class="text-sm wrap-anywhere text-surface-600-400">
-        Chronological transaction journal for {accountName}
+        {m.accounts_entries_subtitle({ accountName })}
       </p>
     </div>
 
@@ -119,18 +120,18 @@
       <input
         class="input w-auto"
         type="month"
-        aria-label="Period"
+        aria-label={m.accounts_entries_period()}
         value={filters.month}
         onchange={(e) =>
           e.currentTarget.value && go({ month: e.currentTarget.value })}
       />
       <select
         class="select w-auto max-w-full"
-        aria-label="Category"
+        aria-label={m.accounts_entries_category()}
         value={filters.categoryId ?? ""}
         onchange={(e) => go({ category: e.currentTarget.value || undefined })}
       >
-        <option value="">All categories</option>
+        <option value="">{m.accounts_entries_all_categories()}</option>
         {#each categories as c (c.id)}
           <option value={c.id}>{c.name}</option>
         {/each}
@@ -144,7 +145,9 @@
         <Switch.Control>
           <Switch.Thumb />
         </Switch.Control>
-        <Switch.Label class="text-sm font-medium">Hide upcoming</Switch.Label>
+        <Switch.Label class="text-sm font-medium"
+          >{m.accounts_entries_hide_upcoming()}</Switch.Label
+        >
         <Switch.HiddenInput />
       </Switch>
       <Switch
@@ -155,7 +158,9 @@
         <Switch.Control>
           <Switch.Thumb />
         </Switch.Control>
-        <Switch.Label class="text-sm font-medium">States only</Switch.Label>
+        <Switch.Label class="text-sm font-medium"
+          >{m.accounts_entries_states_only()}</Switch.Label
+        >
         <Switch.HiddenInput />
       </Switch>
       <div class="field-group grid-cols-[auto_1fr]">
@@ -166,8 +171,8 @@
           class="input"
           type="search"
           name="q"
-          placeholder="Search entries"
-          aria-label="Search entries"
+          placeholder={m.accounts_entries_search()}
+          aria-label={m.accounts_entries_search()}
           value={filters.search}
         />
       </div>
@@ -177,7 +182,7 @@
         class="btn rounded-full bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800"
       >
         <Plus size={16} aria-hidden="true" />
-        <span>Add entry</span>
+        <span>{m.accounts_entries_add()}</span>
       </a>
     </form>
   </header>
@@ -188,13 +193,23 @@
         <tr
           class="border-b border-surface-200-800 text-[11px] tracking-wider text-surface-500 uppercase"
         >
-          <th scope="col" class="pb-3 font-bold">Date</th>
-          <th scope="col" class="pb-3 font-bold">Description</th>
-          <th scope="col" class="pb-3 font-bold">Category</th>
-          <th scope="col" class="pb-3 text-right font-bold">Amount</th>
-          <th scope="col" class="pb-3 pl-4 font-bold">Status</th>
+          <th scope="col" class="pb-3 font-bold"
+            >{m.accounts_entries_col_date()}</th
+          >
+          <th scope="col" class="pb-3 font-bold"
+            >{m.accounts_entries_col_description()}</th
+          >
+          <th scope="col" class="pb-3 font-bold"
+            >{m.accounts_entries_col_category()}</th
+          >
+          <th scope="col" class="pb-3 text-right font-bold"
+            >{m.accounts_entries_col_amount()}</th
+          >
+          <th scope="col" class="pb-3 pl-4 font-bold"
+            >{m.accounts_entries_col_status()}</th
+          >
           <th scope="col" class="pb-3 text-right font-bold">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">{m.accounts_entries_col_actions()}</span>
           </th>
         </tr>
       </thead>
@@ -207,7 +222,10 @@
               ondelete={() =>
                 (deletingCheckpoint = {
                   id: c.id,
-                  description: `Checkpoint ${formatMoney(c.amount)} · ${formatDate(c.created)}`,
+                  description: m.accounts_entries_checkpoint_description({
+                    amount: formatMoney(c.amount),
+                    date: formatDate(c.created),
+                  }),
                 })}
             />
           {:else}
@@ -243,14 +261,18 @@
                     id: String(t.id),
                   })}
                   class="btn-icon btn-icon-sm hover:preset-tonal"
-                  aria-label="Edit {t.description}"
+                  aria-label={m.accounts_entries_edit_label({
+                    description: t.description,
+                  })}
                 >
                   <Pencil size={16} aria-hidden="true" />
                 </a>
                 <button
                   type="button"
                   class="btn-icon btn-icon-sm hover:preset-tonal-error"
-                  aria-label="Delete {t.description}"
+                  aria-label={m.accounts_entries_delete_label({
+                    description: t.description,
+                  })}
                   onclick={() => (deleting = t)}
                 >
                   <Trash2 size={16} aria-hidden="true" />
@@ -261,7 +283,7 @@
         {:else}
           <tr>
             <td colspan="6" class="py-8 text-center text-sm opacity-70">
-              No entries match these filters.
+              {m.accounts_entries_empty()}
             </td>
           </tr>
         {/each}
@@ -272,7 +294,7 @@
   <footer
     class="flex flex-wrap items-center justify-between gap-3 text-sm text-surface-600-400"
   >
-    <p>Showing {first} to {last} of {total} entries</p>
+    <p>{m.accounts_entries_showing({ first, last, total })}</p>
     <LedgerPagination
       {total}
       pageSize={PAGE_SIZE}
@@ -286,5 +308,5 @@
 <DeleteEntryDialog
   bind:entry={deletingCheckpoint}
   action="?/deleteCheckpoint"
-  noun="checkpoint"
+  kind="checkpoint"
 />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   let { entry }: { entry: { cancelled: boolean; confirmed: boolean } } =
     $props();
 </script>
@@ -10,5 +11,9 @@
       ? 'bg-slate-100 text-slate-700'
       : 'bg-amber-50 text-amber-700'}"
 >
-  {entry.cancelled ? "Cancelled" : entry.confirmed ? "Completed" : "Pending"}
+  {entry.cancelled
+    ? m.ledger_status_cancelled()
+    : entry.confirmed
+      ? m.ledger_status_completed()
+      : m.ledger_status_pending()}
 </span>

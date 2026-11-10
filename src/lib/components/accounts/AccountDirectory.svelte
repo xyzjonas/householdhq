@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { Tabs } from "@skeletonlabs/skeleton-svelte";
   import Search from "@lucide/svelte/icons/search";
   import {
@@ -26,7 +27,9 @@
 </script>
 
 <section aria-labelledby="directory-heading" class="flex flex-col gap-5">
-  <h2 id="directory-heading" class="sr-only">Account directory</h2>
+  <h2 id="directory-heading" class="sr-only">
+    {m.accounts_directory_heading()}
+  </h2>
 
   <Tabs value={tab} onValueChange={(e) => (tab = e.value as TabId)}>
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -40,7 +43,10 @@
               ? 'preset-filled-surface-950-50'
               : 'border border-surface-200-800 preset-filled-surface-50-950'}"
           >
-            {t.label} ({countForTab(accounts, t.id)})
+            {m.accounts_directory_tab_label({
+              label: t.label,
+              count: countForTab(accounts, t.id),
+            })}
           </Tabs.Trigger>
         {/each}
       </Tabs.List>
@@ -53,13 +59,14 @@
           <input
             class="input"
             type="search"
-            placeholder="Filter by name"
-            aria-label="Filter accounts by name"
+            placeholder={m.accounts_directory_filter_placeholder()}
+            aria-label={m.accounts_directory_filter_label()}
             bind:value={query}
           />
         </div>
         <label class="flex items-center gap-2 text-sm">
-          <span class="text-surface-600-400">Sort</span>
+          <span class="text-surface-600-400">{m.accounts_directory_sort()}</span
+          >
           <select class="select w-auto" bind:value={sort}>
             {#each sortOptions as o (o.id)}
               <option value={o.id}>{o.label}</option>
@@ -82,7 +89,9 @@
                   {section.group.title}
                 </h3>
                 <p class="text-sm text-surface-600-400">
-                  Total: {formatMoney(section.total)}
+                  {m.accounts_directory_total({
+                    amount: formatMoney(section.total),
+                  })}
                 </p>
               </header>
               <ul class="flex flex-col gap-3">
@@ -92,7 +101,7 @@
               </ul>
             </section>
           {:else}
-            <p class="text-sm opacity-70">No accounts found.</p>
+            <p class="text-sm opacity-70">{m.accounts_directory_empty()}</p>
           {/each}
         {/if}
       </Tabs.Content>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import CreateAccountDialog from "#lib/components/accounts/CreateAccountDialog.svelte";
   import AccountDirectory from "#lib/components/accounts/AccountDirectory.svelte";
@@ -13,20 +14,32 @@
   const netWorth = $derived(netWorthOf(data.accounts));
 </script>
 
-<svelte:head><title>Accounts · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.accounts_page_title({ app: m.common_app_name() })}</title
+  ></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex flex-col gap-2">
-      <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+      <nav
+        aria-label={m.accounts_breadcrumb_label()}
+        class="text-sm text-surface-600-400"
+      >
         <ol class="flex gap-2">
-          <li><a class="anchor" href={resolve("/")}>Home</a></li>
+          <li>
+            <a class="anchor" href={resolve("/")}
+              >{m.accounts_breadcrumb_home()}</a
+            >
+          </li>
           <li aria-hidden="true">›</li>
-          <li aria-current="page">Accounts ({data.accounts.length} total)</li>
+          <li aria-current="page">
+            {m.accounts_breadcrumb_total({ count: data.accounts.length })}
+          </li>
         </ol>
       </nav>
       <h1 class="text-2xl font-extrabold tracking-tight">
-        Institutional accounts & vaults
+        {m.accounts_heading()}
       </h1>
     </div>
     <CreateAccountDialog message={form?.message} />
@@ -40,7 +53,7 @@
       id="net-worth-heading"
       class="text-xs font-bold tracking-wider uppercase opacity-60"
     >
-      Aggregated household net worth
+      {m.accounts_net_worth_heading()}
     </h2>
     <p class="text-3xl font-extrabold tracking-tight md:text-4xl">
       {formatMoney(netWorth)}

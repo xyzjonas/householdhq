@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   let {
     label,
     on,
@@ -16,5 +17,8 @@
     ? onClass[tone]
     : 'border-slate-100 bg-slate-50 text-slate-600'}"
 >
-  {label}: {on ? "Yes" : "No"}
+  {m.accounts_flag_state({
+    label,
+    state: on ? m.common_yes() : m.common_no(),
+  })}
 </span>

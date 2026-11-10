@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import CircleCheck from "@lucide/svelte/icons/circle-check";
@@ -39,7 +40,7 @@
 <Dialog {open} {onOpenChange}>
   <Dialog.Trigger class="btn rounded-full preset-tonal text-xs font-bold">
     <CircleCheck size={16} aria-hidden="true" />
-    <span>Add checkpoint</span>
+    <span>{m.accounts_checkpoint_add()}</span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -49,11 +50,11 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">Add checkpoint</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold">
+          {m.accounts_checkpoint_add()}
+        </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
-          Freeze the balance of {accountName} as of now. The suggestion is the previous
-          checkpoint plus the transactions since. Enter the real balance if it differs;
-          the difference is booked as an adjustment.
+          {m.accounts_checkpoint_description({ accountName })}
         </Dialog.Description>
         <form
           method="POST"
@@ -66,19 +67,23 @@
               submitting = false;
               if (result.type === "success") {
                 open = false;
-                toaster.success({ title: "Checkpoint added" });
+                toaster.success({ title: m.accounts_checkpoint_added() });
               } else if (result.type === "failure") {
                 message =
                   (result.data as { message?: string } | undefined)?.message ??
-                  "Could not add the checkpoint.";
+                  m.accounts_checkpoint_add_failed();
               } else {
-                toaster.error({ title: "Could not add the checkpoint" });
+                toaster.error({
+                  title: m.accounts_checkpoint_add_failed_toast(),
+                });
               }
             };
           }}
         >
           <label class="label">
-            <span class="label-text">Balance</span>
+            <span class="label-text"
+              >{m.accounts_checkpoint_balance_label()}</span
+            >
             <input
               class="input"
               type="text"
@@ -93,14 +98,16 @@
           </label>
           <p id="checkpoint-hint" class="text-sm text-surface-600-400">
             {#if difference === null}
-              Enter the current balance.
+              {m.accounts_checkpoint_hint_empty()}
             {:else if difference === 0}
-              Matches the computed balance of {formatMoney(suggested)}; no
-              adjustment needed.
+              {m.accounts_checkpoint_hint_match({
+                computed: formatMoney(suggested),
+              })}
             {:else}
-              Computed balance is {formatMoney(suggested)}. An adjustment of
-              {difference > 0 ? "+" : "−"}{formatMoney(Math.abs(difference))} will
-              be added.
+              {m.accounts_checkpoint_hint_adjust({
+                computed: formatMoney(suggested),
+                adjustment: `${difference > 0 ? "+" : "−"}${formatMoney(Math.abs(difference))}`,
+              })}
             {/if}
           </p>
           {#if message}
@@ -108,14 +115,14 @@
           {/if}
           <div class="flex justify-end gap-2">
             <Dialog.CloseTrigger class="btn preset-tonal"
-              >Cancel</Dialog.CloseTrigger
+              >{m.common_cancel()}</Dialog.CloseTrigger
             >
             <button
               type="submit"
               class="btn preset-filled-surface-950-50"
               disabled={submitting || difference === null}
             >
-              Add checkpoint
+              {m.accounts_checkpoint_add()}
             </button>
           </div>
         </form>

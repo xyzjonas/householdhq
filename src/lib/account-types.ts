@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { SourceType } from "#lib/server/core/types.ts";
 
 export interface AccountTypeOption {
@@ -6,44 +7,47 @@ export interface AccountTypeOption {
   description: string;
 }
 
-export const accountTypeOptions: AccountTypeOption[] = [
-  {
-    type: "ACCOUNT",
-    label: "Bank account",
-    description: "Daily banking · checking accounts",
-  },
-  {
-    type: "CASH",
-    label: "Cash",
-    description: "Physical cash and wallets",
-  },
-  {
-    type: "SAVINGS",
-    label: "Savings",
-    description: "Savings accounts and vaults",
-  },
-  {
-    type: "INVESTMENT",
-    label: "Investment",
-    description: "Brokerage accounts, ETFs and other assets",
-  },
-  {
-    type: "RETIREMENT",
-    label: "Retirement",
-    description: "Pension and retirement funds · excluded from net worth",
-  },
-  {
-    type: "DEBT",
-    label: "Debt",
-    description: "Loans, mortgages and other liabilities",
-  },
-  {
-    type: "OUT",
-    label: "External",
-    description: "Money outside the household (shops, employers…)",
-  },
-];
+/** The selectable account types; text is read lazily so it follows the locale. */
+export function accountTypeOptions(): AccountTypeOption[] {
+  return [
+    {
+      type: "ACCOUNT",
+      label: m.accounts_type_account_label(),
+      description: m.accounts_type_account_desc(),
+    },
+    {
+      type: "CASH",
+      label: m.accounts_type_cash_label(),
+      description: m.accounts_type_cash_desc(),
+    },
+    {
+      type: "SAVINGS",
+      label: m.accounts_type_savings_label(),
+      description: m.accounts_type_savings_desc(),
+    },
+    {
+      type: "INVESTMENT",
+      label: m.accounts_type_investment_label(),
+      description: m.accounts_type_investment_desc(),
+    },
+    {
+      type: "RETIREMENT",
+      label: m.accounts_type_retirement_label(),
+      description: m.accounts_type_retirement_desc(),
+    },
+    {
+      type: "DEBT",
+      label: m.accounts_type_debt_label(),
+      description: m.accounts_type_debt_desc(),
+    },
+    {
+      type: "OUT",
+      label: m.accounts_type_out_label(),
+      description: m.accounts_type_out_desc(),
+    },
+  ];
+}
 
 export function accountTypeLabel(type: SourceType): string {
-  return accountTypeOptions.find((o) => o.type === type)?.label ?? type;
+  return accountTypeOptions().find((o) => o.type === type)?.label ?? type;
 }

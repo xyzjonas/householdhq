@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Check from "@lucide/svelte/icons/check";
   import X from "@lucide/svelte/icons/x";
@@ -38,12 +39,12 @@
 >
   <div class="min-w-0">
     <p class="text-xs font-bold tracking-wider uppercase opacity-60">
-      Account type
+      {m.accounts_type_picker_label()}
     </p>
     <p class="truncate text-base font-bold">{accountTypeLabel(value)}</p>
     {#if value === "RETIREMENT"}
       <p class="text-xs text-surface-600-400">
-        Retirement accounts are not included in the net worth calculation.
+        {m.accounts_type_picker_retirement_note()}
       </p>
     {/if}
   </div>
@@ -52,7 +53,7 @@
     class="btn shrink-0 rounded-full preset-tonal text-xs"
     onclick={() => (open = true)}
   >
-    Change type
+    {m.accounts_type_picker_change()}
   </button>
 </div>
 
@@ -68,15 +69,15 @@
         <header class="flex items-start justify-between gap-4">
           <div>
             <Dialog.Title class="text-lg font-bold">
-              Choose account type
+              {m.accounts_type_picker_title()}
             </Dialog.Title>
             <Dialog.Description class="text-sm text-surface-600-400">
-              Decides where the account is grouped in the accounts overview.
+              {m.accounts_type_picker_description()}
             </Dialog.Description>
           </div>
           <Dialog.CloseTrigger
             class="btn-icon preset-tonal btn-icon-sm"
-            aria-label="Close"
+            aria-label={m.common_close()}
           >
             <X size={16} aria-hidden="true" />
           </Dialog.CloseTrigger>
@@ -84,10 +85,10 @@
 
         <div
           role="radiogroup"
-          aria-label="Account type"
+          aria-label={m.accounts_type_picker_label()}
           class="flex flex-col gap-2"
         >
-          {#each accountTypeOptions as option (option.type)}
+          {#each accountTypeOptions() as option (option.type)}
             {@const selected = option.type === value}
             <button
               type="button"

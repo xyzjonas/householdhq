@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { accountTypeLabel } from "#lib/account-types.ts";
 import type { AccountChanges } from "#lib/accounts-client.ts";
 import type { TransactionWithRelations } from "#lib/server/core/types.ts";
@@ -18,9 +19,9 @@ export function monthRange(
   param: string | null,
   now: Date = new Date(),
 ): { key: string; from: Date; to: Date } {
-  const m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(param ?? "");
-  const year = m ? Number(m[1]) : now.getFullYear();
-  const month = m ? Number(m[2]) - 1 : now.getMonth();
+  const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(param ?? "");
+  const year = match ? Number(match[1]) : now.getFullYear();
+  const month = match ? Number(match[2]) - 1 : now.getMonth();
   return {
     key: `${year}-${String(month + 1).padStart(2, "0")}`,
     from: new Date(year, month, 1),
@@ -69,32 +70,51 @@ export function areaPath(
   return `${linePath(points)} L${last.x.toFixed(1)} ${baseline} L${points[0].x.toFixed(1)} ${baseline} Z`;
 }
 
-const flagLabels = {
-  isOut: "Expense account",
-  isDisponible: "Disponible liquidity",
-  isPortfolio: "Portfolio overview",
-} as const;
+type Flag = "isOut" | "isDisponible" | "isPortfolio";
+
+function describeFlag(flag: Flag, enabled: boolean): string {
+  switch (flag) {
+    case "isOut":
+      return enabled
+        ? m.accounts_change_is_out_enabled()
+        : m.accounts_change_is_out_disabled();
+    case "isDisponible":
+      return enabled
+        ? m.accounts_change_is_disponible_enabled()
+        : m.accounts_change_is_disponible_disabled();
+    case "isPortfolio":
+      return enabled
+        ? m.accounts_change_is_portfolio_enabled()
+        : m.accounts_change_is_portfolio_disabled();
+  }
+}
+
+const flags: readonly Flag[] = ["isOut", "isDisponible", "isPortfolio"];
 
 /** Human-readable confirmation for each property in a saved patch. */
 export function describeChanges(changes: AccountChanges): string[] {
   const messages: string[] = [];
   if (changes.name !== undefined) {
-    messages.push(`Name changed to “${changes.name}”`);
+    messages.push(m.accounts_change_name({ name: changes.name }));
   }
   if (changes.type !== undefined) {
-    messages.push(`Type changed to ${accountTypeLabel(changes.type)}`);
+    messages.push(
+      m.accounts_change_type({ type: accountTypeLabel(changes.type) }),
+    );
   }
   if (changes.position !== undefined) {
-    messages.push(`Position in summary set to ${changes.position}`);
+    messages.push(m.accounts_change_position({ position: changes.position }));
   }
   if (changes.color !== undefined) {
-    messages.push(`Accent color set to ${changes.color ?? "none"}`);
+    messages.push(
+      changes.color === null
+        ? m.accounts_change_color_none()
+        : m.accounts_change_color({ color: changes.color }),
+    );
   }
-  for (const [key, label] of Object.entries(flagLabels)) {
-    const value = changes[key as keyof typeof flagLabels];
-    if (value !== undefined) {
-      messages.push(`${label} ${value ? "enabled" : "disabled"}`);
-    }
+  for (const flag of flags) {
+    const value = changes[flag];
+    if (value !== undefined) messages.push(describeFlag(flag, value));
   }
   return messages;
 }

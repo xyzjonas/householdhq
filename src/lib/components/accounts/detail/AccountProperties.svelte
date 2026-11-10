@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { invalidateAll } from "$app/navigation";
   import { untrack } from "svelte";
   import { describeChanges } from "#lib/account-detail.ts";
@@ -29,7 +30,7 @@
     } catch (e) {
       current = before;
       toaster.error({
-        title: "Could not save the change",
+        title: m.accounts_properties_save_failed(),
         description: e instanceof Error ? e.message : undefined,
       });
       throw e;
@@ -48,15 +49,15 @@
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex flex-col gap-1">
       <h2 id="properties-heading" class="text-lg font-bold">
-        Account configuration & properties
+        {m.accounts_properties_heading()}
       </h2>
       <p class="text-sm text-surface-600-400">
-        Changes are saved as soon as you make them · Account ID: {account.id}
+        {m.accounts_properties_hint({ id: account.id })}
       </p>
     </div>
     <div class="flex flex-col items-end gap-1">
       <p class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Position in summary
+        {m.accounts_properties_position_heading()}
       </p>
       <PositionStepper
         value={current.position}
@@ -67,7 +68,7 @@
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <InlineField
-      label="Account name"
+      label={m.accounts_properties_name_label()}
       value={current.name}
       onsave={(name) => save({ name })}
     />
@@ -77,7 +78,7 @@
     >
       <div class="min-w-0">
         <p class="text-xs font-bold tracking-wider uppercase opacity-60">
-          Accent theme
+          {m.accounts_properties_accent_label()}
         </p>
         <p class="flex items-center gap-2 text-base font-bold">
           <span
@@ -85,11 +86,11 @@
             style:background-color={current.color ?? "transparent"}
             aria-hidden="true"
           ></span>
-          {current.color ?? "None"}
+          {current.color ?? m.common_none()}
         </p>
       </div>
       <label class="btn cursor-pointer rounded-full preset-tonal text-xs">
-        Pick color
+        {m.accounts_properties_pick_color()}
         <input
           type="color"
           class="sr-only"
@@ -102,20 +103,20 @@
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
     <ToggleTile
-      label="Expense account"
-      description="Mark this account as an expense one · Enabled in outgoing budget models"
+      label={m.accounts_properties_is_out_label()}
+      description={m.accounts_properties_is_out_desc()}
       checked={current.isOut}
       onchange={(isOut) => quiet({ isOut })}
     />
     <ToggleTile
-      label="Disponible liquidity"
-      description="Mark this account as disponible · Available for immediate deployment"
+      label={m.accounts_properties_is_disponible_label()}
+      description={m.accounts_properties_is_disponible_desc()}
       checked={current.isDisponible}
       onchange={(isDisponible) => quiet({ isDisponible })}
     />
     <ToggleTile
-      label="Portfolio overview"
-      description="Part of portfolio overview · Aggregated in main dashboard tile"
+      label={m.accounts_properties_is_portfolio_label()}
+      description={m.accounts_properties_is_portfolio_desc()}
       checked={current.isPortfolio}
       onchange={(isPortfolio) => quiet({ isPortfolio })}
     />
