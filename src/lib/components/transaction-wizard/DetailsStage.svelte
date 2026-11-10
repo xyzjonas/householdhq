@@ -14,6 +14,7 @@
     accounts,
     suggestions,
     tagOptions,
+    fallbackDescription = "",
     sourceId = $bindable(),
     targetId = $bindable(),
     description = $bindable(),
@@ -30,6 +31,8 @@
     suggestions: string[];
     /** The existing tags. */
     tagOptions: WizardTag[];
+    /** Used as the description when left empty (the category name). */
+    fallbackDescription?: string;
     sourceId: number | null;
     targetId: number | null;
     description: string;
@@ -109,7 +112,7 @@
         name="description"
         list="wizard-suggestions"
         autocomplete="off"
-        placeholder="e.g. Globus Hypermarket"
+        placeholder={fallbackDescription}
         bind:value={description}
       />
       <datalist id="wizard-suggestions">
