@@ -115,7 +115,9 @@ export async function shiftCheckpoints(
       if (delta !== 0) {
         await db.sourceState.update({
           where: { id },
-          data: { amount: roundMoney(amount + delta) },
+          // `created` is the checkpoint's timestamp, but Prisma's @updatedAt
+          // would reset it to now on every update: pass it back unchanged.
+          data: { amount: roundMoney(amount + delta), created },
         });
       }
     }

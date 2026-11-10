@@ -250,6 +250,25 @@ export const UserInput = z.object({
 });
 export type UserInput = z.input<typeof UserInput>;
 
+/** Omitted icon and colour fall back to the household defaults. */
+export const HouseholdInput = z.object({
+  name: z.string().trim().min(1, "Please enter a name").max(100),
+  icon: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9-]{1,50}$/, "Choose an icon from the list")
+    .optional(),
+  color: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^#[0-9a-f]{6}$/, "Pick a colour")
+    .optional(),
+});
+export type HouseholdInput = z.input<typeof HouseholdInput>;
+export const HouseholdPatch = HouseholdInput.partial();
+export type HouseholdPatch = z.input<typeof HouseholdPatch>;
+
 export const SettingsInput = z.object({
   currency: z
     .string()

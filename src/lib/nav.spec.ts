@@ -42,12 +42,12 @@ describe("visibleNavItems", () => {
   const labels = (user?: { isSuperuser: boolean }) =>
     visibleNavItems(navItems, user).map((item) => item.label);
 
-  it("hides the users module from regular users and anonymous visitors", () => {
-    expect(labels({ isSuperuser: false })).not.toContain("Users");
-    expect(labels()).not.toContain("Users");
+  it("hides the administration from regular users and anonymous visitors", () => {
+    expect(labels({ isSuperuser: false })).not.toContain("Administration");
+    expect(labels()).not.toContain("Administration");
   });
 
-  it("shows the users module to superusers", () => {
-    expect(labels({ isSuperuser: true })).toContain("Users");
+  it("shows the administration to superusers", () => {
+    expect(labels({ isSuperuser: true })).toContain("Administration");
   });
 });

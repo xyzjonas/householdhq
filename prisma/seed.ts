@@ -18,10 +18,11 @@ if (!url) throw new Error("DATABASE_URL is not set");
 const core = createCore(createPrismaClient(url));
 
 try {
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
   if ((await core.users.count()) === 0) {
     await core.users.create(
       {
-        email: process.env.SEED_ADMIN_EMAIL ?? "admin@example.com",
+        email: adminEmail,
         password: process.env.SEED_ADMIN_PASSWORD ?? "password123",
       },
       { isSuperuser: true },
@@ -29,59 +30,69 @@ try {
     console.log("seed: created admin user");
   }
 
-  await core.ensureDefaults();
-  const accounts = await core.accounts.list();
+  // The sample data lives in the first household, which the admin belongs to.
+  const household =
+    (await core.households.list())[0] ??
+    (await core.households.create({ name: "Home" }));
+  const admin = (await core.users.list()).find(
+    (u) => u.email === adminEmail.toLowerCase(),
+  );
+  if (admin) await core.households.addMember(household.id, admin.id);
+  const hq = core.forHousehold(household.id);
+
+  await hq.ensureDefaults();
+  const accounts = await hq.accounts.list();
   const named = (name: string) => accounts.find((a) => a.name === name);
 
   const main =
     named(DEFAULT_BANK_ACCOUNT) ??
-    (await core.accounts.create({
+    (await hq.accounts.create({
       name: DEFAULT_BANK_ACCOUNT,
       isDisponible: true,
       position: 1,
     }));
   const outside =
     named(DEFAULT_EXPENSE_ACCOUNT) ??
-    (await core.accounts.create({
+    (await hq.accounts.create({
       name: DEFAULT_EXPENSE_ACCOUNT,
       type: "OUT",
       isOut: true,
       position: 2,
     }));
 
-  if ((await core.transactions.list({ limit: 1 })).total > 0) {
+  if ((await hq.transactions.list({ limit: 1 })).total > 0) {
     console.log("seed: transactions already exist, skipping sample data");
   } else {
-    const cash = await core.accounts.create({
+    const cash = await hq.accounts.create({
       name: "Wallet",
       type: "CASH",
       isDisponible: true,
       position: 3,
     });
-    const savings = await core.accounts.create({
+    const savings = await hq.accounts.create({
       name: "Emergency fund",
       type: "SAVINGS",
       isPortfolio: true,
       position: 4,
     });
-    const invest = await core.accounts.create({
+    const invest = await hq.accounts.create({
       name: "Global ETFs",
       type: "INVESTMENT",
       isPortfolio: true,
       position: 5,
     });
 
-    await core.accounts.recordState(main.id, 10_000);
-    await core.accounts.recordState(cash.id, 2_450);
-    await core.accounts.recordState(savings.id, 45_000);
-    await core.accounts.recordState(invest.id, 120_800);
+    await hq.accounts.recordState(main.id, 10_000);
+    await hq.accounts.recordState(cash.id, 2_450);
+    await hq.accounts.recordState(savings.id, 45_000);
+    await hq.accounts.recordState(invest.id, 120_800);
 
-    const groceries = await core.categories.create({ name: "Groceries" });
-    const energy = await core.categories.create({ name: "Energy" });
-    const salary = await core.categories.create({ name: "Income" });
+    const groceries = await hq.categories.create({ name: "Groceries" });
+    const energy = await hq.categories.create({ name: "Energy" });
+    const salary = await hq.categories.create({ name: "Income" });
 
     const now = new Date();
-    await core.transactions.create({
+    await hq.transactions.create({
       description: "Salary",
       amount: 15_000,
       sourceId: outside.id,
@@ -89,7 +100,7 @@ try {
       categoryId: salary.id,
       transactedAt: now,
     });
-    await core.transactions.create({
+    await hq.transactions.create({
       description: "Rohlik delivery",
       amount: 2_180,
       sourceId: main.id,
@@ -97,7 +108,7 @@ try {
       categoryId: groceries.id,
       transactedAt: now,
     });
-    await core.transactions.create({
+    await hq.transactions.create({
       description: "Electricity advance",
       amount: 3_450,
       sourceId: main.id,

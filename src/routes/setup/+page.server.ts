@@ -1,7 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { z } from "zod";
 import { getCore } from "#lib/server/index.ts";
-import { ConflictError, UserInput } from "#lib/server/core/index.ts";
+import {
+  ConflictError,
+  HouseholdInput,
+  UserInput,
+} from "#lib/server/core/index.ts";
 import { setSessionCookie } from "#lib/server/auth.ts";
 import type { Actions } from "./$types";
 
@@ -11,17 +15,28 @@ export const actions: Actions = {
     const email = String(form.get("email") ?? "");
     const password = String(form.get("password") ?? "");
     const confirm = String(form.get("confirm") ?? "");
+    const household = String(form.get("household") ?? "");
 
     const parsed = UserInput.safeParse({ email, password });
-    if (!parsed.success) {
+    const parsedHousehold = HouseholdInput.safeParse({ name: household });
+    if (!parsed.success || !parsedHousehold.success) {
       return fail(400, {
         email,
-        errors: z.flattenError(parsed.error).fieldErrors,
+        household,
+        errors: {
+          ...(parsed.success ? {} : z.flattenError(parsed.error).fieldErrors),
+          ...(parsedHousehold.success
+            ? {}
+            : {
+                household: parsedHousehold.error.issues.map((i) => i.message),
+              }),
+        },
       });
     }
     if (password !== confirm) {
       return fail(400, {
         email,
+        household,
         errors: { confirm: ["Passwords do not match"] },
       });
     }
@@ -37,10 +52,11 @@ export const actions: Actions = {
       if (e instanceof ConflictError) redirect(303, "/login");
       throw e;
     }
-    // Skipped automatically when accounts already exist in the database.
-    await core.ensureDefaults();
+    // The first household, with the default accounts every household starts with.
+    const created = await core.households.create(parsedHousehold.data);
+    await core.households.addMember(created.id, user.id);
 
-    const session = await core.sessions.create(user.id);
+    const session = await core.sessions.create(user.id, created.id);
     setSessionCookie(
       cookies,
       session.token,

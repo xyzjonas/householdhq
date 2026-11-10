@@ -4,6 +4,7 @@ import type { TagWithActivity } from "#lib/server/core/types.ts";
 
 const tag = (over: Partial<TagWithActivity>): TagWithActivity => ({
   id: 1,
+  householdId: 1,
   name: "holiday",
   description: null,
   icon: null,

@@ -1,6 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import {
   itemizeUrl,
   loadWizardData,
@@ -19,16 +19,15 @@ const parseId = (raw: string) => {
   return id;
 };
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
   const id = parseId(params.id);
+  const core = hq(locals);
   const [wizard, tx] = await Promise.all([
-    loadWizardData(),
-    getCore()
-      .transactions.get(id)
-      .catch((e: unknown) => {
-        if (e instanceof NotFoundError) error(404, "Transaction not found");
-        throw e;
-      }),
+    loadWizardData(core),
+    core.transactions.get(id).catch((e: unknown) => {
+      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      throw e;
+    }),
   ]);
 
   const type: TransactionType = tx.isHidden
@@ -59,13 +58,14 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-  update: async ({ request, params }) => {
+  update: async ({ request, params, locals }) => {
     const id = parseId(params.id);
     const itemize = await wantsItemize(request);
-    const input = await parseTransactionForm(request);
+    const core = hq(locals);
+    const input = await parseTransactionForm(core, request);
     if ("status" in input) return input;
     try {
-      await getCore().transactions.update(id, {
+      await core.transactions.update(id, {
         ...input,
         description: input.description ?? "N/A",
       });
@@ -76,9 +76,9 @@ export const actions: Actions = {
     // The edited transaction becomes the receipt's original.
     redirect(303, itemize ? itemizeUrl(id, []) : "/");
   },
-  confirm: async ({ params }) => {
+  confirm: async ({ params, locals }) => {
     try {
-      const confirmed = await getCore().transactions.confirm(
+      const confirmed = await hq(locals).transactions.confirm(
         parseId(params.id),
       );
       return { scheduledNext: confirmed.recurring > 0 };
@@ -88,9 +88,9 @@ export const actions: Actions = {
       throw e;
     }
   },
-  delete: async ({ params }) => {
+  delete: async ({ params, locals }) => {
     try {
-      await getCore().transactions.remove(parseId(params.id));
+      await hq(locals).transactions.remove(parseId(params.id));
     } catch (e) {
       if (e instanceof NotFoundError) error(404, "Transaction not found");
       if (e instanceof ConflictError) error(409, e.message);

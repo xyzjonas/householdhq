@@ -4,7 +4,7 @@ Household budget & finance dashboard. SvelteKit 3 (+ PWA manifest), Skeleton UI 
 
 ## Layout
 
-- `src/lib/server/core/` – **the core layer**: the only code that touches Prisma. Exposes repositories (`accounts`, `categories`, `transactions`, `users`) via `createCore(db)`. Pages, form actions and future API routes use `getCore()` from `src/lib/server`. ESLint forbids importing `@prisma/*` anywhere else.
+- `src/lib/server/core/` – **the core layer**: the only code that touches Prisma. Exposes repositories via `createCore(db)`. Pages, form actions and API routes use `hq(locals)` from `src/lib/server` for household data and `getCore()` for the global parts (users, sessions, households). ESLint forbids importing `@prisma/*` anywhere else.
 - `src/lib/components/` – UI built from Skeleton components/utilities.
 - `prisma/` – schema + migrations (unchanged from the Nuxt version) and `seed.ts`.
 - `e2e/` – Playwright tests.
@@ -20,6 +20,10 @@ just seed       # optional sample data
 ## First run
 
 On an empty database the app redirects everything to `/setup`, where you create the admin account (email + password); you are signed in right away. On startup it also creates the two default accounts when none exist: a **Bank account** (id 1) and **Expenses**, the outgoing account (id 2). Afterwards `/setup` is disabled and you use `/login`.
+
+### Households (multitenancy)
+
+All data (accounts, categories, tags, transactions, vehicles, meters, settings, ...) belongs to exactly one **household**; a user can be a member of zero, one or many and works in one at a time (the switcher in the header only appears with more than one). Isolation is enforced in the core layer, not in pages: `core.forHousehold(id)` returns repositories on a Prisma client that pins every query to that household (`core/scope.ts`), references to other rows are checked to be in the same household (`core/refs.ts`), and `locals.hq` is only set for a household the user is a member of (re-checked on every request). A new table is household-scoped by default; `isolation.spec.ts` fails if it has no `householdId`. The first user is the instance administrator and manages households, users and memberships under `/admin`. Upgrading an existing installation turns its data into the household "Home".
 
 Auth is email + password (scrypt) with server-side sessions: a random token in an `httpOnly`, `SameSite=Lax` cookie, only its sha256 stored in the `session` table, 30-day sliding expiry. `just seed` creates a dev admin `admin@example.com` / `password123` (override with `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`) plus sample data.
 

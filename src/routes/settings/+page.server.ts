@@ -1,12 +1,12 @@
 import { fail } from "@sveltejs/kit";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { SettingsInput } from "#lib/server/core/schemas.ts";
 import { currencies } from "#lib/components/transaction-wizard/types.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
-  const core = getCore();
+export const load: PageServerLoad = async ({ locals }) => {
+  const core = hq(locals);
   const [settings, categories, accounts] = await Promise.all([
     core.settings.get(),
     core.categories.list(),
@@ -23,16 +23,16 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-  update: async ({ request }) => {
+  update: async ({ request, locals }) => {
     const currency = String((await request.formData()).get("currency") ?? "");
     if (!(currencies as string[]).includes(currency)) {
       return fail(400, { message: "Please choose a supported currency." });
     }
-    await getCore().settings.update({ currency });
+    await hq(locals).settings.update({ currency });
     return { saved: true };
   },
 
-  interval: async ({ request }) => {
+  interval: async ({ request, locals }) => {
     const parsed = SettingsInput.pick({
       fiscalIntervalStartDay: true,
     }).safeParse({
@@ -46,11 +46,11 @@ export const actions: Actions = {
           parsed.error.issues[0]?.message ?? "Please enter a day from 1 to 31.",
       });
     }
-    await getCore().settings.update(parsed.data);
+    await hq(locals).settings.update(parsed.data);
     return { intervalSaved: true };
   },
 
-  manko: async ({ request }) => {
+  manko: async ({ request, locals }) => {
     const parsed = SettingsInput.pick({ mankoCategoryId: true }).safeParse({
       mankoCategoryId: (await request.formData()).get("mankoCategoryId"),
     });
@@ -61,7 +61,7 @@ export const actions: Actions = {
       });
     }
     try {
-      await getCore().settings.update(parsed.data);
+      await hq(locals).settings.update(parsed.data);
     } catch (e) {
       if (e instanceof NotFoundError) {
         return fail(400, { mankoMessage: "That category no longer exists." });
@@ -71,7 +71,7 @@ export const actions: Actions = {
     return { mankoSaved: true };
   },
 
-  defaultOut: async ({ request }) => {
+  defaultOut: async ({ request, locals }) => {
     const parsed = SettingsInput.pick({ defaultOutAccountId: true }).safeParse({
       defaultOutAccountId: (await request.formData()).get(
         "defaultOutAccountId",
@@ -84,7 +84,7 @@ export const actions: Actions = {
       });
     }
     try {
-      await getCore().settings.update(parsed.data);
+      await hq(locals).settings.update(parsed.data);
     } catch (e) {
       if (e instanceof NotFoundError || e instanceof ConflictError) {
         return fail(400, { defaultOutMessage: e.message });

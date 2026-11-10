@@ -18,6 +18,7 @@ const url = process.env.DATABASE_URL;
 const db = url ? createPrismaClient(url) : undefined;
 const core = db ? createCore(db) : undefined;
 const run = `t${Date.now()}`;
+const HID = 7;
 
 describe("ensureDefaultAccounts", () => {
   const fake = (existing: number) => {
@@ -56,15 +57,15 @@ describe("settings", () => {
       defaultOutAccountId: 3,
     });
     const db = { appSettings: { upsert } } as unknown as Db;
-    return { repo: settingsRepo(db), upsert };
+    return { repo: settingsRepo(db, HID), upsert };
   };
 
   it("get creates the singleton row with defaults when missing", async () => {
     const { repo, upsert } = fake();
     await repo.get();
     expect(upsert).toHaveBeenCalledWith({
-      where: { id: 1 },
-      create: { id: 1 },
+      where: { householdId: HID },
+      create: { householdId: HID },
       update: {},
     });
   });
@@ -73,8 +74,8 @@ describe("settings", () => {
     const { repo, upsert } = fake();
     await repo.update({ currency: " eur " });
     expect(upsert).toHaveBeenCalledWith({
-      where: { id: 1 },
-      create: { id: 1, currency: "EUR" },
+      where: { householdId: HID },
+      create: { householdId: HID, currency: "EUR" },
       update: { currency: "EUR" },
     });
     await repo.update({});
@@ -98,10 +99,13 @@ describe("settings", () => {
   it("update only accepts an existing external account as the default out account", async () => {
     const upsert = vi.fn().mockResolvedValue({});
     const findUnique = vi.fn();
-    const repo = settingsRepo({
-      appSettings: { upsert },
-      source: { findUnique },
-    } as unknown as Db);
+    const repo = settingsRepo(
+      {
+        appSettings: { upsert },
+        source: { findUnique },
+      } as unknown as Db,
+      HID,
+    );
 
     findUnique.mockResolvedValueOnce(null);
     await expect(
@@ -126,8 +130,14 @@ describe("settings", () => {
   });
 });
 
+// Everything below runs inside one household of its own.
+const household = core
+  ? await core.households.create({ name: `${run}-household` })
+  : undefined;
+
 describe.skipIf(!core)("core layer", () => {
-  const c = core!;
+  const g = core!;
+  const c = g.forHousehold(household!.id);
   const ids = {
     accounts: [] as number[],
     categories: [] as number[],
@@ -146,67 +156,82 @@ describe.skipIf(!core)("core layer", () => {
     for (const id of ids.categories)
       await c.categories.remove(id).catch(() => {});
     for (const id of ids.tags) await c.tags.remove(id).catch(() => {});
-    for (const id of ids.users) await c.users.remove(id).catch(() => {});
-    await c.disconnect();
+    for (const id of ids.users) await g.users.remove(id).catch(() => {});
+    // Whatever the household still owns (checkpoints, settings, ...) goes with it.
+    for (const model of [
+      "appSettings",
+      "sourceState",
+      "meterState",
+      "meter",
+      "vehicleComponent",
+    ] as const) {
+      await (
+        db![model] as unknown as {
+          deleteMany: (a: object) => Promise<unknown>;
+        }
+      ).deleteMany({ where: { householdId: household!.id } });
+    }
+    await db!.household.delete({ where: { id: household!.id } });
+    await g.disconnect();
   });
 
   describe("sessions", () => {
     it("creates, validates and invalidates sessions", async () => {
-      const user = await c.users.create({
+      const user = await g.users.create({
         email: `${run}-s@example.com`,
         password: "correct horse",
       });
       ids.users.push(user.id);
 
-      const { token } = await c.sessions.create(user.id);
+      const { token } = await g.sessions.create(user.id);
       expect(token.length).toBeGreaterThan(30);
-      const valid = await c.sessions.validate(token);
+      const valid = await g.sessions.validate(token);
       expect(valid?.user).toEqual(user);
       expect(valid?.renewed).toBe(false);
 
-      await c.sessions.invalidate(token);
-      expect(await c.sessions.validate(token)).toBeNull();
-      expect(await c.sessions.validate("not-a-token")).toBeNull();
+      await g.sessions.invalidate(token);
+      expect(await g.sessions.validate(token)).toBeNull();
+      expect(await g.sessions.validate("not-a-token")).toBeNull();
     });
 
     it("rejects expired sessions and renews old ones", async () => {
-      const user = await c.users.create({
+      const user = await g.users.create({
         email: `${run}-e@example.com`,
         password: "correct horse",
       });
       ids.users.push(user.id);
 
-      const expired = await c.sessions.create(user.id);
+      const expired = await g.sessions.create(user.id);
       await db!.session.updateMany({
         where: { userId: user.id },
         data: { expiresAt: new Date(Date.now() - 1000) },
       });
-      expect(await c.sessions.validate(expired.token)).toBeNull();
+      expect(await g.sessions.validate(expired.token)).toBeNull();
 
-      const old = await c.sessions.create(user.id);
+      const old = await g.sessions.create(user.id);
       await db!.session.updateMany({
         where: { userId: user.id },
         data: { expiresAt: new Date(Date.now() + 60_000) },
       });
-      const renewed = await c.sessions.validate(old.token);
+      const renewed = await g.sessions.validate(old.token);
       expect(renewed?.renewed).toBe(true);
       expect(renewed!.expiresAt.getTime()).toBeGreaterThan(
         Date.now() + 86_400_000,
       );
 
-      await c.sessions.invalidateAllForUser(user.id);
-      expect(await c.sessions.validate(old.token)).toBeNull();
+      await g.sessions.invalidateAllForUser(user.id);
+      expect(await g.sessions.validate(old.token)).toBeNull();
     });
 
     it("stores only a hash of the token", async () => {
-      const user = await c.users.create({
+      const user = await g.users.create({
         email: `${run}-h@example.com`,
         password: "correct horse",
       });
       ids.users.push(user.id);
-      const { token } = await c.sessions.create(user.id);
+      const { token } = await g.sessions.create(user.id);
       expect(await db!.session.findUnique({ where: { id: token } })).toBeNull();
-      await c.sessions.invalidateAllForUser(user.id);
+      await g.sessions.invalidateAllForUser(user.id);
     });
   });
 
@@ -537,22 +562,22 @@ describe.skipIf(!core)("core layer", () => {
   describe("users", () => {
     it("hashes passwords and authenticates", async () => {
       const email = `${run}@example.com`;
-      const user = await c.users.create({ email, password: "correct horse" });
+      const user = await g.users.create({ email, password: "correct horse" });
       ids.users.push(user.id);
       expect(user).not.toHaveProperty("password");
-      expect(await c.users.authenticate(email, "correct horse")).toEqual(user);
-      expect(await c.users.authenticate(email, "wrong")).toBeNull();
+      expect(await g.users.authenticate(email, "correct horse")).toEqual(user);
+      expect(await g.users.authenticate(email, "wrong")).toBeNull();
       await expect(
-        c.users.create({ email, password: "correct horse" }),
+        g.users.create({ email, password: "correct horse" }),
       ).rejects.toBeInstanceOf(ConflictError);
     });
 
     it("creates regular users unless told otherwise", async () => {
-      const regular = await c.users.create({
+      const regular = await g.users.create({
         email: `${run}-regular@example.com`,
         password: "correct horse",
       });
-      const admin = await c.users.create(
+      const admin = await g.users.create(
         { email: `${run}-admin@example.com`, password: "correct horse" },
         { isSuperuser: true },
       );
@@ -563,49 +588,49 @@ describe.skipIf(!core)("core layer", () => {
 
     it("invites with a random password that works until it is replaced", async () => {
       const email = `${run}-invited@example.com`;
-      const { user, password } = await c.users.invite(email);
+      const { user, password } = await g.users.invite(email);
       ids.users.push(user.id);
       expect(user.isSuperuser).toBe(false);
       expect(password.length).toBeGreaterThanOrEqual(20);
-      expect(await c.users.authenticate(email, password)).toEqual(user);
+      expect(await g.users.authenticate(email, password)).toEqual(user);
 
-      const again = await c.users.reissueInvite(user.id);
+      const again = await g.users.reissueInvite(user.id);
       expect(again.password).not.toBe(password);
-      expect(await c.users.authenticate(email, password)).toBeNull();
-      expect(await c.users.authenticate(email, again.password)).toEqual(user);
+      expect(await g.users.authenticate(email, password)).toBeNull();
+      expect(await g.users.authenticate(email, again.password)).toEqual(user);
     });
 
     it("signs the user out everywhere when the password changes", async () => {
-      const user = await c.users.create({
+      const user = await g.users.create({
         email: `${run}-reset@example.com`,
         password: "correct horse",
       });
       ids.users.push(user.id);
-      const { token } = await c.sessions.create(user.id);
+      const { token } = await g.sessions.create(user.id);
 
-      await c.users.setPassword(user.id, "battery staple");
-      expect(await c.sessions.validate(token)).toBeNull();
+      await g.users.setPassword(user.id, "battery staple");
+      expect(await g.sessions.validate(token)).toBeNull();
       expect(
-        await c.users.authenticate(user.email, "correct horse"),
+        await g.users.authenticate(user.email, "correct horse"),
       ).toBeNull();
-      expect(await c.users.authenticate(user.email, "battery staple")).toEqual(
+      expect(await g.users.authenticate(user.email, "battery staple")).toEqual(
         user,
       );
-      await expect(c.users.setPassword(user.id, "short")).rejects.toThrow();
+      await expect(g.users.setPassword(user.id, "short")).rejects.toThrow();
       await expect(
-        c.users.setPassword(2_000_000_000, "battery staple"),
+        g.users.setPassword(2_000_000_000, "battery staple"),
       ).rejects.toBeInstanceOf(NotFoundError);
     });
 
     it("removes users together with their sessions", async () => {
-      const user = await c.users.create({
+      const user = await g.users.create({
         email: `${run}-gone@example.com`,
         password: "correct horse",
       });
-      const { token } = await c.sessions.create(user.id);
-      await c.users.remove(user.id);
-      expect(await c.sessions.validate(token)).toBeNull();
-      await expect(c.users.remove(user.id)).rejects.toBeInstanceOf(
+      const { token } = await g.sessions.create(user.id);
+      await g.users.remove(user.id);
+      expect(await g.sessions.validate(token)).toBeNull();
+      await expect(g.users.remove(user.id)).rejects.toBeInstanceOf(
         NotFoundError,
       );
     });

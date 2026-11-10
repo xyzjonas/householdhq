@@ -1,6 +1,6 @@
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import {
   MeterPatch,
   MeterReadingInput,
@@ -15,8 +15,8 @@ function meterId(params: { id: string }): number {
   return id;
 }
 
-export const load: PageServerLoad = async ({ params, url }) => {
-  const meter = await getCore()
+export const load: PageServerLoad = async ({ params, url, locals }) => {
+  const meter = await hq(locals)
     .meters.get(meterId(params))
     .catch((e: unknown) =>
       e instanceof NotFoundError ? error(404, e.message) : Promise.reject(e),
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 };
 
 export const actions: Actions = {
-  edit: async ({ params, request }) => {
+  edit: async ({ params, request, locals }) => {
     const form = await request.formData();
     const parsed = MeterPatch.safeParse({
       name: form.get("name") ?? "",
@@ -44,7 +44,7 @@ export const actions: Actions = {
       return fail(400, { message: z.prettifyError(parsed.error) });
     }
     try {
-      await getCore().meters.update(meterId(params), parsed.data);
+      await hq(locals).meters.update(meterId(params), parsed.data);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       throw e;
@@ -52,7 +52,7 @@ export const actions: Actions = {
     return { saved: true };
   },
 
-  addReading: async ({ params, request }) => {
+  addReading: async ({ params, request, locals }) => {
     const form = await request.formData();
     const parsed = MeterReadingInput.safeParse({
       value: Number(
@@ -66,7 +66,7 @@ export const actions: Actions = {
       return fail(400, { message: "Enter a valid value and date." });
     }
     try {
-      await getCore().meters.addReading(meterId(params), parsed.data);
+      await hq(locals).meters.addReading(meterId(params), parsed.data);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       throw e;
@@ -74,11 +74,11 @@ export const actions: Actions = {
     return { added: true };
   },
 
-  deleteReading: async ({ request }) => {
+  deleteReading: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
     if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().meters.removeReading(id);
+      await hq(locals).meters.removeReading(id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       throw e;

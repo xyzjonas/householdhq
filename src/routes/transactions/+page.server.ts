@@ -1,9 +1,9 @@
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { parseView, toFilter } from "#lib/transactions-view.ts";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ url }) => {
-  const core = getCore();
+export const load: PageServerLoad = async ({ url, locals }) => {
+  const core = hq(locals);
   const view = parseView(url.searchParams);
 
   const [result, categories, accounts, tags] = await Promise.all([

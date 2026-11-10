@@ -1,10 +1,10 @@
 import { fiscalIntervalAt } from "#lib/fiscal-interval.ts";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { availableToSpend } from "#lib/upcoming.ts";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
-  const core = getCore();
+export const load: PageServerLoad = async ({ locals }) => {
+  const core = hq(locals);
   const now = new Date();
   const settings = await core.settings.get();
   const interval = fiscalIntervalAt(now, settings.fiscalIntervalStartDay);

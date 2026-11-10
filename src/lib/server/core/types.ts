@@ -5,6 +5,7 @@
 import type {
   AppSettings,
   Category,
+  Household,
   Meter,
   MeterState,
   Source,
@@ -22,6 +23,7 @@ import type {
 export type {
   AppSettings,
   Category,
+  Household,
   Meter,
   SourceType,
   Tag,
@@ -118,6 +120,9 @@ export interface AccountTrajectory {
 
 /** Users never leave the core layer with their password hash attached. */
 export type PublicUser = Omit<User, "password">;
+
+/** A household with the users that belong to it. */
+export type HouseholdWithMembers = Household & { members: PublicUser[] };
 
 export type TransactionWithRelations = Transaction & {
   category: Category | null;

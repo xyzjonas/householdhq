@@ -1,5 +1,5 @@
 import { expect, test, type Browser } from "@playwright/test";
-import { login } from "./helpers";
+import { invite, login, userRow } from "./helpers";
 
 const email = `invitee-${Date.now()}@example.com`;
 const newPassword = "a brand new password";
@@ -8,11 +8,7 @@ async function inviteLink(browser: Browser, address: string) {
   const context = await browser.newContext({ serviceWorkers: "block" });
   const page = await context.newPage();
   await login(page);
-  await page.goto("/users");
-  await page.getByRole("button", { name: "Invite user" }).click();
-  await page.getByLabel("Email").fill(address);
-  await page.getByRole("button", { name: "Create invite" }).click();
-  const link = await page.getByLabel(`Invite link for ${address}`).inputValue();
+  const link = await invite(page, address, "Home");
   await context.close();
   return link;
 }
@@ -26,27 +22,25 @@ test.describe("user management", () => {
 
   let link = "";
 
-  test("a superuser sees the users module and can invite someone", async ({
+  test("a superuser sees the administration and can invite someone", async ({
     page,
     browser,
   }) => {
     await login(page);
     await expect(
       page.getByRole("navigation", { name: "Main" }).getByRole("link", {
-        name: "Users",
+        name: "Administration",
       }),
     ).toBeVisible();
 
     link = await inviteLink(browser, email);
     expect(link).toContain("/invite#");
 
-    await page.goto("/users");
-    await expect(
-      page.getByRole("listitem").filter({ hasText: email }),
-    ).toBeVisible();
+    await page.goto("/admin");
+    await expect(userRow(page, email)).toBeVisible();
   });
 
-  test("the invitee sets a password and lands signed in without the users module", async ({
+  test("the invitee sets a password and lands signed in without the administration", async ({
     page,
     context,
   }) => {
@@ -63,8 +57,10 @@ test.describe("user management", () => {
     );
 
     // completely hidden from navigation, and not reachable by URL
-    await expect(page.getByRole("link", { name: "Users" })).toHaveCount(0);
-    expect((await page.goto("/users"))?.status()).toBe(404);
+    await expect(
+      page.getByRole("link", { name: "Administration" }),
+    ).toHaveCount(0);
+    expect((await page.goto("/admin"))?.status()).toBe(404);
 
     // the one-time link no longer works
     await page.goto(link);
@@ -88,8 +84,9 @@ test.describe("user management", () => {
     browser,
   }) => {
     await login(page);
-    await page.goto("/users");
-    const row = page.getByRole("listitem").filter({ hasText: email });
+    await page.goto("/admin");
+    await page.waitForLoadState("networkidle");
+    const row = userRow(page, email);
 
     await row.getByRole("button", { name: /Set password/ }).click();
     const dialog = page.getByRole("dialog");

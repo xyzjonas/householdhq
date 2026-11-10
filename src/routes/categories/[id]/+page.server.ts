@@ -1,6 +1,6 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import {
   monthKey,
@@ -16,10 +16,10 @@ import {
 } from "#lib/category-detail.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
   const id = Number(params.id);
   if (!Number.isInteger(id)) error(404, "Category not found");
-  const core = getCore();
+  const core = hq(locals);
 
   const category = await core.categories
     .get(id)
@@ -107,7 +107,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 export const actions: Actions = {
   /** Delete this category, moving its transactions to the chosen one. */
-  removeCategory: async ({ params, request }) => {
+  removeCategory: async ({ params, request, locals }) => {
     const id = Number(params.id);
     if (!Number.isInteger(id)) return fail(404, { message: "Not found" });
     const formData = await request.formData();
@@ -117,7 +117,7 @@ export const actions: Actions = {
       .getAll("tags")
       .map((t) => String(t).trim())
       .filter(Boolean);
-    const core = getCore();
+    const core = hq(locals);
     try {
       if (Number.isInteger(reassignTo)) {
         await core.categories.remove(id, {
@@ -143,11 +143,11 @@ export const actions: Actions = {
     redirect(303, resolve("/categories"));
   },
 
-  delete: async ({ request }) => {
+  delete: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
     if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().transactions.remove(id);
+      await hq(locals).transactions.remove(id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       if (e instanceof ConflictError) return fail(409, { message: e.message });

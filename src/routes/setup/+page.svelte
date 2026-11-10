@@ -13,9 +13,22 @@
 
 <AuthCard
   title="Create admin account"
-  description="Welcome! Create the first account to get started."
+  description="Welcome! Create the first account and household to get started."
 >
   <form method="POST" use:enhance class="flex flex-col gap-4">
+    <label class="label">
+      <span class="label-text">Household name</span>
+      <input
+        class="input"
+        name="household"
+        autocomplete="off"
+        required
+        value={form?.household ?? "My household"}
+      />
+      {#each errors.household ?? [] as msg (msg)}
+        <small class="text-error-600-400">{msg}</small>
+      {/each}
+    </label>
     <label class="label">
       <span class="label-text">Email</span>
       <input

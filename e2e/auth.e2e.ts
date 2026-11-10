@@ -16,6 +16,7 @@ test.describe("authentication", () => {
 
   test("rejects wrong credentials", async ({ page }) => {
     await page.goto("/login");
+    await page.waitForLoadState("networkidle"); // hydrated: the error shows inline
     await page.getByLabel("Email").fill(ADMIN_EMAIL);
     await page.getByLabel("Password").fill("definitely wrong");
     await page.getByRole("button", { name: "Sign in" }).click();

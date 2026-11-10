@@ -138,7 +138,11 @@ export function accountsRepo(db: Db) {
     },
 
     /** Record a point-in-time balance snapshot. */
-    recordState(accountId: number, amount: number): Promise<AccountState> {
+    async recordState(
+      accountId: number,
+      amount: number,
+    ): Promise<AccountState> {
+      await this.get(accountId);
       return db.sourceState.create({ data: { sourceId: accountId, amount } });
     },
   };
