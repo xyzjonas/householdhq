@@ -243,7 +243,10 @@ export type CheckpointInput = z.input<typeof CheckpointInput>;
 
 export const UserInput = z.object({
   email: z.email().trim().toLowerCase(),
-  password: z.string().min(8),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(200, "Password is too long"),
 });
 export type UserInput = z.input<typeof UserInput>;
 

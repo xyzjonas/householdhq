@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isActive, moreNavItems, navItems, primaryNavItems } from "#lib/nav.ts";
+import {
+  isActive,
+  moreNavItems,
+  navItems,
+  primaryNavItems,
+  visibleNavItems,
+} from "#lib/nav.ts";
 
 describe("isActive", () => {
   it("matches the exact page", () => {
@@ -29,5 +35,19 @@ describe("nav split", () => {
       "Categories",
       "Transactions",
     ]);
+  });
+});
+
+describe("visibleNavItems", () => {
+  const labels = (user?: { isSuperuser: boolean }) =>
+    visibleNavItems(navItems, user).map((item) => item.label);
+
+  it("hides the users module from regular users and anonymous visitors", () => {
+    expect(labels({ isSuperuser: false })).not.toContain("Users");
+    expect(labels()).not.toContain("Users");
+  });
+
+  it("shows the users module to superusers", () => {
+    expect(labels({ isSuperuser: true })).toContain("Users");
   });
 });

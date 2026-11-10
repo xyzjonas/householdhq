@@ -19,10 +19,13 @@ const core = createCore(createPrismaClient(url));
 
 try {
   if ((await core.users.count()) === 0) {
-    await core.users.create({
-      email: process.env.SEED_ADMIN_EMAIL ?? "admin@example.com",
-      password: process.env.SEED_ADMIN_PASSWORD ?? "password123",
-    });
+    await core.users.create(
+      {
+        email: process.env.SEED_ADMIN_EMAIL ?? "admin@example.com",
+        password: process.env.SEED_ADMIN_PASSWORD ?? "password123",
+      },
+      { isSuperuser: true },
+    );
     console.log("seed: created admin user");
   }
 

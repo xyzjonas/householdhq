@@ -6,7 +6,9 @@ declare global {
     interface Locals {
       user?: import("#lib/server/core/types.ts").PublicUser;
     }
-    // interface PageData {}
+    interface PageData {
+      user?: import("#lib/server/core/types.ts").PublicUser;
+    }
     // interface PageState {}
     // interface Platform {}
   }

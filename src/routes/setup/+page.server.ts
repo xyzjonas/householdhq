@@ -32,7 +32,7 @@ export const actions: Actions = {
 
     let user;
     try {
-      user = await core.users.create(parsed.data);
+      user = await core.users.create(parsed.data, { isSuperuser: true });
     } catch (e) {
       if (e instanceof ConflictError) redirect(303, "/login");
       throw e;

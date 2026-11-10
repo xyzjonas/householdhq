@@ -546,6 +546,69 @@ describe.skipIf(!core)("core layer", () => {
         c.users.create({ email, password: "correct horse" }),
       ).rejects.toBeInstanceOf(ConflictError);
     });
+
+    it("creates regular users unless told otherwise", async () => {
+      const regular = await c.users.create({
+        email: `${run}-regular@example.com`,
+        password: "correct horse",
+      });
+      const admin = await c.users.create(
+        { email: `${run}-admin@example.com`, password: "correct horse" },
+        { isSuperuser: true },
+      );
+      ids.users.push(regular.id, admin.id);
+      expect(regular.isSuperuser).toBe(false);
+      expect(admin.isSuperuser).toBe(true);
+    });
+
+    it("invites with a random password that works until it is replaced", async () => {
+      const email = `${run}-invited@example.com`;
+      const { user, password } = await c.users.invite(email);
+      ids.users.push(user.id);
+      expect(user.isSuperuser).toBe(false);
+      expect(password.length).toBeGreaterThanOrEqual(20);
+      expect(await c.users.authenticate(email, password)).toEqual(user);
+
+      const again = await c.users.reissueInvite(user.id);
+      expect(again.password).not.toBe(password);
+      expect(await c.users.authenticate(email, password)).toBeNull();
+      expect(await c.users.authenticate(email, again.password)).toEqual(user);
+    });
+
+    it("signs the user out everywhere when the password changes", async () => {
+      const user = await c.users.create({
+        email: `${run}-reset@example.com`,
+        password: "correct horse",
+      });
+      ids.users.push(user.id);
+      const { token } = await c.sessions.create(user.id);
+
+      await c.users.setPassword(user.id, "battery staple");
+      expect(await c.sessions.validate(token)).toBeNull();
+      expect(
+        await c.users.authenticate(user.email, "correct horse"),
+      ).toBeNull();
+      expect(await c.users.authenticate(user.email, "battery staple")).toEqual(
+        user,
+      );
+      await expect(c.users.setPassword(user.id, "short")).rejects.toThrow();
+      await expect(
+        c.users.setPassword(2_000_000_000, "battery staple"),
+      ).rejects.toBeInstanceOf(NotFoundError);
+    });
+
+    it("removes users together with their sessions", async () => {
+      const user = await c.users.create({
+        email: `${run}-gone@example.com`,
+        password: "correct horse",
+      });
+      const { token } = await c.sessions.create(user.id);
+      await c.users.remove(user.id);
+      expect(await c.sessions.validate(token)).toBeNull();
+      await expect(c.users.remove(user.id)).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
+    });
   });
 
   describe("accounts and transactions", () => {

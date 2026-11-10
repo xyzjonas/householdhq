@@ -2,13 +2,23 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { Navigation } from "@skeletonlabs/skeleton-svelte";
-  import { isActive, navItems, primaryNavItems } from "#lib/nav.ts";
+  import {
+    isActive,
+    navItems,
+    primaryNavItems,
+    visibleNavItems,
+  } from "#lib/nav.ts";
   import MoreNavSheet from "./MoreNavSheet.svelte";
 
   let { layout }: { layout: "sidebar" | "bar" } = $props();
 
   // The bar only has room for the primary items; the rest live under "More".
-  const items = $derived(layout === "bar" ? primaryNavItems : navItems);
+  const items = $derived(
+    visibleNavItems(
+      layout === "bar" ? primaryNavItems : navItems,
+      page.data.user,
+    ),
+  );
 
   const iconSize = $derived(layout === "sidebar" ? 18 : 22);
   const rootClass = $derived(
