@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { CategoryChanges } from "#lib/categories-client.ts";
 import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
@@ -5,10 +6,10 @@ export const PAGE_SIZE = 50;
 
 export type ChartRange = "6" | "12" | "all";
 
-export const chartRanges: { id: ChartRange; label: string }[] = [
-  { id: "6", label: "Last 6 months" },
-  { id: "12", label: "Last year" },
-  { id: "all", label: "Since forever" },
+export const chartRanges = (): { id: ChartRange; label: string }[] => [
+  { id: "6", label: m.categories_range_6() },
+  { id: "12", label: m.categories_range_12() },
+  { id: "all", label: m.categories_range_all() },
 ];
 
 export function parseChartRange(value: string | null): ChartRange {
@@ -74,12 +75,19 @@ export function averageSpend(series: { spent: number }[]): number {
 }
 
 const labels = {
-  name: (v: string) => `Name changed to “${v}”`,
-  description: (v: string | null | undefined) =>
-    v ? `Description changed to “${v}”` : "Description cleared",
-  icon: (v: string | null | undefined) =>
-    v ? `Icon set to ${v}` : "Icon cleared",
-  color: (v: string | null | undefined) => `Accent color set to ${v ?? "none"}`,
+  name: (value: string) => m.categories_change_name({ value }),
+  description: (value: string | null | undefined) =>
+    value
+      ? m.categories_change_description({ value })
+      : m.categories_change_description_cleared(),
+  icon: (value: string | null | undefined) =>
+    value
+      ? m.categories_change_icon({ value })
+      : m.categories_change_icon_cleared(),
+  color: (value: string | null | undefined) =>
+    value
+      ? m.categories_change_color({ value })
+      : m.categories_change_color_cleared(),
 };
 
 /** Human-readable confirmation for each property in a saved patch. */

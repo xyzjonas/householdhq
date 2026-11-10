@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import type { CategoryItem } from "#lib/categories-view.ts";
 
   let { items }: { items: CategoryItem[] } = $props();
@@ -15,11 +16,10 @@
       id="unbudgeted-heading"
       class="text-xs font-bold tracking-wider uppercase opacity-60"
     >
-      Unbudgeted
+      {m.categories_unbudgeted_heading()}
     </h2>
     <p class="text-sm font-bold">
-      {items.length}
-      {items.length === 1 ? "category has" : "categories have"} no budget
+      {m.categories_unbudgeted_summary({ count: items.length })}
     </p>
     <p class="text-xs wrap-break-word text-slate-500">
       {preview.join(", ")}{items.length > preview.length ? ", …" : ""}

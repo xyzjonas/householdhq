@@ -1,8 +1,18 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { formatMoney } from "#lib/format.ts";
+  import { intlLocale } from "#lib/i18n.ts";
   import type { BurnSlice } from "#lib/categories-view.ts";
 
   let { slices }: { slices: BurnSlice[] } = $props();
+
+  /** "12.3%" in the active language. */
+  const percent = (share: number) =>
+    new Intl.NumberFormat(intlLocale(), {
+      style: "percent",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(share / 100);
 
   /** Hard-stop conic gradient, one segment per slice. */
   const gradient = $derived.by(() => {
@@ -24,20 +34,19 @@
     id="burn-heading"
     class="text-xs font-bold tracking-wider uppercase opacity-60"
   >
-    Burn concentration
+    {m.categories_burn_heading()}
   </h2>
   {#if slices.length}
     <div
       role="img"
-      aria-label="Share of spending: {slices
-        .map((s) => `${s.label} ${s.share.toFixed(1)}%`)
-        .join(', ')}"
+      aria-label={m.categories_burn_aria({
+        list: slices.map((s) => `${s.label} ${percent(s.share)}`).join(", "),
+      })}
       class="donut mx-auto size-36 rounded-full"
       style="background: {gradient}"
     >
       <p class="grid size-full place-items-center text-center">
-        <span class="text-xl font-extrabold">{slices[0].share.toFixed(1)}%</span
-        >
+        <span class="text-xl font-extrabold">{percent(slices[0].share)}</span>
         <span class="-mt-5 max-w-20 truncate text-[11px] opacity-60">
           {slices[0].label}
         </span>
@@ -60,7 +69,7 @@
       {/each}
     </ul>
   {:else}
-    <p class="text-sm opacity-70">No spending recorded this month.</p>
+    <p class="text-sm opacity-70">{m.categories_burn_empty()}</p>
   {/if}
 </section>
 

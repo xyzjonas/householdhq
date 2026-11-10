@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { m } from "#paraglide/messages.js";
   import CategoryEntries from "#lib/components/categories/detail/CategoryEntries.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import CategoryProperties from "#lib/components/categories/detail/CategoryProperties.svelte";
@@ -17,15 +18,33 @@
     viewQuery(data.view, changes, data.currentMonth);
 </script>
 
-<svelte:head><title>{data.category.name} · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>
+    {m.categories_detail_title({
+      name: data.category.name,
+      app: m.common_app_name(),
+    })}
+  </title></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-col gap-2">
-    <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+    <nav
+      aria-label={m.categories_breadcrumb_label()}
+      class="text-sm text-surface-600-400"
+    >
       <ol class="flex gap-2">
-        <li><a class="anchor" href={resolve("/")}>Home</a></li>
+        <li>
+          <a class="anchor" href={resolve("/")}
+            >{m.categories_breadcrumb_home()}</a
+          >
+        </li>
         <li aria-hidden="true">›</li>
-        <li><a class="anchor" href={resolve("/categories")}>Categories</a></li>
+        <li>
+          <a class="anchor" href={resolve("/categories")}
+            >{m.categories_title()}</a
+          >
+        </li>
         <li aria-hidden="true">›</li>
         <li aria-current="page" class="min-w-0 wrap-anywhere">
           {data.category.id} ({data.category.name})

@@ -1,5 +1,6 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
+import { m } from "#paraglide/messages.js";
 import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import {
@@ -18,7 +19,7 @@ import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const id = Number(params.id);
-  if (!Number.isInteger(id)) error(404, "Category not found");
+  if (!Number.isInteger(id)) error(404, m.categories_not_found());
   const core = hq(locals);
 
   const category = await core.categories
@@ -109,7 +110,8 @@ export const actions: Actions = {
   /** Delete this category, moving its transactions to the chosen one. */
   removeCategory: async ({ params, request, locals }) => {
     const id = Number(params.id);
-    if (!Number.isInteger(id)) return fail(404, { message: "Not found" });
+    if (!Number.isInteger(id))
+      return fail(404, { message: m.categories_action_not_found() });
     const formData = await request.formData();
     const raw = formData.get("reassignTo");
     const reassignTo = raw === null || raw === "" ? NaN : Number(raw);
@@ -131,7 +133,7 @@ export const actions: Actions = {
           limit: 1,
         });
         if (total > 0) {
-          return fail(400, { message: "Choose a category to move them to." });
+          return fail(400, { message: m.categories_choose_target() });
         }
         await core.categories.remove(id);
       }
@@ -145,7 +147,8 @@ export const actions: Actions = {
 
   delete: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
-    if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
+    if (!Number.isInteger(id))
+      return fail(400, { message: m.categories_invalid_id() });
     try {
       await hq(locals).transactions.remove(id);
     } catch (e) {

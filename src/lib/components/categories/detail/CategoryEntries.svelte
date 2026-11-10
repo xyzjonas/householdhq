@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { m } from "#paraglide/messages.js";
   import { Switch } from "@skeletonlabs/skeleton-svelte";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
@@ -45,7 +46,9 @@
 
   const first = $derived(total === 0 ? 0 : (view.page - 1) * PAGE_SIZE + 1);
   const last = $derived(Math.min(total, view.page * PAGE_SIZE));
-  const scope = $derived(view.all ? "all time" : monthLabel(view.month));
+  const scope = $derived(
+    view.all ? m.categories_entries_all_time() : monthLabel(view.month),
+  );
 
   const go = (changes: Partial<DetailView>) =>
     // A filter change, not a navigation: keep scroll position and focus.
@@ -64,15 +67,15 @@
         id="entries-heading"
         class="flex items-center gap-2 text-lg font-bold"
       >
-        Entries
+        {m.categories_entries_title()}
         <span
           class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800"
         >
-          {total} recorded
+          {m.categories_entries_recorded({ total })}
         </span>
       </h2>
       <p class="text-sm wrap-anywhere text-surface-600-400">
-        {name} transactions · {scope}
+        {m.categories_entries_subtitle({ name, scope })}
       </p>
     </div>
 
@@ -94,7 +97,9 @@
         <Switch.Control>
           <Switch.Thumb />
         </Switch.Control>
-        <Switch.Label class="text-sm font-medium">All time</Switch.Label>
+        <Switch.Label class="text-sm font-medium">
+          {m.categories_entries_all_time_switch()}
+        </Switch.Label>
         <Switch.HiddenInput />
       </Switch>
       <div class="field-group grid-cols-[auto_1fr]">
@@ -105,8 +110,8 @@
           class="input"
           type="search"
           name="q"
-          placeholder="Search entries"
-          aria-label="Search entries"
+          placeholder={m.categories_entries_search()}
+          aria-label={m.categories_entries_search()}
           value={view.search}
         />
       </div>
@@ -115,7 +120,7 @@
         class="btn rounded-full bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800"
       >
         <Plus size={16} aria-hidden="true" />
-        <span>Add entry</span>
+        <span>{m.categories_entries_add()}</span>
       </a>
     </form>
   </header>
@@ -126,12 +131,20 @@
         <tr
           class="border-b border-surface-200-800 text-[11px] tracking-wider text-surface-500 uppercase"
         >
-          <th scope="col" class="pb-3 font-bold">Date</th>
-          <th scope="col" class="pb-3 font-bold">Description</th>
-          <th scope="col" class="pb-3 text-right font-bold">Amount</th>
-          <th scope="col" class="pb-3 pl-4 font-bold">Status</th>
+          <th scope="col" class="pb-3 font-bold">
+            {m.categories_entries_col_date()}
+          </th>
+          <th scope="col" class="pb-3 font-bold">
+            {m.categories_entries_col_description()}
+          </th>
           <th scope="col" class="pb-3 text-right font-bold">
-            <span class="sr-only">Actions</span>
+            {m.categories_entries_col_amount()}
+          </th>
+          <th scope="col" class="pb-3 pl-4 font-bold">
+            {m.categories_entries_col_status()}
+          </th>
+          <th scope="col" class="pb-3 text-right font-bold">
+            <span class="sr-only">{m.categories_entries_col_actions()}</span>
           </th>
         </tr>
       </thead>
@@ -169,14 +182,18 @@
               <a
                 href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
                 class="btn-icon btn-icon-sm hover:preset-tonal"
-                aria-label="Edit {t.description}"
+                aria-label={m.categories_entries_edit({
+                  description: t.description,
+                })}
               >
                 <Pencil size={16} aria-hidden="true" />
               </a>
               <button
                 type="button"
                 class="btn-icon btn-icon-sm hover:preset-tonal-error"
-                aria-label="Delete {t.description}"
+                aria-label={m.categories_entries_delete({
+                  description: t.description,
+                })}
                 onclick={() => (deleting = t)}
               >
                 <Trash2 size={16} aria-hidden="true" />
@@ -186,7 +203,7 @@
         {:else}
           <tr>
             <td colspan="5" class="py-8 text-center text-sm opacity-70">
-              No entries match these filters.
+              {m.categories_entries_none()}
             </td>
           </tr>
         {/each}
@@ -197,7 +214,7 @@
   <footer
     class="flex flex-wrap items-center justify-between gap-3 text-sm text-surface-600-400"
   >
-    <p>Showing {first} to {last} of {total} entries</p>
+    <p>{m.categories_entries_showing({ first, last, total })}</p>
     <LedgerPagination
       {total}
       pageSize={PAGE_SIZE}
