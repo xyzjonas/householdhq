@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import { formatMoney } from "#lib/format.ts";
   import type { TagItem } from "#lib/tags-view.ts";
@@ -10,14 +11,22 @@
 
 <div class="hidden overflow-x-auto card border border-surface-200-800 lg:block">
   <table class="w-full text-left text-sm">
-    <caption class="sr-only">Tags for {monthLabel}</caption>
+    <caption class="sr-only"
+      >{m.tags_table_caption({ month: monthLabel })}</caption
+    >
     <thead
       class="bg-surface-100-900 text-xs tracking-wider text-surface-600-400 uppercase"
     >
       <tr>
-        <th scope="col" class="w-2/5 px-4 py-3 font-bold">Tag</th>
-        <th scope="col" class="px-4 py-3 text-right font-bold">Activity</th>
-        <th scope="col" class="px-4 py-3 text-right font-bold">Entries</th>
+        <th scope="col" class="w-2/5 px-4 py-3 font-bold">
+          {m.tags_table_col_tag()}
+        </th>
+        <th scope="col" class="px-4 py-3 text-right font-bold">
+          {m.tags_table_col_activity()}
+        </th>
+        <th scope="col" class="px-4 py-3 text-right font-bold">
+          {m.tags_table_col_entries()}
+        </th>
       </tr>
     </thead>
     <tbody class="divide-y divide-surface-200-800">
@@ -57,7 +66,7 @@
       {:else}
         <tr>
           <td colspan="3" class="px-4 py-8 text-center text-sm opacity-70">
-            No tags found.
+            {m.tags_empty()}
           </td>
         </tr>
       {/each}

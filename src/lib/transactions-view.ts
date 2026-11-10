@@ -4,6 +4,7 @@ import type {
   TransactionSort,
   TransactionStatus,
 } from "#lib/server/core/schemas.ts";
+import { m } from "#paraglide/messages.js";
 
 export const PAGE_SIZES = [25, 50, 100] as const;
 export const DEFAULT_PAGE_SIZE = 50;
@@ -11,23 +12,26 @@ export const DEFAULT_PAGE_SIZE = 50;
 /** Sentinel for the category filter: transactions without a category. */
 export const NO_CATEGORY = "none";
 
-export const flowOptions: { id: TransactionFlow; label: string }[] = [
-  { id: "spent", label: "Spending" },
-  { id: "received", label: "Income" },
-  { id: "transfer", label: "Transfers" },
+export const flowOptions = (): { id: TransactionFlow; label: string }[] => [
+  { id: "spent", label: m.transactions_flow_spent() },
+  { id: "received", label: m.transactions_flow_received() },
+  { id: "transfer", label: m.transactions_flow_transfer() },
 ];
 
-export const statusOptions: { id: TransactionStatus; label: string }[] = [
-  { id: "completed", label: "Completed" },
-  { id: "pending", label: "Pending" },
-  { id: "cancelled", label: "Cancelled" },
+export const statusOptions = (): {
+  id: TransactionStatus;
+  label: string;
+}[] => [
+  { id: "completed", label: m.transactions_status_completed() },
+  { id: "pending", label: m.transactions_status_pending() },
+  { id: "cancelled", label: m.transactions_status_cancelled() },
 ];
 
-export const sortOptions: { id: TransactionSort; label: string }[] = [
-  { id: "date-desc", label: "Newest first" },
-  { id: "date-asc", label: "Oldest first" },
-  { id: "amount-desc", label: "Highest amount" },
-  { id: "amount-asc", label: "Lowest amount" },
+export const sortOptions = (): { id: TransactionSort; label: string }[] => [
+  { id: "date-desc", label: m.transactions_sort_date_desc() },
+  { id: "date-asc", label: m.transactions_sort_date_asc() },
+  { id: "amount-desc", label: m.transactions_sort_amount_desc() },
+  { id: "amount-asc", label: m.transactions_sort_amount_asc() },
 ];
 
 export type Toggle = "yes" | "no";
@@ -116,15 +120,15 @@ export function parseView(params: URLSearchParams): TransactionsView {
     account: id("account"),
     source: id("source"),
     target: id("target"),
-    flow: pick<TransactionFlow>(params.get("flow"), flowOptions),
-    status: pick<TransactionStatus>(params.get("status"), statusOptions),
+    flow: pick<TransactionFlow>(params.get("flow"), flowOptions()),
+    status: pick<TransactionStatus>(params.get("status"), statusOptions()),
     important: pick<Toggle>(params.get("important"), ["yes", "no"]),
     recurring: pick<Toggle>(params.get("recurring"), ["yes", "no"]),
     hidden: pick<Toggle>(params.get("hidden"), ["yes", "no"]),
     minAmount: amount(params.get("min")),
     maxAmount: amount(params.get("max")),
     tag: params.get("tag")?.trim() ?? "",
-    sort: pick<TransactionSort>(params.get("sort"), sortOptions),
+    sort: pick<TransactionSort>(params.get("sort"), sortOptions()),
     size: (PAGE_SIZES as readonly number[]).includes(size)
       ? size
       : DEFAULT_PAGE_SIZE,

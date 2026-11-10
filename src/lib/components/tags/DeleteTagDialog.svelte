@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -12,7 +13,7 @@
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Dialog.Trigger class="btn preset-tonal-error">
     <Trash2 size={16} aria-hidden="true" />
-    <span>Delete tag</span>
+    <span>{m.tags_delete_button()}</span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -22,10 +23,11 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">Delete tag?</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold">
+          {m.tags_delete_title()}
+        </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
-          “{name}” will be removed from every transaction that carries it. The
-          transactions themselves are kept.
+          {m.tags_delete_description({ name })}
         </Dialog.Description>
         <form
           method="POST"
@@ -34,19 +36,21 @@
           use:enhance={() =>
             async ({ result, update }) => {
               if (result.type === "redirect") {
-                toaster.success({ title: `Deleted tag “${name}”` });
+                toaster.success({
+                  title: m.tags_delete_toast_success({ name }),
+                });
               } else {
                 open = false;
-                toaster.error({ title: "Could not delete the tag" });
+                toaster.error({ title: m.tags_delete_toast_error() });
               }
               await update();
             }}
         >
-          <Dialog.CloseTrigger class="btn preset-tonal"
-            >Cancel</Dialog.CloseTrigger
-          >
+          <Dialog.CloseTrigger class="btn preset-tonal">
+            {m.common_cancel()}
+          </Dialog.CloseTrigger>
           <button type="submit" class="btn preset-filled-error-500">
-            Delete
+            {m.common_delete()}
           </button>
         </form>
       </Dialog.Content>

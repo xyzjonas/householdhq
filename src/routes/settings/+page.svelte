@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import CurrencyForm from "#lib/components/settings/CurrencyForm.svelte";
   import FiscalIntervalForm from "#lib/components/settings/FiscalIntervalForm.svelte";
@@ -11,18 +12,25 @@
   let { data, form }: PageProps = $props();
 </script>
 
-<svelte:head><title>Settings · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.settings_page_title()} · {m.common_app_name()}</title></svelte:head
+>
 
 <div class="mx-auto flex max-w-3xl flex-col gap-6">
   <header class="flex flex-col gap-2">
-    <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+    <nav
+      aria-label={m.common_breadcrumb()}
+      class="text-sm text-surface-600-400"
+    >
       <ol class="flex gap-2">
-        <li><a class="anchor" href={resolve("/")}>Home</a></li>
+        <li><a class="anchor" href={resolve("/")}>{m.common_home()}</a></li>
         <li aria-hidden="true">›</li>
-        <li aria-current="page">Settings</li>
+        <li aria-current="page">{m.settings_page_title()}</li>
       </ol>
     </nav>
-    <h1 class="text-2xl font-extrabold tracking-tight">Settings</h1>
+    <h1 class="text-2xl font-extrabold tracking-tight">
+      {m.settings_page_title()}
+    </h1>
   </header>
 
   <CurrencyForm

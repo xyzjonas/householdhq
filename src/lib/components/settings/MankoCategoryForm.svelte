@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
 
   let {
@@ -18,11 +19,9 @@
 
 <section class="flex flex-col gap-4 card bg-surface-50-950 p-6">
   <header class="flex flex-col gap-1">
-    <h2 class="text-lg font-bold">Manko category</h2>
+    <h2 class="text-lg font-bold">{m.settings_manko_title()}</h2>
     <p class="text-sm text-surface-600-400">
-      Adding a balance checkpoint creates an adjustment transaction for any
-      difference between the computed and the actual balance. It is filed under
-      this category.
+      {m.settings_manko_hint()}
     </p>
   </header>
   <form
@@ -38,7 +37,7 @@
     }}
   >
     <label class="label">
-      <span class="label-text">Category for checkpoint adjustments</span>
+      <span class="label-text">{m.settings_manko_label()}</span>
       <select class="select" name="mankoCategoryId" value={categoryId}>
         {#each categories as c (c.id)}
           <option value={c.id}>{c.name}</option>
@@ -48,7 +47,9 @@
     {#if message}
       <p role="alert" class="text-sm text-error-600-400">{message}</p>
     {:else if saved}
-      <p role="status" class="text-sm text-success-600-400">Settings saved.</p>
+      <p role="status" class="text-sm text-success-600-400">
+        {m.settings_saved()}
+      </p>
     {/if}
     <div class="flex justify-end">
       <button
@@ -56,7 +57,7 @@
         class="btn preset-filled-surface-950-50"
         disabled={submitting}
       >
-        Save changes
+        {m.common_save_changes()}
       </button>
     </div>
   </form>

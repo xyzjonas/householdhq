@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { fiscalIntervalAt } from "#lib/fiscal-interval.ts";
   import { formatDate } from "#lib/format.ts";
@@ -27,10 +28,9 @@
 
 <section class="flex flex-col gap-4 card bg-surface-50-950 p-6">
   <header class="flex flex-col gap-1">
-    <h2 class="text-lg font-bold">Fiscal interval</h2>
+    <h2 class="text-lg font-bold">{m.settings_interval_title()}</h2>
     <p class="text-sm text-surface-600-400">
-      The period between your major incomes. The dashboard shows what is
-      available to spend until the interval ends.
+      {m.settings_interval_hint()}
     </p>
   </header>
   <form
@@ -46,7 +46,7 @@
     }}
   >
     <label class="label">
-      <span class="label-text">Interval starts on day of month</span>
+      <span class="label-text">{m.settings_interval_label()}</span>
       <input
         class="input"
         type="number"
@@ -62,17 +62,20 @@
     </label>
     <p id="fiscal-interval-hint" class="text-sm text-surface-600-400">
       {#if interval}
-        Current interval: {formatDate(interval.start)} – {formatDate(
-          interval.end,
-        )}. Use 1 for the calendar month; shorter months end on their last day.
+        {m.settings_interval_current({
+          start: formatDate(interval.start),
+          end: formatDate(interval.end),
+        })}
       {:else}
-        Enter a day from 1 to 31.
+        {m.settings_interval_enter_day()}
       {/if}
     </p>
     {#if message}
       <p role="alert" class="text-sm text-error-600-400">{message}</p>
     {:else if saved}
-      <p role="status" class="text-sm text-success-600-400">Settings saved.</p>
+      <p role="status" class="text-sm text-success-600-400">
+        {m.settings_saved()}
+      </p>
     {/if}
     <div class="flex justify-end">
       <button
@@ -80,7 +83,7 @@
         class="btn preset-filled-surface-950-50"
         disabled={submitting}
       >
-        Save changes
+        {m.common_save_changes()}
       </button>
     </div>
   </form>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import {
     chipClass,
@@ -11,7 +12,7 @@
 </script>
 
 {#if tags.length}
-  <ul class="flex flex-wrap gap-1" aria-label="Tags">
+  <ul class="flex flex-wrap gap-1" aria-label={m.tags_chips_label()}>
     {#each tags as tag (tag.id)}
       <li>
         <a

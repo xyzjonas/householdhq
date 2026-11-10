@@ -1,4 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { m } from "#paraglide/messages.js";
 import { resolve } from "$app/paths";
 import { hq } from "#lib/server/index.ts";
 import {
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 export const actions: Actions = {
   create: async ({ request, locals }) => {
     const name = String((await request.formData()).get("name") ?? "").trim();
-    if (!name) return fail(400, { message: "Please enter a tag name." });
+    if (!name) return fail(400, { message: m.tags_name_required() });
     try {
       await hq(locals).tags.create({ name });
     } catch (e) {

@@ -1,4 +1,5 @@
 import { error, fail, redirect } from "@sveltejs/kit";
+import { m } from "#paraglide/messages.js";
 import { resolve } from "$app/paths";
 import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
@@ -18,7 +19,7 @@ import type { Actions, PageServerLoad } from "./$types";
 
 const parseId = (raw: string) => {
   const id = Number(raw);
-  if (!Number.isInteger(id)) error(404, "Tag not found");
+  if (!Number.isInteger(id)) error(404, m.tags_not_found());
   return id;
 };
 
@@ -66,7 +67,10 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     : entries;
 
   const serialize = (s: typeof series) =>
-    s.map((m) => ({ monthStart: m.monthStart.toISOString(), spent: m.spent }));
+    s.map((point) => ({
+      monthStart: point.monthStart.toISOString(),
+      spent: point.spent,
+    }));
 
   return {
     tag,
@@ -91,7 +95,8 @@ export const actions: Actions = {
   /** Deletes one of the tag's transactions. */
   delete: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
-    if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
+    if (!Number.isInteger(id))
+      return fail(400, { message: m.tags_invalid_id() });
     try {
       await hq(locals).transactions.remove(id);
     } catch (e) {
