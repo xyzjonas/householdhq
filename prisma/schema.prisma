@@ -11,19 +11,51 @@ generator client {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
   password String
 
   /// The only role for now: may manage users. The first account is one.
   isSuperuser Boolean @default(false)
+
+  memberships Membership[]
+}
+
+/// The tenant. Every table below (except users, sessions and memberships)
+/// carries a `householdId`, and the core layer scopes every query to one
+/// household, so households never see each other's data. The scoped client
+/// stamps `householdId` on every created row; the 0 default only exists so
+/// callers need not pass it, and matches no household if it is ever missed.
+model Household {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  memberships Membership[]
+
+  @@map("household")
+}
+
+/// Which users belong to which households (many to many).
+model Membership {
+  userId      Int
+  householdId Int
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  household   Household @relation(fields: [householdId], references: [id])
+
+  @@id([userId, householdId])
+  @@index([householdId])
+  @@map("membership")
 }
 
 model Session {
-  id        String   @id @db.Char(64) // sha256 of the session token (the token itself is never stored)
-  userId    Int
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id          String   @id @db.Char(64) // sha256 of the session token (the token itself is never stored)
+  userId      Int
+  /// The household the user is currently working in (re-validated on every request).
+  householdId Int?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
 
   @@index([userId])
   @@index([expiresAt])
@@ -32,7 +64,8 @@ model Session {
 
 model Category {
   id          Int     @id @default(autoincrement())
-  name        String  @unique
+  householdId Int     @default(0)
+  name        String
   description String?
   icon        String?
   color       String?
@@ -42,12 +75,15 @@ model Category {
   fuelVehicle  Vehicle?      @relation("VehicleFuelCategory")
   mankoSetting AppSettings[] @relation("MankoCategory")
 
+  @@unique([householdId, name])
+  @@index([householdId])
   @@map("category")
 }
 
 model Tag {
   id          Int     @id @default(autoincrement())
-  name        String  @unique
+  householdId Int     @default(0)
+  name        String
   description String?
   icon        String?
   color       String?
@@ -58,22 +94,27 @@ model Tag {
 
   transactions Transaction[]
 
+  @@unique([householdId, name])
   @@index([parentId])
+  @@index([householdId])
   @@map("tag")
 }
 
 model SourceState {
-  id       Int      @id @default(autoincrement())
-  created  DateTime @updatedAt
-  amount   Float
-  sourceId Int
-  source   Source   @relation(fields: [sourceId], references: [id])
+  id          Int      @id @default(autoincrement())
+  householdId Int      @default(0)
+  created     DateTime @updatedAt
+  amount      Float
+  sourceId    Int
+  source      Source   @relation(fields: [sourceId], references: [id])
 
   @@index([sourceId])
+  @@index([householdId])
 }
 
 model Source {
   id              Int           @id @default(autoincrement())
+  householdId     Int           @default(0)
   name            String
   transactionsIn  Transaction[] @relation(name: "source")
   transactionsOut Transaction[] @relation(name: "target")
@@ -85,6 +126,8 @@ model Source {
   color           String?
   position        Int           @default(999) // position in the listing
   type            SourceType    @default(ACCOUNT)
+
+  @@index([householdId])
 }
 
 enum SourceType {
@@ -99,6 +142,7 @@ enum SourceType {
 
 model Transaction {
   id           Int       @id @default(autoincrement())
+  householdId  Int       @default(0)
   created      DateTime  @updatedAt
   transactedAt DateTime?
   description  String
@@ -137,12 +181,14 @@ model Transaction {
   @@index([projectId])
   @@index([vehicleId])
   @@index([isImportant])
+  @@index([householdId])
   @@fulltext([description])
   @@map("transaction")
 }
 
 model Project {
   id          Int      @id @default(autoincrement())
+  householdId Int      @default(0)
   name        String
   created     DateTime @updatedAt
   description String?
@@ -151,10 +197,13 @@ model Project {
   color        String?
   isCompleted  Boolean       @default(false)
   transactions Transaction[] @relation(name: "project")
+
+  @@index([householdId])
 }
 
 model Meter {
   id          Int          @id @default(autoincrement())
+  householdId Int          @default(0)
   name        String
   created     DateTime     @updatedAt
   unit        String
@@ -162,23 +211,28 @@ model Meter {
   color       String?
   meterNumber String?
   states      MeterState[] @relation(name: "meter")
+
+  @@index([householdId])
 }
 
 model MeterState {
-  id         Int      @id @default(autoincrement())
-  value      Float
-  meteredAt  DateTime
-  meterId    Int
-  meter      Meter    @relation(name: "meter", fields: [meterId], references: [id])
-  isComputed Boolean  @default(false)
+  id          Int      @id @default(autoincrement())
+  householdId Int      @default(0)
+  value       Float
+  meteredAt   DateTime
+  meterId     Int
+  meter       Meter    @relation(name: "meter", fields: [meterId], references: [id])
+  isComputed  Boolean  @default(false)
 
   @@index([meterId])
+  @@index([householdId])
 }
 
 model Vehicle {
   id                          Int       @id @default(autoincrement())
-  vin                         String    @unique
-  registration                String    @unique
+  householdId                 Int       @default(0)
+  vin                         String
+  registration                String
   name                        String
   brand                       String
   model                       String
@@ -207,9 +261,12 @@ model Vehicle {
   fuelEntries    VehicleFuelEntry[]
   serviceEntries VehicleServiceEntry[]
 
+  @@unique([householdId, vin])
+  @@unique([householdId, registration])
   @@index([categoryId])
   @@index([fuelCategoryId])
   @@index([deletedAt])
+  @@index([householdId])
   @@map("vehicle")
 }
 
@@ -221,12 +278,13 @@ enum VehicleServiceType {
 }
 
 model VehicleFuelEntry {
-  id         Int      @id @default(autoincrement())
-  fueledAt   DateTime
-  odometer   Float
-  fuelAmount Float
-  unitPrice  Float
-  isFullTank Boolean  @default(true)
+  id          Int      @id @default(autoincrement())
+  householdId Int      @default(0)
+  fueledAt    DateTime
+  odometer    Float
+  fuelAmount  Float
+  unitPrice   Float
+  isFullTank  Boolean  @default(true)
 
   vehicleId Int
   vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
@@ -245,11 +303,13 @@ model VehicleFuelEntry {
   @@index([vehicleId])
   @@index([fueledAt])
   @@index([previousFullTankFuelEntryId])
+  @@index([householdId])
   @@map("vehicle_fuel_entry")
 }
 
 model VehicleServiceEntry {
   id          Int                @id @default(autoincrement())
+  householdId Int                @default(0)
   type        VehicleServiceType
   odometer    Float?
   title       String
@@ -271,12 +331,14 @@ model VehicleServiceEntry {
   @@index([vehicleId])
   @@index([servicedAt])
   @@index([type])
+  @@index([householdId])
   @@map("vehicle_service_entry")
 }
 
 model VehicleComponent {
   id          Int     @id @default(autoincrement())
-  name        String  @unique
+  householdId Int     @default(0)
+  name        String
   icon        String?
   color       String?
   description String?
@@ -286,11 +348,15 @@ model VehicleComponent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([householdId, name])
+  @@index([householdId])
   @@map("vehicle_component")
 }
 
 model AppSettings {
-  id                     Int       @id @default(1) // Singleton - always ID 1
+  id                     Int       @id @default(autoincrement())
+  // one settings row per household
+  householdId            Int       @unique @default(0)
   currency               String    @default("USD")
   // day of the month on which a fiscal interval (e.g. payday to payday) starts; 1 = calendar month
   fiscalIntervalStartDay Int       @default(1)
