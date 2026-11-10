@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import { Tabs } from "@skeletonlabs/skeleton-svelte";
   import Fuel from "@lucide/svelte/icons/fuel";
@@ -26,10 +27,18 @@
   let { data }: PageProps = $props();
 
   const tabs = [
-    { id: "fuel", label: "Fuel", icon: Fuel },
-    { id: "maintenance", label: "Maintenance", icon: Wrench },
-    { id: "transactions", label: "Transactions", icon: Receipt },
-    { id: "details", label: "Details", icon: Info },
+    { id: "fuel", label: () => m.vehicles_tab_fuel(), icon: Fuel },
+    {
+      id: "maintenance",
+      label: () => m.vehicles_tab_maintenance(),
+      icon: Wrench,
+    },
+    {
+      id: "transactions",
+      label: () => m.vehicles_tab_transactions(),
+      icon: Receipt,
+    },
+    { id: "details", label: () => m.vehicles_tab_details(), icon: Info },
   ] as const;
   let tab = $state<(typeof tabs)[number]["id"]>("fuel");
 
@@ -63,18 +72,23 @@
     deleting = {
       action: "?/deleteFuel",
       id: entry.id,
-      title: "Delete fill-up?",
-      description: `The fill-up at ${formatNumber(entry.odometer, "km")} and its transaction “${entry.transaction.description}” will be permanently removed.`,
-      done: "Fill-up deleted",
+      title: m.vehicles_delete_fuel_title(),
+      description: m.vehicles_delete_fuel_description({
+        odometer: formatNumber(entry.odometer, "km"),
+        description: entry.transaction.description,
+      }),
+      done: m.vehicles_delete_fuel_done(),
     };
   }
   function deleteService(entry: ServiceEntry) {
     deleting = {
       action: "?/deleteService",
       id: entry.id,
-      title: "Delete service?",
-      description: `“${entry.title}” and its transaction will be permanently removed.`,
-      done: "Service deleted",
+      title: m.vehicles_delete_service_title(),
+      description: m.vehicles_delete_service_description({
+        title: entry.title,
+      }),
+      done: m.vehicles_delete_service_done(),
     };
   }
   function deleteVehicle() {
@@ -82,25 +96,46 @@
     const services = vehicle.serviceEntries.length;
     deleting = {
       action: "?/deleteVehicle",
-      title: `Delete ${vehicle.name}?`,
+      title: m.vehicles_delete_vehicle_title({ name: vehicle.name }),
       description:
         fills + services
-          ? `The vehicle, its ${fills} fuel ${fills === 1 ? "entry" : "entries"} and ${services} ${services === 1 ? "service" : "services"} will be permanently removed, together with their transactions.`
-          : "The vehicle will be permanently removed.",
-      done: "Vehicle deleted",
+          ? m.vehicles_delete_vehicle_description_with_entries({
+              fuel: m.vehicles_delete_fuel_entries_count({ count: fills }),
+              services: m.vehicles_delete_services_count({ count: services }),
+            })
+          : m.vehicles_delete_vehicle_description(),
+      done: m.vehicles_delete_vehicle_done(),
     };
   }
 </script>
 
-<svelte:head><title>{vehicle.name} · Household HQ</title></svelte:head>
+<svelte:head
+  ><title
+    >{m.vehicles_detail_title({
+      name: vehicle.name,
+      appName: m.common_app_name(),
+    })}</title
+  ></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-col gap-4">
-    <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+    <nav
+      aria-label={m.vehicles_breadcrumb_label()}
+      class="text-sm text-surface-600-400"
+    >
       <ol class="flex gap-2">
-        <li><a class="anchor" href={resolve("/")}>Home</a></li>
+        <li>
+          <a class="anchor" href={resolve("/")}
+            >{m.vehicles_breadcrumb_home()}</a
+          >
+        </li>
         <li aria-hidden="true">›</li>
-        <li><a class="anchor" href={resolve("/vehicles")}>Vehicles</a></li>
+        <li>
+          <a class="anchor" href={resolve("/vehicles")}
+            >{m.vehicles_list_heading()}</a
+          >
+        </li>
         <li aria-hidden="true">›</li>
         <li aria-current="page" class="min-w-0 wrap-anywhere">
           {vehicle.id} ({vehicle.name})
@@ -134,7 +169,7 @@
           onclick={() => (editingVehicle = true)}
         >
           <Pencil size={16} aria-hidden="true" />
-          <span>Edit</span>
+          <span>{m.common_edit()}</span>
         </button>
         <button
           type="button"
@@ -142,7 +177,7 @@
           onclick={deleteVehicle}
         >
           <Trash2 size={16} aria-hidden="true" />
-          <span>Delete</span>
+          <span>{m.common_delete()}</span>
         </button>
       </div>
     </div>
@@ -161,7 +196,7 @@
             : 'border border-surface-200-800 preset-filled-surface-50-950'}"
         >
           <t.icon size={16} aria-hidden="true" />
-          <span>{t.label}</span>
+          <span>{t.label()}</span>
         </Tabs.Trigger>
       {/each}
     </Tabs.List>
@@ -191,14 +226,15 @@
         <header class="flex flex-wrap items-baseline justify-between gap-2">
           <div>
             <h2 id="transactions-heading" class="text-lg font-bold">
-              Transactions
+              {m.vehicles_tab_transactions()}
             </h2>
             <p class="text-sm text-surface-600-400">
               {#if vehicle.category}
-                Filed under {vehicle.category.name}
+                {m.vehicles_transactions_filed_under({
+                  category: vehicle.category.name,
+                })}
               {:else}
-                Choose a maintenance category in the vehicle's settings to see
-                its transactions here.
+                {m.vehicles_transactions_choose_category()}
               {/if}
             </p>
           </div>
@@ -209,14 +245,16 @@
                 id: String(vehicle.category.id),
               })}
             >
-              Showing {data.transactions.length} of {data.transactionTotal} · view
-              all
+              {m.vehicles_transactions_showing({
+                shown: data.transactions.length,
+                total: data.transactionTotal,
+              })}
             </a>
           {/if}
         </header>
         <TransactionList
           transactions={data.transactions}
-          empty="No transactions in this category yet."
+          empty={m.vehicles_transactions_empty()}
         />
       </section>
     </Tabs.Content>

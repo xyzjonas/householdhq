@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal, Switch } from "@skeletonlabs/skeleton-svelte";
   import {
@@ -60,12 +61,14 @@
         class="flex max-h-[calc(100dvh-2rem)] w-full max-w-md flex-col gap-4 overflow-y-auto card bg-surface-50-950 p-6 shadow-xl"
       >
         <Dialog.Title class="text-lg font-bold">
-          {editing ? "Edit fill-up" : "Add fuel"}
+          {editing
+            ? m.vehicles_fuel_dialog_edit_title()
+            : m.vehicles_fuel_dialog_add_title()}
         </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
           {editing
-            ? "The fill-up's transaction follows its date and cost."
-            : "A transaction for the cost is recorded along with the fill-up."}
+            ? m.vehicles_fuel_dialog_edit_description()
+            : m.vehicles_fuel_dialog_add_description()}
         </Dialog.Description>
         {#if open}
           <form
@@ -80,14 +83,18 @@
                 if (result.type === "success") {
                   open = false;
                   toaster.success({
-                    title: editing ? "Fill-up updated" : "Fill-up added",
+                    title: editing
+                      ? m.vehicles_fuel_dialog_updated()
+                      : m.vehicles_fuel_dialog_added(),
                   });
                 } else if (result.type === "failure") {
                   message =
                     (result.data as { message?: string } | undefined)
-                      ?.message ?? "Could not save the fill-up.";
+                      ?.message ?? m.vehicles_fuel_dialog_save_failed();
                 } else {
-                  toaster.error({ title: "Could not save the fill-up" });
+                  toaster.error({
+                    title: m.vehicles_fuel_dialog_save_failed_toast(),
+                  });
                 }
               };
             }}
@@ -96,7 +103,7 @@
             <input type="hidden" name="fueledAt" value={instant} />
 
             <label class="label">
-              <span class="label-text">Date and time</span>
+              <span class="label-text">{m.vehicles_field_date_and_time()}</span>
               <input
                 class="input"
                 type="datetime-local"
@@ -107,7 +114,7 @@
 
             <div class="grid grid-cols-2 gap-4">
               <label class="label">
-                <span class="label-text">Odometer (km)</span>
+                <span class="label-text">{m.vehicles_field_odometer_km()}</span>
                 <input
                   class="input"
                   type="number"
@@ -120,7 +127,7 @@
                 />
               </label>
               <label class="label">
-                <span class="label-text">Fuel (L)</span>
+                <span class="label-text">{m.vehicles_field_fuel_litres()}</span>
                 <input
                   class="input"
                   type="number"
@@ -135,7 +142,9 @@
             </div>
 
             <label class="label">
-              <span class="label-text">Unit price (per litre)</span>
+              <span class="label-text"
+                >{m.vehicles_field_unit_price_per_litre()}</span
+              >
               <input
                 class="input"
                 type="number"
@@ -149,7 +158,9 @@
             </label>
 
             <label class="label">
-              <span class="label-text">Previous full tank</span>
+              <span class="label-text"
+                >{m.vehicles_field_previous_full_tank()}</span
+              >
               <select
                 class="select"
                 name="previousFullTank"
@@ -158,15 +169,17 @@
                   : "auto"}
               >
                 {#if !editing}
-                  <option value="auto">Automatic (latest earlier one)</option>
+                  <option value="auto"
+                    >{m.vehicles_field_previous_full_tank_auto()}</option
+                  >
                 {/if}
-                <option value="none">None</option>
+                <option value="none">{m.common_none()}</option>
                 {#each fullTanks as t (t.id)}
                   <option value={t.id}>
-                    {formatDateWithYear(t.fueledAt)} · {formatNumber(
-                      t.odometer,
-                      "km",
-                    )}
+                    {m.vehicles_fuel_option_label({
+                      date: formatDateWithYear(t.fueledAt),
+                      odometer: formatNumber(t.odometer, "km"),
+                    })}
                   </option>
                 {/each}
               </select>
@@ -179,7 +192,7 @@
               class="flex items-center justify-between gap-4"
             >
               <Switch.Label class="text-sm font-semibold">
-                Full tank
+                {m.vehicles_field_full_tank()}
               </Switch.Label>
               <Switch.Control>
                 <Switch.Thumb />
@@ -200,21 +213,23 @@
                     if (entry) ondelete(entry);
                   }}
                 >
-                  Delete
+                  {m.common_delete()}
                 </button>
               {:else}
                 <span></span>
               {/if}
               <div class="flex gap-2">
                 <Dialog.CloseTrigger class="btn preset-tonal"
-                  >Cancel</Dialog.CloseTrigger
+                  >{m.common_cancel()}</Dialog.CloseTrigger
                 >
                 <button
                   type="submit"
                   class="btn preset-filled-surface-950-50"
                   disabled={submitting || instant === ""}
                 >
-                  {editing ? "Save changes" : "Add fill-up"}
+                  {editing
+                    ? m.vehicles_dialog_save_changes()
+                    : m.vehicles_fuel_dialog_submit_add()}
                 </button>
               </div>
             </div>

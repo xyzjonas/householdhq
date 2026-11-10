@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import { toDateInput } from "#lib/datetime.ts";
@@ -59,10 +60,9 @@
   name: string,
   label: string,
   value: number | null | undefined,
-  unit?: string,
 )}
   <label class="label">
-    <span class="label-text">{label}{unit ? ` (${unit})` : ""}</span>
+    <span class="label-text">{label}</span>
     <input
       class="input"
       type="number"
@@ -94,7 +94,7 @@
   <label class="label">
     <span class="label-text">{label}</span>
     <select class="select" {name} value={value ?? ""}>
-      <option value="">None</option>
+      <option value="">{m.common_none()}</option>
       {#each categories as c (c.id)}
         <option value={c.id}>{c.name}</option>
       {/each}
@@ -112,12 +112,14 @@
         class="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col gap-4 overflow-y-auto card bg-surface-50-950 p-6 shadow-xl"
       >
         <Dialog.Title class="text-lg font-bold">
-          {editing ? "Edit vehicle" : "New vehicle"}
+          {editing
+            ? m.vehicles_dialog_edit_title()
+            : m.vehicles_dialog_new_title()}
         </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
           {editing
-            ? "Changes apply to this vehicle only; recorded fill-ups and services stay as they are."
-            : "Describe the vehicle. VIN and registration must be unique."}
+            ? m.vehicles_dialog_edit_description()
+            : m.vehicles_dialog_new_description()}
         </Dialog.Description>
         {#if open}
           <form
@@ -133,72 +135,103 @@
                   open = false;
                 } else if (result.type === "success") {
                   open = false;
-                  toaster.success({ title: "Vehicle saved" });
+                  toaster.success({ title: m.vehicles_dialog_saved() });
                 } else if (result.type === "failure") {
                   message =
                     (result.data as { message?: string } | undefined)
-                      ?.message ?? "Could not save the vehicle.";
+                      ?.message ?? m.vehicles_dialog_save_failed();
                 } else {
-                  toaster.error({ title: "Could not save the vehicle" });
+                  toaster.error({
+                    title: m.vehicles_dialog_save_failed_toast(),
+                  });
                 }
               };
             }}
           >
-            {@render textField("name", "Name", vehicle?.name, true)}
+            {@render textField(
+              "name",
+              m.vehicles_field_name(),
+              vehicle?.name,
+              true,
+            )}
             <div class="grid gap-4 sm:grid-cols-2">
-              {@render textField("brand", "Brand", vehicle?.brand, true)}
-              {@render textField("model", "Model", vehicle?.model, true)}
-              {@render textField("vin", "VIN", vehicle?.vin, true)}
+              {@render textField(
+                "brand",
+                m.vehicles_field_brand(),
+                vehicle?.brand,
+                true,
+              )}
+              {@render textField(
+                "model",
+                m.vehicles_field_model(),
+                vehicle?.model,
+                true,
+              )}
+              {@render textField(
+                "vin",
+                m.vehicles_field_vin(),
+                vehicle?.vin,
+                true,
+              )}
               {@render textField(
                 "registration",
-                "Registration",
+                m.vehicles_field_registration(),
                 vehicle?.registration,
                 true,
               )}
               {@render numberField(
                 "purchasePrice",
-                "Purchase price",
+                m.vehicles_field_purchase_price(),
                 vehicle?.purchasePrice,
               )}
               {@render dateField(
                 "purchasedAt",
-                "Purchased",
+                m.vehicles_field_purchased(),
                 vehicle?.purchasedAt,
               )}
-              {@render numberField("mass", "Mass", vehicle?.mass, "kg")}
+              {@render numberField(
+                "mass",
+                m.vehicles_field_mass_kg(),
+                vehicle?.mass,
+              )}
               {@render numberField(
                 "engineSize",
-                "Engine size",
+                m.vehicles_field_engine_size_cc(),
                 vehicle?.engineSize,
-                "cc",
               )}
-              {@render textField("fuelType", "Fuel type", vehicle?.fuelType)}
+              {@render textField(
+                "fuelType",
+                m.vehicles_field_fuel_type(),
+                vehicle?.fuelType,
+              )}
               {@render numberField(
                 "maxPower",
-                "Max power",
+                m.vehicles_field_max_power_kw(),
                 vehicle?.maxPower,
-                "kW",
               )}
               {@render dateField(
                 "dateOfFabrication",
-                "Date of fabrication",
+                m.vehicles_field_date_of_fabrication(),
                 vehicle?.dateOfFabrication,
               )}
               {@render dateField(
                 "dateFirstRegistered",
-                "First registered",
+                m.vehicles_field_first_registered(),
                 vehicle?.dateFirstRegistered,
               )}
             </div>
 
             <label class="label">
-              <span class="label-text">Fuel transaction title</span>
+              <span class="label-text"
+                >{m.vehicles_field_fuel_transaction_title()}</span
+              >
               <input
                 class="input"
                 type="text"
                 name="defaultFuelTransactionTitle"
                 required
-                value={vehicle?.defaultFuelTransactionTitle ?? "Fuel"}
+                value={vehicle?.defaultFuelTransactionTitle ??
+                  m.vehicles_dialog_default_fuel_title()}
                 autocomplete="off"
               />
             </label>
@@ -206,18 +239,18 @@
             <div class="grid gap-4 sm:grid-cols-2">
               {@render categoryField(
                 "categoryId",
-                "Maintenance category",
+                m.vehicles_field_maintenance_category(),
                 vehicle?.categoryId,
               )}
               {@render categoryField(
                 "fuelCategoryId",
-                "Fuel category",
+                m.vehicles_field_fuel_category(),
                 vehicle?.fuelCategoryId,
               )}
             </div>
 
             <label class="label">
-              <span class="label-text">Accent colour</span>
+              <span class="label-text">{m.vehicles_field_accent_colour()}</span>
               <input
                 class="input h-10 p-1"
                 type="color"
@@ -232,14 +265,16 @@
             {/if}
             <div class="flex justify-end gap-2">
               <Dialog.CloseTrigger class="btn preset-tonal"
-                >Cancel</Dialog.CloseTrigger
+                >{m.common_cancel()}</Dialog.CloseTrigger
               >
               <button
                 type="submit"
                 class="btn preset-filled-surface-950-50"
                 disabled={submitting}
               >
-                {editing ? "Save changes" : "Create vehicle"}
+                {editing
+                  ? m.vehicles_dialog_save_changes()
+                  : m.vehicles_dialog_create()}
               </button>
             </div>
           </form>

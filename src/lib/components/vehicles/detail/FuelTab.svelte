@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import Fuel from "@lucide/svelte/icons/fuel";
   import Pencil from "@lucide/svelte/icons/pencil";
@@ -37,10 +38,11 @@
   >
     <header class="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h2 id="fuel-heading" class="text-lg font-bold">Fuel entries</h2>
+        <h2 id="fuel-heading" class="text-lg font-bold">
+          {m.vehicles_fuel_heading()}
+        </h2>
         <p class="text-sm text-surface-600-400">
-          {entries.length}
-          {entries.length === 1 ? "fill-up" : "fill-ups"} recorded
+          {m.vehicles_fuel_recorded({ count: entries.length })}
         </p>
       </div>
       <button
@@ -49,7 +51,7 @@
         onclick={onadd}
       >
         <Fuel size={16} aria-hidden="true" />
-        <span>Add fuel</span>
+        <span>{m.vehicles_fuel_add()}</span>
       </button>
     </header>
 
@@ -64,17 +66,19 @@
                 {formatNumber(entry.odometer, "km")}
               </h3>
               <p class="text-sm">
-                {formatNumber(entry.fuelAmount, "L")}
+                {formatNumber(entry.fuelAmount, m.vehicles_unit_litre())}
                 <span aria-hidden="true" class="mx-1 opacity-40">|</span>
-                {formatNumber(entry.unitPrice)}
-                {entry.transaction.currency} / L
+                {m.vehicles_fuel_price_per_litre({
+                  price: formatNumber(entry.unitPrice),
+                  currency: entry.transaction.currency,
+                })}
               </p>
               {#if entry.isFullTank}
                 <span
                   class="inline-flex items-center gap-1 rounded-full border border-success-500 px-2 py-0.5 text-xs font-bold text-success-600-400"
                 >
                   <Fuel size={12} aria-hidden="true" />
-                  Full tank
+                  {m.vehicles_field_full_tank()}
                 </span>
               {/if}
               <time
@@ -106,9 +110,11 @@
                 onclick={() => onedit(entry)}
               >
                 <Pencil size={14} aria-hidden="true" />
-                <span>Edit</span>
+                <span>{m.common_edit()}</span>
                 <span class="sr-only">
-                  fill-up at {formatNumber(entry.odometer, "km")}
+                  {m.vehicles_fuel_edit_sr({
+                    odometer: formatNumber(entry.odometer, "km"),
+                  })}
                 </span>
               </button>
             </div>
@@ -117,7 +123,7 @@
       </Timeline>
     {:else}
       <p class="py-8 text-center text-sm opacity-70">
-        No fuel entries yet. Add the first fill-up to see statistics.
+        {m.vehicles_fuel_empty()}
       </p>
     {/if}
   </section>

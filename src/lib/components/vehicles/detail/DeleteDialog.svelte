@@ -12,6 +12,7 @@
 </script>
 
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import { toaster } from "#lib/toaster.ts";
@@ -54,7 +55,7 @@
                     (result.type === "failure"
                       ? (result.data as { message?: string } | undefined)
                           ?.message
-                      : undefined) ?? "Could not delete",
+                      : undefined) ?? m.vehicles_delete_failed(),
                 });
               }
               await update();
@@ -64,10 +65,10 @@
             <input type="hidden" name="id" value={target.id} />
           {/if}
           <Dialog.CloseTrigger class="btn preset-tonal"
-            >Cancel</Dialog.CloseTrigger
+            >{m.common_cancel()}</Dialog.CloseTrigger
           >
           <button type="submit" class="btn preset-filled-error-500">
-            Delete
+            {m.common_delete()}
           </button>
         </form>
       </Dialog.Content>

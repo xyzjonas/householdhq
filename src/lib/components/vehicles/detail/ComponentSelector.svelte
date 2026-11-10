@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { untrack } from "svelte";
   import Plus from "@lucide/svelte/icons/plus";
   import { readableTextOn } from "#lib/color.ts";
@@ -38,7 +39,8 @@
       creating = false;
       name = "";
     } catch (e) {
-      message = e instanceof Error ? e.message : "Could not add the component.";
+      message =
+        e instanceof Error ? e.message : m.vehicles_error_add_component_short();
     } finally {
       saving = false;
     }
@@ -46,7 +48,7 @@
 </script>
 
 <fieldset class="flex flex-col gap-2">
-  <legend class="label-text">Components</legend>
+  <legend class="label-text">{m.vehicles_components_legend()}</legend>
   <div class="flex flex-wrap gap-1.5">
     {#each available as c (c.id)}
       <label
@@ -72,7 +74,7 @@
         onclick={() => (creating = true)}
       >
         <Plus size={14} aria-hidden="true" />
-        <span>New component</span>
+        <span>{m.vehicles_components_new()}</span>
       </button>
     {/if}
   </div>
@@ -83,12 +85,12 @@
       class="flex flex-wrap items-end gap-2 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3"
     >
       <label class="label min-w-36 flex-1">
-        <span class="label-text">Component name</span>
+        <span class="label-text">{m.vehicles_components_name()}</span>
         <input
           class="input"
           type="text"
           bind:value={name}
-          placeholder="e.g. Brake pads"
+          placeholder={m.vehicles_components_name_placeholder()}
           autocomplete="off"
           onkeydown={(e) => {
             if (e.key === "Enter") {
@@ -102,7 +104,7 @@
         />
       </label>
       <label class="label">
-        <span class="label-text">Colour</span>
+        <span class="label-text">{m.vehicles_components_colour()}</span>
         <input class="input h-10 w-14 p-1" type="color" bind:value={color} />
       </label>
       <button
@@ -111,14 +113,14 @@
         disabled={saving || !name.trim()}
         onclick={add}
       >
-        Add
+        {m.common_add()}
       </button>
       <button
         type="button"
         class="btn preset-tonal"
         onclick={() => (creating = false)}
       >
-        Cancel
+        {m.common_cancel()}
       </button>
       {#if message}
         <p role="alert" class="w-full text-sm text-error-600-400">{message}</p>

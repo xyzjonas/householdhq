@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { Component } from "svelte";
 import Ambulance from "@lucide/svelte/icons/ambulance";
 import Bike from "@lucide/svelte/icons/bike";
@@ -14,22 +15,34 @@ import Truck from "@lucide/svelte/icons/truck";
 export interface VehicleIconOption {
   /** What is stored in `Vehicle.icon`. */
   key: string;
-  label: string;
+  label: () => string;
   icon: Component;
 }
 
 export const vehicleIconOptions: VehicleIconOption[] = [
-  { key: "car", label: "Car", icon: Car },
-  { key: "car-front", label: "Car (front)", icon: CarFront },
-  { key: "motorbike", label: "Motorbike", icon: Motorbike },
-  { key: "scooter", label: "Scooter", icon: Scooter },
-  { key: "bike", label: "Bicycle", icon: Bike },
-  { key: "bus", label: "Van or bus", icon: Bus },
-  { key: "truck", label: "Truck", icon: Truck },
-  { key: "caravan", label: "Caravan", icon: Caravan },
-  { key: "tractor", label: "Tractor", icon: Tractor },
-  { key: "forklift", label: "Machinery", icon: Forklift },
-  { key: "ambulance", label: "Emergency", icon: Ambulance },
+  { key: "car", label: () => m.vehicles_icon_car(), icon: Car },
+  {
+    key: "car-front",
+    label: () => m.vehicles_icon_car_front(),
+    icon: CarFront,
+  },
+  {
+    key: "motorbike",
+    label: () => m.vehicles_icon_motorbike(),
+    icon: Motorbike,
+  },
+  { key: "scooter", label: () => m.vehicles_icon_scooter(), icon: Scooter },
+  { key: "bike", label: () => m.vehicles_icon_bicycle(), icon: Bike },
+  { key: "bus", label: () => m.vehicles_icon_van_or_bus(), icon: Bus },
+  { key: "truck", label: () => m.vehicles_icon_truck(), icon: Truck },
+  { key: "caravan", label: () => m.vehicles_icon_caravan(), icon: Caravan },
+  { key: "tractor", label: () => m.vehicles_icon_tractor(), icon: Tractor },
+  { key: "forklift", label: () => m.vehicles_icon_machinery(), icon: Forklift },
+  {
+    key: "ambulance",
+    label: () => m.vehicles_icon_emergency(),
+    icon: Ambulance,
+  },
 ];
 
 /** Icons the previous version stored, as icon-font class names. */

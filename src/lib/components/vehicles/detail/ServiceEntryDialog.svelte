@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import {
@@ -52,12 +53,14 @@
         class="flex max-h-[calc(100dvh-2rem)] w-full max-w-md flex-col gap-4 overflow-y-auto card bg-surface-50-950 p-6 shadow-xl"
       >
         <Dialog.Title class="text-lg font-bold">
-          {editing ? "Edit service" : "Add service"}
+          {editing
+            ? m.vehicles_service_dialog_edit_title()
+            : m.vehicles_service_dialog_add_title()}
         </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
           {editing
-            ? "The service's transaction follows its date, title and price."
-            : "A transaction for the price is recorded along with the service."}
+            ? m.vehicles_service_dialog_edit_description()
+            : m.vehicles_service_dialog_add_description()}
         </Dialog.Description>
         {#if open}
           <form
@@ -72,14 +75,18 @@
                 if (result.type === "success") {
                   open = false;
                   toaster.success({
-                    title: editing ? "Service updated" : "Service added",
+                    title: editing
+                      ? m.vehicles_service_dialog_updated()
+                      : m.vehicles_service_dialog_added(),
                   });
                 } else if (result.type === "failure") {
                   message =
                     (result.data as { message?: string } | undefined)
-                      ?.message ?? "Could not save the service.";
+                      ?.message ?? m.vehicles_service_dialog_save_failed();
                 } else {
-                  toaster.error({ title: "Could not save the service" });
+                  toaster.error({
+                    title: m.vehicles_service_dialog_save_failed_toast(),
+                  });
                 }
               };
             }}
@@ -88,33 +95,33 @@
             <input type="hidden" name="servicedAt" value={instant} />
 
             <label class="label">
-              <span class="label-text">Type</span>
+              <span class="label-text">{m.vehicles_field_type()}</span>
               <select
                 class="select"
                 name="type"
                 value={entry?.type ?? "REGULAR_MAINTENANCE"}
               >
                 {#each Object.entries(serviceTypeLabels) as [value, label] (value)}
-                  <option {value}>{label}</option>
+                  <option {value}>{label()}</option>
                 {/each}
               </select>
             </label>
 
             <label class="label">
-              <span class="label-text">Title</span>
+              <span class="label-text">{m.vehicles_field_title()}</span>
               <input
                 class="input"
                 type="text"
                 name="title"
                 required
                 autocomplete="off"
-                placeholder="e.g. Oil and filter change"
+                placeholder={m.vehicles_service_dialog_title_placeholder()}
                 value={entry?.title ?? ""}
               />
             </label>
 
             <label class="label">
-              <span class="label-text">Date and time</span>
+              <span class="label-text">{m.vehicles_field_date_and_time()}</span>
               <input
                 class="input"
                 type="datetime-local"
@@ -125,7 +132,7 @@
 
             <div class="grid grid-cols-2 gap-4">
               <label class="label">
-                <span class="label-text">Odometer (km)</span>
+                <span class="label-text">{m.vehicles_field_odometer_km()}</span>
                 <input
                   class="input"
                   type="number"
@@ -137,7 +144,7 @@
                 />
               </label>
               <label class="label">
-                <span class="label-text">Price</span>
+                <span class="label-text">{m.vehicles_field_price()}</span>
                 <input
                   class="input"
                   type="number"
@@ -151,7 +158,7 @@
             </div>
 
             <label class="label">
-              <span class="label-text">Description</span>
+              <span class="label-text">{m.vehicles_field_description()}</span>
               <textarea
                 class="textarea"
                 name="description"
@@ -177,21 +184,23 @@
                     if (entry) ondelete(entry);
                   }}
                 >
-                  Delete
+                  {m.common_delete()}
                 </button>
               {:else}
                 <span></span>
               {/if}
               <div class="flex gap-2">
                 <Dialog.CloseTrigger class="btn preset-tonal"
-                  >Cancel</Dialog.CloseTrigger
+                  >{m.common_cancel()}</Dialog.CloseTrigger
                 >
                 <button
                   type="submit"
                   class="btn preset-filled-surface-950-50"
                   disabled={submitting || instant === ""}
                 >
-                  {editing ? "Save changes" : "Add service"}
+                  {editing
+                    ? m.vehicles_dialog_save_changes()
+                    : m.vehicles_maintenance_add()}
                 </button>
               </div>
             </div>

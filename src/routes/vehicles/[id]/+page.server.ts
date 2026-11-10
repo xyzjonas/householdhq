@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
 import { hq } from "#lib/server/index.ts";
@@ -16,7 +17,7 @@ const TRANSACTION_LIMIT = 100;
 
 const parseId = (raw: string) => {
   const id = Number(raw);
-  if (!Number.isInteger(id) || id < 1) error(404, "Vehicle not found");
+  if (!Number.isInteger(id) || id < 1) error(404, m.vehicles_error_not_found());
   return id;
 };
 
@@ -94,7 +95,7 @@ export const actions: Actions = {
 
   deleteFuel: async ({ params, request, locals }) => {
     const entryId = idField(await request.formData(), "id");
-    if (!entryId) return fail(400, { message: "Invalid id" });
+    if (!entryId) return fail(400, { message: m.vehicles_error_invalid_id() });
     try {
       await hq(locals).vehicles.fuel.remove(parseId(params.id), entryId);
     } catch (e) {
@@ -128,7 +129,7 @@ export const actions: Actions = {
 
   deleteService: async ({ params, request, locals }) => {
     const entryId = idField(await request.formData(), "id");
-    if (!entryId) return fail(400, { message: "Invalid id" });
+    if (!entryId) return fail(400, { message: m.vehicles_error_invalid_id() });
     try {
       await hq(locals).vehicles.service.remove(parseId(params.id), entryId);
     } catch (e) {

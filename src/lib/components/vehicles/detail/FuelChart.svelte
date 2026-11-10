@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { areaPath, chartPoints, linePath } from "#lib/account-detail.ts";
   import { formatNumber } from "#lib/format.ts";
+  import { intlLocale } from "#lib/i18n.ts";
   import {
     distanceByMonth,
     distanceByYear,
@@ -23,19 +25,27 @@
 
   const W = 480;
   const H = 180;
-  const monthFmt = new Intl.DateTimeFormat("en-GB", {
-    month: "short",
-    year: "2-digit",
-  });
-  const dayFmt = new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "2-digit",
-  });
-  const priceFmt = new Intl.NumberFormat("cs-CZ", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const monthFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), {
+      month: "short",
+      year: "2-digit",
+    }),
+  );
+  const dayFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), {
+      day: "numeric",
+      month: "short",
+      year: "2-digit",
+    }),
+  );
+  const priceFmt = $derived(
+    new Intl.NumberFormat(intlLocale(), {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+  );
+
+  const modes = $derived(fuelChartModes());
 
   const series = $derived.by<ChartPoint[]>(() => {
     if (mode === "price") return unitPrices(entries, (d) => dayFmt.format(d));
@@ -45,7 +55,7 @@
 
   const format = $derived((v: number) =>
     mode === "price"
-      ? `${priceFmt.format(v)} ${currency}/L`
+      ? m.vehicles_chart_price_value({ price: priceFmt.format(v), currency })
       : formatNumber(Math.round(v), "km"),
   );
 
@@ -69,16 +79,27 @@
 
   const subtitle = $derived(
     mode === "price"
-      ? "Unit price of every fill-up"
+      ? m.vehicles_chart_subtitle_price()
       : mode === "yearly"
-        ? "Distance driven per year"
-        : "Odometer at the start of each month",
+        ? m.vehicles_chart_subtitle_yearly()
+        : m.vehicles_chart_subtitle_distance(),
   );
   const ariaLabel = $derived(
     series.length
-      ? `${fuelChartModes.find((m) => m.id === mode)?.label}, ${series[0].label} to ${series[series.length - 1].label}: ` +
-          series.map((s) => `${s.label} ${format(s.value)}`).join(", ")
-      : "No fuel data",
+      ? m.vehicles_chart_aria({
+          mode: modes.find((option) => option.id === mode)?.label ?? "",
+          from: series[0].label,
+          to: series[series.length - 1].label,
+          points: series
+            .map((s) =>
+              m.vehicles_chart_aria_point({
+                label: s.label,
+                value: format(s.value),
+              }),
+            )
+            .join(", "),
+        })
+      : m.vehicles_chart_no_data(),
   );
 </script>
 
@@ -88,20 +109,26 @@
 >
   <header class="flex flex-col gap-3">
     <div>
-      <h2 id="fuel-chart-heading" class="text-lg font-bold">Fuel statistics</h2>
+      <h2 id="fuel-chart-heading" class="text-lg font-bold">
+        {m.vehicles_chart_heading()}
+      </h2>
       <p class="text-sm text-surface-600-400">{subtitle}</p>
     </div>
-    <div class="flex flex-wrap gap-1" role="group" aria-label="Chart type">
-      {#each fuelChartModes as m (m.id)}
+    <div
+      class="flex flex-wrap gap-1"
+      role="group"
+      aria-label={m.vehicles_chart_type()}
+    >
+      {#each modes as option (option.id)}
         <button
           type="button"
-          aria-pressed={m.id === mode}
-          class="btn rounded-full text-xs btn-sm {m.id === mode
+          aria-pressed={option.id === mode}
+          class="btn rounded-full text-xs btn-sm {option.id === mode
             ? 'preset-filled-surface-950-50'
             : 'preset-tonal'}"
-          onclick={() => (mode = m.id)}
+          onclick={() => (mode = option.id)}
         >
-          {m.label}
+          {option.label}
         </button>
       {/each}
     </div>
@@ -175,19 +202,25 @@
 
     <dl class="grid grid-cols-3 gap-3 text-xs">
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Min</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.vehicles_chart_min()}
+        </dt>
         <dd class="text-sm font-bold">{format(min)}</dd>
       </div>
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Latest</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.vehicles_chart_latest()}
+        </dt>
         <dd class="text-sm font-bold">{format(lastValue)}</dd>
       </div>
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Peak</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.vehicles_chart_peak()}
+        </dt>
         <dd class="text-sm font-bold">{format(peak)}</dd>
       </div>
     </dl>
   {:else}
-    <p class="text-sm opacity-70">Not enough fill-ups to chart yet.</p>
+    <p class="text-sm opacity-70">{m.vehicles_chart_empty()}</p>
   {/if}
 </section>
