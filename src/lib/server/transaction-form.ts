@@ -1,5 +1,6 @@
 import { fail } from "@sveltejs/kit";
 import { z } from "zod";
+import { m } from "#paraglide/messages.js";
 import type { ItemizeContext } from "#lib/components/transaction-wizard/types.ts";
 import { NotFoundError, type HouseholdCore } from "#lib/server/core/index.ts";
 
@@ -46,20 +47,26 @@ const optionalId = z.preprocess(
 
 const Form = z.object({
   type: z.enum(["EXPENSE", "INCOME", "TRANSFER", "HIDDEN"]),
-  amount: z.coerce.number().positive("Amount must be greater than zero"),
+  amount: z.coerce
+    .number()
+    .positive({ error: () => m.wizard_error_amount_positive() }),
   currency: z.enum(["CZK", "EUR", "USD"]),
-  categoryId: z.coerce.number().int("Pick a category"),
-  accountId: z.coerce.number().int("Pick an account"),
+  categoryId: z.coerce
+    .number()
+    .int({ error: () => m.wizard_error_pick_category() }),
+  accountId: z.coerce
+    .number()
+    .int({ error: () => m.wizard_error_pick_account() }),
   targetId: optionalId,
   description: z.string().trim().optional(),
-  transactedAt: z.coerce.date("Pick a valid date and time"),
+  transactedAt: z.coerce.date({ error: () => m.wizard_error_pick_date() }),
   recurring: flag,
   recurringMonths: z.preprocess(
     (v) => (v === "" || v === undefined ? 1 : v),
     z.coerce
-      .number("Repeat period must be a number")
-      .int("Repeat period must be a whole number of months")
-      .min(1, "Repeat period must be at least 1 month"),
+      .number({ error: () => m.wizard_error_repeat_number() })
+      .int({ error: () => m.wizard_error_repeat_whole() })
+      .min(1, { error: () => m.wizard_error_repeat_min() }),
   ),
   isHidden: flag,
   isImportant: flag,
@@ -118,21 +125,19 @@ export async function parseTransactionForm(
   if (type === "INCOME") [sourceId, target] = [outside?.id ?? NaN, accountId];
   if (type === "TRANSFER") {
     if (targetId === undefined || targetId === accountId) {
-      return failure(values, ["Choose two different accounts"]);
+      return failure(values, [m.wizard_error_two_accounts()]);
     }
     target = targetId;
   }
   if ((type === "EXPENSE" || type === "HIDDEN") && targetId !== undefined) {
     // The user may pay to another external account than the default.
     if (!accounts.some((a) => a.id === targetId && a.isOut)) {
-      return failure(values, ["Choose an external account to pay to"]);
+      return failure(values, [m.wizard_error_external_account()]);
     }
     target = targetId;
   }
   if (target === undefined || Number.isNaN(sourceId)) {
-    return failure(values, [
-      'No external account to pair with — create one marked "out" first',
-    ]);
+    return failure(values, [m.wizard_error_no_external()]);
   }
 
   const category = (await core.categories.list()).find(

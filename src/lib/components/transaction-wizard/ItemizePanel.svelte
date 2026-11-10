@@ -1,6 +1,7 @@
 <script lang="ts">
   import Check from "@lucide/svelte/icons/check";
   import { formatMoney } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import { categoryIcon, fallbackColor } from "./category-icons";
   import type { ItemizeContext, WizardCategory } from "./types";
 
@@ -33,20 +34,20 @@
     ...itemize.items.map((item) => ({
       ...item,
       category: find(item.categoryId),
-      status: "Saved",
+      status: "saved" as "saved" | "original",
     })),
     {
       id: itemize.parent.id,
       amount: itemize.parent.amount,
       description: itemize.parent.description,
       category: find(itemize.parent.categoryId),
-      status: "Original",
+      status: "original" as "saved" | "original",
     },
   ]);
 </script>
 
 <section
-  aria-label="Receipt allocation"
+  aria-label={m.wizard_itemize_allocation()}
   class="flex flex-col gap-3 rounded-2xl bg-surface-50-950 p-4"
   style="box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.05)"
 >
@@ -55,7 +56,7 @@
       <h3
         class="text-xs font-bold tracking-wider text-surface-600-400 uppercase"
       >
-        Receipt total
+        {m.wizard_itemize_receipt_total()}
       </h3>
       <p
         class="text-2xl font-extrabold tracking-[-0.03em] break-words text-surface-950-50"
@@ -70,11 +71,11 @@
       aria-live="polite"
     >
       {#if left > 0}
-        Left on original: {formatMoney(left, currency)}
+        {m.wizard_itemize_left({ amount: formatMoney(left, currency) })}
       {:else if left === 0}
-        Nothing left on original
+        {m.wizard_itemize_nothing_left()}
       {:else}
-        Over by {formatMoney(-left, currency)}
+        {m.wizard_itemize_over({ amount: formatMoney(-left, currency) })}
       {/if}
     </p>
   </div>
@@ -82,10 +83,10 @@
   <div
     class="flex h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
     role="img"
-    aria-label="{formatMoney(saved, currency)} saved, {formatMoney(
-      current,
-      currency,
-    )} in this item"
+    aria-label={m.wizard_itemize_bar_label({
+      saved: formatMoney(saved, currency),
+      current: formatMoney(current, currency),
+    })}
   >
     <span
       class="h-full bg-emerald-700 transition-[width]"
@@ -101,17 +102,22 @@
     class="flex justify-between gap-2 text-xs font-medium text-surface-600-400"
   >
     <span
-      >Saved: {formatMoney(saved, currency)} ({percent(saved).toFixed(
-        1,
-      )}%)</span
+      >{m.wizard_itemize_saved_summary({
+        amount: formatMoney(saved, currency),
+        percent: percent(saved).toFixed(1),
+      })}</span
     >
-    <span>This item: {percent(current).toFixed(1)}%</span>
+    <span
+      >{m.wizard_itemize_this_item({
+        percent: percent(current).toFixed(1),
+      })}</span
+    >
   </p>
 
   <h3
     class="mt-1 text-xs font-bold tracking-wider text-surface-600-400 uppercase"
   >
-    Items
+    {m.wizard_itemize_items()}
   </h3>
   <ul class="flex flex-col gap-2">
     {#each rows as row (row.id)}
@@ -127,10 +133,10 @@
         </span>
         <span class="min-w-0 flex-1">
           <span class="block truncate text-xs font-bold text-surface-950-50">
-            {row.category?.name ?? "Uncategorised"}
+            {row.category?.name ?? m.wizard_itemize_uncategorised()}
           </span>
           <span class="block truncate text-[11px] text-surface-500">
-            {row.description || "No description"}
+            {row.description || m.wizard_itemize_no_description()}
           </span>
         </span>
         <span class="flex shrink-0 flex-col items-end">
@@ -140,11 +146,13 @@
           <span
             class="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-600"
           >
-            {#if row.status === "Saved"}<Check
+            {#if row.status === "saved"}<Check
                 size={10}
                 aria-hidden="true"
               />{/if}
-            {row.status}
+            {row.status === "saved"
+              ? m.wizard_itemize_status_saved()
+              : m.wizard_itemize_status_original()}
           </span>
         </span>
       </li>

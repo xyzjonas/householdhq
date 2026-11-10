@@ -5,6 +5,7 @@
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
   import type { HouseholdSummary } from "#lib/household.ts";
+  import { m } from "#paraglide/messages.js";
   import CategoryGlyph from "./categories/CategoryGlyph.svelte";
 
   let {
@@ -18,7 +19,7 @@
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Dialog.Trigger
     class="btn-icon shrink-0 preset-tonal btn-icon-sm"
-    aria-label="Switch household"
+    aria-label={m.household_switch_open()}
   >
     <ChevronsUpDown size={16} aria-hidden="true" />
   </Dialog.Trigger>
@@ -34,15 +35,15 @@
           <header class="flex items-start justify-between gap-4">
             <div>
               <Dialog.Title class="text-lg font-bold"
-                >Switch household</Dialog.Title
+                >{m.household_switch_title()}</Dialog.Title
               >
               <Dialog.Description class="text-sm text-surface-600-400">
-                Everything you see belongs to one household at a time.
+                {m.household_switch_description()}
               </Dialog.Description>
             </div>
             <Dialog.CloseTrigger
               class="btn-icon preset-tonal btn-icon-sm"
-              aria-label="Close"
+              aria-label={m.common_close()}
             >
               <X size={16} aria-hidden="true" />
             </Dialog.CloseTrigger>
@@ -68,7 +69,8 @@
                     </span>
                     {#if current}
                       <Check size={16} aria-hidden="true" />
-                      <span class="sr-only">Current household</span>
+                      <span class="sr-only">{m.household_switch_current()}</span
+                      >
                     {/if}
                   </button>
                 </form>

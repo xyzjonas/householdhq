@@ -4,6 +4,7 @@
   import DeleteUserDialog from "./DeleteUserDialog.svelte";
   import ReinviteDialog from "./ReinviteDialog.svelte";
   import SetPasswordDialog from "./SetPasswordDialog.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let {
     user,
@@ -31,9 +32,12 @@
       <button
         type="submit"
         class="btn preset-tonal btn-sm"
-        aria-label="Remove {user.email} from {household.name}"
+        aria-label={m.admin_remove_member_label({
+          email: user.email,
+          household: household.name,
+        })}
       >
-        Remove
+        {m.admin_remove()}
       </button>
     </form>
   {/if}

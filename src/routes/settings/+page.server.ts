@@ -1,4 +1,5 @@
 import { fail } from "@sveltejs/kit";
+import { m } from "#paraglide/messages.js";
 import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { SettingsInput } from "#lib/server/core/schemas.ts";
@@ -26,7 +27,7 @@ export const actions: Actions = {
   update: async ({ request, locals }) => {
     const currency = String((await request.formData()).get("currency") ?? "");
     if (!(currencies as string[]).includes(currency)) {
-      return fail(400, { message: "Please choose a supported currency." });
+      return fail(400, { message: m.settings_currency_invalid() });
     }
     await hq(locals).settings.update({ currency });
     return { saved: true };
@@ -43,7 +44,7 @@ export const actions: Actions = {
     if (!parsed.success) {
       return fail(400, {
         intervalMessage:
-          parsed.error.issues[0]?.message ?? "Please enter a day from 1 to 31.",
+          parsed.error.issues[0]?.message ?? m.settings_interval_invalid(),
       });
     }
     await hq(locals).settings.update(parsed.data);
@@ -57,14 +58,14 @@ export const actions: Actions = {
     if (!parsed.success) {
       return fail(400, {
         mankoMessage:
-          parsed.error.issues[0]?.message ?? "Please choose a category.",
+          parsed.error.issues[0]?.message ?? m.settings_manko_invalid(),
       });
     }
     try {
       await hq(locals).settings.update(parsed.data);
     } catch (e) {
       if (e instanceof NotFoundError) {
-        return fail(400, { mankoMessage: "That category no longer exists." });
+        return fail(400, { mankoMessage: m.settings_manko_gone() });
       }
       throw e;
     }
@@ -80,7 +81,7 @@ export const actions: Actions = {
     if (!parsed.success) {
       return fail(400, {
         defaultOutMessage:
-          parsed.error.issues[0]?.message ?? "Please choose an account.",
+          parsed.error.issues[0]?.message ?? m.settings_default_out_invalid(),
       });
     }
     try {

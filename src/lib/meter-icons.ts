@@ -1,4 +1,5 @@
 import type { Component } from "svelte";
+import { m } from "#paraglide/messages.js";
 import Droplet from "@lucide/svelte/icons/droplet";
 import Droplets from "@lucide/svelte/icons/droplets";
 import Flame from "@lucide/svelte/icons/flame";
@@ -20,21 +21,33 @@ export interface MeterIcon {
   component: Component;
 }
 
-export const meterIcons: MeterIcon[] = [
-  { name: "gauge", label: "Meter", component: Gauge },
-  { name: "zap", label: "Electricity", component: Zap },
-  { name: "plug", label: "Socket", component: Plug },
-  { name: "lightbulb", label: "Lighting", component: Lightbulb },
-  { name: "sun", label: "Solar", component: Sun },
-  { name: "flame", label: "Gas", component: Flame },
-  { name: "thermometer", label: "Heating", component: Thermometer },
-  { name: "droplet", label: "Water", component: Droplet },
-  { name: "droplets", label: "Hot water", component: Droplets },
-  { name: "waves", label: "Sewage", component: Waves },
-  { name: "glass-water", label: "Drinking water", component: GlassWater },
-  { name: "refrigerator", label: "Appliance", component: Refrigerator },
-  { name: "wind", label: "Air", component: Wind },
-  { name: "fuel", label: "Fuel", component: Fuel },
+export const meterIcons = (): MeterIcon[] => [
+  { name: "gauge", label: m.energy_icon_meter(), component: Gauge },
+  { name: "zap", label: m.energy_icon_electricity(), component: Zap },
+  { name: "plug", label: m.energy_icon_socket(), component: Plug },
+  { name: "lightbulb", label: m.energy_icon_lighting(), component: Lightbulb },
+  { name: "sun", label: m.energy_icon_solar(), component: Sun },
+  { name: "flame", label: m.energy_icon_gas(), component: Flame },
+  {
+    name: "thermometer",
+    label: m.energy_icon_heating(),
+    component: Thermometer,
+  },
+  { name: "droplet", label: m.energy_icon_water(), component: Droplet },
+  { name: "droplets", label: m.energy_icon_hot_water(), component: Droplets },
+  { name: "waves", label: m.energy_icon_sewage(), component: Waves },
+  {
+    name: "glass-water",
+    label: m.energy_icon_drinking_water(),
+    component: GlassWater,
+  },
+  {
+    name: "refrigerator",
+    label: m.energy_icon_appliance(),
+    component: Refrigerator,
+  },
+  { name: "wind", label: m.energy_icon_air(), component: Wind },
+  { name: "fuel", label: m.energy_icon_fuel(), component: Fuel },
 ];
 
 /** Icon names stored by the legacy app (Iconify classes) -> current names. */
@@ -62,7 +75,7 @@ export function normalizeMeterIcon(name: string | null): string | null {
 /** Meter icons are free text in the DB; unknown names fall back to a gauge. */
 export function meterIcon(name: string | null): Component {
   const key = normalizeMeterIcon(name);
-  return meterIcons.find((i) => i.name === key)?.component ?? Gauge;
+  return meterIcons().find((i) => i.name === key)?.component ?? Gauge;
 }
 
 export const meterFallbackColor = "#38c089";

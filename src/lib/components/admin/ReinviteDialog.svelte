@@ -3,6 +3,7 @@
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Link from "@lucide/svelte/icons/link";
   import InviteLink from "./InviteLink.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let { id, email }: { id: number; email: string } = $props();
 
@@ -24,7 +25,11 @@
 >
   <Dialog.Trigger class="btn preset-tonal btn-sm">
     <Link size={14} aria-hidden="true" />
-    <span>New invite link<span class="sr-only"> for {email}</span></span>
+    <span
+      >{m.users_reinvite_title()}<span class="sr-only">
+        {m.users_for_email({ email })}</span
+      ></span
+    >
   </Dialog.Trigger>
   <Portal>
     {#if open}
@@ -35,18 +40,19 @@
         <Dialog.Content
           class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
         >
-          <Dialog.Title class="text-lg font-bold">New invite link</Dialog.Title>
+          <Dialog.Title class="text-lg font-bold"
+            >{m.users_reinvite_title()}</Dialog.Title
+          >
           {#if invite}
             <InviteLink email={invite.email} token={invite.token} />
             <div class="flex justify-end">
               <Dialog.CloseTrigger class="btn preset-filled-surface-950-50"
-                >Done</Dialog.CloseTrigger
+                >{m.common_done()}</Dialog.CloseTrigger
               >
             </div>
           {:else}
             <Dialog.Description class="text-sm text-surface-600-400">
-              Replaces {email}'s password with a new random one and signs them
-              out everywhere. Any earlier link or password stops working.
+              {m.users_reinvite_description({ email })}
             </Dialog.Description>
             <form
               method="POST"
@@ -60,7 +66,9 @@
                   if (result.type === "success" && result.data?.invite) {
                     invite = result.data.invite as typeof invite;
                   } else if (result.type === "failure") {
-                    message = String(result.data?.message ?? "Could not reset");
+                    message = String(
+                      result.data?.message ?? m.users_reinvite_failed(),
+                    );
                   }
                   await update({ reset: false });
                 };
@@ -72,14 +80,14 @@
               {/if}
               <div class="flex justify-end gap-2">
                 <Dialog.CloseTrigger class="btn preset-tonal"
-                  >Cancel</Dialog.CloseTrigger
+                  >{m.common_cancel()}</Dialog.CloseTrigger
                 >
                 <button
                   type="submit"
                   class="btn preset-filled-surface-950-50"
                   disabled={submitting}
                 >
-                  Generate link
+                  {m.users_reinvite_submit()}
                 </button>
               </div>
             </form>

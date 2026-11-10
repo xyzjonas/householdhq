@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import { formatMoney } from "#lib/format.ts";
   import type { TagItem } from "#lib/tags-view.ts";
@@ -26,8 +27,7 @@
                 </a>
               </h3>
               <p class="text-xs text-slate-500">
-                {item.entries}
-                {item.entries === 1 ? "entry" : "entries"}
+                {m.tags_entries_count({ count: item.entries })}
               </p>
             </div>
           </div>
@@ -45,6 +45,6 @@
       </article>
     </li>
   {:else}
-    <li class="text-sm opacity-70">No tags found.</li>
+    <li class="text-sm opacity-70">{m.tags_empty()}</li>
   {/each}
 </ul>

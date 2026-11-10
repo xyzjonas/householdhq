@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { transactionTypes, type TransactionType } from "./types";
+  import { m } from "#paraglide/messages.js";
+  import {
+    transactionTypes,
+    typeHint,
+    typeLabel,
+    type TransactionType,
+  } from "./types";
 
   let {
     value = $bindable(),
@@ -11,7 +17,7 @@
 </script>
 
 <fieldset class="flex flex-col gap-3">
-  <legend class="sr-only">Type of transaction</legend>
+  <legend class="sr-only">{m.wizard_type_legend()}</legend>
   <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
     {#each transactionTypes as t (t.value)}
       <label
@@ -30,9 +36,9 @@
         />
         <span class="flex items-center gap-2 text-base font-bold">
           <span class="size-2.5 rounded-full {t.dot}" aria-hidden="true"></span>
-          {t.label}
+          {typeLabel(t.value)}
         </span>
-        <span class="text-xs font-medium opacity-70">{t.hint}</span>
+        <span class="text-xs font-medium opacity-70">{typeHint(t.value)}</span>
       </label>
     {/each}
   </div>

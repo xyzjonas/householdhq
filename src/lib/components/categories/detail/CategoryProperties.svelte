@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
+  import { m } from "#paraglide/messages.js";
   import { untrack } from "svelte";
   import { describeChanges } from "#lib/category-detail.ts";
   import { toaster } from "#lib/toaster.ts";
@@ -37,12 +38,14 @@
     } catch (e) {
       current = before;
       toaster.error({
-        title: "Could not save the change",
+        title: m.categories_save_failed(),
         description: e instanceof Error ? e.message : undefined,
       });
       throw e;
     }
   }
+
+  const isTag = $derived(noun === "Tag");
 
   // The colour picker has no field to keep open, so a failure is only
   // surfaced through the error toast.
@@ -55,24 +58,32 @@
 >
   <header class="flex flex-col gap-1">
     <h2 id="properties-heading" class="text-lg font-bold">
-      {noun} configuration & properties
+      {isTag
+        ? m.categories_props_heading_tag()
+        : m.categories_props_heading_category()}
     </h2>
     <p class="text-sm text-surface-600-400">
-      Changes are saved as soon as you make them · {noun} ID: {category.id}
+      {isTag
+        ? m.categories_props_hint_tag({ id: category.id })
+        : m.categories_props_hint_category({ id: category.id })}
     </p>
   </header>
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
     <InlineField
-      label="{noun} name"
+      label={isTag
+        ? m.categories_props_name_tag()
+        : m.categories_props_name_category()}
       value={current.name}
       onsave={(name) => save({ name })}
     />
     <InlineField
-      label="Description"
+      label={m.categories_props_description()}
       value={current.description ?? ""}
       required={false}
-      placeholder="What belongs in this {noun.toLowerCase()}"
+      placeholder={isTag
+        ? m.categories_props_placeholder_tag()
+        : m.categories_props_placeholder_category()}
       onsave={(description) => save({ description })}
     />
     <CategoryIconPicker
@@ -84,7 +95,7 @@
     >
       <div class="min-w-0">
         <p class="text-xs font-bold tracking-wider uppercase opacity-60">
-          Accent theme
+          {m.categories_props_accent()}
         </p>
         <p class="flex items-center gap-2 text-base font-bold">
           <span
@@ -92,11 +103,11 @@
             style:background-color={current.color ?? "transparent"}
             aria-hidden="true"
           ></span>
-          {current.color ?? "None"}
+          {current.color ?? m.common_none()}
         </p>
       </div>
       <label class="btn cursor-pointer rounded-full preset-tonal text-xs">
-        Pick color
+        {m.categories_props_pick_color()}
         <input
           type="color"
           class="sr-only"

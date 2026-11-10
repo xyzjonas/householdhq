@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { balanceOf, roundMoney } from "./balance";
 import type { Db } from "./prisma";
 import { CheckpointInput } from "./schemas";
@@ -99,9 +100,7 @@ export function checkpointsRepo(
               orderBy: [{ position: "asc" }, { id: "asc" }],
             }));
           if (!external) {
-            throw new ConflictError(
-              "An external (expense) account is needed to record the adjustment",
-            );
+            throw new ConflictError(m.core_checkpoint_needs_out_account());
           }
           const [sourceId, targetId] =
             difference > 0

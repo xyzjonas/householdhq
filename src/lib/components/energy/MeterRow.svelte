@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import { formatReading } from "#lib/energy.ts";
@@ -23,9 +24,10 @@
       <span class="flex min-w-0 flex-col">
         <span class="truncate font-bold">{meter.name}</span>
         <span class="truncate text-xs text-surface-600-400">
-          {meter.readings.length}
-          {meter.readings.length === 1 ? "reading" : "readings"}
-          {#if meter.meterNumber}· ID {meter.meterNumber}{/if}
+          {m.energy_readings_count({ count: meter.readings.length })}
+          {#if meter.meterNumber}· {m.energy_row_id({
+              id: meter.meterNumber,
+            })}{/if}
           {#if latest}· {formatDateWithYear(latest.meteredAt)}{/if}
         </span>
       </span>
@@ -35,7 +37,7 @@
         <span
           class="text-xs font-bold tracking-wider uppercase opacity-60 max-sm:sr-only"
         >
-          Latest
+          {m.energy_latest()}
         </span>
         <span class="font-bold">
           {latest ? formatReading(latest.value, meter.unit) : "—"}

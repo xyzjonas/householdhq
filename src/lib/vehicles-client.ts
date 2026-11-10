@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { VehicleComponent } from "#lib/server/core/types.ts";
 
 /** Creates a service component; resolves to the saved component. */
@@ -15,7 +16,7 @@ export async function createComponent(input: {
       message?: string;
     } | null;
     throw new Error(
-      body?.message ?? `Could not add the component (${res.status})`,
+      body?.message ?? m.vehicles_error_add_component({ status: res.status }),
     );
   }
   return res.json();

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { m } from "#paraglide/messages.js";
   import TransactionWizard from "#lib/components/transaction-wizard/TransactionWizard.svelte";
   import type { PageProps } from "./$types";
 
@@ -11,7 +12,9 @@
   );
 </script>
 
-<svelte:head><title>New record · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.wizard_title_new()} · {m.common_app_name()}</title></svelte:head
+>
 
 <!-- Every itemizing round lands here with new arguments: start it afresh. -->
 {#key page.url.search}

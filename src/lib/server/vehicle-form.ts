@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { fail, type ActionFailure } from "@sveltejs/kit";
 import type { ZodType, z } from "zod";
 import {
@@ -15,29 +16,55 @@ export interface FormFailure {
 
 type Parsed<T> = { data: T } | { failure: ActionFailure<FormFailure> };
 
-const FIELD_LABELS: Record<string, string> = {
-  name: "Name",
-  brand: "Brand",
-  model: "Model",
-  vin: "VIN",
-  registration: "Registration",
-  purchasePrice: "Purchase price",
-  mass: "Mass",
-  engineSize: "Engine size",
-  maxPower: "Max power",
-  defaultFuelTransactionTitle: "Fuel transaction title",
-  purchasedAt: "Purchase date",
-  dateOfFabrication: "Date of fabrication",
-  dateFirstRegistered: "First registration",
-  fueledAt: "Date and time",
-  odometer: "Odometer",
-  fuelAmount: "Fuel amount",
-  unitPrice: "Unit price",
-  servicedAt: "Date and time",
-  title: "Title",
-  price: "Price",
-  type: "Service type",
-};
+/** The label of a form field, in the active language. */
+function fieldLabel(key: string): string {
+  switch (key) {
+    case "name":
+      return m.vehicles_field_name();
+    case "brand":
+      return m.vehicles_field_brand();
+    case "model":
+      return m.vehicles_field_model();
+    case "vin":
+      return m.vehicles_field_vin();
+    case "registration":
+      return m.vehicles_field_registration();
+    case "purchasePrice":
+      return m.vehicles_field_purchase_price();
+    case "mass":
+      return m.vehicles_field_mass();
+    case "engineSize":
+      return m.vehicles_field_engine_size();
+    case "maxPower":
+      return m.vehicles_field_max_power();
+    case "defaultFuelTransactionTitle":
+      return m.vehicles_field_fuel_transaction_title();
+    case "purchasedAt":
+      return m.vehicles_field_purchase_date();
+    case "dateOfFabrication":
+      return m.vehicles_field_date_of_fabrication();
+    case "dateFirstRegistered":
+      return m.vehicles_field_first_registration();
+    case "fueledAt":
+      return m.vehicles_field_date_and_time();
+    case "odometer":
+      return m.vehicles_field_odometer();
+    case "fuelAmount":
+      return m.vehicles_field_fuel_amount();
+    case "unitPrice":
+      return m.vehicles_field_unit_price();
+    case "servicedAt":
+      return m.vehicles_field_date_and_time();
+    case "title":
+      return m.vehicles_field_title();
+    case "price":
+      return m.vehicles_field_price();
+    case "type":
+      return m.vehicles_field_service_type();
+    default:
+      return key;
+  }
+}
 
 /** "Check these fields: Name, VIN" instead of zod's technical messages. */
 function parse<S extends ZodType>(
@@ -50,12 +77,14 @@ function parse<S extends ZodType>(
     ...new Set(
       result.error.issues.map((i) => {
         const key = String(i.path[0] ?? "");
-        return FIELD_LABELS[key] ?? key;
+        return fieldLabel(key);
       }),
     ),
   ];
   return {
-    failure: fail(400, { message: `Check these fields: ${fields.join(", ")}` }),
+    failure: fail(400, {
+      message: m.vehicles_form_check_fields({ fields: fields.join(", ") }),
+    }),
   };
 }
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import type { BudgetStatus } from "#lib/categories-view.ts";
 
   let { pct, status }: { pct?: number; status: BudgetStatus } = $props();
@@ -6,7 +7,9 @@
 
 {#if pct !== undefined}
   <span class="badge {status}">
-    {pct}%{status === "over" ? " over" : ""}
+    {status === "over"
+      ? m.categories_badge_over({ pct })
+      : m.categories_badge_pct({ pct })}
   </span>
 {/if}
 

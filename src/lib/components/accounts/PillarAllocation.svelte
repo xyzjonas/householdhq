@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { formatMoney } from "#lib/format.ts";
   import type { Pillar } from "#lib/accounts-view.ts";
 
@@ -10,12 +11,12 @@
   class="flex flex-col gap-5 card border border-surface-200-800 p-6"
 >
   <h2 id="pillars-heading" class="text-lg font-bold">
-    Pillar liquidity & wealth allocation
+    {m.accounts_pillars_heading()}
   </h2>
 
   <div
     role="img"
-    aria-label="Wealth allocation by pillar"
+    aria-label={m.accounts_pillars_chart_label()}
     class="flex h-3 w-full overflow-hidden rounded-full bg-surface-200-800"
   >
     {#each pillars as p (p.type)}

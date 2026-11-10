@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
+  import { accountTypeLabel } from "#lib/account-types.ts";
   import AccountProperties from "#lib/components/accounts/detail/AccountProperties.svelte";
   import BalanceHero from "#lib/components/accounts/detail/BalanceHero.svelte";
   import EntriesLedger from "#lib/components/accounts/detail/EntriesLedger.svelte";
@@ -9,15 +11,33 @@
   let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>{data.account.name} · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>
+    {m.accounts_detail_page_title({
+      name: data.account.name,
+      app: m.common_app_name(),
+    })}
+  </title></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-col gap-2">
-    <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+    <nav
+      aria-label={m.accounts_breadcrumb_label()}
+      class="text-sm text-surface-600-400"
+    >
       <ol class="flex gap-2">
-        <li><a class="anchor" href={resolve("/")}>Home</a></li>
+        <li>
+          <a class="anchor" href={resolve("/")}
+            >{m.accounts_breadcrumb_home()}</a
+          >
+        </li>
         <li aria-hidden="true">›</li>
-        <li><a class="anchor" href={resolve("/accounts")}>Accounts</a></li>
+        <li>
+          <a class="anchor" href={resolve("/accounts")}
+            >{m.accounts_detail_breadcrumb_accounts()}</a
+          >
+        </li>
         <li aria-hidden="true">›</li>
         <li aria-current="page" class="min-w-0 wrap-anywhere">
           {data.account.id} ({data.account.name})
@@ -36,7 +56,7 @@
       <span
         class="rounded-md bg-emerald-100 px-2 py-0.5 text-[11px] font-bold tracking-wide text-emerald-800 uppercase"
       >
-        {data.account.type.toLowerCase()}
+        {accountTypeLabel(data.account.type)}
       </span>
     </h1>
   </header>

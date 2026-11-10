@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import type { BudgetStatus } from "#lib/categories-view.ts";
 
   let {
     pct,
     status,
-    label = "Budget used",
+    label = m.categories_budget_used(),
   }: {
     /** Share of the budget used; without it nothing is rendered. */
     pct?: number;

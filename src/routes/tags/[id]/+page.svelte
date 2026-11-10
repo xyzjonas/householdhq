@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import CategoryEntries from "#lib/components/categories/detail/CategoryEntries.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
@@ -17,16 +18,24 @@
     viewQuery(data.view, changes, data.currentMonth);
 </script>
 
-<svelte:head><title>{data.tag.name} · Household HQ</title></svelte:head>
+<svelte:head><title>{data.tag.name} · {m.common_app_name()}</title></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex min-w-0 flex-col gap-2">
-      <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+      <nav
+        aria-label={m.common_breadcrumb()}
+        class="text-sm text-surface-600-400"
+      >
         <ol class="flex gap-2">
-          <li><a class="anchor" href={resolve("/")}>Home</a></li>
+          <li><a class="anchor" href={resolve("/")}>{m.common_home()}</a></li>
           <li aria-hidden="true">›</li>
-          <li><a class="anchor" href={resolve("/tags")}>Tags</a></li>
+          <li>
+            <a class="anchor" href={resolve("/tags")}>
+              {m.tags_page_title()}
+            </a>
+          </li>
           <li aria-hidden="true">›</li>
           <li aria-current="page" class="min-w-0 wrap-anywhere">
             {data.tag.id} ({data.tag.name})

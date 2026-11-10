@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { Prisma } from "@prisma/client";
 import { roundMoney } from "./balance";
 import type { Db } from "./prisma";
@@ -46,7 +47,7 @@ const serviceInclude = {
   components: { orderBy: { name: "asc" } },
 } satisfies Prisma.VehicleServiceEntryInclude;
 
-/** Name of the column a unique-constraint violation was about. */
+/** Localized name of the column a unique-constraint violation was about. */
 function uniqueField(e: Prisma.PrismaClientKnownRequestError): string {
   const meta = e.meta as
     | { target?: string | string[]; constraint?: { fields?: string[] } }
@@ -54,10 +55,14 @@ function uniqueField(e: Prisma.PrismaClientKnownRequestError): string {
   const target = meta?.target ?? meta?.constraint?.fields;
   const name = Array.isArray(target) ? target[0] : target;
   // MySQL reports the index name (`vehicle_vin_key`), not the column.
-  return (
-    name?.replace(/^vehicle_(householdId_)?|_key$/g, "") ??
-    "VIN or registration"
-  );
+  switch (name?.replace(/^vehicle_(householdId_)?|_key$/g, "")) {
+    case "vin":
+      return m.core_vehicle_field_vin();
+    case "registration":
+      return m.core_vehicle_field_registration();
+    default:
+      return m.core_vehicle_field_unknown();
+  }
 }
 
 function isCode(e: unknown, code: string): boolean {
@@ -108,9 +113,7 @@ export function vehiclesRepo(
         orderBy: [{ position: "asc" }, { id: "asc" }],
       }));
     if (!from || !to) {
-      throw new ConflictError(
-        "Cannot record the transaction: an account to pay from and an external account to pay to are needed",
-      );
+      throw new ConflictError(m.core_vehicle_needs_accounts());
     }
     return { sourceId: from.id, targetId: to.id };
   }
@@ -141,23 +144,19 @@ export function vehiclesRepo(
     }
 
     if (requested === selfId) {
-      throw new ConflictError("A fill-up cannot follow itself");
+      throw new ConflictError(m.core_fuel_follows_itself());
     }
     const previous = await db.vehicleFuelEntry.findUnique({
       where: { id: requested },
     });
     if (!previous || previous.vehicleId !== vehicleId) {
-      throw new ConflictError(
-        "The previous full tank must be a fill-up of the same vehicle",
-      );
+      throw new ConflictError(m.core_fuel_previous_other_vehicle());
     }
     if (!previous.isFullTank) {
-      throw new ConflictError("The previous fill-up was not a full tank");
+      throw new ConflictError(m.core_fuel_previous_not_full());
     }
     if (previous.fueledAt >= fueledAt) {
-      throw new ConflictError(
-        "The previous full tank must be older than this fill-up",
-      );
+      throw new ConflictError(m.core_fuel_previous_not_older());
     }
     return previous.id;
   }
@@ -430,7 +429,7 @@ export function vehiclesRepo(
         return await db.vehicleComponent.create({ data });
       } catch (e) {
         if (isCode(e, "P2002")) {
-          throw new ConflictError(`Component '${data.name}' already exists`);
+          throw new ConflictError(m.core_component_exists({ name: data.name }));
         }
         throw e;
       }
@@ -446,7 +445,9 @@ export function vehiclesRepo(
       } catch (e) {
         if (isCode(e, "P2025")) throw new NotFoundError("Component", id);
         if (isCode(e, "P2002")) {
-          throw new ConflictError(`Component '${data.name}' already exists`);
+          throw new ConflictError(
+            m.core_component_exists({ name: data.name ?? "?" }),
+          );
         }
         throw e;
       }
@@ -499,7 +500,9 @@ export function vehiclesRepo(
       } catch (e) {
         if (isCode(e, "P2002")) {
           throw new ConflictError(
-            `A vehicle with this ${uniqueField(e as Prisma.PrismaClientKnownRequestError)} already exists`,
+            m.core_vehicle_unique_exists({
+              field: uniqueField(e as Prisma.PrismaClientKnownRequestError),
+            }),
           );
         }
         throw e;
@@ -515,7 +518,9 @@ export function vehiclesRepo(
       } catch (e) {
         if (isCode(e, "P2002")) {
           throw new ConflictError(
-            `A vehicle with this ${uniqueField(e as Prisma.PrismaClientKnownRequestError)} already exists`,
+            m.core_vehicle_unique_exists({
+              field: uniqueField(e as Prisma.PrismaClientKnownRequestError),
+            }),
           );
         }
         throw e;

@@ -1,4 +1,5 @@
 <script lang="ts" generics="T extends CategoryItem">
+  import { m } from "#paraglide/messages.js";
   import type { Snippet } from "svelte";
   import { Tabs } from "@skeletonlabs/skeleton-svelte";
   import Search from "@lucide/svelte/icons/search";
@@ -20,9 +21,9 @@
     children,
   }: {
     items: T[];
-    /** What the items are called, lowercase ("category" / "categories"). */
-    singular?: string;
-    plural?: string;
+    /** What the items are called ("category" / "tag"). */
+    singular?: "category" | "tag";
+    plural?: "categories" | "tags";
     /** Renders the filtered, sorted items (table on desktop, cards on mobile). */
     children: Snippet<[T[]]>;
   } = $props();
@@ -38,7 +39,9 @@
 
 <section aria-labelledby="directory-heading" class="flex flex-col gap-4">
   <h2 id="directory-heading" class="sr-only">
-    {singular[0].toUpperCase() + singular.slice(1)} directory
+    {singular === "tag"
+      ? m.categories_directory_heading_tag()
+      : m.categories_directory_heading_category()}
   </h2>
 
   <Tabs value={filter} onValueChange={(e) => (filter = e.value as FilterId)}>
@@ -67,15 +70,19 @@
           <input
             class="input"
             type="search"
-            placeholder="Search {singular} or note"
-            aria-label="Search {plural}"
+            placeholder={singular === "tag"
+              ? m.categories_search_placeholder_tag()
+              : m.categories_search_placeholder_category()}
+            aria-label={plural === "tags"
+              ? m.categories_search_label_tag()
+              : m.categories_search_label_category()}
             bind:value={query}
           />
         </div>
         <label class="flex items-center gap-2 text-sm">
-          <span class="text-surface-600-400">Sort</span>
+          <span class="text-surface-600-400">{m.categories_sort_label()}</span>
           <select class="select w-auto" bind:value={sort}>
-            {#each sortOptions as o (o.id)}
+            {#each sortOptions() as o (o.id)}
               <option value={o.id}>{o.label}</option>
             {/each}
           </select>

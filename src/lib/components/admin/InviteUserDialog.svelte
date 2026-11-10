@@ -3,11 +3,12 @@
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import UserPlus from "@lucide/svelte/icons/user-plus";
   import InviteLink from "./InviteLink.svelte";
+  import { m } from "#paraglide/messages.js";
 
   let {
     households,
     defaultHouseholdId = null,
-    label = "Invite user",
+    label,
   }: {
     households: { id: number; name: string }[];
     /** Preselected household, e.g. the one a branch of the tree belongs to. */
@@ -32,7 +33,9 @@
 <Dialog {open} {onOpenChange}>
   <Dialog.Trigger class="btn max-w-full min-w-0 preset-filled-surface-950-50">
     <UserPlus size={16} aria-hidden="true" class="shrink-0" />
-    <span class="truncate" title={label}>{label}</span>
+    <span class="truncate" title={label ?? m.users_invite_title()}
+      >{label ?? m.users_invite_title()}</span
+    >
   </Dialog.Trigger>
   <Portal>
     {#if open}
@@ -43,19 +46,19 @@
         <Dialog.Content
           class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
         >
-          <Dialog.Title class="text-lg font-bold">Invite user</Dialog.Title>
+          <Dialog.Title class="text-lg font-bold"
+            >{m.users_invite_title()}</Dialog.Title
+          >
           {#if invite}
             <InviteLink email={invite.email} token={invite.token} />
             <div class="flex justify-end">
               <Dialog.CloseTrigger class="btn preset-filled-surface-950-50"
-                >Done</Dialog.CloseTrigger
+                >{m.common_done()}</Dialog.CloseTrigger
               >
             </div>
           {:else}
             <Dialog.Description class="text-sm text-surface-600-400">
-              Creates the account with a random password, adds it to the chosen
-              household and gives you a link the new user opens to choose their
-              own.
+              {m.admin_invite_description()}
             </Dialog.Description>
             <form
               method="POST"
@@ -70,7 +73,7 @@
                     invite = result.data.invite as typeof invite;
                   } else if (result.type === "failure") {
                     message = String(
-                      result.data?.message ?? "Could not invite",
+                      result.data?.message ?? m.users_invite_failed(),
                     );
                   }
                   await update({ reset: false });
@@ -78,20 +81,22 @@
               }}
             >
               <label class="label">
-                <span class="label-text">Email</span>
+                <span class="label-text">{m.admin_invite_email_label()}</span>
                 <input
                   class="input"
                   name="email"
                   type="email"
                   required
                   autocomplete="off"
-                  placeholder="e.g. partner@example.com"
+                  placeholder={m.users_invite_email_placeholder()}
                 />
               </label>
               <label class="label">
-                <span class="label-text">Household</span>
+                <span class="label-text"
+                  >{m.admin_invite_household_label()}</span
+                >
                 <select class="select" name="householdId">
-                  <option value="">No household (assign later)</option>
+                  <option value="">{m.admin_invite_no_household()}</option>
                   {#each households as household (household.id)}
                     <option
                       value={household.id}
@@ -107,14 +112,14 @@
               {/if}
               <div class="flex justify-end gap-2">
                 <Dialog.CloseTrigger class="btn preset-tonal"
-                  >Cancel</Dialog.CloseTrigger
+                  >{m.common_cancel()}</Dialog.CloseTrigger
                 >
                 <button
                   type="submit"
                   class="btn preset-filled-surface-950-50"
                   disabled={submitting}
                 >
-                  Create invite
+                  {m.users_invite_submit()}
                 </button>
               </div>
             </form>

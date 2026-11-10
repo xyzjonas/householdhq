@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { m } from "#paraglide/messages.js";
   import BurnConcentration from "#lib/components/categories/BurnConcentration.svelte";
   import CreateCategoryDialog from "#lib/components/categories/CreateCategoryDialog.svelte";
   import CategoriesDirectory from "#lib/components/categories/CategoriesDirectory.svelte";
@@ -24,22 +25,37 @@
   const label = $derived(monthLabel(data.month));
 </script>
 
-<svelte:head><title>Categories · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>
+    {m.categories_page_title({ app: m.common_app_name() })}
+  </title></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex flex-col gap-2">
-      <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+      <nav
+        aria-label={m.categories_breadcrumb_label()}
+        class="text-sm text-surface-600-400"
+      >
         <ol class="flex gap-2">
-          <li><a class="anchor" href={resolve("/")}>Home</a></li>
+          <li>
+            <a class="anchor" href={resolve("/")}
+              >{m.categories_breadcrumb_home()}</a
+            >
+          </li>
           <li aria-hidden="true">›</li>
-          <li aria-current="page">Categories ({items.length} total)</li>
+          <li aria-current="page">
+            {m.categories_breadcrumb_current({ count: items.length })}
+          </li>
         </ol>
       </nav>
       <h1 class="text-2xl font-extrabold tracking-tight">
-        Category rules & budget caps
+        {m.categories_heading()}
       </h1>
-      <p class="text-sm text-surface-600-400">{label} household ledger</p>
+      <p class="text-sm text-surface-600-400">
+        {m.categories_ledger_subtitle({ month: label })}
+      </p>
     </div>
     <div class="flex flex-wrap items-center gap-3">
       <MonthSwitcher
@@ -63,7 +79,10 @@
         {/snippet}
       </CategoriesDirectory>
     </div>
-    <aside aria-label="Spending insights" class="flex flex-col gap-6">
+    <aside
+      aria-label={m.categories_insights_label()}
+      class="flex flex-col gap-6"
+    >
       <BurnConcentration slices={burnConcentration(items)} />
       <UnbudgetedAdvisory items={unbudgeted(items)} />
     </aside>

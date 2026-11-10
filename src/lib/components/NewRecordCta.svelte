@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Plus from "@lucide/svelte/icons/plus";
+  import { m } from "#paraglide/messages.js";
 </script>
 
 <a
@@ -17,8 +18,10 @@
     </span>
   </span>
   <span class="flex flex-col">
-    <span class="text-2xl font-extrabold tracking-tight">Add record</span>
-    <span class="text-sm opacity-90">Log an expense, income or transfer</span>
+    <span class="text-2xl font-extrabold tracking-tight"
+      >{m.shell_add_record()}</span
+    >
+    <span class="text-sm opacity-90">{m.shell_add_record_hint()}</span>
   </span>
 </a>
 

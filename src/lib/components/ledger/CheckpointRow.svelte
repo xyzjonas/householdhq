@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { formatDate, formatMoney } from "#lib/format.ts";
   import CheckpointBadge from "./CheckpointBadge.svelte";
 
@@ -21,8 +22,8 @@
     </time>
   </td>
   <td class="py-3 pr-4">
-    <p class="text-sm font-bold">Checkpoint</p>
-    <p class="text-xs text-surface-500">Balance at this point</p>
+    <p class="text-sm font-bold">{m.ledger_checkpoint()}</p>
+    <p class="text-xs text-surface-500">{m.ledger_checkpoint_balance_at()}</p>
   </td>
   <td class="py-3 pr-4"></td>
   <td class="py-3 text-right text-sm font-bold whitespace-nowrap tabular-nums">
@@ -34,7 +35,9 @@
       <button
         type="button"
         class="btn-icon btn-icon-sm hover:preset-tonal-error"
-        aria-label="Delete checkpoint of {formatMoney(checkpoint.amount)}"
+        aria-label={m.ledger_checkpoint_delete_label({
+          amount: formatMoney(checkpoint.amount),
+        })}
         onclick={ondelete}
       >
         <Trash2 size={16} aria-hidden="true" />

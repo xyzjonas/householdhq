@@ -3,6 +3,7 @@
   import Receipt from "@lucide/svelte/icons/receipt";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { formatMoney } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import {
     evaluate,
     hasOperator,
@@ -79,7 +80,7 @@
 
 <div class="flex flex-col gap-4">
   <section
-    aria-label="Total value"
+    aria-label={m.wizard_amount_total_value()}
     class="rounded-2xl bg-surface-50-950 p-5"
     style="box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.05)"
   >
@@ -87,7 +88,7 @@
       <h3
         class="text-xs font-bold tracking-wider text-surface-600-400 uppercase"
       >
-        Total value
+        {m.wizard_amount_total_value()}
       </h3>
       {#if lockCurrency}
         <span
@@ -100,7 +101,7 @@
           type="button"
           class="rounded-full bg-surface-100-900 px-3 py-1 text-xs font-bold text-surface-800-200 uppercase active:scale-95"
           onclick={cycleCurrency}
-          aria-label="Currency {currency}, tap to change"
+          aria-label={m.wizard_amount_currency_change({ currency })}
         >
           {currency}
         </button>
@@ -117,7 +118,7 @@
         <button
           type="button"
           class="btn-icon size-10 shrink-0 rounded-full preset-tonal"
-          aria-label="Clear amount"
+          aria-label={m.wizard_amount_clear()}
           onclick={() => (tape = "")}
         >
           <Trash2 size={18} aria-hidden="true" />
@@ -143,10 +144,10 @@
         </span>
         <div>
           <h3 class="text-sm font-bold text-surface-950-50">
-            Need itemized split?
+            {m.wizard_amount_split_title()}
           </h3>
           <p class="text-xs text-surface-600-400">
-            Divide by friends or sub-items
+            {m.wizard_amount_split_hint()}
           </p>
         </div>
       </div>
@@ -155,7 +156,7 @@
         class="rounded-full bg-surface-50-950 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-xs active:scale-95 dark:text-emerald-300"
         onclick={() => onsplit(total)}
       >
-        Split ⚡
+        {m.wizard_amount_split_button()}
       </button>
     </aside>
   {/if}
@@ -177,14 +178,15 @@
       <span
         class="block text-xs font-semibold tracking-wide text-surface-600-400 uppercase"
       >
-        Chosen category
+        {m.wizard_amount_chosen_category()}
       </span>
       <span class="block truncate font-bold text-surface-950-50">
-        {category?.name ?? "Not chosen yet"}
+        {category?.name ?? m.wizard_amount_category_not_chosen()}
       </span>
     </span>
     <span class="flex items-center text-sm font-semibold text-surface-600-400">
-      Change <ChevronRight size={16} aria-hidden="true" />
+      {m.wizard_amount_change()}
+      <ChevronRight size={16} aria-hidden="true" />
     </span>
   </button>
 </div>

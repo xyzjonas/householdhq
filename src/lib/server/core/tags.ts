@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { Prisma } from "@prisma/client";
 import { monthlyFlow, type Flow } from "./flow";
 import type { Db } from "./prisma";
@@ -13,7 +14,7 @@ import {
 function rethrow(e: unknown, name?: string | null): never {
   if (e instanceof Prisma.PrismaClientKnownRequestError) {
     if (e.code === "P2002") {
-      throw new ConflictError(`Tag '${name}' already exists`);
+      throw new ConflictError(m.core_tag_exists({ name: name ?? "?" }));
     }
     if (e.code === "P2025") {
       throw new NotFoundError("Tag", name ?? "?");

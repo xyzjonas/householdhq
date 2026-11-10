@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
 
   let {
@@ -18,9 +19,9 @@
 
 <section class="flex flex-col gap-4 card bg-surface-50-950 p-6">
   <header class="flex flex-col gap-1">
-    <h2 class="text-lg font-bold">Currency</h2>
+    <h2 class="text-lg font-bold">{m.settings_currency_title()}</h2>
     <p class="text-sm text-surface-600-400">
-      The default currency for your household.
+      {m.settings_currency_hint()}
     </p>
   </header>
   <form
@@ -36,7 +37,7 @@
     }}
   >
     <label class="label">
-      <span class="label-text">Default currency</span>
+      <span class="label-text">{m.settings_currency_label()}</span>
       <select class="select" name="currency" value={currency}>
         {#each currencies as code (code)}
           <option value={code}>{code}</option>
@@ -46,7 +47,9 @@
     {#if message}
       <p role="alert" class="text-sm text-error-600-400">{message}</p>
     {:else if saved}
-      <p role="status" class="text-sm text-success-600-400">Settings saved.</p>
+      <p role="status" class="text-sm text-success-600-400">
+        {m.settings_saved()}
+      </p>
     {/if}
     <div class="flex justify-end">
       <button
@@ -54,7 +57,7 @@
         class="btn preset-filled-surface-950-50"
         disabled={submitting}
       >
-        Save changes
+        {m.common_save_changes()}
       </button>
     </div>
   </form>

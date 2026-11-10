@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { m } from "#paraglide/messages.js";
   import { SegmentedControl } from "@skeletonlabs/skeleton-svelte";
   import {
     chartRanges,
@@ -7,6 +8,7 @@
     type DetailView,
   } from "#lib/category-detail.ts";
   import { formatMoney } from "#lib/format.ts";
+  import { intlLocale } from "#lib/i18n.ts";
 
   type Series = { monthStart: string; spent: number }[];
   type Mode = "out" | "in" | "transfer";
@@ -33,28 +35,11 @@
     color: string | null;
   } = $props();
 
-  const modes: { id: Mode; label: string }[] = [
-    { id: "out", label: "Spending" },
-    { id: "in", label: "Income" },
-    { id: "transfer", label: "Transferred" },
+  const modes = (): { id: Mode; label: string }[] => [
+    { id: "out", label: m.categories_chart_mode_out() },
+    { id: "in", label: m.categories_chart_mode_in() },
+    { id: "transfer", label: m.categories_chart_mode_transfer() },
   ];
-  const copy: Record<Mode, { title: string; noun: string; empty: string }> = {
-    out: {
-      title: "Spending history",
-      noun: "spending",
-      empty: "No spending recorded yet.",
-    },
-    in: {
-      title: "Income history",
-      noun: "income",
-      empty: "No income recorded yet.",
-    },
-    transfer: {
-      title: "Transfer history",
-      noun: "transfers",
-      empty: "No transfers recorded yet.",
-    },
-  };
 
   let mode = $state<Mode>("out");
   const seriesByMode = $derived({
@@ -63,20 +48,20 @@
     transfer: transferSeries,
   });
   const series = $derived(seriesByMode[mode]);
-  const text = $derived(copy[mode]);
 
   const W = 480;
   const H = 180;
   const PAD = 8;
-  const fmt = new Intl.DateTimeFormat("en-GB", {
-    month: "short",
-    timeZone: "UTC",
-  });
-  const fmtYear = new Intl.DateTimeFormat("en-GB", {
-    month: "short",
-    year: "2-digit",
-    timeZone: "UTC",
-  });
+  const fmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), { month: "short", timeZone: "UTC" }),
+  );
+  const fmtYear = $derived(
+    new Intl.DateTimeFormat(intlLocale(), {
+      month: "short",
+      year: "2-digit",
+      timeZone: "UTC",
+    }),
+  );
 
   const peak = $derived(Math.max(0, ...series.map((s) => s.spent)));
   const step = $derived((W - PAD * 2) / Math.max(series.length, 1));
@@ -99,11 +84,45 @@
   // Label at most ~8 months so a long history stays legible.
   const every = $derived(Math.max(1, Math.ceil(series.length / 8)));
   const total = $derived(series.reduce((sum, s) => sum + s.spent, 0));
-  const ariaLabel = $derived(
-    series.length
-      ? `Monthly ${text.noun}, ${bars[0].full} to ${bars[bars.length - 1].full}: ` +
-          bars.map((b) => `${b.full} ${formatMoney(b.spent)}`).join(", ")
-      : `No ${text.noun} history`,
+  const ariaLabel = $derived.by(() => {
+    if (!series.length) {
+      return mode === "in"
+        ? m.categories_chart_aria_empty_in()
+        : mode === "transfer"
+          ? m.categories_chart_aria_empty_transfer()
+          : m.categories_chart_aria_empty_out();
+    }
+    const params = {
+      from: bars[0].full,
+      to: bars[bars.length - 1].full,
+      list: bars.map((b) => `${b.full} ${formatMoney(b.spent)}`).join(", "),
+    };
+    return mode === "in"
+      ? m.categories_chart_aria_in(params)
+      : mode === "transfer"
+        ? m.categories_chart_aria_transfer(params)
+        : m.categories_chart_aria_out(params);
+  });
+  const title = $derived(
+    mode === "in"
+      ? m.categories_chart_title_in()
+      : mode === "transfer"
+        ? m.categories_chart_title_transfer()
+        : m.categories_chart_title_out(),
+  );
+  const subtitle = $derived(
+    mode === "in"
+      ? m.categories_chart_subtitle_in({ count: series.length })
+      : mode === "transfer"
+        ? m.categories_chart_subtitle_transfer({ count: series.length })
+        : m.categories_chart_subtitle_out({ count: series.length }),
+  );
+  const empty = $derived(
+    mode === "in"
+      ? m.categories_chart_empty_in()
+      : mode === "transfer"
+        ? m.categories_chart_empty_transfer()
+        : m.categories_chart_empty_out(),
   );
 </script>
 
@@ -113,14 +132,13 @@
 >
   <header class="flex flex-wrap items-start justify-between gap-3">
     <div>
-      <h2 id="chart-heading" class="text-lg font-bold">{text.title}</h2>
+      <h2 id="chart-heading" class="text-lg font-bold">{title}</h2>
       <p class="text-sm text-surface-600-400">
-        Monthly {text.noun}, {series.length}
-        {series.length === 1 ? "month" : "months"}
+        {subtitle}
       </p>
     </div>
-    <nav aria-label="Chart range" class="flex gap-1">
-      {#each chartRanges as r (r.id)}
+    <nav aria-label={m.categories_chart_range_label()} class="flex gap-1">
+      {#each chartRanges() as r (r.id)}
         <a
           href={resolve(`${route}?${queryFor({ range: r.id })}`, {
             id: String(id),
@@ -172,24 +190,28 @@
 
     <dl class="grid grid-cols-3 gap-3 text-xs">
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Total</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.categories_chart_total()}
+        </dt>
         <dd class="text-sm font-bold">{formatMoney(total)}</dd>
       </div>
       <div>
         <dt class="font-bold tracking-wider uppercase opacity-60">
-          Highest month
+          {m.categories_chart_highest()}
         </dt>
         <dd class="text-sm font-bold">{formatMoney(peak)}</dd>
       </div>
       <div>
-        <dt class="font-bold tracking-wider uppercase opacity-60">Latest</dt>
+        <dt class="font-bold tracking-wider uppercase opacity-60">
+          {m.categories_chart_latest()}
+        </dt>
         <dd class="text-sm font-bold">
           {formatMoney(series[series.length - 1].spent)}
         </dd>
       </div>
     </dl>
   {:else}
-    <p class="text-sm opacity-70">{text.empty}</p>
+    <p class="text-sm opacity-70">{empty}</p>
   {/if}
 
   <SegmentedControl
@@ -199,9 +221,9 @@
   >
     <SegmentedControl.Control class="w-full">
       <SegmentedControl.Indicator />
-      {#each modes as m (m.id)}
-        <SegmentedControl.Item value={m.id} class="flex-1 justify-center">
-          <SegmentedControl.ItemText>{m.label}</SegmentedControl.ItemText>
+      {#each modes() as option (option.id)}
+        <SegmentedControl.Item value={option.id} class="flex-1 justify-center">
+          <SegmentedControl.ItemText>{option.label}</SegmentedControl.ItemText>
           <SegmentedControl.ItemHiddenInput />
         </SegmentedControl.Item>
       {/each}

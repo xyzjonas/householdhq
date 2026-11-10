@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
+  import { intlLocale } from "#lib/i18n.ts";
   import { formatMoney, formatNumber } from "#lib/format.ts";
   import { yearSummary, type YearFill } from "#lib/vehicle-fuel.ts";
 
@@ -6,10 +8,12 @@
     $props();
 
   const summary = $derived(yearSummary(entries));
-  const perKm = new Intl.NumberFormat("cs-CZ", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const perKm = $derived(
+    new Intl.NumberFormat(intlLocale(), {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+  );
 </script>
 
 <section
@@ -21,14 +25,13 @@
       id="fuel-summary-heading"
       class="text-xs font-bold tracking-wider uppercase opacity-60"
     >
-      Spent on fuel in {summary.year}
+      {m.vehicles_summary_heading({ year: summary.year })}
     </h2>
     <p class="text-4xl font-extrabold tracking-tight">
       {formatMoney(summary.spent, currency)}
     </p>
     <p class="text-sm text-surface-600-400">
-      So far this year · {summary.fillUps}
-      {summary.fillUps === 1 ? "fill-up" : "fill-ups"}
+      {m.vehicles_summary_so_far({ count: summary.fillUps })}
     </p>
   </div>
 
@@ -37,7 +40,7 @@
   >
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Monthly average
+        {m.vehicles_summary_monthly_average()}
       </dt>
       <dd class="font-bold">
         {formatMoney(summary.monthlyAverage, currency)}
@@ -45,16 +48,21 @@
     </div>
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Average price per km
+        {m.vehicles_summary_price_per_km()}
       </dt>
       <dd class="font-bold">
         {summary.costPerKm === null
           ? "—"
-          : `${perKm.format(summary.costPerKm)} ${currency} / km`}
+          : m.vehicles_summary_cost_per_km({
+              price: perKm.format(summary.costPerKm),
+              currency,
+            })}
         <span class="block text-xs font-medium opacity-60">
           {summary.distance > 0
-            ? `Over ${formatNumber(summary.distance, "km")} driven`
-            : "Needs two fill-ups"}
+            ? m.vehicles_summary_distance({
+                distance: formatNumber(summary.distance, "km"),
+              })
+            : m.vehicles_summary_needs_two()}
         </span>
       </dd>
     </div>

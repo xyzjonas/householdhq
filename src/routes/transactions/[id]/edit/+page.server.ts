@@ -1,4 +1,5 @@
 import { error, redirect } from "@sveltejs/kit";
+import { m } from "#paraglide/messages.js";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { hq } from "#lib/server/index.ts";
 import {
@@ -15,7 +16,7 @@ import type { Actions, PageServerLoad } from "./$types";
 
 const parseId = (raw: string) => {
   const id = Number(raw);
-  if (!Number.isInteger(id) || id < 1) error(404, "Transaction not found");
+  if (!Number.isInteger(id) || id < 1) error(404, m.wizard_error_not_found());
   return id;
 };
 
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const [wizard, tx] = await Promise.all([
     loadWizardData(core),
     core.transactions.get(id).catch((e: unknown) => {
-      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      if (e instanceof NotFoundError) error(404, m.wizard_error_not_found());
       throw e;
     }),
   ]);
@@ -70,7 +71,7 @@ export const actions: Actions = {
         description: input.description ?? "N/A",
       });
     } catch (e) {
-      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      if (e instanceof NotFoundError) error(404, m.wizard_error_not_found());
       throw e;
     }
     // The edited transaction becomes the receipt's original.
@@ -83,7 +84,7 @@ export const actions: Actions = {
       );
       return { scheduledNext: confirmed.recurring > 0 };
     } catch (e) {
-      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      if (e instanceof NotFoundError) error(404, m.wizard_error_not_found());
       if (e instanceof ConflictError) error(409, e.message);
       throw e;
     }
@@ -92,7 +93,7 @@ export const actions: Actions = {
     try {
       await hq(locals).transactions.remove(parseId(params.id));
     } catch (e) {
-      if (e instanceof NotFoundError) error(404, "Transaction not found");
+      if (e instanceof NotFoundError) error(404, m.wizard_error_not_found());
       if (e instanceof ConflictError) error(409, e.message);
       throw e;
     }

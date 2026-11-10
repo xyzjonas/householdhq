@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { Account } from "#lib/server/core/types.ts";
 
 export type AccountChanges = Partial<
@@ -27,7 +28,9 @@ export async function patchAccount(
     const body = (await res.json().catch(() => null)) as {
       message?: string;
     } | null;
-    throw new Error(body?.message ?? `Update failed (${res.status})`);
+    throw new Error(
+      body?.message ?? m.accounts_client_update_failed({ status: res.status }),
+    );
   }
   return res.json();
 }

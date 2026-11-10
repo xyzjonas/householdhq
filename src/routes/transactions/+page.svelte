@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import LedgerPagination from "#lib/components/ledger/LedgerPagination.svelte";
@@ -21,18 +22,26 @@
     });
 </script>
 
-<svelte:head><title>Transactions · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.transactions_page_title()} · {m.common_app_name()}</title
+  ></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-col gap-2">
-    <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+    <nav
+      aria-label={m.common_breadcrumb()}
+      class="text-sm text-surface-600-400"
+    >
       <ol class="flex gap-2">
-        <li><a class="anchor" href={resolve("/")}>Home</a></li>
+        <li><a class="anchor" href={resolve("/")}>{m.common_home()}</a></li>
         <li aria-hidden="true">›</li>
-        <li aria-current="page">Transactions</li>
+        <li aria-current="page">{m.transactions_page_title()}</li>
       </ol>
     </nav>
-    <h1 class="text-2xl font-extrabold tracking-tight">Transactions</h1>
+    <h1 class="text-2xl font-extrabold tracking-tight">
+      {m.transactions_page_title()}
+    </h1>
   </header>
 
   <TransactionFilters
@@ -45,15 +54,15 @@
   <section aria-labelledby="results-heading" class="flex flex-col gap-4">
     <h2 id="results-heading" class="text-sm font-semibold text-surface-600-400">
       {#if data.total === 0}
-        No transactions found
+        {m.transactions_results_none()}
       {:else}
-        Showing {first} to {last} of {data.total} transactions
+        {m.transactions_results_range({ first, last, total: data.total })}
       {/if}
     </h2>
 
     <TransactionList
       transactions={data.transactions}
-      empty="No transactions match these filters."
+      empty={m.transactions_empty_filtered()}
     />
 
     {#if data.total > data.view.size}

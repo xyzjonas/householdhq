@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { Prisma } from "@prisma/client";
 import { monthlyFlow, type Flow } from "./flow";
 import type { Db } from "./prisma";
@@ -13,7 +14,7 @@ import {
 function rethrow(e: unknown, name?: string | null): never {
   if (e instanceof Prisma.PrismaClientKnownRequestError) {
     if (e.code === "P2002") {
-      throw new ConflictError(`Category '${name}' already exists`);
+      throw new ConflictError(m.core_category_exists({ name: name ?? "?" }));
     }
     if (e.code === "P2025") {
       throw new NotFoundError("Category", name ?? "?");
@@ -166,7 +167,7 @@ export function categoriesRepo(db: Db, householdId: number) {
         return;
       }
       if (reassignTo === id) {
-        throw new ConflictError("Choose a different category to move to");
+        throw new ConflictError(m.core_category_move_same());
       }
       const [category, target, vehicle] = await Promise.all([
         db.category.findUnique({ where: { id }, select: { id: true } }),
@@ -183,7 +184,7 @@ export function categoriesRepo(db: Db, householdId: number) {
       if (!target) throw new NotFoundError("Category", reassignTo);
       if (vehicle) {
         throw new ConflictError(
-          `This category is used by the vehicle '${vehicle.name}'`,
+          m.core_category_used_by_vehicle({ name: vehicle.name }),
         );
       }
       await db.$transaction(async (tx) => {

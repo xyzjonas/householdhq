@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import { formatMoney } from "#lib/format.ts";
   import type { CategoryItem } from "#lib/categories-view.ts";
@@ -40,7 +41,9 @@
             </span>
             {#if item.budget !== undefined}
               <span class="block text-xs text-slate-500 tabular-nums">
-                of {formatMoney(item.budget)}
+                {m.categories_card_of_budget({
+                  amount: formatMoney(item.budget),
+                })}
               </span>
             {/if}
           </p>
@@ -52,6 +55,6 @@
       </article>
     </li>
   {:else}
-    <li class="text-sm opacity-70">No categories found.</li>
+    <li class="text-sm opacity-70">{m.categories_none_found()}</li>
   {/each}
 </ul>

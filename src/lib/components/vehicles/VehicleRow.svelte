@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import { formatDateWithYear, formatMoney } from "#lib/format.ts";
   import type { Vehicle } from "#lib/server/core/types.ts";
@@ -42,7 +43,7 @@
         <RegistrationPlate value={vehicle.registration} />
         {#if vehicle.purchasedAt}
           <p class="text-[11px] text-surface-500">
-            Purchased
+            {m.vehicles_field_purchased()}
             <time datetime={new Date(vehicle.purchasedAt).toISOString()}>
               {formatDateWithYear(vehicle.purchasedAt)}
             </time>
@@ -55,7 +56,7 @@
   {#if vehicle.purchasePrice}
     <div class="hidden shrink-0 text-right sm:block">
       <p class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Purchase price
+        {m.vehicles_field_purchase_price()}
       </p>
       <p class="text-xl font-extrabold">
         {formatMoney(vehicle.purchasePrice, currency)}

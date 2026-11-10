@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import { toaster } from "#lib/toaster.ts";
@@ -7,13 +8,13 @@
   let {
     entry = $bindable(),
     action = "?/delete",
-    noun = "entry",
+    kind = "entry",
   }: {
     entry: { id: number; description: string } | null;
     /** Form action that performs the deletion. */
     action?: string;
     /** What is being deleted, for the dialog title and error toast. */
-    noun?: string;
+    kind?: "entry" | "checkpoint";
   } = $props();
 </script>
 
@@ -31,9 +32,15 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">Delete {noun}?</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold">
+          {kind === "entry"
+            ? m.ledger_delete_title_entry()
+            : m.ledger_delete_title_checkpoint()}
+        </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
-          “{entry?.description}” will be permanently removed from the journal.
+          {m.ledger_delete_description({
+            description: entry?.description ?? "",
+          })}
         </Dialog.Description>
         <form
           method="POST"
@@ -44,19 +51,28 @@
               const description = entry?.description;
               entry = null;
               if (result.type === "success") {
-                toaster.success({ title: `Deleted “${description}”` });
+                toaster.success({
+                  title: m.ledger_delete_success({
+                    description: description ?? "",
+                  }),
+                });
               } else {
-                toaster.error({ title: `Could not delete the ${noun}` });
+                toaster.error({
+                  title:
+                    kind === "entry"
+                      ? m.ledger_delete_failed_entry()
+                      : m.ledger_delete_failed_checkpoint(),
+                });
               }
               await update();
             }}
         >
           <input type="hidden" name="id" value={entry?.id} />
           <Dialog.CloseTrigger class="btn preset-tonal"
-            >Cancel</Dialog.CloseTrigger
+            >{m.common_cancel()}</Dialog.CloseTrigger
           >
           <button type="submit" class="btn preset-filled-error-500">
-            Delete
+            {m.common_delete()}
           </button>
         </form>
       </Dialog.Content>

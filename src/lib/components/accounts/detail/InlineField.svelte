@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { tick } from "svelte";
   import Check from "@lucide/svelte/icons/check";
   import Pencil from "@lucide/svelte/icons/pencil";
@@ -72,7 +73,7 @@
       <button
         type="submit"
         class="btn-icon preset-filled-surface-950-50"
-        aria-label="Save {label.toLowerCase()}"
+        aria-label={m.accounts_field_save({ label: label.toLowerCase() })}
         disabled={saving}
       >
         <Check size={16} aria-hidden="true" />
@@ -80,7 +81,7 @@
       <button
         type="button"
         class="btn-icon preset-tonal"
-        aria-label="Cancel editing {label.toLowerCase()}"
+        aria-label={m.accounts_field_cancel({ label: label.toLowerCase() })}
         onclick={() => (editing = false)}
       >
         <X size={16} aria-hidden="true" />
@@ -98,7 +99,7 @@
     <button
       type="button"
       class="btn-icon preset-tonal btn-icon-sm"
-      aria-label="Edit {label.toLowerCase()}"
+      aria-label={m.accounts_field_edit({ label: label.toLowerCase() })}
       onclick={start}
     >
       <Pencil size={16} aria-hidden="true" />

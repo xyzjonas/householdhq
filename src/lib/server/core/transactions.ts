@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { Prisma } from "@prisma/client";
 import { shiftCheckpoints } from "./balance";
 import type { Db } from "./prisma";
@@ -367,17 +368,15 @@ export function transactionsRepo(db: Db, householdId: number) {
             include: { tags: true },
           });
           if (before.cancelled) {
-            throw new ConflictError(
-              "A cancelled transaction can't be confirmed",
-            );
+            throw new ConflictError(m.core_transaction_cancelled_confirm());
           }
           if (before.confirmed) {
-            throw new ConflictError("This transaction is already confirmed");
+            throw new ConflictError(m.core_transaction_already_confirmed());
           }
           const due = before.transactedAt ?? before.created;
           const now = new Date();
           if (due > now) {
-            throw new ConflictError("This transaction is not due yet");
+            throw new ConflictError(m.core_transaction_not_due());
           }
           const updated = await tx.transaction.update({
             where: { id },
@@ -434,9 +433,7 @@ export function transactionsRepo(db: Db, householdId: number) {
         },
       });
       if (owner?.fuelEntry || owner?.serviceEntry) {
-        throw new ConflictError(
-          "This transaction belongs to a vehicle entry; delete the entry on the vehicle page instead",
-        );
+        throw new ConflictError(m.core_transaction_belongs_to_vehicle_entry());
       }
       try {
         await db.transaction.delete({ where: { id } });

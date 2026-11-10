@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
+  import { intlLocale } from "#lib/i18n.ts";
   import { resolve } from "$app/paths";
   import {
     chartModes,
@@ -31,12 +33,15 @@
   const W = 480;
   const H = 180;
   const PAD = 8;
-  const monthFmt = new Intl.DateTimeFormat("en-GB", { month: "short" });
-  const monthYearFmt = new Intl.DateTimeFormat("en-GB", {
-    month: "short",
-    year: "numeric",
-  });
-  const fullFmt = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" });
+  const monthFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), { month: "short" }),
+  );
+  const monthYearFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), { month: "short", year: "numeric" }),
+  );
+  const fullFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), { dateStyle: "medium" }),
+  );
 
   interface Bar {
     value: number | null;
@@ -51,14 +56,14 @@
   }
 
   const byKey = $derived(
-    new Map(months.map((m) => [monthKey(m.monthStart), m])),
+    new Map(months.map((month) => [monthKey(month.monthStart), month])),
   );
   const window = $derived(months.slice(-12));
 
   const slots = $derived<Slot[]>(
     mode === "readings"
       ? []
-      : window.map((m) => {
+      : window.map((month) => {
           const bar = (
             stat: MonthStat | undefined,
             previous: boolean,
@@ -66,24 +71,26 @@
             value: stat?.consumption ?? null,
             partial: stat?.partial ?? false,
             previous,
-            title: `${monthYearFmt.format(stat?.monthStart ?? m.monthStart)}: ${
-              stat?.consumption == null
-                ? "no data"
-                : formatReading(stat.consumption, unit) +
-                  (stat.partial ? " (so far)" : "")
-            }`,
+            title: m.energy_chart_bar_title({
+              month: monthYearFmt.format(stat?.monthStart ?? month.monthStart),
+              value:
+                stat?.consumption == null
+                  ? m.energy_chart_no_data()
+                  : formatReading(stat.consumption, unit) +
+                    (stat.partial ? ` (${m.energy_so_far()})` : ""),
+            }),
           });
           const before = new Date(
-            m.monthStart.getFullYear() - 1,
-            m.monthStart.getMonth(),
+            month.monthStart.getFullYear() - 1,
+            month.monthStart.getMonth(),
             1,
           );
           return {
-            label: monthFmt.format(m.monthStart),
+            label: monthFmt.format(month.monthStart),
             bars:
               mode === "yoy"
-                ? [bar(byKey.get(monthKey(before)), true), bar(m, false)]
-                : [bar(m, false)],
+                ? [bar(byKey.get(monthKey(before)), true), bar(month, false)]
+                : [bar(month, false)],
           };
         }),
   );
@@ -113,7 +120,10 @@
       cx: PAD + i * step + step / 2,
       y: H - scale(p.value) - 8,
       label: monthFmt.format(p.at),
-      title: `${fullFmt.format(p.at)}: ${formatReading(p.value, unit)}`,
+      title: m.energy_chart_point_title({
+        date: fullFmt.format(p.at),
+        value: formatReading(p.value, unit),
+      }),
     })),
   );
   const line = $derived(points.map((p) => `${p.cx},${p.y}`).join(" "));
@@ -128,49 +138,63 @@
       ? series.length > 0
       : slots.some((s) => s.bars.some((b) => b.value !== null)),
   );
+  const barTitles = $derived(
+    slots.flatMap((s) => s.bars.map((b) => b.title)).join(", "),
+  );
   const ariaLabel = $derived(
     !hasData
-      ? "No chart data"
+      ? m.energy_chart_no_data_label()
       : mode === "readings"
-        ? `Readings: ${points.map((p) => p.title).join(", ")}`
-        : `${mode === "yoy" ? "Year over year" : "Monthly"} consumption: ${slots
-            .flatMap((s) => s.bars.map((b) => b.title))
-            .join(", ")}`,
+        ? m.energy_chart_label_readings({
+            items: points.map((p) => p.title).join(", "),
+          })
+        : mode === "yoy"
+          ? m.energy_chart_label_yoy({ items: barTitles })
+          : m.energy_chart_label_monthly({ items: barTitles }),
   );
 
   const figures = $derived.by(() => {
     if (mode === "readings") {
       return [
-        ["Min", series.length ? Math.min(...values) : null],
-        ["Latest", series.length ? values[values.length - 1] : null],
-        ["Peak", series.length ? peak : null],
+        [m.energy_figure_min(), series.length ? Math.min(...values) : null],
+        [m.energy_latest(), series.length ? values[values.length - 1] : null],
+        [m.energy_figure_peak(), series.length ? peak : null],
       ] as const;
     }
-    const current = window.map((m) => m.consumption).filter((v) => v !== null);
+    const current = window
+      .map((month) => month.consumption)
+      .filter((v) => v !== null);
     return [
-      ["Total", current.length ? current.reduce((a, b) => a + b, 0) : null],
-      ["Highest month", current.length ? Math.max(...current) : null],
-      ["Latest", current.length ? current[current.length - 1] : null],
+      [
+        m.energy_figure_total(),
+        current.length ? current.reduce((a, b) => a + b, 0) : null,
+      ],
+      [
+        m.energy_figure_highest_month(),
+        current.length ? Math.max(...current) : null,
+      ],
+      [m.energy_latest(), current.length ? current[current.length - 1] : null],
     ] as const;
   });
 
-  const heading = {
-    monthly: "Monthly consumption",
-    yoy: "Year over year",
-    readings: "Readings history",
-  } as const;
+  const heading = $derived(
+    {
+      monthly: m.energy_chart_heading_monthly(),
+      yoy: m.energy_chart_heading_yoy(),
+      readings: m.energy_chart_heading_readings(),
+    }[mode],
+  );
   const description = $derived(
     {
-      monthly:
-        "Interpolated to calendar months, so irregular readings stay comparable",
-      yoy: "Each of the last 12 months next to the same month a year earlier",
-      readings: `The counter as read, in ${unit}`,
+      monthly: m.energy_chart_desc_monthly(),
+      yoy: m.energy_chart_desc_yoy(),
+      readings: m.energy_chart_desc_readings({ unit }),
     }[mode],
   );
   const emptyText = $derived(
     mode === "readings"
-      ? "No readings recorded yet."
-      : "Add readings spanning at least a full month to see consumption.",
+      ? m.energy_chart_empty_readings()
+      : m.energy_chart_empty_monthly(),
   );
 </script>
 
@@ -182,28 +206,28 @@
   <header class="flex flex-wrap items-start justify-between gap-3">
     <div>
       <h2 id="energy-chart-heading" class="text-lg font-bold">
-        {heading[mode]}
+        {heading}
       </h2>
       <p class="text-sm text-surface-600-400">{description}</p>
     </div>
-    <nav aria-label="Chart mode" class="flex gap-1">
-      {#each chartModes as m (m.id)}
+    <nav aria-label={m.energy_chart_mode()} class="flex gap-1">
+      {#each chartModes() as option (option.id)}
         <a
           href={resolve(
-            m.id === "monthly"
+            option.id === "monthly"
               ? "/energy/[id]"
-              : m.id === "yoy"
+              : option.id === "yoy"
                 ? "/energy/[id]?view=yoy"
                 : "/energy/[id]?view=readings",
             { id: String(meterId) },
           )}
           data-sveltekit-reset="false"
-          aria-current={m.id === mode ? "true" : undefined}
-          class="btn rounded-full text-xs btn-sm {m.id === mode
+          aria-current={option.id === mode ? "true" : undefined}
+          class="btn rounded-full text-xs btn-sm {option.id === mode
             ? 'preset-filled-surface-950-50'
             : 'preset-tonal'}"
         >
-          {m.label}
+          {option.label}
         </a>
       {/each}
     </nav>
@@ -274,11 +298,11 @@
       <p class="flex gap-4 text-xs text-surface-600-400">
         <span class="flex items-center gap-1.5">
           <span class="size-2.5 rounded-sm bg-(--meter) opacity-35"></span>
-          Year before
+          {m.energy_chart_year_before()}
         </span>
         <span class="flex items-center gap-1.5">
           <span class="size-2.5 rounded-sm bg-(--meter)"></span>
-          Last 12 months
+          {m.energy_last_12_months()}
         </span>
       </p>
     {/if}

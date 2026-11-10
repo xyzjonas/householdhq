@@ -1,5 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
+import { m } from "#paraglide/messages.js";
 import { hq } from "#lib/server/index.ts";
 import {
   monthKey,
@@ -27,7 +28,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 export const actions: Actions = {
   create: async ({ request, locals }) => {
     const name = String((await request.formData()).get("name") ?? "").trim();
-    if (!name) return fail(400, { message: "Please enter a category name." });
+    if (!name)
+      return fail(400, { message: m.categories_create_name_required() });
     try {
       await hq(locals).categories.create({ name });
     } catch (e) {

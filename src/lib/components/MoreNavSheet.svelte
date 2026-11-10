@@ -4,6 +4,7 @@
   import Ellipsis from "@lucide/svelte/icons/ellipsis";
   import { Dialog, Navigation, Portal } from "@skeletonlabs/skeleton-svelte";
   import { isActive, moreNavItems, visibleNavItems } from "#lib/nav.ts";
+  import { m } from "#paraglide/messages.js";
 
   let { triggerClass = "" }: { triggerClass?: string } = $props();
 
@@ -26,7 +27,7 @@
   onclick={() => (open = true)}
 >
   <Ellipsis size={22} aria-hidden="true" />
-  <Navigation.TriggerText>More</Navigation.TriggerText>
+  <Navigation.TriggerText>{m.nav_more()}</Navigation.TriggerText>
 </Navigation.Trigger>
 
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
@@ -37,11 +38,11 @@
         class="flex w-full flex-col gap-2 rounded-t-container bg-surface-50-950 p-4 pb-8 shadow-xl"
       >
         <Dialog.Title class="px-2 text-sm font-bold opacity-70">
-          More
+          {m.nav_more()}
         </Dialog.Title>
-        <nav aria-label="More">
+        <nav aria-label={m.nav_more()}>
           <ul class="flex flex-col gap-1">
-            {#each items as item (item.label)}
+            {#each items as item (item.key)}
               {@const Icon = item.icon}
               <li>
                 {#if item.href}
@@ -55,7 +56,7 @@
                     onclick={() => (open = false)}
                   >
                     <Icon size={18} aria-hidden="true" />
-                    <span>{item.label}</span>
+                    <span>{item.label()}</span>
                   </a>
                 {:else}
                   <!-- Not built yet: shown, but not interactive -->
@@ -65,7 +66,7 @@
                     class="btn w-full cursor-not-allowed justify-start preset-tonal opacity-50"
                   >
                     <Icon size={18} aria-hidden="true" />
-                    <span>{item.label}</span>
+                    <span>{item.label()}</span>
                   </button>
                 {/if}
               </li>

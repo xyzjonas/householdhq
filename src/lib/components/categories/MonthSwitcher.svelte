@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
@@ -18,11 +19,13 @@
   } = $props();
 </script>
 
-<nav aria-label="Fiscal month" class="flex items-center gap-1">
+<nav aria-label={m.categories_fiscal_month()} class="flex items-center gap-1">
   <a
     href={resolve(`${route}?month=${previous}`)}
     class="btn-icon preset-tonal"
-    aria-label="Previous month: {monthLabel(previous)}"
+    aria-label={m.categories_previous_month({
+      month: monthLabel(previous),
+    })}
   >
     <ChevronLeft size={16} aria-hidden="true" />
   </a>
@@ -32,7 +35,7 @@
   <a
     href={resolve(`${route}?month=${next}`)}
     class="btn-icon preset-tonal"
-    aria-label="Next month: {monthLabel(next)}"
+    aria-label={m.categories_next_month({ month: monthLabel(next) })}
   >
     <ChevronRight size={16} aria-hidden="true" />
   </a>

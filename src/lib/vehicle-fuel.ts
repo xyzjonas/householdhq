@@ -1,3 +1,5 @@
+import { m } from "#paraglide/messages.js";
+
 /** Series behind the fuel chart on a vehicle's page. */
 
 export interface FuelPoint {
@@ -13,10 +15,10 @@ export interface ChartPoint {
 
 export type FuelChartMode = "distance" | "price" | "yearly";
 
-export const fuelChartModes: { id: FuelChartMode; label: string }[] = [
-  { id: "distance", label: "Distance by date" },
-  { id: "price", label: "Price by date" },
-  { id: "yearly", label: "Distance by year" },
+export const fuelChartModes = (): { id: FuelChartMode; label: string }[] => [
+  { id: "distance", label: m.vehicles_chart_mode_distance() },
+  { id: "price", label: m.vehicles_chart_mode_price() },
+  { id: "yearly", label: m.vehicles_chart_mode_yearly() },
 ];
 
 const time = (e: FuelPoint) => new Date(e.fueledAt).getTime();

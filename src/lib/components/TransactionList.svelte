@@ -8,11 +8,12 @@
   import ConfirmTransactionButton from "#lib/components/ConfirmTransactionButton.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import { formatDateWithYear, formatMoney } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import type { TransactionWithRelations } from "#lib/server/core/types.ts";
 
   let {
     transactions,
-    empty = "No transactions yet.",
+    empty = m.dashboard_no_transactions(),
   }: {
     transactions: TransactionWithRelations[];
     /** Shown instead of the rows when there are none. */
@@ -53,7 +54,7 @@
         <a
           href={resolve("/categories/[id]", { id: String(t.category.id) })}
           class="shrink-0 rounded-full transition-opacity hover:opacity-75"
-          aria-label="Open category {t.category.name}"
+          aria-label={m.dashboard_open_category({ name: t.category.name })}
           title={t.category.name}
         >
           <CategoryGlyph
@@ -74,9 +75,9 @@
           {#if t.recurring > 0}
             <span
               class="shrink-0 text-surface-500"
-              title="Recurring"
+              title={m.dashboard_recurring()}
               role="img"
-              aria-label="Recurring"
+              aria-label={m.dashboard_recurring()}
             >
               <Repeat size={14} aria-hidden="true" />
             </span>
@@ -84,9 +85,9 @@
           {#if t.isImportant}
             <span
               class="shrink-0 text-warning-500"
-              title="Important"
+              title={m.dashboard_important()}
               role="img"
-              aria-label="Important"
+              aria-label={m.dashboard_important()}
             >
               <TriangleAlert size={14} aria-hidden="true" />
             </span>
@@ -128,7 +129,9 @@
       <a
         href={resolve("/transactions/[id]/edit", { id: String(t.id) })}
         class="grid size-8 shrink-0 place-items-center rounded-full text-surface-400 transition-colors hover:bg-surface-500/15 hover:text-surface-950-50"
-        aria-label="Edit {t.description}"
+        aria-label={m.dashboard_edit_transaction({
+          description: t.description,
+        })}
       >
         <Pencil size={14} aria-hidden="true" />
       </a>

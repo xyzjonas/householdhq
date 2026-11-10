@@ -7,6 +7,7 @@ import {
   setSessionCookie,
 } from "#lib/server/auth.ts";
 import { UserInput } from "#lib/server/core/index.ts";
+import { m } from "#paraglide/messages.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -28,16 +29,16 @@ export const actions: Actions = {
       return fail(400, { message: parsed.error.issues[0]?.message });
     }
     if (password !== confirm) {
-      return fail(400, { message: "Passwords do not match" });
+      return fail(400, { message: m.auth_passwords_mismatch() });
     }
     if (password === current) {
-      return fail(400, { message: "Choose a different password" });
+      return fail(400, { message: m.invite_password_same() });
     }
 
     const key = `${getClientAddress()}|${email}`;
     if (isRateLimited(key)) {
       return fail(429, {
-        message: "Too many attempts. Try again in a few minutes.",
+        message: m.auth_too_many_attempts(),
       });
     }
 
@@ -46,7 +47,7 @@ export const actions: Actions = {
     if (!user) {
       recordFailure(key);
       return fail(400, {
-        message: "This invite link is no longer valid. Ask for a new one.",
+        message: m.invite_link_no_longer_valid(),
       });
     }
 

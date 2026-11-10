@@ -1,3 +1,5 @@
+import { m } from "#paraglide/messages.js";
+import { intlLocale } from "#lib/i18n.ts";
 import type { CategoryWithActivity } from "#lib/server/core/types.ts";
 
 /** <80% healthy, 80–99% near the cap, >=100% over; none without a budget. */
@@ -27,17 +29,23 @@ export type SortId = "spend" | "name";
 
 /** Directory tabs; `plural` names the listed things ("categories", "tags"). */
 export const filtersFor = (
-  plural: string,
+  plural: "categories" | "tags",
 ): { id: FilterId; label: string }[] => [
-  { id: "all", label: `All ${plural}` },
-  { id: "spending", label: "Spending" },
-  { id: "inflows", label: "Inflows" },
-  { id: "inactive", label: "No activity" },
+  {
+    id: "all",
+    label:
+      plural === "tags"
+        ? m.categories_filter_all_tags()
+        : m.categories_filter_all_categories(),
+  },
+  { id: "spending", label: m.categories_filter_spending() },
+  { id: "inflows", label: m.categories_filter_inflows() },
+  { id: "inactive", label: m.categories_filter_inactive() },
 ];
 
-export const sortOptions: { id: SortId; label: string }[] = [
-  { id: "spend", label: "Highest spend" },
-  { id: "name", label: "Name (A–Z)" },
+export const sortOptions = (): { id: SortId; label: string }[] => [
+  { id: "spend", label: m.categories_sort_spend() },
+  { id: "name", label: m.categories_sort_name() },
 ];
 
 export function budgetStatus(pct: number | undefined): BudgetStatus {
@@ -172,7 +180,8 @@ export function burnConcentration(items: CategoryItem[], top = 4): BurnSlice[] {
   const head = spending.slice(0, top);
   const restAmount = total - head.reduce((s, i) => s + i.amount, 0);
   const slices = head.map((i) => ({ label: i.name, amount: i.amount }));
-  if (restAmount > 0) slices.push({ label: "Other", amount: restAmount });
+  if (restAmount > 0)
+    slices.push({ label: m.categories_other(), amount: restAmount });
   return slices.map((s, n) => ({
     ...s,
     share: (s.amount / total) * 100,
@@ -197,10 +206,10 @@ export function parseMonth(value: string | null, now = new Date()): string {
 }
 
 export function monthRange(key: string): { from: Date; to: Date } {
-  const [y, m] = key.split("-").map(Number);
+  const [y, mo] = key.split("-").map(Number);
   return {
-    from: new Date(Date.UTC(y, m - 1, 1)),
-    to: new Date(Date.UTC(y, m, 1)),
+    from: new Date(Date.UTC(y, mo - 1, 1)),
+    to: new Date(Date.UTC(y, mo, 1)),
   };
 }
 
@@ -212,7 +221,7 @@ export function shiftMonth(key: string, delta: number): string {
 }
 
 export function monthLabel(key: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(intlLocale(), {
     month: "long",
     year: "numeric",
     timeZone: "UTC",

@@ -24,7 +24,7 @@ test.describe("energy", () => {
       await page.getByRole("button", { name: "Add reading" }).click();
       await expect(page.getByText("Reading added").first()).toBeVisible();
     }
-    await expect(page.getByText("130,5 kWh").first()).toBeVisible();
+    await expect(page.getByText("130.5 kWh").first()).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Monthly consumption" }),
     ).toBeVisible();

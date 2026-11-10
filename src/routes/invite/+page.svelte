@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import AuthCard from "#lib/components/AuthCard.svelte";
   import { decodeInvite, type InviteCredentials } from "#lib/invite.ts";
+  import { m } from "#paraglide/messages.js";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
@@ -18,18 +19,24 @@
   });
 </script>
 
-<svelte:head><title>Welcome · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.invite_page_title({ app: m.common_app_name() })}</title
+  ></svelte:head
+>
 
 {#if credentials}
   <AuthCard
-    title="Welcome!"
-    description="You've been invited to Household HQ as {credentials.email}. Choose a password to finish setting up your account."
+    title={m.invite_welcome_title()}
+    description={m.invite_welcome_description({
+      app: m.common_app_name(),
+      email: credentials.email,
+    })}
   >
     <form method="POST" use:enhance class="flex flex-col gap-4">
       <input type="hidden" name="email" value={credentials.email} />
       <input type="hidden" name="current" value={credentials.password} />
       <label class="label">
-        <span class="label-text">New password</span>
+        <span class="label-text">{m.invite_password_label()}</span>
         <input
           class="input"
           name="password"
@@ -40,7 +47,7 @@
         />
       </label>
       <label class="label">
-        <span class="label-text">Confirm new password</span>
+        <span class="label-text">{m.invite_confirm_label()}</span>
         <input
           class="input"
           name="confirm"
@@ -53,15 +60,17 @@
         <p role="alert" class="text-sm text-error-600-400">{form.message}</p>
       {/if}
       <button type="submit" class="btn preset-filled-surface-950-50">
-        Set password & sign in
+        {m.invite_submit()}
       </button>
     </form>
   </AuthCard>
 {:else if checked}
   <AuthCard
-    title="Invalid invite link"
-    description="This link is incomplete or damaged. Ask for a new invite."
+    title={m.invite_invalid_title()}
+    description={m.invite_invalid_description()}
   >
-    <a class="btn preset-tonal" href={resolve("/login")}>Go to sign in</a>
+    <a class="btn preset-tonal" href={resolve("/login")}
+      >{m.invite_go_to_sign_in()}</a
+    >
   </AuthCard>
 {/if}

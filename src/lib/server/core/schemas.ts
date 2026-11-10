@@ -1,4 +1,47 @@
 import { z } from "zod";
+import { m } from "#paraglide/messages.js";
+
+// Localizes zod's built-in messages. The handler runs per issue, at parse
+// time, so the message follows the locale of the request being served.
+z.config({
+  customError: (iss) => {
+    switch (iss.code) {
+      case "invalid_type":
+        return iss.input === undefined
+          ? m.core_validation_required()
+          : m.core_validation_invalid_type();
+      case "too_small": {
+        const min = Number(iss.minimum);
+        if (iss.origin === "string" && min === 1) {
+          return m.core_validation_required();
+        }
+        if (iss.origin === "string")
+          return m.core_validation_string_min({ min });
+        if (iss.origin === "array") return m.core_validation_array_min({ min });
+        return iss.inclusive
+          ? m.core_validation_number_min({ min })
+          : m.core_validation_number_above({ min });
+      }
+      case "too_big": {
+        const max = Number(iss.maximum);
+        if (iss.origin === "string")
+          return m.core_validation_string_max({ max });
+        if (iss.origin === "array") return m.core_validation_array_max({ max });
+        return iss.inclusive
+          ? m.core_validation_number_max({ max })
+          : m.core_validation_number_below({ max });
+      }
+      case "invalid_format":
+        return iss.format === "email"
+          ? m.core_validation_email()
+          : m.core_validation_invalid_format();
+      case "invalid_value":
+        return m.core_validation_invalid_value();
+      default:
+        return m.core_validation_invalid();
+    }
+  },
+});
 
 const optionalText = z
   .string()
@@ -245,24 +288,30 @@ export const UserInput = z.object({
   email: z.email().trim().toLowerCase(),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(200, "Password is too long"),
+    .min(8, { error: () => m.core_password_min() })
+    .max(200, { error: () => m.core_password_max() }),
 });
 export type UserInput = z.input<typeof UserInput>;
 
 /** Omitted icon and colour fall back to the household defaults. */
 export const HouseholdInput = z.object({
-  name: z.string().trim().min(1, "Please enter a name").max(100),
+  name: z
+    .string()
+    .trim()
+    .min(1, { error: () => m.core_household_name_required() })
+    .max(100),
   icon: z
     .string()
     .trim()
-    .regex(/^[a-z0-9-]{1,50}$/, "Choose an icon from the list")
+    .regex(/^[a-z0-9-]{1,50}$/, {
+      error: () => m.core_household_icon_invalid(),
+    })
     .optional(),
   color: z
     .string()
     .trim()
     .toLowerCase()
-    .regex(/^#[0-9a-f]{6}$/, "Pick a colour")
+    .regex(/^#[0-9a-f]{6}$/, { error: () => m.core_household_color_invalid() })
     .optional(),
 });
 export type HouseholdInput = z.input<typeof HouseholdInput>;
@@ -274,20 +323,20 @@ export const SettingsInput = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO 4217 code"),
+    .regex(/^[A-Z]{3}$/, { error: () => m.core_settings_currency_invalid() }),
   fiscalIntervalStartDay: z.coerce
     .number()
-    .int("Day must be a whole number")
-    .min(1, "Day must be between 1 and 31")
-    .max(31, "Day must be between 1 and 31"),
+    .int({ error: () => m.core_settings_day_whole() })
+    .min(1, { error: () => m.core_settings_day_range() })
+    .max(31, { error: () => m.core_settings_day_range() }),
   mankoCategoryId: z.coerce
     .number()
-    .int("Please choose a category")
-    .positive("Please choose a category"),
+    .int({ error: () => m.core_settings_choose_category() })
+    .positive({ error: () => m.core_settings_choose_category() }),
   defaultOutAccountId: z.coerce
     .number()
-    .int("Please choose an account")
-    .positive("Please choose an account"),
+    .int({ error: () => m.core_settings_choose_account() })
+    .positive({ error: () => m.core_settings_choose_account() }),
 });
 export type SettingsInput = z.input<typeof SettingsInput>;
 export const SettingsPatch = SettingsInput.partial();

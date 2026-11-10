@@ -27,7 +27,7 @@ test.describe("add record wizard", () => {
     for (const key of ["1", "2", "0", "0", "Plus", "2", "5", "0"]) {
       await step(key).click();
     }
-    await expect(page.getByText("= 1 450 Kč")).toBeVisible();
+    await expect(page.getByText("= 1,450 Kč")).toBeVisible();
     await step("=").click();
     await expect(page.getByRole("status")).toHaveText("1450");
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
+  import { intlLocale } from "#lib/i18n.ts";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { formatReading, incrementById } from "#lib/energy.ts";
   import type { MeterReading } from "#lib/server/core/types.ts";
@@ -16,10 +18,12 @@
   } = $props();
 
   const increments = $derived(incrementById(readings));
-  const dateFmt = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  const dateFmt = $derived(
+    new Intl.DateTimeFormat(intlLocale(), {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+  );
 
   let pending = $state<{ id: number; label: string } | null>(null);
 </script>
@@ -52,7 +56,9 @@
         <button
           type="button"
           class="btn-icon preset-tonal btn-icon-sm"
-          aria-label="Delete reading from {dateFmt.format(reading.meteredAt)}"
+          aria-label={m.energy_delete_reading({
+            date: dateFmt.format(reading.meteredAt),
+          })}
           onclick={() =>
             (pending = {
               id: reading.id,

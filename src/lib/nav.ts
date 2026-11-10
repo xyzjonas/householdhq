@@ -9,9 +9,13 @@ import ShieldCheck from "@lucide/svelte/icons/shield-check";
 import Tags from "@lucide/svelte/icons/tags";
 import Wallet from "@lucide/svelte/icons/wallet";
 import Zap from "@lucide/svelte/icons/zap";
+import { m } from "#paraglide/messages.js";
 
 export interface NavItem {
-  label: string;
+  /** Stable identifier (labels are translated, so they can't be keys). */
+  key: string;
+  /** Resolved when rendered, so it follows the active language. */
+  label: () => string;
   /** Items without an href are not built yet and render disabled. */
   href?:
     | "/"
@@ -31,26 +35,56 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard, primary: true },
-  { label: "Accounts", href: "/accounts", icon: Wallet, primary: true },
-  { label: "Categories", href: "/categories", icon: Tags, primary: true },
   {
-    label: "Transactions",
+    key: "dashboard",
+    label: () => m.nav_dashboard(),
+    href: "/",
+    icon: LayoutDashboard,
+    primary: true,
+  },
+  {
+    key: "accounts",
+    label: () => m.nav_accounts(),
+    href: "/accounts",
+    icon: Wallet,
+    primary: true,
+  },
+  {
+    key: "categories",
+    label: () => m.nav_categories(),
+    href: "/categories",
+    icon: Tags,
+    primary: true,
+  },
+  {
+    key: "transactions",
+    label: () => m.nav_transactions(),
     href: "/transactions",
     icon: Receipt,
     primary: true,
   },
-  { label: "Tags", href: "/tags", icon: Tag },
-  { label: "Vehicles", href: "/vehicles", icon: Car },
-  { label: "Energy", href: "/energy", icon: Zap },
-  { label: "Analytics", icon: ChartColumn },
+  { key: "tags", label: () => m.nav_tags(), href: "/tags", icon: Tag },
   {
-    label: "Administration",
+    key: "vehicles",
+    label: () => m.nav_vehicles(),
+    href: "/vehicles",
+    icon: Car,
+  },
+  { key: "energy", label: () => m.nav_energy(), href: "/energy", icon: Zap },
+  { key: "analytics", label: () => m.nav_analytics(), icon: ChartColumn },
+  {
+    key: "admin",
+    label: () => m.nav_admin(),
     href: "/admin",
     icon: ShieldCheck,
     superuserOnly: true,
   },
-  { label: "Settings", href: "/settings", icon: Settings },
+  {
+    key: "settings",
+    label: () => m.nav_settings(),
+    href: "/settings",
+    icon: Settings,
+  },
 ];
 
 /** The items `user` is allowed to see. */

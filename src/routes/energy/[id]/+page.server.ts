@@ -1,5 +1,6 @@
 import { error, fail } from "@sveltejs/kit";
 import { z } from "zod";
+import { m } from "#paraglide/messages.js";
 import { hq } from "#lib/server/index.ts";
 import {
   MeterPatch,
@@ -11,7 +12,7 @@ import type { Actions, PageServerLoad } from "./$types";
 
 function meterId(params: { id: string }): number {
   const id = Number(params.id);
-  if (!Number.isInteger(id)) error(404, "Meter not found");
+  if (!Number.isInteger(id)) error(404, m.energy_error_not_found());
   return id;
 }
 
@@ -63,7 +64,7 @@ export const actions: Actions = {
       meteredAt: form.get("meteredAt") || undefined,
     });
     if (!parsed.success) {
-      return fail(400, { message: "Enter a valid value and date." });
+      return fail(400, { message: m.energy_error_invalid_reading() });
     }
     try {
       await hq(locals).meters.addReading(meterId(params), parsed.data);
@@ -76,7 +77,8 @@ export const actions: Actions = {
 
   deleteReading: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
-    if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
+    if (!Number.isInteger(id))
+      return fail(400, { message: m.energy_error_invalid_id() });
     try {
       await hq(locals).meters.removeReading(id);
     } catch (e) {

@@ -1,11 +1,14 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import TransactionWizard from "#lib/components/transaction-wizard/TransactionWizard.svelte";
   import type { PageProps } from "./$types";
 
   let { data, form }: PageProps = $props();
 </script>
 
-<svelte:head><title>Edit record · Household HQ</title></svelte:head>
+<svelte:head
+  ><title>{m.wizard_title_edit()} · {m.common_app_name()}</title></svelte:head
+>
 
 <TransactionWizard
   accounts={data.accounts}

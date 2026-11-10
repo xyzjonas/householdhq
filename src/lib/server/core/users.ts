@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { Prisma } from "@prisma/client";
@@ -81,7 +82,7 @@ export function usersRepo(db: RawDb) {
           e instanceof Prisma.PrismaClientKnownRequestError &&
           e.code === "P2002"
         ) {
-          throw new ConflictError(`User '${email}' already exists`);
+          throw new ConflictError(m.core_user_exists({ email }));
         }
         throw e;
       }
@@ -143,7 +144,7 @@ export function usersRepo(db: RawDb) {
         target.isSuperuser &&
         (await db.user.count({ where: { isSuperuser: true } })) <= 1
       ) {
-        throw new ConflictError("The last superuser cannot be deleted");
+        throw new ConflictError(m.core_user_last_superuser());
       }
       try {
         await db.$transaction([

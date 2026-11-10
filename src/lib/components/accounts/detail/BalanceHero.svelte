@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import TrendingDown from "@lucide/svelte/icons/trending-down";
   import TrendingUp from "@lucide/svelte/icons/trending-up";
   import { formatMoney } from "#lib/format.ts";
@@ -28,7 +29,7 @@
       id="balance-heading"
       class="text-xs font-bold tracking-wider uppercase opacity-60"
     >
-      Active current balance
+      {m.accounts_balance_heading()}
     </h2>
     <p class="text-4xl font-extrabold tracking-tight">
       {formatMoney(balance)}
@@ -41,7 +42,9 @@
             : 'border-red-100 bg-red-50 text-red-700'}"
         >
           <Trend size={14} aria-hidden="true" />
-          {up ? "+" : ""}{formatMoney(delta)} vs last month
+          {m.accounts_balance_vs_last_month({
+            delta: `${up ? "+" : ""}${formatMoney(delta)}`,
+          })}
         </span>
       </p>
     {/if}
@@ -52,7 +55,7 @@
   >
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Disponible
+        {m.accounts_balance_disponible()}
       </dt>
       <dd class="font-bold">
         {disponible ? formatMoney(balance) : formatMoney(0)}
@@ -61,18 +64,20 @@
             ? 'text-emerald-700'
             : 'opacity-60'}"
         >
-          {disponible ? "100% liquid" : "Not marked as disponible"}
+          {disponible
+            ? m.accounts_balance_fully_liquid()
+            : m.accounts_balance_not_disponible()}
         </span>
       </dd>
     </div>
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
-        Projected month end
+        {m.accounts_balance_projected()}
       </dt>
       <dd class="font-bold">
         {formatMoney(projectedMonthEnd)}
         <span class="block text-xs font-medium opacity-60">
-          Includes scheduled entries
+          {m.accounts_balance_includes_scheduled()}
         </span>
       </dd>
     </div>

@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import { error, fail } from "@sveltejs/kit";
 import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
@@ -6,7 +7,7 @@ import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const id = Number(params.id);
-  if (!Number.isInteger(id)) error(404, "Account not found");
+  if (!Number.isInteger(id)) error(404, m.accounts_api_not_found());
   const core = hq(locals);
 
   const account = await core.accounts
@@ -89,7 +90,9 @@ export const actions: Actions = {
       .replace(",", ".");
     const amount = raw === "" ? NaN : Number(raw);
     if (!Number.isFinite(amount)) {
-      return fail(400, { message: "Please enter the current balance." });
+      return fail(400, {
+        message: m.accounts_detail_checkpoint_amount_required(),
+      });
     }
     try {
       const { adjustment } = await hq(locals).checkpoints.create(id, {
@@ -106,7 +109,8 @@ export const actions: Actions = {
   deleteCheckpoint: async ({ params, request, locals }) => {
     const accountId = Number(params.id);
     const id = Number((await request.formData()).get("id"));
-    if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
+    if (!Number.isInteger(id))
+      return fail(400, { message: m.accounts_detail_invalid_id() });
     try {
       await hq(locals).checkpoints.remove(accountId, id);
     } catch (e) {
@@ -118,7 +122,8 @@ export const actions: Actions = {
 
   delete: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
-    if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
+    if (!Number.isInteger(id))
+      return fail(400, { message: m.accounts_detail_invalid_id() });
     try {
       await hq(locals).transactions.remove(id);
     } catch (e) {

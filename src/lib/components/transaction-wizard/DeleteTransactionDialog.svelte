@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import { toaster } from "#lib/toaster.ts";
+  import { m } from "#paraglide/messages.js";
 
   let {
     open = $bindable(false),
@@ -28,12 +29,12 @@
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
         <Dialog.Title class="text-lg font-bold"
-          >Delete transaction?</Dialog.Title
+          >{m.wizard_delete_title()}</Dialog.Title
         >
         <Dialog.Description class="text-sm text-surface-600-400">
           {description
-            ? `“${description}” will be permanently removed from the journal.`
-            : "This transaction will be permanently removed from the journal."}
+            ? m.wizard_delete_description_named({ description })
+            : m.wizard_delete_description()}
         </Dialog.Description>
         <form
           method="POST"
@@ -42,19 +43,19 @@
           use:enhance={() =>
             async ({ result, update }) => {
               if (result.type === "redirect" || result.type === "success") {
-                toaster.success({ title: "Transaction deleted" });
+                toaster.success({ title: m.wizard_delete_toast_success() });
               } else {
                 open = false;
-                toaster.error({ title: "Could not delete the transaction" });
+                toaster.error({ title: m.wizard_delete_toast_error() });
               }
               await update();
             }}
         >
           <Dialog.CloseTrigger class="btn preset-tonal"
-            >Cancel</Dialog.CloseTrigger
+            >{m.common_cancel()}</Dialog.CloseTrigger
           >
           <button type="submit" class="btn preset-filled-error-500">
-            Delete
+            {m.common_delete()}
           </button>
         </form>
       </Dialog.Content>

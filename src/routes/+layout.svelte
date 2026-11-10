@@ -4,6 +4,7 @@
   import UpdateBanner from "#lib/components/UpdateBanner.svelte";
   import AppShell from "#lib/components/AppShell.svelte";
   import SoloShell from "#lib/components/SoloShell.svelte";
+  import { m } from "#paraglide/messages.js";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
@@ -14,7 +15,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#4f46e5" />
-  <title>Household HQ</title>
+  <title>{m.common_app_name()}</title>
 </svelte:head>
 
 {#if data.user && data.household}

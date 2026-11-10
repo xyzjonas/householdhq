@@ -2,7 +2,9 @@
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Search from "@lucide/svelte/icons/search";
   import X from "@lucide/svelte/icons/x";
+  import { m } from "#paraglide/messages.js";
   import {
+    iconGroupLabel,
     iconGroups,
     searchIcons,
     type CatalogIcon,
@@ -53,10 +55,12 @@
   class="flex min-h-24 items-center justify-between gap-3 rounded-xl border border-surface-200-800 bg-surface-100-900/70 p-3.5"
 >
   <div class="min-w-0">
-    <p class="text-xs font-bold tracking-wider uppercase opacity-60">Icon</p>
+    <p class="text-xs font-bold tracking-wider uppercase opacity-60">
+      {m.categories_props_icon()}
+    </p>
     <p class="flex items-center gap-2 text-base font-bold">
       <Current size={16} aria-hidden="true" />
-      <span class="truncate">{value ?? "Default"}</span>
+      <span class="truncate">{value ?? m.categories_props_icon_default()}</span>
     </p>
   </div>
   <button
@@ -67,7 +71,7 @@
       open = true;
     }}
   >
-    Change icon
+    {m.categories_props_change_icon()}
   </button>
 </div>
 
@@ -83,14 +87,16 @@
         >
           <header class="flex items-start justify-between gap-4">
             <div>
-              <Dialog.Title class="text-lg font-bold">Choose icon</Dialog.Title>
+              <Dialog.Title class="text-lg font-bold">
+                {m.categories_icon_picker_title()}
+              </Dialog.Title>
               <Dialog.Description class="text-sm text-surface-600-400">
-                Search by name, theme or what you spend on, e.g. “petrol”.
+                {m.categories_icon_picker_description()}
               </Dialog.Description>
             </div>
             <Dialog.CloseTrigger
               class="btn-icon preset-tonal btn-icon-sm"
-              aria-label="Close"
+              aria-label={m.common_close()}
             >
               <X size={16} aria-hidden="true" />
             </Dialog.CloseTrigger>
@@ -103,19 +109,22 @@
             <input
               class="input"
               type="search"
-              placeholder="Search icons"
-              aria-label="Search icons"
+              placeholder={m.categories_icon_picker_search()}
+              aria-label={m.categories_icon_picker_search()}
               bind:value={query}
             />
           </div>
 
           <div class="flex flex-col gap-5 overflow-y-auto pr-1">
             {#each groups as { group, icons } (group)}
-              <section aria-label={group} class="flex flex-col gap-2">
+              <section
+                aria-label={iconGroupLabel(group)}
+                class="flex flex-col gap-2"
+              >
                 <h3
                   class="text-xs font-bold tracking-wider uppercase opacity-60"
                 >
-                  {group}
+                  {iconGroupLabel(group)}
                 </h3>
                 <ul
                   class="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2"
@@ -144,7 +153,7 @@
               </section>
             {:else}
               <p class="py-8 text-center text-sm opacity-70">
-                No icons match “{query}”.
+                {m.categories_icon_picker_none({ query })}
               </p>
             {/each}
           </div>
@@ -156,7 +165,7 @@
               disabled={saving || value === null}
               onclick={() => choose(null)}
             >
-              Use default icon
+              {m.categories_icon_picker_use_default()}
             </button>
           </footer>
         </Dialog.Content>

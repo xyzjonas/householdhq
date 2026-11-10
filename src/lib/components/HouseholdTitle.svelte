@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import type { HouseholdSummary } from "#lib/household.ts";
+  import { m } from "#paraglide/messages.js";
   import CategoryGlyph from "./categories/CategoryGlyph.svelte";
   import HouseholdSwitchDialog from "./HouseholdSwitchDialog.svelte";
 
@@ -17,7 +18,7 @@
     <span
       class="truncate text-[0.625rem] leading-none font-bold tracking-widest text-surface-500 uppercase"
     >
-      Household HQ
+      {m.common_app_name()}
     </span>
     <a
       href={resolve("/")}

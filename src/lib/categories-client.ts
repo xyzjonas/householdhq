@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { Category, Tag } from "#lib/server/core/types.ts";
 
 export type CategoryChanges = Partial<
@@ -17,7 +18,9 @@ async function patch<T>(url: string, changes: CategoryChanges): Promise<T> {
     const body = (await res.json().catch(() => null)) as {
       message?: string;
     } | null;
-    throw new Error(body?.message ?? `Update failed (${res.status})`);
+    throw new Error(
+      body?.message ?? m.categories_update_failed({ status: res.status }),
+    );
   }
   return res.json();
 }

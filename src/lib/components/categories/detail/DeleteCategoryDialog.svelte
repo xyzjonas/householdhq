@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { m } from "#paraglide/messages.js";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { toaster } from "#lib/toaster.ts";
@@ -27,16 +28,13 @@
   let tagNames = $state<string[]>([]);
 
   const needsTarget = $derived(transactionCount > 0);
-  const noun = $derived(
-    transactionCount === 1 ? "transaction" : "transactions",
-  );
   const blocked = $derived(needsTarget && (others.length === 0 || !reassignTo));
 </script>
 
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Dialog.Trigger class="btn h-12 w-full preset-tonal-error">
     <Trash2 size={18} aria-hidden="true" />
-    Delete category
+    {m.categories_delete_button()}
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -47,15 +45,13 @@
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
         <Dialog.Title class="text-lg font-bold">
-          Delete “{name}”?
+          {m.categories_delete_title({ name })}
         </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
           {#if needsTarget}
-            {transactionCount}
-            {noun} currently filed under this category. Choose the category they should
-            be moved to; the category is then permanently deleted. This can't be undone.
+            {m.categories_delete_description_move({ count: transactionCount })}
           {:else}
-            No transactions use this category. It will be permanently deleted.
+            {m.categories_delete_description_empty()}
           {/if}
         </Dialog.Description>
         <form
@@ -69,14 +65,14 @@
               if (result.type === "redirect") {
                 toaster.success({
                   title: needsTarget
-                    ? `Category deleted · ${transactionCount} ${noun} moved`
-                    : "Category deleted",
+                    ? m.categories_deleted_moved({ count: transactionCount })
+                    : m.categories_deleted(),
                 });
               } else if (result.type === "failure") {
                 toaster.error({
                   title:
                     (result.data as { message?: string } | undefined)
-                      ?.message ?? "Could not delete the category",
+                      ?.message ?? m.categories_delete_failed(),
                 });
                 return;
               }
@@ -86,34 +82,37 @@
         >
           {#if needsTarget}
             <label class="label">
-              <span class="label-text">Move transactions to</span>
+              <span class="label-text">{m.categories_delete_move_to()}</span>
               <select
                 class="select"
                 name="reassignTo"
                 required
                 bind:value={reassignTo}
               >
-                <option value="" disabled>Select a category…</option>
+                <option value="" disabled>{m.categories_delete_select()}</option
+                >
                 {#each others as other (other.id)}
                   <option value={other.id}>{other.name}</option>
                 {/each}
               </select>
             </label>
             <section class="flex flex-col gap-2">
-              <h3 class="label-text">Tags for the moved transactions</h3>
+              <h3 class="label-text">{m.categories_delete_tags()}</h3>
               <TagPicker bind:value={tagNames} options={tags} />
             </section>
           {/if}
           <div class="flex justify-end gap-2">
-            <Dialog.CloseTrigger class="btn preset-tonal"
-              >Cancel</Dialog.CloseTrigger
-            >
+            <Dialog.CloseTrigger class="btn preset-tonal">
+              {m.common_cancel()}
+            </Dialog.CloseTrigger>
             <button
               type="submit"
               class="btn preset-filled-error-500"
               disabled={submitting || blocked}
             >
-              {needsTarget ? "Move & delete" : "Delete"}
+              {needsTarget
+                ? m.categories_delete_move_and_delete()
+                : m.common_delete()}
             </button>
           </div>
         </form>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Plus from "@lucide/svelte/icons/plus";
@@ -12,7 +13,7 @@
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Dialog.Trigger class="btn preset-filled-surface-950-50">
     <Plus size={16} aria-hidden="true" />
-    <span>New account</span>
+    <span>{m.accounts_create_trigger()}</span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -22,10 +23,11 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">New account</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold">
+          {m.accounts_create_title()}
+        </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
-          Give the account a name. You can adjust its type and other properties
-          on the next screen.
+          {m.accounts_create_description()}
         </Dialog.Description>
         <form
           method="POST"
@@ -41,7 +43,7 @@
           }}
         >
           <label class="label">
-            <span class="label-text">Account name</span>
+            <span class="label-text">{m.accounts_create_name_label()}</span>
             <input
               class="input"
               name="name"
@@ -49,7 +51,7 @@
               required
               maxlength="100"
               autocomplete="off"
-              placeholder="e.g. Savings vault"
+              placeholder={m.accounts_create_name_placeholder()}
             />
           </label>
           {#if message}
@@ -57,14 +59,14 @@
           {/if}
           <div class="flex justify-end gap-2">
             <Dialog.CloseTrigger class="btn preset-tonal"
-              >Cancel</Dialog.CloseTrigger
+              >{m.common_cancel()}</Dialog.CloseTrigger
             >
             <button
               type="submit"
               class="btn preset-filled-surface-950-50"
               disabled={submitting}
             >
-              Create account
+              {m.accounts_create_submit()}
             </button>
           </div>
         </form>

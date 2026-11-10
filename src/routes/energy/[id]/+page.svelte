@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import EnergyChart from "#lib/components/energy/EnergyChart.svelte";
   import MeterDialog from "#lib/components/energy/MeterDialog.svelte";
@@ -15,16 +16,28 @@
   const color = $derived(meter.color ?? meterFallbackColor);
 </script>
 
-<svelte:head><title>{meter.name} · Household HQ</title></svelte:head>
+<svelte:head
+  ><title
+    >{m.energy_meter_page_title({
+      name: meter.name,
+      app: m.common_app_name(),
+    })}</title
+  ></svelte:head
+>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="flex min-w-0 flex-col gap-2">
-      <nav aria-label="Breadcrumb" class="text-sm text-surface-600-400">
+      <nav
+        aria-label={m.energy_breadcrumb()}
+        class="text-sm text-surface-600-400"
+      >
         <ol class="flex gap-2">
-          <li><a class="anchor" href={resolve("/")}>Home</a></li>
+          <li><a class="anchor" href={resolve("/")}>{m.energy_home()}</a></li>
           <li aria-hidden="true">›</li>
-          <li><a class="anchor" href={resolve("/energy")}>Energy</a></li>
+          <li>
+            <a class="anchor" href={resolve("/energy")}>{m.energy_title()}</a>
+          </li>
           <li aria-hidden="true">›</li>
           <li aria-current="page" class="min-w-0 wrap-anywhere">
             {meter.id} ({meter.name})
@@ -38,10 +51,11 @@
         <span class="truncate">{meter.name}</span>
       </h1>
       <p class="text-sm text-surface-600-400">
-        Unit: {meter.unit}
-        {#if meter.meterNumber}· Meter ID: {meter.meterNumber}{/if}
-        · {meter.readings.length}
-        {meter.readings.length === 1 ? "reading" : "readings"}
+        {m.energy_meter_unit({ unit: meter.unit })}
+        {#if meter.meterNumber}· {m.energy_meter_id({
+            id: meter.meterNumber,
+          })}{/if}
+        · {m.energy_readings_count({ count: meter.readings.length })}
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
@@ -75,16 +89,18 @@
     class="flex flex-col gap-4 card border border-surface-200-800 p-6"
   >
     <header class="flex flex-col gap-1">
-      <h2 id="readings-heading" class="text-lg font-bold">Readings</h2>
+      <h2 id="readings-heading" class="text-lg font-bold">
+        {m.energy_readings_title()}
+      </h2>
       <p class="text-sm text-surface-600-400">
-        Each reading stays on its own timeline for this meter.
+        {m.energy_readings_hint()}
       </p>
     </header>
     {#if meter.readings.length}
       <ReadingsTimeline readings={meter.readings} unit={meter.unit} {color} />
     {:else}
       <p class="py-6 text-center text-sm opacity-70">
-        Add the first reading for this meter to populate the timeline.
+        {m.energy_readings_empty()}
       </p>
     {/if}
   </section>

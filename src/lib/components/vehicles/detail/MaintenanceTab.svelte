@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Wrench from "@lucide/svelte/icons/wrench";
@@ -45,10 +46,11 @@
 >
   <header class="flex flex-wrap items-start justify-between gap-3">
     <div>
-      <h2 id="service-heading" class="text-lg font-bold">Maintenance</h2>
+      <h2 id="service-heading" class="text-lg font-bold">
+        {m.vehicles_maintenance_heading()}
+      </h2>
       <p class="text-sm text-surface-600-400">
-        {entries.length}
-        {entries.length === 1 ? "service" : "services"} recorded
+        {m.vehicles_maintenance_recorded({ count: entries.length })}
       </p>
     </div>
     <button
@@ -57,13 +59,13 @@
       onclick={onadd}
     >
       <Wrench size={16} aria-hidden="true" />
-      <span>Add service</span>
+      <span>{m.vehicles_maintenance_add()}</span>
     </button>
   </header>
 
   {#if components.length}
     <fieldset class="flex flex-wrap gap-1.5">
-      <legend class="sr-only">Filter by component</legend>
+      <legend class="sr-only">{m.vehicles_components_filter()}</legend>
       {#each components as c (c.id)}
         <label
           class="cursor-pointer rounded-full border border-surface-300-700 bg-surface-100-900 px-3 py-1 text-xs font-semibold transition-shadow has-checked:ring-2 has-checked:ring-offset-1 has-focus-visible:outline-2"
@@ -92,7 +94,7 @@
           <div class="flex min-w-0 flex-col items-start gap-1">
             <h3 class="text-base font-bold capitalize">{entry.title}</h3>
             <p class="text-sm text-surface-600-400">
-              {serviceTypeLabels[entry.type]}
+              {serviceTypeLabels[entry.type]()}
               {#if entry.odometer}
                 · {formatNumber(entry.odometer, "km")}
               {/if}
@@ -103,7 +105,10 @@
               </p>
             {/if}
             {#if entry.components.length}
-              <ul class="mt-1 flex flex-wrap gap-1" aria-label="Components">
+              <ul
+                class="mt-1 flex flex-wrap gap-1"
+                aria-label={m.vehicles_maintenance_components_label()}
+              >
                 {#each entry.components as c (c.id)}
                   <li><ComponentChip name={c.name} color={c.color} /></li>
                 {/each}
@@ -138,7 +143,7 @@
               onclick={() => onedit(entry)}
             >
               <Pencil size={14} aria-hidden="true" />
-              <span>Edit</span>
+              <span>{m.common_edit()}</span>
               <span class="sr-only">{entry.title}</span>
             </button>
           </div>
@@ -148,8 +153,8 @@
   {:else}
     <p class="py-8 text-center text-sm opacity-70">
       {entries.length
-        ? "No services touched the selected components."
-        : "No services recorded yet."}
+        ? m.vehicles_maintenance_empty_filtered()
+        : m.vehicles_maintenance_empty()}
     </p>
   {/if}
 </section>

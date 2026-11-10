@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from "#paraglide/messages.js";
   import { enhance } from "$app/forms";
   import { Dialog, Portal } from "@skeletonlabs/skeleton-svelte";
   import Plus from "@lucide/svelte/icons/plus";
@@ -9,13 +10,11 @@
     example = "Groceries",
   }: {
     message?: string;
-    /** What is being created, lowercase ("category", "tag"). */
-    noun?: string;
+    /** What is being created. */
+    noun?: "category" | "tag";
     /** Placeholder suggestion for the name field. */
     example?: string;
   } = $props();
-
-  const Noun = $derived(noun[0].toUpperCase() + noun.slice(1));
 
   let open = $state(false);
   let submitting = $state(false);
@@ -24,7 +23,9 @@
 <Dialog {open} onOpenChange={(e) => (open = e.open)}>
   <Dialog.Trigger class="btn preset-filled-surface-950-50">
     <Plus size={16} aria-hidden="true" />
-    <span>New {noun}</span>
+    <span>
+      {noun === "tag" ? m.categories_new_tag() : m.categories_new_category()}
+    </span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -34,9 +35,15 @@
       <Dialog.Content
         class="flex w-full max-w-md flex-col gap-4 card bg-surface-50-950 p-6 shadow-xl"
       >
-        <Dialog.Title class="text-lg font-bold">New {noun}</Dialog.Title>
+        <Dialog.Title class="text-lg font-bold">
+          {noun === "tag"
+            ? m.categories_new_tag()
+            : m.categories_new_category()}
+        </Dialog.Title>
         <Dialog.Description class="text-sm text-surface-600-400">
-          Give the {noun} a name. It will show up in the directory right away.
+          {noun === "tag"
+            ? m.categories_create_description_tag()
+            : m.categories_create_description_category()}
         </Dialog.Description>
         <form
           method="POST"
@@ -52,7 +59,11 @@
           }}
         >
           <label class="label">
-            <span class="label-text">{Noun} name</span>
+            <span class="label-text">
+              {noun === "tag"
+                ? m.categories_name_label_tag()
+                : m.categories_name_label_category()}
+            </span>
             <input
               class="input"
               name="name"
@@ -60,22 +71,24 @@
               required
               maxlength="100"
               autocomplete="off"
-              placeholder="e.g. {example}"
+              placeholder={m.categories_name_placeholder({ example })}
             />
           </label>
           {#if message}
             <p role="alert" class="text-sm text-error-600-400">{message}</p>
           {/if}
           <div class="flex justify-end gap-2">
-            <Dialog.CloseTrigger class="btn preset-tonal"
-              >Cancel</Dialog.CloseTrigger
-            >
+            <Dialog.CloseTrigger class="btn preset-tonal">
+              {m.common_cancel()}
+            </Dialog.CloseTrigger>
             <button
               type="submit"
               class="btn preset-filled-surface-950-50"
               disabled={submitting}
             >
-              Create {noun}
+              {noun === "tag"
+                ? m.categories_create_tag()
+                : m.categories_create_category()}
             </button>
           </div>
         </form>

@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type {
   HouseholdWithMembers,
   PublicUser,
@@ -22,7 +23,7 @@ export function buildSections(
 ): AdminSection[] {
   const byId = new Map(users.map((u) => [u.id, u]));
   const assigned = new Set(
-    households.flatMap((h) => h.members.map((m) => m.id)),
+    households.flatMap((h) => h.members.map((member) => member.id)),
   );
   const loose = users.filter((u) => !assigned.has(u.id));
   return [
@@ -30,10 +31,18 @@ export function buildSections(
       key: `household-${household.id}`,
       household,
       title: household.name,
-      users: household.members.map((m) => byId.get(m.id) ?? m),
+      users: household.members.map((member) => byId.get(member.id) ?? member),
     })),
     ...(loose.length > 0
-      ? [{ key: "no-household", title: "No household", users: loose }]
+      ? [
+          {
+            key: "no-household",
+            get title() {
+              return m.admin_no_household();
+            },
+            users: loose,
+          },
+        ]
       : []),
   ];
 }
