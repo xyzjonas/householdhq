@@ -17,6 +17,7 @@
     visibleNavItems(
       layout === "bar" ? primaryNavItems : navItems,
       page.data.user,
+      page.data.enabledModules,
     ),
   );
 

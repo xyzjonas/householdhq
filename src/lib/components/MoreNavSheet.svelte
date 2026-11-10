@@ -10,7 +10,9 @@
 
   let open = $state(false);
 
-  const items = $derived(visibleNavItems(moreNavItems, page.data.user));
+  const items = $derived(
+    visibleNavItems(moreNavItems, page.data.user, page.data.enabledModules),
+  );
 
   // The trigger stands in for any hidden item that is currently open.
   const active = $derived(

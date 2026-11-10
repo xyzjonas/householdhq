@@ -370,6 +370,8 @@ model AppSettings {
   // external account that expenses (and checkpoint adjustments) are paid to by default
   defaultOutAccountId    Int?
   defaultOutAccount      Source?   @relation("DefaultOutAccount", fields: [defaultOutAccountId], references: [id], onDelete: SetNull)
+  // comma-separated modules shown in the navigation (null = all); hiding never blocks routes
+  enabledModules         String?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 

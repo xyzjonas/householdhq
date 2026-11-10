@@ -1,4 +1,5 @@
 import { m } from "#paraglide/messages.js";
+import { parseEnabledModules, type ModuleKey } from "../../modules";
 import type { Db } from "./prisma";
 import { SettingsPatch } from "./schemas";
 import { ConflictError, NotFoundError, type AppSettings } from "./types";
@@ -55,6 +56,15 @@ export function settingsRepo(db: Db, householdId: number) {
         });
       }
       return settings;
+    },
+
+    /** Modules shown in the navigation; all of them until the household chooses. */
+    async enabledModules(): Promise<ModuleKey[]> {
+      const row = await db.appSettings.findUnique({
+        where: { householdId },
+        select: { enabledModules: true },
+      });
+      return parseEnabledModules(row?.enabledModules ?? null);
     },
 
     /** Changes the given settings only; omitted ones keep their value. */

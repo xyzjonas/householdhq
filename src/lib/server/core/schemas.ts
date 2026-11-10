@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { serializeEnabledModules } from "../../modules";
 import { m } from "#paraglide/messages.js";
 
 // Localizes zod's built-in messages. The handler runs per issue, at parse
@@ -337,6 +338,8 @@ export const SettingsInput = z.object({
     .number()
     .int({ error: () => m.core_settings_choose_account() })
     .positive({ error: () => m.core_settings_choose_account() }),
+  /** Module keys; stored as a normalised comma-separated list. */
+  enabledModules: z.array(z.string()).transform(serializeEnabledModules),
 });
 export type SettingsInput = z.input<typeof SettingsInput>;
 export const SettingsPatch = SettingsInput.partial();

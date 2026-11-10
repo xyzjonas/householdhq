@@ -72,6 +72,15 @@ export const actions: Actions = {
     return { mankoSaved: true };
   },
 
+  modules: async ({ request, locals }) => {
+    // Unchecked switches submit nothing, so an empty list switches all off.
+    const enabledModules = (await request.formData())
+      .getAll("enabledModules")
+      .map(String);
+    await hq(locals).settings.update({ enabledModules });
+    return { success: true };
+  },
+
   defaultOut: async ({ request, locals }) => {
     const parsed = SettingsInput.pick({ defaultOutAccountId: true }).safeParse({
       defaultOutAccountId: (await request.formData()).get(
