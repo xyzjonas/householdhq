@@ -1,6 +1,8 @@
 import { fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { getCore } from "#lib/server/index.ts";
+import { setSessionCookie } from "#lib/server/auth.ts";
+import { encodeInvite } from "#lib/invite.ts";
 import {
   ConflictError,
   HouseholdInput,
@@ -12,13 +14,19 @@ import type { Actions, PageServerLoad } from "./$types";
 // Only instance administrators get here: the request hook turns everyone
 // else away from /admin, loads and actions alike.
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
   const core = getCore();
   const [households, users] = await Promise.all([
     core.households.list(),
     core.users.list(),
   ]);
-  return { households, users };
+  return {
+    households,
+    users,
+    currentUserId: locals.user?.id,
+    /** Preselected when inviting: the household the admin is working in. */
+    activeHouseholdId: locals.household?.id ?? null,
+  };
 };
 
 const Id = z.coerce.number().int().positive();
@@ -105,34 +113,104 @@ export const actions: Actions = {
     };
   },
 
-  createUser: async ({ request }) => {
+  /**
+   * Creates the account with a random password and returns the invite link
+   * token. The invitee joins the chosen household (none: assigned later).
+   */
+  invite: async ({ request }) => {
     const form = await request.formData();
-    const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
-    const parsed = UserInput.safeParse({ email, password });
+    const parsed = UserInput.shape.email.safeParse(
+      String(form.get("email") ?? ""),
+    );
     if (!parsed.success) {
-      return fail(400, {
-        action: "createUser",
-        email,
-        errors: z.flattenError(parsed.error).fieldErrors,
-      });
+      return fail(400, { message: "Please enter a valid email address." });
+    }
+    const chosen = String(form.get("householdId") ?? "");
+    const householdId = chosen === "" ? null : Id.safeParse(chosen);
+    if (householdId && !householdId.success) {
+      return fail(400, { message: "Please choose a household." });
     }
     const core = getCore();
-    const householdId = Id.safeParse(form.get("householdId"));
     try {
       // Fail before creating anything when the household is unknown.
-      if (householdId.success) await core.households.get(householdId.data);
-      const user = await core.users.create(parsed.data);
-      if (householdId.success) {
+      if (householdId) await core.households.get(householdId.data);
+      const { user, password } = await core.users.invite(parsed.data);
+      if (householdId) {
         await core.households.addMember(householdId.data, user.id);
       }
+      return {
+        invite: {
+          email: user.email,
+          token: encodeInvite({ email: user.email, password }),
+        },
+      };
     } catch (e) {
-      return fail(400, {
-        action: "createUser",
-        email,
-        errors: { email: [message(e)] },
-      });
+      if (e instanceof ConflictError) return fail(409, { message: e.message });
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      throw e;
     }
-    return { action: "createUser", saved: true };
+  },
+
+  /** Replaces the password with a fresh random one and returns a new link. */
+  reinvite: async ({ request, locals }) => {
+    const id = Number((await request.formData()).get("id"));
+    if (id === locals.user?.id) {
+      return fail(400, { message: "Use a new password for your own account." });
+    }
+    try {
+      const { user, password } = await getCore().users.reissueInvite(id);
+      return {
+        invite: {
+          email: user.email,
+          token: encodeInvite({ email: user.email, password }),
+        },
+      };
+    } catch (e) {
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      throw e;
+    }
+  },
+
+  setPassword: async ({ request, locals, cookies, url }) => {
+    const form = await request.formData();
+    const id = Number(form.get("id"));
+    const parsed = UserInput.shape.password.safeParse(form.get("password"));
+    if (!parsed.success) {
+      return fail(400, { message: z.prettifyError(parsed.error) });
+    }
+    const core = getCore();
+    try {
+      const user = await core.users.setPassword(id, parsed.data);
+      if (user.id === locals.user?.id) {
+        // Changing the password signs everyone out, including this session.
+        const session = await core.sessions.create(user.id);
+        setSessionCookie(
+          cookies,
+          session.token,
+          session.expiresAt,
+          url.protocol === "https:",
+        );
+      }
+      return { passwordSetFor: user.email };
+    } catch (e) {
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      throw e;
+    }
+  },
+
+  /** Deletes the account everywhere (use removeMember to leave one household). */
+  remove: async ({ request, locals }) => {
+    const id = Number((await request.formData()).get("id"));
+    if (id === locals.user?.id) {
+      return fail(400, { message: "You cannot delete your own account." });
+    }
+    try {
+      await getCore().users.remove(id);
+    } catch (e) {
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      if (e instanceof ConflictError) return fail(409, { message: e.message });
+      throw e;
+    }
+    return { removed: true };
   },
 };

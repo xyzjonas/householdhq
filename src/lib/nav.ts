@@ -5,7 +5,7 @@ import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
 import Receipt from "@lucide/svelte/icons/receipt";
 import Settings from "@lucide/svelte/icons/settings";
 import Tag from "@lucide/svelte/icons/tag";
-import Users from "@lucide/svelte/icons/users";
+import ShieldCheck from "@lucide/svelte/icons/shield-check";
 import Tags from "@lucide/svelte/icons/tags";
 import Wallet from "@lucide/svelte/icons/wallet";
 import Zap from "@lucide/svelte/icons/zap";
@@ -21,7 +21,7 @@ export interface NavItem {
     | "/transactions"
     | "/vehicles"
     | "/energy"
-    | "/users"
+    | "/admin"
     | "/settings";
   icon: Component;
   /** Shown directly in the mobile bar; everything else goes under "More". */
@@ -44,7 +44,12 @@ export const navItems: NavItem[] = [
   { label: "Vehicles", href: "/vehicles", icon: Car },
   { label: "Energy", href: "/energy", icon: Zap },
   { label: "Analytics", icon: ChartColumn },
-  { label: "Users", href: "/users", icon: Users, superuserOnly: true },
+  {
+    label: "Administration",
+    href: "/admin",
+    icon: ShieldCheck,
+    superuserOnly: true,
+  },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 

@@ -21,13 +21,11 @@ const ASSET_PATHS = new Set([
 ]);
 const isPublic = (path: string) =>
   path === "/login" || path === "/invite" || ASSET_PATHS.has(path);
-/** Only superusers may reach these; everyone else gets a plain 404. */
-const isSuperuserOnly = (path: string) =>
-  path === "/users" || path.startsWith("/users/");
 
 /** What a signed-in user can reach without being in a household. */
 const isHouseholdFree = (path: string) =>
   path === "/no-household" || path === "/logout";
+/** Only superusers may reach these; everyone else gets a plain 404. */
 const isSuperuserPath = (path: string) =>
   path === "/admin" || path.startsWith("/admin/");
 
@@ -80,9 +78,6 @@ export const handle: Handle = async ({ event, resolve }) => {
   } else if (event.locals.user && pathname === "/login") {
     redirect(303, "/");
   } else if (event.locals.user) {
-    if (isSuperuserPath(pathname) && !event.locals.user.isSuperuser) {
-      error(404, "Not found");
-    }
     if (
       !event.locals.hq &&
       !isHouseholdFree(pathname) &&
@@ -95,7 +90,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   // Guarding here covers page loads and form actions alike.
-  if (isSuperuserOnly(pathname) && !event.locals.user?.isSuperuser) {
+  if (isSuperuserPath(pathname) && !event.locals.user?.isSuperuser) {
     error(404, "Not found");
   }
 

@@ -4,7 +4,6 @@
   import Plus from "@lucide/svelte/icons/plus";
   import LogOut from "@lucide/svelte/icons/log-out";
   import Search from "@lucide/svelte/icons/search";
-  import ShieldCheck from "@lucide/svelte/icons/shield-check";
   import HouseholdSwitcher from "./HouseholdSwitcher.svelte";
   import NavItems from "./NavItems.svelte";
 
@@ -14,7 +13,7 @@
     households,
     children,
   }: {
-    user: { email: string; isSuperuser: boolean };
+    user: { email: string };
     household: { id: number; name: string };
     households: { id: number; name: string }[];
     children: Snippet;
@@ -34,12 +33,6 @@
     </nav>
     <div class="mt-auto flex flex-col gap-2 text-sm">
       <p class="truncate opacity-70" title={user.email}>{user.email}</p>
-      {#if user.isSuperuser}
-        <a href={resolve("/admin")} class="btn w-full preset-tonal">
-          <ShieldCheck size={16} aria-hidden="true" />
-          <span>Administration</span>
-        </a>
-      {/if}
       <form method="POST" action={resolve("/logout")}>
         <button type="submit" class="btn w-full preset-tonal">
           <LogOut size={16} aria-hidden="true" />

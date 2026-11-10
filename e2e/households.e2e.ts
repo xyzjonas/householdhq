@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { login } from "./helpers";
+import { acceptInvite, invite, login } from "./helpers";
 
 // Requires a migrated database seeded with `npm run db:seed` (see `just e2e`):
 // the seeded admin's household holds "Wallet", "Global ETFs", "Groceries", ...
@@ -9,8 +9,7 @@ const neighbourEmail = `neighbour-${run}@example.com`;
 const neighbourPassword = "correct horse";
 const neighbours = `Neighbours ${run}`;
 
-// Sections nest (the forms sit inside the "Households" / "Users" ones): the
-// innermost match comes last in document order.
+// Sections can nest: the innermost match comes last in document order.
 const section = (page: Page, heading: string) =>
   page
     .locator("section", {
@@ -21,25 +20,32 @@ const section = (page: Page, heading: string) =>
 test.describe.configure({ mode: "serial" });
 
 test.describe("households", () => {
-  test("an admin creates a household and a user in it", async ({ page }) => {
+  test("an admin creates a household and invites a user into it", async ({
+    page,
+    browser,
+  }) => {
     await login(page);
     await page.getByRole("link", { name: "Administration" }).click();
     await expect(page).toHaveURL(/\/admin$/);
+    await page.waitForLoadState("networkidle");
 
     const create = section(page, "New household");
     await create.getByLabel("Name").fill(neighbours);
     await create.getByRole("button", { name: "Create household" }).click();
     await expect(create.getByRole("status")).toHaveText("Household created.");
-    await expect(page.getByRole("heading", { name: neighbours })).toBeVisible();
-
-    const user = section(page, "New user");
-    await user.getByLabel("Email").fill(neighbourEmail);
-    await user.getByLabel("Password").fill(neighbourPassword);
-    await user.getByLabel("Household").selectOption({ label: neighbours });
-    await user.getByRole("button", { name: "Create user" }).click();
-    await expect(user.getByRole("status")).toHaveText("User created.");
     await expect(
-      page.getByRole("article", { name: neighbours }).getByText(neighbourEmail),
+      page.getByRole("group", { name: `Manage ${neighbours}` }),
+    ).toBeVisible();
+
+    // The invite form offers every household; the invitee joins the chosen one.
+    const link = await invite(page, neighbourEmail, neighbours);
+    await acceptInvite(browser, link, neighbourPassword);
+
+    await page.goto("/admin");
+    await expect(
+      page.getByRole("button", {
+        name: `Remove ${neighbourEmail} from ${neighbours}`,
+      }),
     ).toBeVisible();
   });
 
@@ -105,14 +111,17 @@ test.describe("households", () => {
   }) => {
     await login(page);
     await page.goto("/admin");
-    const home = page.getByRole("article").filter({
-      hasNot: page.getByRole("heading", { name: neighbours }),
-    });
-    await home.first().getByLabel("Add a user").selectOption({
+    await page.waitForLoadState("networkidle");
+    const home = page.getByRole("group", { name: "Manage Home" });
+    await home.getByLabel("Add an existing user").selectOption({
       label: neighbourEmail,
     });
-    await home.first().getByRole("button", { name: "Add" }).click();
-    await expect(home.first().getByText(neighbourEmail)).toBeVisible();
+    await home.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(
+      page.getByRole("button", {
+        name: `Remove ${neighbourEmail} from Home`,
+      }),
+    ).toBeVisible();
 
     const neighbour = await (await browser.newContext()).newPage();
     await login(neighbour, neighbourEmail, neighbourPassword);
@@ -147,15 +156,12 @@ test.describe("households", () => {
     // Removing the membership takes effect on the very next request.
     await switchTo("Home");
     await page.goto("/admin");
-    await page
-      .getByRole("article", { name: "Home" })
-      .getByRole("button", { name: `Remove ${neighbourEmail} from Home` })
-      .click();
-    await expect(
-      page
-        .getByRole("article", { name: "Home" })
-        .getByRole("button", { name: `Remove ${neighbourEmail} from Home` }),
-    ).toHaveCount(0);
+    await page.waitForLoadState("networkidle");
+    const remove = page.getByRole("button", {
+      name: `Remove ${neighbourEmail} from Home`,
+    });
+    await remove.click();
+    await expect(remove).toHaveCount(0);
     await neighbour.goto("/accounts");
     await expect(wallet).toHaveCount(0);
 

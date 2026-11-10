@@ -4,6 +4,17 @@
   import UserPlus from "@lucide/svelte/icons/user-plus";
   import InviteLink from "./InviteLink.svelte";
 
+  let {
+    households,
+    defaultHouseholdId = null,
+    label = "Invite user",
+  }: {
+    households: { id: number; name: string }[];
+    /** Preselected household, e.g. the one a branch of the tree belongs to. */
+    defaultHouseholdId?: number | null;
+    label?: string;
+  } = $props();
+
   let open = $state(false);
   let submitting = $state(false);
   let message = $state("");
@@ -21,7 +32,7 @@
 <Dialog {open} {onOpenChange}>
   <Dialog.Trigger class="btn preset-filled-surface-950-50">
     <UserPlus size={16} aria-hidden="true" />
-    <span>Invite user</span>
+    <span>{label}</span>
   </Dialog.Trigger>
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-40 bg-surface-950/50" />
@@ -41,8 +52,9 @@
           </div>
         {:else}
           <Dialog.Description class="text-sm text-surface-600-400">
-            Creates the account with a random password and gives you a link the
-            new user opens to choose their own.
+            Creates the account with a random password, adds it to the chosen
+            household and gives you a link the new user opens to choose their
+            own.
           </Dialog.Description>
           <form
             method="POST"
@@ -72,6 +84,20 @@
                 autocomplete="off"
                 placeholder="e.g. partner@example.com"
               />
+            </label>
+            <label class="label">
+              <span class="label-text">Household</span>
+              <select class="select" name="householdId">
+                <option value="">No household (assign later)</option>
+                {#each households as household (household.id)}
+                  <option
+                    value={household.id}
+                    selected={household.id === defaultHouseholdId}
+                  >
+                    {household.name}
+                  </option>
+                {/each}
+              </select>
             </label>
             {#if message}
               <p role="alert" class="text-sm text-error-600-400">{message}</p>
