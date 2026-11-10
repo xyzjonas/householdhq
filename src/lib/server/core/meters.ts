@@ -9,7 +9,11 @@ import {
   type MeterWithReadings,
 } from "./types";
 
-function rethrow(e: unknown, entity: string, id: number): never {
+function rethrow(
+  e: unknown,
+  entity: "Meter" | "Meter reading",
+  id: number,
+): never {
   if (e instanceof Prisma.PrismaClientKnownRequestError) {
     if (e.code === "P2025" || e.code === "P2003") {
       throw new NotFoundError(entity, id);

@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 import type { Db } from "./prisma";
 import { SettingsPatch } from "./schemas";
 import { ConflictError, NotFoundError, type AppSettings } from "./types";
@@ -75,7 +76,7 @@ export function settingsRepo(db: Db, householdId: number) {
         }
         if (!account.isOut) {
           throw new ConflictError(
-            `'${account.name}' is not an external account`,
+            m.core_account_not_external({ name: account.name }),
           );
         }
       }

@@ -1,3 +1,4 @@
+import { m } from "#paraglide/messages.js";
 /**
  * Domain types exposed by the core layer. The rest of the app imports these
  * instead of reaching into `@prisma/client`.
@@ -145,9 +146,53 @@ export interface Balances {
   byType: Partial<Record<SourceType, number>>;
 }
 
+export type NotFoundEntity =
+  | "Account"
+  | "Category"
+  | "Checkpoint"
+  | "Component"
+  | "Fuel entry"
+  | "Meter"
+  | "Meter reading"
+  | "Service entry"
+  | "Tag"
+  | "Transaction"
+  | "User"
+  | "Vehicle";
+
+/** One message per entity: Czech agrees in gender with the noun. */
+function notFoundMessage(entity: NotFoundEntity, id: string): string {
+  switch (entity) {
+    case "Account":
+      return m.core_account_not_found({ id });
+    case "Category":
+      return m.core_category_not_found({ id });
+    case "Checkpoint":
+      return m.core_checkpoint_not_found({ id });
+    case "Component":
+      return m.core_component_not_found({ id });
+    case "Fuel entry":
+      return m.core_fuel_entry_not_found({ id });
+    case "Meter":
+      return m.core_meter_not_found({ id });
+    case "Meter reading":
+      return m.core_meter_reading_not_found({ id });
+    case "Service entry":
+      return m.core_service_entry_not_found({ id });
+    case "Tag":
+      return m.core_tag_not_found({ id });
+    case "Transaction":
+      return m.core_transaction_not_found({ id });
+    case "User":
+      return m.core_user_not_found({ id });
+    case "Vehicle":
+      return m.core_vehicle_not_found({ id });
+  }
+}
+
 export class NotFoundError extends Error {
-  constructor(entity: string, id: number | string) {
-    super(`${entity} '${id}' not found`);
+  constructor(entity: NotFoundEntity, id: number | string) {
+    super(notFoundMessage(entity, String(id)));
     this.name = "NotFoundError";
   }
 }

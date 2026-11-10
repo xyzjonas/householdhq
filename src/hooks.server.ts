@@ -1,6 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import type { Handle } from "@sveltejs/kit/hooks";
+import { m } from "#paraglide/messages.js";
 import { paraglideMiddleware } from "#paraglide/server.js";
 import { getCore } from "#lib/server/index.ts";
 import { pickActiveHousehold } from "#lib/server/core/index.ts";
@@ -93,7 +94,7 @@ const auth: Handle = async ({ event, resolve }) => {
 
   // Guarding here covers page loads and form actions alike.
   if (isSuperuserPath(pathname) && !event.locals.user?.isSuperuser) {
-    error(404, "Not found");
+    error(404, m.hooks_not_found());
   }
 
   return resolve(event);
