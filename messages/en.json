@@ -15,8 +15,13 @@
   "accounts_breadcrumb_label": "Breadcrumb",
   "accounts_breadcrumb_total": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Accounts ({count} total)",
         "countPlural=other": "Accounts ({count} total)"
@@ -42,8 +47,13 @@
   "accounts_chart_peak": "Peak",
   "accounts_chart_subtitle": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Monthly closing balances, last {count} month",
         "countPlural=other": "Monthly closing balances, last {count} months"
@@ -96,8 +106,13 @@
   "accounts_entries_period": "Period",
   "accounts_entries_recorded": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} recorded",
         "countPlural=other": "{count} recorded"
@@ -113,7 +128,9 @@
         "input total",
         "local totalPlural = total: plural"
       ],
-      "selectors": ["totalPlural"],
+      "selectors": [
+        "totalPlural"
+      ],
       "match": {
         "totalPlural=one": "Showing {first} to {last} of {total} entry",
         "totalPlural=other": "Showing {first} to {last} of {total} entries"
@@ -247,8 +264,13 @@
   "categories_chart_range_label": "Chart range",
   "categories_chart_subtitle_in": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Monthly income, {count} month",
         "countPlural=other": "Monthly income, {count} months"
@@ -257,8 +279,13 @@
   ],
   "categories_chart_subtitle_out": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Monthly spending, {count} month",
         "countPlural=other": "Monthly spending, {count} months"
@@ -267,8 +294,13 @@
   ],
   "categories_chart_subtitle_transfer": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Monthly transfers, {count} month",
         "countPlural=other": "Monthly transfers, {count} months"
@@ -293,8 +325,13 @@
   "categories_delete_description_empty": "No transactions use this category. It will be permanently deleted.",
   "categories_delete_description_move": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} transaction currently filed under this category. Choose the category they should be moved to; the category is then permanently deleted. This can't be undone.",
         "countPlural=other": "{count} transactions currently filed under this category. Choose the category they should be moved to; the category is then permanently deleted. This can't be undone."
@@ -310,8 +347,13 @@
   "categories_deleted": "Category deleted",
   "categories_deleted_moved": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Category deleted · {count} transaction moved",
         "countPlural=other": "Category deleted · {count} transactions moved"
@@ -336,8 +378,13 @@
   "categories_entries_search": "Search entries",
   "categories_entries_showing": [
     {
-      "declarations": ["input total", "local countPlural = total: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input total",
+        "local countPlural = total: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Showing {first} to {last} of {total} entry",
         "countPlural=other": "Showing {first} to {last} of {total} entries"
@@ -717,8 +764,13 @@
   "categories_unbudgeted_heading": "Unbudgeted",
   "categories_unbudgeted_summary": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} category has no budget",
         "countPlural=other": "{count} categories have no budget"
@@ -782,8 +834,13 @@
   "core_user_not_found": "User '{id}' not found",
   "core_validation_array_max": [
     {
-      "declarations": ["input max", "local maxPlural = max: plural"],
-      "selectors": ["maxPlural"],
+      "declarations": [
+        "input max",
+        "local maxPlural = max: plural"
+      ],
+      "selectors": [
+        "maxPlural"
+      ],
       "match": {
         "maxPlural=one": "Select at most {max} item",
         "maxPlural=other": "Select at most {max} items"
@@ -792,8 +849,13 @@
   ],
   "core_validation_array_min": [
     {
-      "declarations": ["input min", "local minPlural = min: plural"],
-      "selectors": ["minPlural"],
+      "declarations": [
+        "input min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "minPlural"
+      ],
       "match": {
         "minPlural=one": "Select at least {min} item",
         "minPlural=other": "Select at least {min} items"
@@ -812,8 +874,13 @@
   "core_validation_required": "This field is required",
   "core_validation_string_max": [
     {
-      "declarations": ["input max", "local maxPlural = max: plural"],
-      "selectors": ["maxPlural"],
+      "declarations": [
+        "input max",
+        "local maxPlural = max: plural"
+      ],
+      "selectors": [
+        "maxPlural"
+      ],
       "match": {
         "maxPlural=one": "Must be at most {max} character",
         "maxPlural=other": "Must be at most {max} characters"
@@ -822,8 +889,13 @@
   ],
   "core_validation_string_min": [
     {
-      "declarations": ["input min", "local minPlural = min: plural"],
-      "selectors": ["minPlural"],
+      "declarations": [
+        "input min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "minPlural"
+      ],
       "match": {
         "minPlural=one": "Must be at least {min} character",
         "minPlural=other": "Must be at least {min} characters"
@@ -864,8 +936,13 @@
   "energy_breadcrumb": "Breadcrumb",
   "energy_breadcrumb_current": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Energy ({count} meter)",
         "countPlural=other": "Energy ({count} meters)"
@@ -891,8 +968,13 @@
   "energy_chart_year_before": "Year before",
   "energy_complete_months": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} complete month",
         "countPlural=other": "{count} complete months"
@@ -972,8 +1054,13 @@
   "energy_reading_value_placeholder": "e.g. 12345.6",
   "energy_readings_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} reading",
         "countPlural=other": "{count} readings"
@@ -1016,6 +1103,7 @@
   "ledger_status_completed": "Completed",
   "ledger_status_pending": "Pending",
   "nav_accounts": "Accounts",
+  "nav_admin": "Administration",
   "nav_analytics": "Analytics",
   "nav_categories": "Categories",
   "nav_dashboard": "Dashboard",
@@ -1026,7 +1114,6 @@
   "nav_settings": "Settings",
   "nav_tags": "Tags",
   "nav_transactions": "Transactions",
-  "nav_users": "Users",
   "nav_vehicles": "Vehicles",
   "settings_currency_hint": "The default currency for your household.",
   "settings_currency_invalid": "Please choose a supported currency.",
@@ -1076,8 +1163,13 @@
   "tags_empty": "No tags found.",
   "tags_entries_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} entry",
         "countPlural=other": "{count} entries"
@@ -1203,8 +1295,13 @@
   "vehicles_delete_fuel_done": "Fill-up deleted",
   "vehicles_delete_fuel_entries_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} fuel entry",
         "countPlural=other": "{count} fuel entries"
@@ -1217,8 +1314,13 @@
   "vehicles_delete_service_title": "Delete service?",
   "vehicles_delete_services_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} service",
         "countPlural=other": "{count} services"
@@ -1313,8 +1415,13 @@
   "vehicles_fuel_price_per_litre": "{price} {currency} / L",
   "vehicles_fuel_recorded": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} fill-up recorded",
         "countPlural=other": "{count} fill-ups recorded"
@@ -1342,8 +1449,13 @@
   "vehicles_maintenance_heading": "Maintenance",
   "vehicles_maintenance_recorded": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} service recorded",
         "countPlural=other": "{count} services recorded"
@@ -1372,8 +1484,13 @@
   "vehicles_summary_price_per_km": "Average price per km",
   "vehicles_summary_so_far": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "So far this year · {count} fill-up",
         "countPlural=other": "So far this year · {count} fill-ups"
@@ -1461,8 +1578,13 @@
   "wizard_not_chosen": "Not chosen",
   "wizard_overview_every_months": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Every month",
         "countPlural=other": "Every {count} months"

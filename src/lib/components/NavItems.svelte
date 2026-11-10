@@ -30,7 +30,7 @@
 <Navigation {layout} class={rootClass}>
   <Navigation.Content>
     <Navigation.Menu class={layout === "bar" ? "gap-0" : ""}>
-      {#each items as item (item.label)}
+      {#each items as item (item.key)}
         {@const Icon = item.icon}
         {#if item.href}
           {@const active = isActive(item.href, page.url.pathname)}
@@ -42,7 +42,7 @@
               : ''}"
           >
             <Icon size={iconSize} aria-hidden="true" />
-            <Navigation.TriggerText>{item.label}</Navigation.TriggerText>
+            <Navigation.TriggerText>{item.label()}</Navigation.TriggerText>
           </Navigation.TriggerAnchor>
         {:else}
           <!-- Not built yet: shown, but not interactive -->
@@ -51,7 +51,7 @@
             class="{triggerClass} cursor-not-allowed opacity-50"
           >
             <Icon size={iconSize} aria-hidden="true" />
-            <Navigation.TriggerText>{item.label}</Navigation.TriggerText>
+            <Navigation.TriggerText>{item.label()}</Navigation.TriggerText>
           </Navigation.Trigger>
         {/if}
       {/each}

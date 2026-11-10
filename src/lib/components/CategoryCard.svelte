@@ -1,6 +1,7 @@
 <script lang="ts">
   import Check from "@lucide/svelte/icons/check";
   import { formatMoney } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import {
     categoryIcon,
     fallbackColor,
@@ -121,7 +122,7 @@
         <span
           class="block h-1.5 w-full overflow-hidden rounded-full bg-surface-200-800"
           role="progressbar"
-          aria-label="Budget used"
+          aria-label={m.dashboard_budget_used()}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.min(percentage, 100)}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import AuthCard from "#lib/components/AuthCard.svelte";
+  import { m } from "#paraglide/messages.js";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
@@ -9,7 +10,7 @@
   );
 </script>
 
-<svelte:head><title>Set up · Household HQ</title></svelte:head>
+<svelte:head><title>{m.auth_setup_title()}</title></svelte:head>
 
 <AuthCard
   title="Create admin account"
@@ -30,7 +31,7 @@
       {/each}
     </label>
     <label class="label">
-      <span class="label-text">Email</span>
+      <span class="label-text">{m.auth_email()}</span>
       <input
         class="input"
         name="email"
@@ -44,7 +45,7 @@
       {/each}
     </label>
     <label class="label">
-      <span class="label-text">Password</span>
+      <span class="label-text">{m.auth_password()}</span>
       <input
         class="input"
         name="password"
@@ -58,7 +59,7 @@
       {/each}
     </label>
     <label class="label">
-      <span class="label-text">Confirm password</span>
+      <span class="label-text">{m.auth_confirm_password()}</span>
       <input
         class="input"
         name="confirm"
@@ -71,7 +72,7 @@
       {/each}
     </label>
     <button type="submit" class="btn preset-filled-surface-950-50">
-      Create account
+      {m.auth_create_account()}
     </button>
   </form>
 </AuthCard>

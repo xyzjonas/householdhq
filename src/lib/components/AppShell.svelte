@@ -6,6 +6,7 @@
   import Search from "@lucide/svelte/icons/search";
   import type { HouseholdSummary } from "#lib/household.ts";
   import HouseholdTitle from "./HouseholdTitle.svelte";
+  import { m } from "#paraglide/messages.js";
   import NavItems from "./NavItems.svelte";
 
   let {
@@ -26,7 +27,7 @@
     class="sticky top-0 hidden h-screen flex-col gap-8 border-r border-surface-200-800 bg-surface-50-950 p-6 lg:flex"
   >
     <HouseholdTitle {household} {households} />
-    <nav aria-label="Main">
+    <nav aria-label={m.nav_main_label()}>
       <NavItems layout="sidebar" />
     </nav>
     <div class="mt-auto flex flex-col gap-2 text-sm">
@@ -34,7 +35,7 @@
       <form method="POST" action={resolve("/logout")}>
         <button type="submit" class="btn w-full preset-tonal">
           <LogOut size={16} aria-hidden="true" />
-          <span>Sign out</span>
+          <span>{m.shell_sign_out()}</span>
         </button>
       </form>
     </div>
@@ -59,8 +60,8 @@
             class="input"
             type="search"
             name="q"
-            placeholder="Search transactions"
-            aria-label="Search transactions"
+            placeholder={m.shell_search_placeholder()}
+            aria-label={m.shell_search_label()}
           />
         </div>
       </form>
@@ -69,13 +70,13 @@
         class="ml-auto btn preset-filled-surface-950-50 sm:ml-0"
       >
         <Plus size={16} aria-hidden="true" />
-        <span class="max-sm:sr-only">Add record</span>
+        <span class="max-sm:sr-only">{m.shell_add_record()}</span>
       </a>
       <form method="POST" action={resolve("/logout")} class="lg:hidden">
         <button
           type="submit"
           class="btn-icon preset-tonal"
-          aria-label="Sign out"
+          aria-label={m.shell_sign_out()}
         >
           <LogOut size={16} aria-hidden="true" />
         </button>
@@ -88,7 +89,7 @@
   </div>
 
   <nav
-    aria-label="Mobile"
+    aria-label={m.nav_mobile_label()}
     class="fixed inset-x-0 bottom-0 z-10 border-t border-surface-200-800 bg-surface-50-950 lg:hidden"
   >
     <NavItems layout="bar" />

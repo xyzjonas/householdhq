@@ -15,8 +15,13 @@
   "accounts_breadcrumb_label": "Drobečková navigace",
   "accounts_breadcrumb_total": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Účty (celkem {count})",
         "countPlural=few": "Účty (celkem {count})",
@@ -44,8 +49,13 @@
   "accounts_chart_peak": "Max",
   "accounts_chart_subtitle": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Měsíční konečné zůstatky, poslední {count} měsíc",
         "countPlural=few": "Měsíční konečné zůstatky, poslední {count} měsíce",
@@ -100,8 +110,13 @@
   "accounts_entries_period": "Období",
   "accounts_entries_recorded": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} zaznamenán",
         "countPlural=few": "{count} zaznamenány",
@@ -119,7 +134,9 @@
         "input total",
         "local totalPlural = total: plural"
       ],
-      "selectors": ["totalPlural"],
+      "selectors": [
+        "totalPlural"
+      ],
       "match": {
         "totalPlural=one": "Zobrazeno {first} až {last} z {total} záznamu",
         "totalPlural=few": "Zobrazeno {first} až {last} ze {total} záznamů",
@@ -255,8 +272,13 @@
   "categories_chart_range_label": "Období grafu",
   "categories_chart_subtitle_in": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Měsíční příjmy, {count} měsíc",
         "countPlural=few": "Měsíční příjmy, {count} měsíce",
@@ -267,8 +289,13 @@
   ],
   "categories_chart_subtitle_out": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Měsíční výdaje, {count} měsíc",
         "countPlural=few": "Měsíční výdaje, {count} měsíce",
@@ -279,8 +306,13 @@
   ],
   "categories_chart_subtitle_transfer": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Měsíční převody, {count} měsíc",
         "countPlural=few": "Měsíční převody, {count} měsíce",
@@ -307,8 +339,13 @@
   "categories_delete_description_empty": "Tuto kategorii nepoužívá žádná transakce. Bude trvale smazána.",
   "categories_delete_description_move": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Do této kategorie je aktuálně zařazena {count} transakce. Vyberte kategorii, do které se přesunou; kategorie bude poté trvale smazána. Tuto akci nelze vrátit zpět.",
         "countPlural=few": "Do této kategorie jsou aktuálně zařazeny {count} transakce. Vyberte kategorii, do které se přesunou; kategorie bude poté trvale smazána. Tuto akci nelze vrátit zpět.",
@@ -326,8 +363,13 @@
   "categories_deleted": "Kategorie smazána",
   "categories_deleted_moved": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Kategorie smazána · přesunuta {count} transakce",
         "countPlural=few": "Kategorie smazána · přesunuty {count} transakce",
@@ -354,8 +396,13 @@
   "categories_entries_search": "Hledat záznamy",
   "categories_entries_showing": [
     {
-      "declarations": ["input total", "local countPlural = total: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input total",
+        "local countPlural = total: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Zobrazeno {first} až {last} z {total} záznamu",
         "countPlural=few": "Zobrazeno {first} až {last} z {total} záznamů",
@@ -737,8 +784,13 @@
   "categories_unbudgeted_heading": "Bez rozpočtu",
   "categories_unbudgeted_summary": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} kategorie nemá rozpočet",
         "countPlural=few": "{count} kategorie nemají rozpočet",
@@ -804,8 +856,13 @@
   "core_user_not_found": "Uživatel „{id}“ nebyl nalezen",
   "core_validation_array_max": [
     {
-      "declarations": ["input max", "local maxPlural = max: plural"],
-      "selectors": ["maxPlural"],
+      "declarations": [
+        "input max",
+        "local maxPlural = max: plural"
+      ],
+      "selectors": [
+        "maxPlural"
+      ],
       "match": {
         "maxPlural=one": "Vyberte nejvýše {max} položku",
         "maxPlural=few": "Vyberte nejvýše {max} položky",
@@ -816,8 +873,13 @@
   ],
   "core_validation_array_min": [
     {
-      "declarations": ["input min", "local minPlural = min: plural"],
-      "selectors": ["minPlural"],
+      "declarations": [
+        "input min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "minPlural"
+      ],
       "match": {
         "minPlural=one": "Vyberte alespoň {min} položku",
         "minPlural=few": "Vyberte alespoň {min} položky",
@@ -838,8 +900,13 @@
   "core_validation_required": "Toto pole je povinné",
   "core_validation_string_max": [
     {
-      "declarations": ["input max", "local maxPlural = max: plural"],
-      "selectors": ["maxPlural"],
+      "declarations": [
+        "input max",
+        "local maxPlural = max: plural"
+      ],
+      "selectors": [
+        "maxPlural"
+      ],
       "match": {
         "maxPlural=one": "Může mít nejvýše {max} znak",
         "maxPlural=few": "Může mít nejvýše {max} znaky",
@@ -850,8 +917,13 @@
   ],
   "core_validation_string_min": [
     {
-      "declarations": ["input min", "local minPlural = min: plural"],
-      "selectors": ["minPlural"],
+      "declarations": [
+        "input min",
+        "local minPlural = min: plural"
+      ],
+      "selectors": [
+        "minPlural"
+      ],
       "match": {
         "minPlural=one": "Musí mít alespoň {min} znak",
         "minPlural=few": "Musí mít alespoň {min} znaky",
@@ -894,8 +966,13 @@
   "energy_breadcrumb": "Drobečková navigace",
   "energy_breadcrumb_current": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Energie ({count} měřidlo)",
         "countPlural=few": "Energie ({count} měřidla)",
@@ -923,8 +1000,13 @@
   "energy_chart_year_before": "Předchozí rok",
   "energy_complete_months": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} celý měsíc",
         "countPlural=few": "{count} celé měsíce",
@@ -1006,8 +1088,13 @@
   "energy_reading_value_placeholder": "např. 12345,6",
   "energy_readings_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} odečet",
         "countPlural=few": "{count} odečty",
@@ -1052,6 +1139,7 @@
   "ledger_status_completed": "Dokončeno",
   "ledger_status_pending": "Čeká",
   "nav_accounts": "Účty",
+  "nav_admin": "Správa",
   "nav_analytics": "Analýzy",
   "nav_categories": "Kategorie",
   "nav_dashboard": "Přehled",
@@ -1062,7 +1150,6 @@
   "nav_settings": "Nastavení",
   "nav_tags": "Štítky",
   "nav_transactions": "Transakce",
-  "nav_users": "Uživatelé",
   "nav_vehicles": "Vozidla",
   "settings_currency_hint": "Výchozí měna vaší domácnosti.",
   "settings_currency_invalid": "Vyberte podporovanou měnu.",
@@ -1112,8 +1199,13 @@
   "tags_empty": "Nenalezeny žádné štítky.",
   "tags_entries_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} záznam",
         "countPlural=few": "{count} záznamy",
@@ -1241,8 +1333,13 @@
   "vehicles_delete_fuel_done": "Tankování smazáno",
   "vehicles_delete_fuel_entries_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} záznam o palivu",
         "countPlural=few": "{count} záznamy o palivu",
@@ -1257,8 +1354,13 @@
   "vehicles_delete_service_title": "Smazat servisní záznam?",
   "vehicles_delete_services_count": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} servisní záznam",
         "countPlural=few": "{count} servisní záznamy",
@@ -1355,8 +1457,13 @@
   "vehicles_fuel_price_per_litre": "{price} {currency} / l",
   "vehicles_fuel_recorded": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Zaznamenáno: {count} tankování",
         "countPlural=few": "Zaznamenáno: {count} tankování",
@@ -1386,8 +1493,13 @@
   "vehicles_maintenance_heading": "Údržba",
   "vehicles_maintenance_recorded": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Zaznamenán {count} servisní záznam",
         "countPlural=few": "Zaznamenány {count} servisní záznamy",
@@ -1418,8 +1530,13 @@
   "vehicles_summary_price_per_km": "Průměrná cena za km",
   "vehicles_summary_so_far": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Od začátku roku · {count} tankování",
         "countPlural=few": "Od začátku roku · {count} tankování",
@@ -1509,8 +1626,13 @@
   "wizard_not_chosen": "Nevybráno",
   "wizard_overview_every_months": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Každý měsíc",
         "countPlural=few": "Každé {count} měsíce",

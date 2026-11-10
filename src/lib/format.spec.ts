@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { overwriteGetLocale } from "#paraglide/runtime.js";
 import {
   formatDate,
   formatDateTime,
@@ -7,9 +8,11 @@ import {
   formatNumber,
 } from "./format";
 
+const nbsp = (text: string) => text.replace(/\s/g, " ");
+
 describe("formatMoney", () => {
   it("formats CZK with the Kč symbol", () => {
-    expect(formatMoney(11651).replace(/\s/g, " ")).toBe("11 651 Kč");
+    expect(formatMoney(11651)).toBe("11,651 Kč");
   });
 
   it("falls back to the currency code", () => {
@@ -41,7 +44,7 @@ describe("formatDateTime", () => {
 
 describe("formatNumber", () => {
   it("groups digits and appends the unit", () => {
-    expect(formatNumber(12345.5, "km").replace(/\s/g, " ")).toBe("12 345,5 km");
+    expect(formatNumber(12345.5, "km")).toBe("12,345.5 km");
   });
 
   it("has no unit by default", () => {
@@ -63,5 +66,16 @@ describe("formatDateWithYear", () => {
 
   it("handles missing dates", () => {
     expect(formatDateWithYear(null, now)).toBe("");
+  });
+});
+
+describe("Czech locale", () => {
+  afterEach(() => overwriteGetLocale(() => "en"));
+
+  it("follows the active language", () => {
+    overwriteGetLocale(() => "cs");
+    expect(nbsp(formatMoney(11651))).toBe("11 651 Kč");
+    expect(nbsp(formatNumber(12345.5, "km"))).toBe("12 345,5 km");
+    expect(nbsp(formatDate("2026-11-22T12:00:00Z"))).toBe("22. 11.");
   });
 });

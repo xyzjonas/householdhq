@@ -7,6 +7,7 @@
   import { resolve } from "$app/paths";
   import { buildPillars } from "#lib/accounts-view.ts";
   import { formatDate, formatMoney } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -23,25 +24,26 @@
 </script>
 
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
-  <h1 class="sr-only">Dashboard</h1>
+  <h1 class="sr-only">{m.dashboard_title()}</h1>
 
   <section
     aria-labelledby="balances-heading"
     class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto overscroll-x-contain px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible sm:px-0"
   >
-    <h2 id="balances-heading" class="sr-only">Balances</h2>
+    <h2 id="balances-heading" class="sr-only">{m.dashboard_balances()}</h2>
     <BalanceCard
       featured
-      label="Total liquid balance"
+      label={m.dashboard_total_liquid()}
       amount={data.balances.liquid}
-      hint="Available to spend: {formatMoney(
-        data.availableToSpend,
-      )} until {formatDate(data.interval.end)}"
+      hint={m.dashboard_available_hint({
+        amount: formatMoney(data.availableToSpend),
+        date: formatDate(data.interval.end),
+      })}
     />
     <BalanceCard
-      label="Household net worth"
+      label={m.dashboard_net_worth()}
       amount={data.balances.total}
-      hint="All owned accounts"
+      hint={m.dashboard_all_owned()}
     />
   </section>
 
@@ -57,17 +59,17 @@
           id="accounts-heading"
           class="text-lg font-extrabold tracking-tight sm:text-xl"
         >
-          Accounts
+          {m.dashboard_accounts_title()}
         </h2>
         <p class="mt-1 text-xs font-medium text-surface-600-400 sm:text-sm">
-          Distribution across transaction rails, cash, savings and investments
+          {m.dashboard_accounts_description()}
         </p>
       </div>
       <a
         class="shrink-0 anchor text-sm font-semibold"
         href={resolve("/accounts")}
       >
-        View all
+        {m.dashboard_view_all()}
       </a>
     </header>
     <PillarOverview {pillars} />
@@ -76,11 +78,11 @@
 
   <section aria-labelledby="upcoming-heading" class="flex flex-col gap-4">
     <h2 id="upcoming-heading" class="text-xl font-bold">
-      Upcoming until {formatDate(data.interval.end)}
+      {m.dashboard_upcoming_title({ date: formatDate(data.interval.end) })}
     </h2>
     <TransactionList
       transactions={visibleUpcoming}
-      empty="Nothing scheduled in this interval."
+      empty={m.dashboard_upcoming_empty()}
     />
     {#if data.upcoming.length > UPCOMING_PREVIEW_COUNT}
       <button
@@ -90,8 +92,10 @@
         onclick={() => (showAllUpcoming = !showAllUpcoming)}
       >
         {showAllUpcoming
-          ? "Show less"
-          : `Show more (${data.upcoming.length - UPCOMING_PREVIEW_COUNT})`}
+          ? m.dashboard_show_less()
+          : m.dashboard_show_more({
+              count: data.upcoming.length - UPCOMING_PREVIEW_COUNT,
+            })}
       </button>
     {/if}
   </section>
@@ -99,10 +103,10 @@
   <section aria-labelledby="transactions-heading" class="flex flex-col gap-4">
     <header class="flex items-baseline justify-between gap-4">
       <h2 id="transactions-heading" class="text-xl font-bold">
-        Recent transactions
+        {m.dashboard_recent_title()}
       </h2>
       <a class="anchor text-sm font-semibold" href={resolve("/transactions")}>
-        View all
+        {m.dashboard_view_all()}
       </a>
     </header>
     <TransactionList transactions={data.transactions} />

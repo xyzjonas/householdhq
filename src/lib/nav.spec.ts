@@ -29,7 +29,7 @@ describe("isActive", () => {
 describe("nav split", () => {
   it("partitions every item into the bar or the More sheet", () => {
     expect(primaryNavItems.length + moreNavItems.length).toBe(navItems.length);
-    expect(primaryNavItems.map((item) => item.label)).toEqual([
+    expect(primaryNavItems.map((item) => item.label())).toEqual([
       "Dashboard",
       "Accounts",
       "Categories",
@@ -40,14 +40,14 @@ describe("nav split", () => {
 
 describe("visibleNavItems", () => {
   const labels = (user?: { isSuperuser: boolean }) =>
-    visibleNavItems(navItems, user).map((item) => item.label);
+    visibleNavItems(navItems, user).map((item) => item.key);
 
   it("hides the administration from regular users and anonymous visitors", () => {
-    expect(labels({ isSuperuser: false })).not.toContain("Administration");
-    expect(labels()).not.toContain("Administration");
+    expect(labels({ isSuperuser: false })).not.toContain("admin");
+    expect(labels()).not.toContain("admin");
   });
 
   it("shows the administration to superusers", () => {
-    expect(labels({ isSuperuser: true })).toContain("Administration");
+    expect(labels({ isSuperuser: true })).toContain("admin");
   });
 });

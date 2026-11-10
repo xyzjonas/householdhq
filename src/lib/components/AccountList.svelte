@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { m } from "#paraglide/messages.js";
   import { groups } from "#lib/accounts-view.ts";
   import { formatMoney } from "#lib/format.ts";
   import type {
@@ -44,6 +45,6 @@
       </p>
     </li>
   {:else}
-    <li class="text-sm opacity-70">No accounts yet.</li>
+    <li class="text-sm opacity-70">{m.dashboard_no_accounts()}</li>
   {/each}
 </ul>

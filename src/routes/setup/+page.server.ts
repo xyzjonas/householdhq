@@ -7,6 +7,7 @@ import {
   UserInput,
 } from "#lib/server/core/index.ts";
 import { setSessionCookie } from "#lib/server/auth.ts";
+import { m } from "#paraglide/messages.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -37,7 +38,7 @@ export const actions: Actions = {
       return fail(400, {
         email,
         household,
-        errors: { confirm: ["Passwords do not match"] },
+        errors: { confirm: [m.auth_passwords_mismatch()] },
       });
     }
 

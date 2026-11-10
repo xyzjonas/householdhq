@@ -6,6 +6,7 @@ import {
   recordFailure,
   setSessionCookie,
 } from "#lib/server/auth.ts";
+import { m } from "#paraglide/messages.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -20,7 +21,7 @@ export const actions: Actions = {
     if (isRateLimited(key)) {
       return fail(429, {
         email,
-        message: "Too many attempts. Try again in a few minutes.",
+        message: m.auth_too_many_attempts(),
       });
     }
 
@@ -28,7 +29,7 @@ export const actions: Actions = {
     const user = await core.users.authenticate(email, password);
     if (!user) {
       recordFailure(key);
-      return fail(400, { email, message: "Invalid email or password" });
+      return fail(400, { email, message: m.auth_invalid_credentials() });
     }
 
     clearFailures(key);
