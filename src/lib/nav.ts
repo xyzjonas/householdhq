@@ -5,6 +5,7 @@ import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
 import Receipt from "@lucide/svelte/icons/receipt";
 import Settings from "@lucide/svelte/icons/settings";
 import Tag from "@lucide/svelte/icons/tag";
+import Users from "@lucide/svelte/icons/users";
 import Tags from "@lucide/svelte/icons/tags";
 import Wallet from "@lucide/svelte/icons/wallet";
 import Zap from "@lucide/svelte/icons/zap";
@@ -20,10 +21,13 @@ export interface NavItem {
     | "/transactions"
     | "/vehicles"
     | "/energy"
+    | "/users"
     | "/settings";
   icon: Component;
   /** Shown directly in the mobile bar; everything else goes under "More". */
   primary?: true;
+  /** Hidden entirely (not just disabled) for everyone else. */
+  superuserOnly?: true;
 }
 
 export const navItems: NavItem[] = [
@@ -40,8 +44,17 @@ export const navItems: NavItem[] = [
   { label: "Vehicles", href: "/vehicles", icon: Car },
   { label: "Energy", href: "/energy", icon: Zap },
   { label: "Analytics", icon: ChartColumn },
+  { label: "Users", href: "/users", icon: Users, superuserOnly: true },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
+
+/** The items `user` is allowed to see. */
+export function visibleNavItems(
+  items: NavItem[],
+  user: { isSuperuser: boolean } | undefined,
+): NavItem[] {
+  return items.filter((item) => !item.superuserOnly || user?.isSuperuser);
+}
 
 export const primaryNavItems = navItems.filter((item) => item.primary);
 export const moreNavItems = navItems.filter((item) => !item.primary);

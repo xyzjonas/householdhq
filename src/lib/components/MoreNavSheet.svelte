@@ -3,17 +3,17 @@
   import { page } from "$app/state";
   import Ellipsis from "@lucide/svelte/icons/ellipsis";
   import { Dialog, Navigation, Portal } from "@skeletonlabs/skeleton-svelte";
-  import { isActive, moreNavItems } from "#lib/nav.ts";
+  import { isActive, moreNavItems, visibleNavItems } from "#lib/nav.ts";
 
   let { triggerClass = "" }: { triggerClass?: string } = $props();
 
   let open = $state(false);
 
+  const items = $derived(visibleNavItems(moreNavItems, page.data.user));
+
   // The trigger stands in for any hidden item that is currently open.
   const active = $derived(
-    moreNavItems.some(
-      (item) => item.href && isActive(item.href, page.url.pathname),
-    ),
+    items.some((item) => item.href && isActive(item.href, page.url.pathname)),
   );
 </script>
 
@@ -41,7 +41,7 @@
         </Dialog.Title>
         <nav aria-label="More">
           <ul class="flex flex-col gap-1">
-            {#each moreNavItems as item (item.label)}
+            {#each items as item (item.label)}
               {@const Icon = item.icon}
               <li>
                 {#if item.href}

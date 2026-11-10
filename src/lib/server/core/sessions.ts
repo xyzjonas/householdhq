@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { Db } from "./prisma";
+import { publicUserSelect } from "./users";
 import type { PublicUser } from "./types";
 
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -39,7 +40,7 @@ export function sessionsRepo(db: Db) {
       }
       const user = await db.user.findUnique({
         where: { id: session.userId },
-        select: { id: true, email: true },
+        select: publicUserSelect,
       });
       if (!user) {
         await db.session.deleteMany({ where: { id } });

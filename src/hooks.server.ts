@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import type { Handle } from "@sveltejs/kit/hooks";
 import { getCore } from "#lib/server/index.ts";
 import {
@@ -18,7 +18,11 @@ const ASSET_PATHS = new Set([
   "/service-worker.js",
   "/robots.txt",
 ]);
-const isPublic = (path: string) => path === "/login" || ASSET_PATHS.has(path);
+const isPublic = (path: string) =>
+  path === "/login" || path === "/invite" || ASSET_PATHS.has(path);
+/** Only superusers may reach these; everyone else gets a plain 404. */
+const isSuperuserOnly = (path: string) =>
+  path === "/users" || path.startsWith("/users/");
 
 // Once an admin exists this never goes back to false.
 let hasUsers = false;
@@ -54,6 +58,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     redirect(303, "/login");
   } else if (event.locals.user && pathname === "/login") {
     redirect(303, "/");
+  }
+
+  // Guarding here covers page loads and form actions alike.
+  if (isSuperuserOnly(pathname) && !event.locals.user?.isSuperuser) {
+    error(404, "Not found");
   }
 
   return resolve(event);

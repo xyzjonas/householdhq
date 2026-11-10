@@ -14,6 +14,9 @@ model User {
   id       Int    @id @default(autoincrement())
   email    String @unique
   password String
+
+  /// The only role for now: may manage users. The first account is one.
+  isSuperuser Boolean @default(false)
 }
 
 model Session {
