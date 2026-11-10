@@ -1,5 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import { getCore } from "#lib/server/index.ts";
+import { m } from "#paraglide/messages.js";
 import { SESSION_COOKIE } from "#lib/server/auth.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -12,7 +13,8 @@ export const actions: Actions = {
     const id = Number((await request.formData()).get("householdId"));
     // `locals.households` is the user's own memberships, loaded for this request.
     const target = locals.households.find((h) => h.id === id);
-    if (!token || !locals.user || !target) error(404, "Household not found");
+    if (!token || !locals.user || !target)
+      error(404, m.household_switch_not_found());
     await getCore().sessions.setHousehold(token, target.id);
     // Ids on the current page mean nothing in the other household.
     redirect(303, "/");

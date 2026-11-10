@@ -152,6 +152,7 @@ export type NotFoundEntity =
   | "Checkpoint"
   | "Component"
   | "Fuel entry"
+  | "Household"
   | "Meter"
   | "Meter reading"
   | "Service entry"
@@ -173,6 +174,8 @@ function notFoundMessage(entity: NotFoundEntity, id: string): string {
       return m.core_component_not_found({ id });
     case "Fuel entry":
       return m.core_fuel_entry_not_found({ id });
+    case "Household":
+      return m.core_household_not_found({ id });
     case "Meter":
       return m.core_meter_not_found({ id });
     case "Meter reading":

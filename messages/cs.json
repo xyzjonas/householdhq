@@ -15,13 +15,8 @@
   "accounts_breadcrumb_label": "Drobečková navigace",
   "accounts_breadcrumb_total": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Účty (celkem {count})",
         "countPlural=few": "Účty (celkem {count})",
@@ -49,13 +44,8 @@
   "accounts_chart_peak": "Max",
   "accounts_chart_subtitle": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Měsíční konečné zůstatky, poslední {count} měsíc",
         "countPlural=few": "Měsíční konečné zůstatky, poslední {count} měsíce",
@@ -110,13 +100,8 @@
   "accounts_entries_period": "Období",
   "accounts_entries_recorded": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} zaznamenán",
         "countPlural=few": "{count} zaznamenány",
@@ -134,9 +119,7 @@
         "input total",
         "local totalPlural = total: plural"
       ],
-      "selectors": [
-        "totalPlural"
-      ],
+      "selectors": ["totalPlural"],
       "match": {
         "totalPlural=one": "Zobrazeno {first} až {last} z {total} záznamu",
         "totalPlural=few": "Zobrazeno {first} až {last} ze {total} záznamů",
@@ -225,14 +208,76 @@
   "accounts_type_retirement_label": "Důchod",
   "accounts_type_savings_desc": "Spořicí účty a rezervy",
   "accounts_type_savings_label": "Spoření",
+  "admin_add": "Přidat",
+  "admin_add_choose": "Vyberte…",
+  "admin_add_existing_label": "Přidat existujícího uživatele do domácnosti {household}",
+  "admin_breadcrumb_current": "Správa ({households}, {users})",
+  "admin_choose_user_to_add": "Vyberte uživatele, kterého chcete přidat.",
+  "admin_col_actions": "Akce",
+  "admin_col_role": "Role",
+  "admin_col_user": "Uživatel",
+  "admin_description": "Domácnosti jsou zcela oddělené: členové vidí pouze data domácností, do kterých patří. Zvěte lidi, spravujte jejich hesla a určujte, kdo kam patří.",
+  "admin_household_color": "Barva",
+  "admin_household_color_default": "Výchozí",
+  "admin_household_create_submit": "Vytvořit domácnost",
+  "admin_household_created": "Domácnost byla vytvořena.",
+  "admin_household_edit_description": "Název, ikona a barva určují domácnost v záhlaví aplikace a v přepínači domácností.",
+  "admin_household_edit_title": "Upravit domácnost",
+  "admin_household_name_label": "Název",
+  "admin_household_new_description": "Domácnost je samostatný prostor s vlastními účty, kategoriemi, štítky, vozidly a měřiči. Mezi domácnostmi se nic nesdílí.",
+  "admin_household_new_title": "Nová domácnost",
+  "admin_household_pick_color": "Vybrat barvu",
+  "admin_household_save": "Uložit domácnost",
+  "admin_household_save_failed": "Uložení se nezdařilo",
+  "admin_households_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} domácnost",
+        "countPlural=few": "{count} domácnosti",
+        "countPlural=many": "{count} domácnosti",
+        "countPlural=other": "{count} domácností"
+      }
+    }
+  ],
+  "admin_invite_choose_household": "Vyberte domácnost.",
+  "admin_invite_description": "Vytvoří účet s náhodným heslem, přidá ho do vybrané domácnosti a dá vám odkaz, přes který si nový uživatel zvolí heslo vlastní.",
+  "admin_invite_email_label": "E-mail",
+  "admin_invite_household_label": "Domácnost",
+  "admin_invite_no_household": "Bez domácnosti (přiřadit později)",
+  "admin_invite_to": "Pozvat do domácnosti {household}",
+  "admin_no_household": "Bez domácnosti",
+  "admin_nobody_here": "Zatím sem nikdo nepatří.",
+  "admin_page_title": "Správa · {app}",
+  "admin_remove": "Odebrat",
+  "admin_remove_member_label": "Odebrat uživatele {email} z domácnosti {household}",
+  "admin_section_users_caption": "Uživatelé – {title}",
+  "admin_title": "Správa",
+  "admin_unknown_household": "Neznámá domácnost",
+  "admin_unknown_member": "Neznámý člen.",
+  "admin_users_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} uživatel",
+        "countPlural=few": "{count} uživatelé",
+        "countPlural=many": "{count} uživatele",
+        "countPlural=other": "{count} uživatelů"
+      }
+    }
+  ],
   "auth_confirm_password": "Potvrzení hesla",
   "auth_create_account": "Vytvořit účet",
   "auth_email": "E-mail",
   "auth_invalid_credentials": "Neplatný e-mail nebo heslo",
   "auth_password": "Heslo",
   "auth_passwords_mismatch": "Hesla se neshodují",
-  "auth_setup_description": "Vítejte! Vytvořte první účet a můžete začít.",
+  "auth_setup_description_household": "Vítejte! Vytvořte první účet a domácnost a můžete začít.",
   "auth_setup_heading": "Vytvořit účet správce",
+  "auth_setup_household_default": "Moje domácnost",
+  "auth_setup_household_name": "Název domácnosti",
   "auth_setup_title": "Nastavení · Household HQ",
   "auth_sign_in": "Přihlásit se",
   "auth_sign_in_title": "Přihlášení · Household HQ",
@@ -272,13 +317,8 @@
   "categories_chart_range_label": "Období grafu",
   "categories_chart_subtitle_in": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Měsíční příjmy, {count} měsíc",
         "countPlural=few": "Měsíční příjmy, {count} měsíce",
@@ -289,13 +329,8 @@
   ],
   "categories_chart_subtitle_out": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Měsíční výdaje, {count} měsíc",
         "countPlural=few": "Měsíční výdaje, {count} měsíce",
@@ -306,13 +341,8 @@
   ],
   "categories_chart_subtitle_transfer": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Měsíční převody, {count} měsíc",
         "countPlural=few": "Měsíční převody, {count} měsíce",
@@ -339,13 +369,8 @@
   "categories_delete_description_empty": "Tuto kategorii nepoužívá žádná transakce. Bude trvale smazána.",
   "categories_delete_description_move": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Do této kategorie je aktuálně zařazena {count} transakce. Vyberte kategorii, do které se přesunou; kategorie bude poté trvale smazána. Tuto akci nelze vrátit zpět.",
         "countPlural=few": "Do této kategorie jsou aktuálně zařazeny {count} transakce. Vyberte kategorii, do které se přesunou; kategorie bude poté trvale smazána. Tuto akci nelze vrátit zpět.",
@@ -363,13 +388,8 @@
   "categories_deleted": "Kategorie smazána",
   "categories_deleted_moved": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Kategorie smazána · přesunuta {count} transakce",
         "countPlural=few": "Kategorie smazána · přesunuty {count} transakce",
@@ -396,13 +416,8 @@
   "categories_entries_search": "Hledat záznamy",
   "categories_entries_showing": [
     {
-      "declarations": [
-        "input total",
-        "local countPlural = total: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input total", "local countPlural = total: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Zobrazeno {first} až {last} z {total} záznamu",
         "countPlural=few": "Zobrazeno {first} až {last} z {total} záznamů",
@@ -784,13 +799,8 @@
   "categories_unbudgeted_heading": "Bez rozpočtu",
   "categories_unbudgeted_summary": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} kategorie nemá rozpočet",
         "countPlural=few": "{count} kategorie nemají rozpočet",
@@ -834,8 +844,13 @@
   "core_fuel_previous_not_full": "Předchozí tankování nebylo do plné nádrže",
   "core_fuel_previous_not_older": "Předchozí plná nádrž musí být starší než toto tankování",
   "core_fuel_previous_other_vehicle": "Předchozí plná nádrž musí být tankování stejného vozidla",
+  "core_household_color_invalid": "Vyberte barvu",
+  "core_household_icon_invalid": "Vyberte ikonu ze seznamu",
+  "core_household_name_required": "Zadejte název",
+  "core_household_not_found": "Domácnost „{id}“ nebyla nalezena",
   "core_meter_not_found": "Měřidlo „{id}“ nebylo nalezeno",
   "core_meter_reading_not_found": "Odečet „{id}“ nebyl nalezen",
+  "core_no_household_selected": "Není vybrána žádná domácnost",
   "core_password_max": "Heslo je příliš dlouhé",
   "core_password_min": "Heslo musí mít alespoň 8 znaků",
   "core_service_entry_not_found": "Servisní záznam „{id}“ nebyl nalezen",
@@ -856,13 +871,8 @@
   "core_user_not_found": "Uživatel „{id}“ nebyl nalezen",
   "core_validation_array_max": [
     {
-      "declarations": [
-        "input max",
-        "local maxPlural = max: plural"
-      ],
-      "selectors": [
-        "maxPlural"
-      ],
+      "declarations": ["input max", "local maxPlural = max: plural"],
+      "selectors": ["maxPlural"],
       "match": {
         "maxPlural=one": "Vyberte nejvýše {max} položku",
         "maxPlural=few": "Vyberte nejvýše {max} položky",
@@ -873,13 +883,8 @@
   ],
   "core_validation_array_min": [
     {
-      "declarations": [
-        "input min",
-        "local minPlural = min: plural"
-      ],
-      "selectors": [
-        "minPlural"
-      ],
+      "declarations": ["input min", "local minPlural = min: plural"],
+      "selectors": ["minPlural"],
       "match": {
         "minPlural=one": "Vyberte alespoň {min} položku",
         "minPlural=few": "Vyberte alespoň {min} položky",
@@ -900,13 +905,8 @@
   "core_validation_required": "Toto pole je povinné",
   "core_validation_string_max": [
     {
-      "declarations": [
-        "input max",
-        "local maxPlural = max: plural"
-      ],
-      "selectors": [
-        "maxPlural"
-      ],
+      "declarations": ["input max", "local maxPlural = max: plural"],
+      "selectors": ["maxPlural"],
       "match": {
         "maxPlural=one": "Může mít nejvýše {max} znak",
         "maxPlural=few": "Může mít nejvýše {max} znaky",
@@ -917,13 +917,8 @@
   ],
   "core_validation_string_min": [
     {
-      "declarations": [
-        "input min",
-        "local minPlural = min: plural"
-      ],
-      "selectors": [
-        "minPlural"
-      ],
+      "declarations": ["input min", "local minPlural = min: plural"],
+      "selectors": ["minPlural"],
       "match": {
         "minPlural=one": "Musí mít alespoň {min} znak",
         "minPlural=few": "Musí mít alespoň {min} znaky",
@@ -966,13 +961,8 @@
   "energy_breadcrumb": "Drobečková navigace",
   "energy_breadcrumb_current": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Energie ({count} měřidlo)",
         "countPlural=few": "Energie ({count} měřidla)",
@@ -1000,13 +990,8 @@
   "energy_chart_year_before": "Předchozí rok",
   "energy_complete_months": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} celý měsíc",
         "countPlural=few": "{count} celé měsíce",
@@ -1088,13 +1073,8 @@
   "energy_reading_value_placeholder": "např. 12345,6",
   "energy_readings_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} odečet",
         "countPlural=few": "{count} odečty",
@@ -1112,6 +1092,14 @@
   "energy_title": "Energie",
   "energy_yoy_badge": "{percent} oproti stejnému měsíci loni",
   "hooks_not_found": "Nenalezeno",
+  "household_none_description": "Váš účet zatím nepatří do žádné domácnosti. Požádejte správce, aby vás do některé přidal, a poté se znovu přihlaste nebo načtěte tuto stránku.",
+  "household_none_heading": "Zatím žádná domácnost",
+  "household_none_title": "Žádná domácnost · Household HQ",
+  "household_switch_current": "Aktuální domácnost",
+  "household_switch_description": "Vše, co vidíte, patří vždy jen jedné domácnosti.",
+  "household_switch_not_found": "Domácnost nebyla nalezena",
+  "household_switch_open": "Přepnout domácnost",
+  "household_switch_title": "Přepnout domácnost",
   "invite_confirm_label": "Potvrzení nového hesla",
   "invite_go_to_sign_in": "Přejít na přihlášení",
   "invite_invalid_description": "Tento odkaz je neúplný nebo poškozený. Požádejte o novou pozvánku.",
@@ -1199,13 +1187,8 @@
   "tags_empty": "Nenalezeny žádné štítky.",
   "tags_entries_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} záznam",
         "countPlural=few": "{count} záznamy",
@@ -1266,7 +1249,6 @@
   "transactions_status_cancelled": "Zrušená",
   "transactions_status_completed": "Dokončená",
   "transactions_status_pending": "Čekající",
-  "users_breadcrumb_current": "Uživatelé ({count} celkem)",
   "users_copy": "Kopírovat",
   "users_delete_description": "Účet bude trvale smazán a všude odhlášen. Tuto akci nelze vrátit zpět.",
   "users_delete_failed": "Smazání se nezdařilo",
@@ -1274,9 +1256,7 @@
   "users_delete_submit": "Smazat uživatele",
   "users_delete_success": "Uživatel {email} byl smazán",
   "users_delete_title": "Smazat uživatele {email}?",
-  "users_description": "Zvěte do domácnosti další lidi a spravujte jejich hesla.",
   "users_for_email": "pro {email}",
-  "users_invite_description": "Vytvoří účet s náhodným heslem a dá vám odkaz, přes který si nový uživatel zvolí heslo vlastní.",
   "users_invite_email_placeholder": "např. partner@example.com",
   "users_invite_failed": "Pozvání se nezdařilo",
   "users_invite_invalid_email": "Zadejte platnou e-mailovou adresu.",
@@ -1287,7 +1267,6 @@
   "users_invite_link_label": "Odkaz s pozvánkou",
   "users_invite_submit": "Vytvořit pozvánku",
   "users_invite_title": "Pozvat uživatele",
-  "users_page_title": "Uživatelé · {app}",
   "users_reinvite_description": "Nahradí heslo uživatele {email} novým náhodným a odhlásí ho všude. Dřívější odkaz ani heslo už nebudou fungovat.",
   "users_reinvite_failed": "Obnovení se nezdařilo",
   "users_reinvite_self": "Pro vlastní účet nastavte nové heslo.",
@@ -1301,7 +1280,6 @@
   "users_set_password_submit": "Změnit heslo",
   "users_set_password_success": "Heslo uživatele {email} bylo změněno",
   "users_set_password_title": "Nastavit heslo",
-  "users_title": "Uživatelé",
   "users_you": "Vy",
   "vehicles_breadcrumb_home": "Domů",
   "vehicles_breadcrumb_label": "Drobečková navigace",
@@ -1333,13 +1311,8 @@
   "vehicles_delete_fuel_done": "Tankování smazáno",
   "vehicles_delete_fuel_entries_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} záznam o palivu",
         "countPlural=few": "{count} záznamy o palivu",
@@ -1354,13 +1327,8 @@
   "vehicles_delete_service_title": "Smazat servisní záznam?",
   "vehicles_delete_services_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} servisní záznam",
         "countPlural=few": "{count} servisní záznamy",
@@ -1457,13 +1425,8 @@
   "vehicles_fuel_price_per_litre": "{price} {currency} / l",
   "vehicles_fuel_recorded": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Zaznamenáno: {count} tankování",
         "countPlural=few": "Zaznamenáno: {count} tankování",
@@ -1493,13 +1456,8 @@
   "vehicles_maintenance_heading": "Údržba",
   "vehicles_maintenance_recorded": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Zaznamenán {count} servisní záznam",
         "countPlural=few": "Zaznamenány {count} servisní záznamy",
@@ -1530,13 +1488,8 @@
   "vehicles_summary_price_per_km": "Průměrná cena za km",
   "vehicles_summary_so_far": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Od začátku roku · {count} tankování",
         "countPlural=few": "Od začátku roku · {count} tankování",
@@ -1626,13 +1579,8 @@
   "wizard_not_chosen": "Nevybráno",
   "wizard_overview_every_months": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Každý měsíc",
         "countPlural=few": "Každé {count} měsíce",

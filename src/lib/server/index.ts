@@ -1,6 +1,7 @@
 import { DATABASE_URL } from "$app/env/private";
 import { building } from "$app/env";
 import { error } from "@sveltejs/kit";
+import { m } from "#paraglide/messages.js";
 import {
   createCore,
   createPrismaClient,
@@ -27,6 +28,6 @@ export function getCore(): Core {
  * the one door to household data and it cannot be pointed elsewhere.
  */
 export function hq(locals: App.Locals): HouseholdCore {
-  if (!locals.hq) error(403, "No household selected");
+  if (!locals.hq) error(403, m.core_no_household_selected());
   return locals.hq;
 }

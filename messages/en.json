@@ -15,13 +15,8 @@
   "accounts_breadcrumb_label": "Breadcrumb",
   "accounts_breadcrumb_total": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Accounts ({count} total)",
         "countPlural=other": "Accounts ({count} total)"
@@ -47,13 +42,8 @@
   "accounts_chart_peak": "Peak",
   "accounts_chart_subtitle": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Monthly closing balances, last {count} month",
         "countPlural=other": "Monthly closing balances, last {count} months"
@@ -106,13 +96,8 @@
   "accounts_entries_period": "Period",
   "accounts_entries_recorded": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} recorded",
         "countPlural=other": "{count} recorded"
@@ -128,9 +113,7 @@
         "input total",
         "local totalPlural = total: plural"
       ],
-      "selectors": [
-        "totalPlural"
-      ],
+      "selectors": ["totalPlural"],
       "match": {
         "totalPlural=one": "Showing {first} to {last} of {total} entry",
         "totalPlural=other": "Showing {first} to {last} of {total} entries"
@@ -217,14 +200,72 @@
   "accounts_type_retirement_label": "Retirement",
   "accounts_type_savings_desc": "Savings accounts and vaults",
   "accounts_type_savings_label": "Savings",
+  "admin_add": "Add",
+  "admin_add_choose": "Choose…",
+  "admin_add_existing_label": "Add an existing user to {household}",
+  "admin_breadcrumb_current": "Administration ({households}, {users})",
+  "admin_choose_user_to_add": "Choose a user to add.",
+  "admin_col_actions": "Actions",
+  "admin_col_role": "Role",
+  "admin_col_user": "User",
+  "admin_description": "Households are completely separate: members only ever see the data of the households they belong to. Invite people, manage their passwords and decide who belongs where.",
+  "admin_household_color": "Color",
+  "admin_household_color_default": "Default",
+  "admin_household_create_submit": "Create household",
+  "admin_household_created": "Household created.",
+  "admin_household_edit_description": "The name, icon and colour identify the household in the app header and in the household switcher.",
+  "admin_household_edit_title": "Edit household",
+  "admin_household_name_label": "Name",
+  "admin_household_new_description": "A household is a separate space with its own accounts, categories, tags, vehicles and meters. Nothing is shared between households.",
+  "admin_household_new_title": "New household",
+  "admin_household_pick_color": "Pick color",
+  "admin_household_save": "Save household",
+  "admin_household_save_failed": "Could not save",
+  "admin_households_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} household",
+        "countPlural=other": "{count} households"
+      }
+    }
+  ],
+  "admin_invite_choose_household": "Please choose a household.",
+  "admin_invite_description": "Creates the account with a random password, adds it to the chosen household and gives you a link the new user opens to choose their own.",
+  "admin_invite_email_label": "Email",
+  "admin_invite_household_label": "Household",
+  "admin_invite_no_household": "No household (assign later)",
+  "admin_invite_to": "Invite to {household}",
+  "admin_no_household": "No household",
+  "admin_nobody_here": "Nobody belongs here yet.",
+  "admin_page_title": "Administration · {app}",
+  "admin_remove": "Remove",
+  "admin_remove_member_label": "Remove {email} from {household}",
+  "admin_section_users_caption": "Users of {title}",
+  "admin_title": "Administration",
+  "admin_unknown_household": "Unknown household",
+  "admin_unknown_member": "Unknown member.",
+  "admin_users_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} user",
+        "countPlural=other": "{count} users"
+      }
+    }
+  ],
   "auth_confirm_password": "Confirm password",
   "auth_create_account": "Create account",
   "auth_email": "Email",
   "auth_invalid_credentials": "Invalid email or password",
   "auth_password": "Password",
   "auth_passwords_mismatch": "Passwords do not match",
-  "auth_setup_description": "Welcome! Create the first account to get started.",
+  "auth_setup_description_household": "Welcome! Create the first account and household to get started.",
   "auth_setup_heading": "Create admin account",
+  "auth_setup_household_default": "My household",
+  "auth_setup_household_name": "Household name",
   "auth_setup_title": "Set up · Household HQ",
   "auth_sign_in": "Sign in",
   "auth_sign_in_title": "Sign in · Household HQ",
@@ -264,13 +305,8 @@
   "categories_chart_range_label": "Chart range",
   "categories_chart_subtitle_in": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Monthly income, {count} month",
         "countPlural=other": "Monthly income, {count} months"
@@ -279,13 +315,8 @@
   ],
   "categories_chart_subtitle_out": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Monthly spending, {count} month",
         "countPlural=other": "Monthly spending, {count} months"
@@ -294,13 +325,8 @@
   ],
   "categories_chart_subtitle_transfer": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Monthly transfers, {count} month",
         "countPlural=other": "Monthly transfers, {count} months"
@@ -325,13 +351,8 @@
   "categories_delete_description_empty": "No transactions use this category. It will be permanently deleted.",
   "categories_delete_description_move": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} transaction currently filed under this category. Choose the category they should be moved to; the category is then permanently deleted. This can't be undone.",
         "countPlural=other": "{count} transactions currently filed under this category. Choose the category they should be moved to; the category is then permanently deleted. This can't be undone."
@@ -347,13 +368,8 @@
   "categories_deleted": "Category deleted",
   "categories_deleted_moved": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Category deleted · {count} transaction moved",
         "countPlural=other": "Category deleted · {count} transactions moved"
@@ -378,13 +394,8 @@
   "categories_entries_search": "Search entries",
   "categories_entries_showing": [
     {
-      "declarations": [
-        "input total",
-        "local countPlural = total: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input total", "local countPlural = total: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Showing {first} to {last} of {total} entry",
         "countPlural=other": "Showing {first} to {last} of {total} entries"
@@ -764,13 +775,8 @@
   "categories_unbudgeted_heading": "Unbudgeted",
   "categories_unbudgeted_summary": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} category has no budget",
         "countPlural=other": "{count} categories have no budget"
@@ -812,8 +818,13 @@
   "core_fuel_previous_not_full": "The previous fill-up was not a full tank",
   "core_fuel_previous_not_older": "The previous full tank must be older than this fill-up",
   "core_fuel_previous_other_vehicle": "The previous full tank must be a fill-up of the same vehicle",
+  "core_household_color_invalid": "Pick a colour",
+  "core_household_icon_invalid": "Choose an icon from the list",
+  "core_household_name_required": "Please enter a name",
+  "core_household_not_found": "Household '{id}' not found",
   "core_meter_not_found": "Meter '{id}' not found",
   "core_meter_reading_not_found": "Meter reading '{id}' not found",
+  "core_no_household_selected": "No household selected",
   "core_password_max": "Password is too long",
   "core_password_min": "Password must be at least 8 characters",
   "core_service_entry_not_found": "Service entry '{id}' not found",
@@ -834,13 +845,8 @@
   "core_user_not_found": "User '{id}' not found",
   "core_validation_array_max": [
     {
-      "declarations": [
-        "input max",
-        "local maxPlural = max: plural"
-      ],
-      "selectors": [
-        "maxPlural"
-      ],
+      "declarations": ["input max", "local maxPlural = max: plural"],
+      "selectors": ["maxPlural"],
       "match": {
         "maxPlural=one": "Select at most {max} item",
         "maxPlural=other": "Select at most {max} items"
@@ -849,13 +855,8 @@
   ],
   "core_validation_array_min": [
     {
-      "declarations": [
-        "input min",
-        "local minPlural = min: plural"
-      ],
-      "selectors": [
-        "minPlural"
-      ],
+      "declarations": ["input min", "local minPlural = min: plural"],
+      "selectors": ["minPlural"],
       "match": {
         "minPlural=one": "Select at least {min} item",
         "minPlural=other": "Select at least {min} items"
@@ -874,13 +875,8 @@
   "core_validation_required": "This field is required",
   "core_validation_string_max": [
     {
-      "declarations": [
-        "input max",
-        "local maxPlural = max: plural"
-      ],
-      "selectors": [
-        "maxPlural"
-      ],
+      "declarations": ["input max", "local maxPlural = max: plural"],
+      "selectors": ["maxPlural"],
       "match": {
         "maxPlural=one": "Must be at most {max} character",
         "maxPlural=other": "Must be at most {max} characters"
@@ -889,13 +885,8 @@
   ],
   "core_validation_string_min": [
     {
-      "declarations": [
-        "input min",
-        "local minPlural = min: plural"
-      ],
-      "selectors": [
-        "minPlural"
-      ],
+      "declarations": ["input min", "local minPlural = min: plural"],
+      "selectors": ["minPlural"],
       "match": {
         "minPlural=one": "Must be at least {min} character",
         "minPlural=other": "Must be at least {min} characters"
@@ -936,13 +927,8 @@
   "energy_breadcrumb": "Breadcrumb",
   "energy_breadcrumb_current": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Energy ({count} meter)",
         "countPlural=other": "Energy ({count} meters)"
@@ -968,13 +954,8 @@
   "energy_chart_year_before": "Year before",
   "energy_complete_months": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} complete month",
         "countPlural=other": "{count} complete months"
@@ -1054,13 +1035,8 @@
   "energy_reading_value_placeholder": "e.g. 12345.6",
   "energy_readings_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} reading",
         "countPlural=other": "{count} readings"
@@ -1076,6 +1052,14 @@
   "energy_title": "Energy",
   "energy_yoy_badge": "{percent} vs same month last year",
   "hooks_not_found": "Not found",
+  "household_none_description": "Your account isn't part of any household. Ask an administrator to add you to one, then sign in again or reload this page.",
+  "household_none_heading": "No household yet",
+  "household_none_title": "No household · Household HQ",
+  "household_switch_current": "Current household",
+  "household_switch_description": "Everything you see belongs to one household at a time.",
+  "household_switch_not_found": "Household not found",
+  "household_switch_open": "Switch household",
+  "household_switch_title": "Switch household",
   "invite_confirm_label": "Confirm new password",
   "invite_go_to_sign_in": "Go to sign in",
   "invite_invalid_description": "This link is incomplete or damaged. Ask for a new invite.",
@@ -1163,13 +1147,8 @@
   "tags_empty": "No tags found.",
   "tags_entries_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} entry",
         "countPlural=other": "{count} entries"
@@ -1228,7 +1207,6 @@
   "transactions_status_cancelled": "Cancelled",
   "transactions_status_completed": "Completed",
   "transactions_status_pending": "Pending",
-  "users_breadcrumb_current": "Users ({count} total)",
   "users_copy": "Copy",
   "users_delete_description": "The account is permanently deleted and signed out everywhere. This can't be undone.",
   "users_delete_failed": "Could not delete",
@@ -1236,9 +1214,7 @@
   "users_delete_submit": "Delete user",
   "users_delete_success": "Deleted {email}",
   "users_delete_title": "Delete {email}?",
-  "users_description": "Invite people to the household and manage their passwords.",
   "users_for_email": "for {email}",
-  "users_invite_description": "Creates the account with a random password and gives you a link the new user opens to choose their own.",
   "users_invite_email_placeholder": "e.g. partner@example.com",
   "users_invite_failed": "Could not invite",
   "users_invite_invalid_email": "Please enter a valid email address.",
@@ -1249,7 +1225,6 @@
   "users_invite_link_label": "Invite link",
   "users_invite_submit": "Create invite",
   "users_invite_title": "Invite user",
-  "users_page_title": "Users · {app}",
   "users_reinvite_description": "Replaces {email}'s password with a new random one and signs them out everywhere. Any earlier link or password stops working.",
   "users_reinvite_failed": "Could not reset",
   "users_reinvite_self": "Use a new password for your own account.",
@@ -1263,7 +1238,6 @@
   "users_set_password_submit": "Change password",
   "users_set_password_success": "Password changed for {email}",
   "users_set_password_title": "Set password",
-  "users_title": "Users",
   "users_you": "You",
   "vehicles_breadcrumb_home": "Home",
   "vehicles_breadcrumb_label": "Breadcrumb",
@@ -1295,13 +1269,8 @@
   "vehicles_delete_fuel_done": "Fill-up deleted",
   "vehicles_delete_fuel_entries_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} fuel entry",
         "countPlural=other": "{count} fuel entries"
@@ -1314,13 +1283,8 @@
   "vehicles_delete_service_title": "Delete service?",
   "vehicles_delete_services_count": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} service",
         "countPlural=other": "{count} services"
@@ -1415,13 +1379,8 @@
   "vehicles_fuel_price_per_litre": "{price} {currency} / L",
   "vehicles_fuel_recorded": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} fill-up recorded",
         "countPlural=other": "{count} fill-ups recorded"
@@ -1449,13 +1408,8 @@
   "vehicles_maintenance_heading": "Maintenance",
   "vehicles_maintenance_recorded": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} service recorded",
         "countPlural=other": "{count} services recorded"
@@ -1484,13 +1438,8 @@
   "vehicles_summary_price_per_km": "Average price per km",
   "vehicles_summary_so_far": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "So far this year · {count} fill-up",
         "countPlural=other": "So far this year · {count} fill-ups"
@@ -1578,13 +1527,8 @@
   "wizard_not_chosen": "Not chosen",
   "wizard_overview_every_months": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Every month",
         "countPlural=other": "Every {count} months"

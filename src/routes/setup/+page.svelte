@@ -13,18 +13,18 @@
 <svelte:head><title>{m.auth_setup_title()}</title></svelte:head>
 
 <AuthCard
-  title="Create admin account"
-  description="Welcome! Create the first account and household to get started."
+  title={m.auth_setup_heading()}
+  description={m.auth_setup_description_household()}
 >
   <form method="POST" use:enhance class="flex flex-col gap-4">
     <label class="label">
-      <span class="label-text">Household name</span>
+      <span class="label-text">{m.auth_setup_household_name()}</span>
       <input
         class="input"
         name="household"
         autocomplete="off"
         required
-        value={form?.household ?? "My household"}
+        value={form?.household ?? m.auth_setup_household_default()}
       />
       {#each errors.household ?? [] as msg (msg)}
         <small class="text-error-600-400">{msg}</small>
