@@ -1,6 +1,6 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import {
   monthKey,
@@ -22,9 +22,9 @@ const parseId = (raw: string) => {
   return id;
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
   const id = parseId(params.id);
-  const core = getCore();
+  const core = hq(locals);
 
   const tag = await core.tags
     .get(id)
@@ -89,11 +89,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 export const actions: Actions = {
   /** Deletes one of the tag's transactions. */
-  delete: async ({ request }) => {
+  delete: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
     if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().transactions.remove(id);
+      await hq(locals).transactions.remove(id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       if (e instanceof ConflictError) return fail(409, { message: e.message });
@@ -103,9 +103,9 @@ export const actions: Actions = {
   },
 
   /** Deletes the tag itself; its transactions stay. */
-  deleteTag: async ({ params }) => {
+  deleteTag: async ({ params, locals }) => {
     try {
-      await getCore().tags.remove(parseId(params.id));
+      await hq(locals).tags.remove(parseId(params.id));
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       throw e;

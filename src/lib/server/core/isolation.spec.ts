@@ -685,7 +685,7 @@ describe.skipIf(!core)("household isolation", () => {
         password: "correct horse",
       });
       userIds.push(user.id);
-      expect(user.isAdmin).toBe(false);
+      expect(user.isSuperuser).toBe(false);
       expect(await g.households.forUser(user.id)).toEqual([]);
 
       await g.households.addMember(a.householdId, user.id);

@@ -1,6 +1,6 @@
 import { error, json } from "@sveltejs/kit";
 import { z } from "zod";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import {
   ConflictError,
   VehicleComponentInput,
@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   if (!parsed.success) error(400, z.prettifyError(parsed.error));
 
   try {
-    return json(await getCore().vehicles.components.create(parsed.data), {
+    return json(await hq(locals).vehicles.components.create(parsed.data), {
       status: 201,
     });
   } catch (e) {

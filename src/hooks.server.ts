@@ -1,6 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
 import type { Handle } from "@sveltejs/kit/hooks";
 import { getCore } from "#lib/server/index.ts";
+import { pickActiveHousehold } from "#lib/server/core/index.ts";
 import {
   SESSION_COOKIE,
   clearSessionCookie,
@@ -24,6 +25,12 @@ const isPublic = (path: string) =>
 const isSuperuserOnly = (path: string) =>
   path === "/users" || path.startsWith("/users/");
 
+/** What a signed-in user can reach without being in a household. */
+const isHouseholdFree = (path: string) =>
+  path === "/no-household" || path === "/logout";
+const isSuperuserPath = (path: string) =>
+  path === "/admin" || path.startsWith("/admin/");
+
 // Once an admin exists this never goes back to false.
 let hasUsers = false;
 
@@ -31,6 +38,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   const core = getCore();
   const { pathname } = event.url;
   const secure = event.url.protocol === "https:";
+  event.locals.households = [];
 
   const token = event.cookies.get(SESSION_COOKIE);
   if (token) {
@@ -39,6 +47,19 @@ export const handle: Handle = async ({ event, resolve }) => {
       event.locals.user = session.user;
       if (session.renewed) {
         setSessionCookie(event.cookies, token, session.expiresAt, secure);
+      }
+      // Membership is looked up on every request, so a user removed from a
+      // household loses access at once; the session only remembers a
+      // preference. `hq` is only ever set for a household the user is in.
+      const households = await core.households.forUser(session.user.id);
+      const active = pickActiveHousehold(households, session.householdId);
+      event.locals.households = households;
+      if (active) {
+        event.locals.household = active;
+        event.locals.hq = core.forHousehold(active.id);
+      }
+      if ((active?.id ?? null) !== session.householdId) {
+        await core.sessions.setHousehold(token, active?.id ?? null);
       }
     } else {
       clearSessionCookie(event.cookies);
@@ -58,6 +79,19 @@ export const handle: Handle = async ({ event, resolve }) => {
     redirect(303, "/login");
   } else if (event.locals.user && pathname === "/login") {
     redirect(303, "/");
+  } else if (event.locals.user) {
+    if (isSuperuserPath(pathname) && !event.locals.user.isSuperuser) {
+      error(404, "Not found");
+    }
+    if (
+      !event.locals.hq &&
+      !isHouseholdFree(pathname) &&
+      !isSuperuserPath(pathname) &&
+      !ASSET_PATHS.has(pathname)
+    ) {
+      // Nothing to show without a household: admins can create one.
+      redirect(303, event.locals.user.isSuperuser ? "/admin" : "/no-household");
+    }
   }
 
   // Guarding here covers page loads and form actions alike.

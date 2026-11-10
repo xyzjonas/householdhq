@@ -1,13 +1,13 @@
 import { error, fail } from "@sveltejs/kit";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import { PAGE_SIZE, monthRange } from "#lib/account-detail.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
   const id = Number(params.id);
   if (!Number.isInteger(id)) error(404, "Account not found");
-  const core = getCore();
+  const core = hq(locals);
 
   const account = await core.accounts
     .get(id)
@@ -81,7 +81,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 };
 
 export const actions: Actions = {
-  checkpoint: async ({ params, request }) => {
+  checkpoint: async ({ params, request, locals }) => {
     const id = Number(params.id);
     const raw = String((await request.formData()).get("amount") ?? "")
       .trim()
@@ -92,7 +92,7 @@ export const actions: Actions = {
       return fail(400, { message: "Please enter the current balance." });
     }
     try {
-      const { adjustment } = await getCore().checkpoints.create(id, {
+      const { adjustment } = await hq(locals).checkpoints.create(id, {
         amount,
       });
       return { checkpointed: true, adjustment: adjustment?.amount ?? 0 };
@@ -103,12 +103,12 @@ export const actions: Actions = {
     }
   },
 
-  deleteCheckpoint: async ({ params, request }) => {
+  deleteCheckpoint: async ({ params, request, locals }) => {
     const accountId = Number(params.id);
     const id = Number((await request.formData()).get("id"));
     if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().checkpoints.remove(accountId, id);
+      await hq(locals).checkpoints.remove(accountId, id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       throw e;
@@ -116,11 +116,11 @@ export const actions: Actions = {
     return { deletedCheckpoint: id };
   },
 
-  delete: async ({ request }) => {
+  delete: async ({ request, locals }) => {
     const id = Number((await request.formData()).get("id"));
     if (!Number.isInteger(id)) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().transactions.remove(id);
+      await hq(locals).transactions.remove(id);
     } catch (e) {
       if (e instanceof NotFoundError) return fail(404, { message: e.message });
       if (e instanceof ConflictError) return fail(409, { message: e.message });

@@ -3,6 +3,7 @@
   import Toaster from "#lib/components/Toaster.svelte";
   import UpdateBanner from "#lib/components/UpdateBanner.svelte";
   import AppShell from "#lib/components/AppShell.svelte";
+  import SoloShell from "#lib/components/SoloShell.svelte";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
@@ -16,8 +17,17 @@
   <title>Household HQ</title>
 </svelte:head>
 
-{#if data.user}
-  <AppShell user={data.user}>{@render children()}</AppShell>
+{#if data.user && data.household}
+  <AppShell
+    user={data.user}
+    household={data.household}
+    households={data.households}
+  >
+    {@render children()}
+  </AppShell>
+{:else if data.user}
+  <!-- Not in any household (yet): nothing to navigate, only the account. -->
+  <SoloShell user={data.user}>{@render children()}</SoloShell>
 {:else}
   {@render children()}
 {/if}

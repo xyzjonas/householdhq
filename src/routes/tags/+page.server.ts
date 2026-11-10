@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import {
   monthKey,
   monthRange,
@@ -10,9 +10,9 @@ import {
 import { ConflictError } from "#lib/server/core/index.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
   const month = parseMonth(url.searchParams.get("month"));
-  const tags = await getCore().tags.listWithActivity(monthRange(month));
+  const tags = await hq(locals).tags.listWithActivity(monthRange(month));
   return {
     month,
     previousMonth: shiftMonth(month, -1),
@@ -23,11 +23,11 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-  create: async ({ request }) => {
+  create: async ({ request, locals }) => {
     const name = String((await request.formData()).get("name") ?? "").trim();
     if (!name) return fail(400, { message: "Please enter a tag name." });
     try {
-      await getCore().tags.create({ name });
+      await hq(locals).tags.create({ name });
     } catch (e) {
       if (e instanceof ConflictError) return fail(409, { message: e.message });
       throw e;

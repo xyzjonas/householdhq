@@ -4,10 +4,21 @@
   import Plus from "@lucide/svelte/icons/plus";
   import LogOut from "@lucide/svelte/icons/log-out";
   import Search from "@lucide/svelte/icons/search";
+  import ShieldCheck from "@lucide/svelte/icons/shield-check";
+  import HouseholdSwitcher from "./HouseholdSwitcher.svelte";
   import NavItems from "./NavItems.svelte";
 
-  let { user, children }: { user: { email: string }; children: Snippet } =
-    $props();
+  let {
+    user,
+    household,
+    households,
+    children,
+  }: {
+    user: { email: string; isSuperuser: boolean };
+    household: { id: number; name: string };
+    households: { id: number; name: string }[];
+    children: Snippet;
+  } = $props();
 </script>
 
 <div class="min-h-screen lg:grid lg:grid-cols-[17.5rem_1fr]">
@@ -17,11 +28,18 @@
     <a href={resolve("/")} class="text-xl font-extrabold tracking-tight"
       >Household HQ</a
     >
+    <HouseholdSwitcher {household} {households} />
     <nav aria-label="Main">
       <NavItems layout="sidebar" />
     </nav>
     <div class="mt-auto flex flex-col gap-2 text-sm">
       <p class="truncate opacity-70" title={user.email}>{user.email}</p>
+      {#if user.isSuperuser}
+        <a href={resolve("/admin")} class="btn w-full preset-tonal">
+          <ShieldCheck size={16} aria-hidden="true" />
+          <span>Administration</span>
+        </a>
+      {/if}
       <form method="POST" action={resolve("/logout")}>
         <button type="submit" class="btn w-full preset-tonal">
           <LogOut size={16} aria-hidden="true" />
@@ -41,6 +59,11 @@
       >
         Household HQ
       </a>
+      {#if households.length > 1}
+        <div class="lg:hidden">
+          <HouseholdSwitcher {household} {households} />
+        </div>
+      {/if}
       <form
         role="search"
         class="ml-auto hidden max-w-sm flex-1 sm:block lg:ml-0"

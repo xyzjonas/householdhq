@@ -1,6 +1,6 @@
 import { error, fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { NotFoundError } from "#lib/server/core/index.ts";
 import {
   failureFor,
@@ -20,9 +20,9 @@ const parseId = (raw: string) => {
   return id;
 };
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
   const id = parseId(params.id);
-  const core = getCore();
+  const core = hq(locals);
 
   const vehicle = await core.vehicles
     .get(id)
@@ -53,20 +53,20 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-  vehicle: async ({ params, request }) => {
+  vehicle: async ({ params, request, locals }) => {
     const parsed = parseVehicleForm(await request.formData());
     if ("failure" in parsed) return parsed.failure;
     try {
-      await getCore().vehicles.update(parseId(params.id), parsed.data);
+      await hq(locals).vehicles.update(parseId(params.id), parsed.data);
     } catch (e) {
       return failureFor(e);
     }
     return { saved: true };
   },
 
-  deleteVehicle: async ({ params }) => {
+  deleteVehicle: async ({ params, locals }) => {
     try {
-      await getCore().vehicles.remove(parseId(params.id));
+      await hq(locals).vehicles.remove(parseId(params.id));
     } catch (e) {
       return failureFor(e);
     }
@@ -74,7 +74,7 @@ export const actions: Actions = {
   },
 
   /** Records a fill-up, or edits it when an `id` is posted. */
-  fuel: async ({ params, request }) => {
+  fuel: async ({ params, request, locals }) => {
     const form = await request.formData();
     const parsed = parseFuelForm(form);
     if ("failure" in parsed) return parsed.failure;
@@ -82,9 +82,9 @@ export const actions: Actions = {
     const entryId = idField(form, "id");
     try {
       if (entryId) {
-        await getCore().vehicles.fuel.update(vehicleId, entryId, parsed.data);
+        await hq(locals).vehicles.fuel.update(vehicleId, entryId, parsed.data);
       } else {
-        await getCore().vehicles.fuel.create(vehicleId, parsed.data);
+        await hq(locals).vehicles.fuel.create(vehicleId, parsed.data);
       }
     } catch (e) {
       return failureFor(e);
@@ -92,11 +92,11 @@ export const actions: Actions = {
     return { saved: true };
   },
 
-  deleteFuel: async ({ params, request }) => {
+  deleteFuel: async ({ params, request, locals }) => {
     const entryId = idField(await request.formData(), "id");
     if (!entryId) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().vehicles.fuel.remove(parseId(params.id), entryId);
+      await hq(locals).vehicles.fuel.remove(parseId(params.id), entryId);
     } catch (e) {
       return failureFor(e);
     }
@@ -104,7 +104,7 @@ export const actions: Actions = {
   },
 
   /** Records a service, or edits it when an `id` is posted. */
-  service: async ({ params, request }) => {
+  service: async ({ params, request, locals }) => {
     const form = await request.formData();
     const parsed = parseServiceForm(form);
     if ("failure" in parsed) return parsed.failure;
@@ -112,13 +112,13 @@ export const actions: Actions = {
     const entryId = idField(form, "id");
     try {
       if (entryId) {
-        await getCore().vehicles.service.update(
+        await hq(locals).vehicles.service.update(
           vehicleId,
           entryId,
           parsed.data,
         );
       } else {
-        await getCore().vehicles.service.create(vehicleId, parsed.data);
+        await hq(locals).vehicles.service.create(vehicleId, parsed.data);
       }
     } catch (e) {
       return failureFor(e);
@@ -126,11 +126,11 @@ export const actions: Actions = {
     return { saved: true };
   },
 
-  deleteService: async ({ params, request }) => {
+  deleteService: async ({ params, request, locals }) => {
     const entryId = idField(await request.formData(), "id");
     if (!entryId) return fail(400, { message: "Invalid id" });
     try {
-      await getCore().vehicles.service.remove(parseId(params.id), entryId);
+      await hq(locals).vehicles.service.remove(parseId(params.id), entryId);
     } catch (e) {
       return failureFor(e);
     }

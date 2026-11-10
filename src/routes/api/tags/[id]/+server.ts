@@ -1,6 +1,6 @@
 import { error, json } from "@sveltejs/kit";
 import { z } from "zod";
-import { getCore } from "#lib/server/index.ts";
+import { hq } from "#lib/server/index.ts";
 import { TagPatch, NotFoundError } from "#lib/server/core/index.ts";
 import type { RequestHandler } from "./$types";
 
@@ -23,7 +23,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
   if (Object.keys(parsed.data).length === 0) error(400, "Nothing to update");
 
   try {
-    return json(await getCore().tags.update(id, parsed.data));
+    return json(await hq(locals).tags.update(id, parsed.data));
   } catch (e) {
     if (e instanceof NotFoundError) error(404, e.message);
     throw e;
