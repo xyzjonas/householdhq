@@ -1,12 +1,10 @@
 import { fail } from "@sveltejs/kit";
 import { z } from "zod";
 import type { ItemizeContext } from "#lib/components/transaction-wizard/types.ts";
-import { NotFoundError } from "#lib/server/core/index.ts";
-import { getCore } from "#lib/server/index.ts";
+import { NotFoundError, type HouseholdCore } from "#lib/server/core/index.ts";
 
 /** Reference data the transaction wizard needs, shared by create and edit. */
-export async function loadWizardData() {
-  const core = getCore();
+export async function loadWizardData(core: HouseholdCore) {
   const [accounts, categories, recent, settings, tags] = await Promise.all([
     core.accounts.listWithBalances(),
     core.categories.list(),
@@ -74,7 +72,10 @@ const failure = (values: Record<string, string>, errors: string[]) =>
  * Validate the wizard's form post and translate it into the fields shared by
  * transaction creation and updates. Returns a `fail()` result on bad input.
  */
-export async function parseTransactionForm(request: Request) {
+export async function parseTransactionForm(
+  core: HouseholdCore,
+  request: Request,
+) {
   const formData = await request.formData();
   const values = Object.fromEntries(
     [...formData].filter(([, v]) => typeof v === "string"),
@@ -106,7 +107,6 @@ export async function parseTransactionForm(request: Request) {
     ...rest
   } = parsed.data;
 
-  const core = getCore();
   const accounts = await core.accounts.list();
   const { defaultOutAccountId } = await core.settings.get();
   // The external counterpart: the configured default, else any external account.
@@ -188,12 +188,13 @@ export function parseItemizeRefs(
 
 /** The itemization described by the page's arguments, if there is a valid one. */
 export async function loadItemize(
+  core: HouseholdCore,
   parent: string | null,
   items: string | null,
 ): Promise<ItemizeContext | null> {
   const refs = parseItemizeRefs(parent, items);
   if (refs.parentId === null) return null;
-  const { transactions } = getCore();
+  const { transactions } = core;
   const find = (id: number) =>
     transactions.get(id).catch((e: unknown) => {
       if (e instanceof NotFoundError) return null;

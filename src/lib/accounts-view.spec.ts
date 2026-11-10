@@ -16,6 +16,7 @@ const acc = (
   position = 999,
 ): AccountWithBalance => ({
   id: ++id,
+  householdId: 1,
   name,
   type,
   balance,

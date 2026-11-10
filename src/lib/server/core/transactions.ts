@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { shiftCheckpoints } from "./balance";
 import type { Db } from "./prisma";
+import { requireAccounts, requireCategories } from "./refs";
 import {
   TransactionFilter,
   TransactionInput,
@@ -23,8 +24,12 @@ const include = {
   tags: true,
 } satisfies Prisma.TransactionInclude;
 
-function tagLinks(tags: string[]) {
-  return tags.map((name) => ({ where: { name }, create: { name } }));
+/** Tags are looked up (and created) by name within the household. */
+function tagLinks(householdId: number, tags: string[]) {
+  return tags.map((name) => ({
+    where: { householdId_name: { householdId, name } },
+    create: { name, householdId },
+  }));
 }
 
 /** Turn free text into a safe MySQL boolean-mode prefix query. */
@@ -97,7 +102,7 @@ const orderBy: Record<
   "amount-asc": [{ amount: "asc" }, { id: "asc" }],
 };
 
-export function transactionsRepo(db: Db) {
+export function transactionsRepo(db: Db, householdId: number) {
   function buildWhere(f: Filter): Prisma.TransactionWhereInput {
     const and: Prisma.TransactionWhereInput[] = [];
     if (f.accountId !== undefined) {
@@ -135,7 +140,8 @@ export function transactionsRepo(db: Db) {
     if (!q) return [];
     const rows = await db.$queryRaw<Array<{ id: number }>>(Prisma.sql`
       SELECT t.id FROM \`transaction\` t
-      WHERE MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE)
+      WHERE t.householdId = ${householdId}
+        AND MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE)
       ORDER BY MATCH(t.description) AGAINST (${q} IN BOOLEAN MODE) DESC,
                t.transactedAt DESC, t.id DESC
     `);
@@ -264,8 +270,10 @@ export function transactionsRepo(db: Db) {
         source: { connect: { id: sourceId } },
         target: { connect: { id: targetId } },
         category: categoryId ? { connect: { id: categoryId } } : undefined,
-        tags: { connectOrCreate: tagLinks(tags) },
+        tags: { connectOrCreate: tagLinks(householdId, tags) },
       });
+      await requireAccounts(db, sourceId, targetId);
+      await requireCategories(db, categoryId);
       if (data.recurring > 0 && when <= now) {
         const at = nextOccurrence(when, data.recurring, now);
         return db.$transaction(async (tx) => ({
@@ -291,6 +299,8 @@ export function transactionsRepo(db: Db) {
     ): Promise<TransactionWithRelations> {
       const { tags, categoryId, sourceId, targetId, transactedAt, ...data } =
         TransactionPatch.parse(input);
+      await requireAccounts(db, sourceId, targetId);
+      await requireCategories(db, categoryId);
       try {
         // The edit and the checkpoint corrections land together or not at all.
         return await db.$transaction(async (tx) => {
@@ -319,7 +329,12 @@ export function transactionsRepo(db: Db) {
                   }
                 : {}),
               ...(tags
-                ? { tags: { set: [], connectOrCreate: tagLinks(tags) } }
+                ? {
+                    tags: {
+                      set: [],
+                      connectOrCreate: tagLinks(householdId, tags),
+                    },
+                  }
                 : {}),
             },
             include,
@@ -387,7 +402,10 @@ export function transactionsRepo(db: Db) {
                   ? { connect: { id: before.categoryId } }
                   : undefined,
                 tags: {
-                  connectOrCreate: tagLinks(before.tags.map((t) => t.name)),
+                  connectOrCreate: tagLinks(
+                    householdId,
+                    before.tags.map((t) => t.name),
+                  ),
                 },
               },
             });

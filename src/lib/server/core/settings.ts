@@ -2,16 +2,13 @@ import type { Db } from "./prisma";
 import { SettingsPatch } from "./schemas";
 import { ConflictError, NotFoundError, type AppSettings } from "./types";
 
-/** `AppSettings` is a singleton row; it always lives under this id. */
-const SETTINGS_ID = 1;
-
 /** Category checkpoint adjustments land in until another one is chosen. */
 export const FALLBACK_CATEGORY = "N/A";
 
-export function settingsRepo(db: Db) {
+export function settingsRepo(db: Db, householdId: number) {
   return {
     /**
-     * The app settings, created with their defaults on first access. Two
+     * The household's settings, created with their defaults on first access. Two
      * settings always resolve once set up:
      *  - the manko category falls back to "N/A", created when missing (or
      *    after its category was deleted);
@@ -21,16 +18,19 @@ export function settingsRepo(db: Db) {
      */
     async get(): Promise<AppSettings> {
       let settings = await db.appSettings.upsert({
-        where: { id: SETTINGS_ID },
-        create: { id: SETTINGS_ID },
+        where: { householdId },
+        create: { householdId },
         update: {},
       });
       const fill: { mankoCategoryId?: number; defaultOutAccountId?: number } =
         {};
       if (settings.mankoCategoryId == null) {
         const fallback = await db.category.upsert({
-          where: { name: FALLBACK_CATEGORY },
+          where: {
+            householdId_name: { householdId, name: FALLBACK_CATEGORY },
+          },
           create: {
+            householdId,
             name: FALLBACK_CATEGORY,
             description: "Uncategorised, e.g. balance checkpoint adjustments",
           },
@@ -49,7 +49,7 @@ export function settingsRepo(db: Db) {
       }
       if (Object.keys(fill).length > 0) {
         settings = await db.appSettings.update({
-          where: { id: SETTINGS_ID },
+          where: { householdId },
           data: fill,
         });
       }
@@ -80,8 +80,8 @@ export function settingsRepo(db: Db) {
         }
       }
       return await db.appSettings.upsert({
-        where: { id: SETTINGS_ID },
-        create: { id: SETTINGS_ID, ...data },
+        where: { householdId },
+        create: { householdId, ...data },
         update: data,
       });
     },

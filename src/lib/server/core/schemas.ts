@@ -250,6 +250,11 @@ export const UserInput = z.object({
 });
 export type UserInput = z.input<typeof UserInput>;
 
+export const HouseholdInput = z.object({
+  name: z.string().trim().min(1, "Please enter a name").max(100),
+});
+export type HouseholdInput = z.input<typeof HouseholdInput>;
+
 export const SettingsInput = z.object({
   currency: z
     .string()

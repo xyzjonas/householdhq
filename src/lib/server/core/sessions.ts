@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { Db } from "./prisma";
+import type { RawDb } from "./prisma";
 import { publicUserSelect } from "./users";
 import type { PublicUser } from "./types";
 
@@ -12,6 +12,8 @@ const hash = (token: string) =>
 
 export interface ValidSession {
   user: PublicUser;
+  /** The household the session last worked in; not yet checked against the user's memberships. */
+  householdId: number | null;
   expiresAt: Date;
   /** True when the expiry was pushed out and the cookie should be refreshed. */
   renewed: boolean;
@@ -21,12 +23,17 @@ export interface ValidSession {
  * Server-side sessions. Only a sha256 of the random token is stored, so a
  * leaked database cannot be used to hijack sessions.
  */
-export function sessionsRepo(db: Db) {
+export function sessionsRepo(db: RawDb) {
   return {
-    async create(userId: number): Promise<{ token: string; expiresAt: Date }> {
+    async create(
+      userId: number,
+      householdId: number | null = null,
+    ): Promise<{ token: string; expiresAt: Date }> {
       const token = randomBytes(32).toString("base64url");
       const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-      await db.session.create({ data: { id: hash(token), userId, expiresAt } });
+      await db.session.create({
+        data: { id: hash(token), userId, householdId, expiresAt },
+      });
       return { token, expiresAt };
     },
 
@@ -53,7 +60,23 @@ export function sessionsRepo(db: Db) {
         await db.session.update({ where: { id }, data: { expiresAt } });
         renewed = true;
       }
-      return { user, expiresAt, renewed };
+      return {
+        user,
+        householdId: session.householdId,
+        expiresAt,
+        renewed,
+      };
+    },
+
+    /** Remembers the household the session works in (callers verify membership first). */
+    async setHousehold(
+      token: string,
+      householdId: number | null,
+    ): Promise<void> {
+      await db.session.updateMany({
+        where: { id: hash(token) },
+        data: { householdId },
+      });
     },
 
     async invalidate(token: string): Promise<void> {

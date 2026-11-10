@@ -45,7 +45,7 @@ export function rankCategories<T extends Pick<Category, "id" | "name">>(
   );
 }
 
-export function categoriesRepo(db: Db) {
+export function categoriesRepo(db: Db, householdId: number) {
   const counts = async (where: Prisma.TransactionWhereInput) => {
     const rows = await db.transaction.groupBy({
       by: ["categoryId"],
@@ -194,8 +194,8 @@ export function categoriesRepo(db: Db) {
           });
           for (const name of new Set(tags)) {
             await tx.tag.upsert({
-              where: { name },
-              create: { name, transactions: { connect: moved } },
+              where: { householdId_name: { householdId, name } },
+              create: { name, householdId, transactions: { connect: moved } },
               update: { transactions: { connect: moved } },
             });
           }

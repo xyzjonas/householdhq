@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import type { Db } from "./prisma";
+import { requireMeter } from "./refs";
 import { MeterInput, MeterPatch, MeterReadingInput } from "./schemas";
 import {
   NotFoundError,
@@ -68,6 +69,7 @@ export function metersRepo(db: Db) {
       input: MeterReadingInput,
     ): Promise<MeterReading> {
       const { value, meteredAt } = MeterReadingInput.parse(input);
+      await requireMeter(db, meterId);
       try {
         return await db.meterState.create({
           data: { meterId, value, meteredAt: meteredAt ?? new Date() },

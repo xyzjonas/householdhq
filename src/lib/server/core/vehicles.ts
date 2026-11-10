@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { roundMoney } from "./balance";
 import type { Db } from "./prisma";
+import { requireCategories } from "./refs";
 import {
   FuelEntryInput,
   FuelEntryPatch,
@@ -53,7 +54,10 @@ function uniqueField(e: Prisma.PrismaClientKnownRequestError): string {
   const target = meta?.target ?? meta?.constraint?.fields;
   const name = Array.isArray(target) ? target[0] : target;
   // MySQL reports the index name (`vehicle_vin_key`), not the column.
-  return name?.replace(/^vehicle_|_key$/g, "") ?? "VIN or registration";
+  return (
+    name?.replace(/^vehicle_(householdId_)?|_key$/g, "") ??
+    "VIN or registration"
+  );
 }
 
 function isCode(e: unknown, code: string): boolean {
@@ -489,6 +493,7 @@ export function vehiclesRepo(
 
     async create(input: VehicleInput): Promise<Vehicle> {
       const data = VehicleInput.parse(input);
+      await requireCategories(db, data.categoryId, data.fuelCategoryId);
       try {
         return await db.vehicle.create({ data });
       } catch (e) {
@@ -503,6 +508,7 @@ export function vehiclesRepo(
 
     async update(id: number, input: VehiclePatch): Promise<Vehicle> {
       const data = VehiclePatch.parse(input);
+      await requireCategories(db, data.categoryId, data.fuelCategoryId);
       try {
         await requireVehicle(id);
         return await db.vehicle.update({ where: { id }, data });

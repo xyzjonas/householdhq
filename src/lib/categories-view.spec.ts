@@ -21,6 +21,7 @@ const cat = (
   description: string | null = null,
 ): CategoryWithActivity => ({
   id: ++id,
+  householdId: 1,
   name,
   description,
   icon: null,

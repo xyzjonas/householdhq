@@ -1,7 +1,7 @@
 import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { Prisma } from "@prisma/client";
-import type { Db } from "./prisma";
+import type { RawDb } from "./prisma";
 import { UserInput } from "./schemas";
 import { ConflictError, NotFoundError, type PublicUser } from "./types";
 
@@ -40,7 +40,7 @@ export const publicUserSelect = {
 // reveal which emails exist.
 const DUMMY_HASH = `scrypt$${"00".repeat(16)}$${"00".repeat(64)}`;
 
-export function usersRepo(db: Db) {
+export function usersRepo(db: RawDb) {
   return {
     count(): Promise<number> {
       return db.user.count();
@@ -148,6 +148,7 @@ export function usersRepo(db: Db) {
       try {
         await db.$transaction([
           db.session.deleteMany({ where: { userId: id } }),
+          db.membership.deleteMany({ where: { userId: id } }),
           db.user.delete({ where: { id } }),
         ]);
       } catch (e) {
