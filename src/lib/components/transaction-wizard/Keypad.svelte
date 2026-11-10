@@ -1,5 +1,6 @@
 <script lang="ts">
   import Delete from "@lucide/svelte/icons/delete";
+  import { m } from "#paraglide/messages.js";
   import type { Key } from "./calculator";
 
   let { onpress }: { onpress: (key: Key) => void } = $props();
@@ -40,7 +41,7 @@
 <div
   class="keypad grid grid-cols-3 gap-3 rounded-2xl border border-surface-200-800 bg-surface-100-900 p-4"
   role="group"
-  aria-label="Calculator keypad"
+  aria-label={m.wizard_keypad_label()}
 >
   {#each rows as row (row.join())}
     {#each row as key (key)}
@@ -49,7 +50,7 @@
         <button
           type="button"
           class="key"
-          aria-label="Backspace (hold to clear)"
+          aria-label={m.wizard_keypad_backspace()}
           onpointerdown={startBackspace}
           onpointerup={endBackspace}
           onpointerleave={cancelBackspace}
@@ -68,7 +69,11 @@
         <button
           type="button"
           class="key {'+-='.includes(key) ? 'operator' : ''}"
-          aria-label={key === "-" ? "Minus" : key === "+" ? "Plus" : undefined}
+          aria-label={key === "-"
+            ? m.wizard_keypad_minus()
+            : key === "+"
+              ? m.wizard_keypad_plus()
+              : undefined}
           onclick={() => onpress(key)}
         >
           {label(key)}

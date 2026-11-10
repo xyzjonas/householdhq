@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatMoney } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import TagPicker from "./TagPicker.svelte";
   import ToggleRow from "./ToggleRow.svelte";
   import {
@@ -58,10 +59,10 @@
   const source = $derived(owned.find((a) => a.id === sourceId));
   const accountLabel = $derived(
     type === "INCOME"
-      ? "Received to"
+      ? m.wizard_received_to()
       : type === "TRANSFER"
-        ? "From"
-        : "Paid from",
+        ? m.wizard_from()
+        : m.wizard_paid_from(),
   );
 </script>
 
@@ -76,16 +77,18 @@
       </select>
       {#if source}
         <small class="text-surface-600-400">
-          Balance {formatMoney(source.balance)}
+          {m.wizard_details_balance({ balance: formatMoney(source.balance) })}
         </small>
       {/if}
     </label>
 
     {#if type === "TRANSFER"}
       <label class="label">
-        <span class="wizard-label label-text">To</span>
+        <span class="wizard-label label-text">{m.wizard_to()}</span>
         <select class="select" name="targetId" bind:value={targetId} required>
-          <option value={null} disabled>Choose account</option>
+          <option value={null} disabled
+            >{m.wizard_details_choose_account()}</option
+          >
           {#each targets as a (a.id)}
             <option value={a.id}>{a.name}</option>
           {/each}
@@ -95,7 +98,7 @@
 
     {#if isExpenseLike(type)}
       <label class="label">
-        <span class="wizard-label label-text">Paid to</span>
+        <span class="wizard-label label-text">{m.wizard_paid_to()}</span>
         <select class="select" name="targetId" bind:value={targetId}>
           {#each outside as a (a.id)}
             <option value={a.id}>{a.name}</option>
@@ -105,7 +108,9 @@
     {/if}
 
     <label class="label">
-      <span class="wizard-label label-text">Description / merchant</span>
+      <span class="wizard-label label-text"
+        >{m.wizard_details_description_merchant()}</span
+      >
       <input
         class="input"
         bind:this={descriptionInput}
@@ -121,17 +126,19 @@
     </label>
 
     <div class="label">
-      <span class="wizard-label label-text" aria-hidden="true">Tags</span>
+      <span class="wizard-label label-text" aria-hidden="true"
+        >{m.wizard_tags()}</span
+      >
       <TagPicker bind:value={tags} options={tagOptions} />
     </div>
 
     <div class="grid grid-cols-2 gap-3">
       <label class="label">
-        <span class="wizard-label label-text">Date</span>
+        <span class="wizard-label label-text">{m.wizard_details_date()}</span>
         <input class="input" type="date" bind:value={date} required />
       </label>
       <label class="label">
-        <span class="wizard-label label-text">Time</span>
+        <span class="wizard-label label-text">{m.wizard_details_time()}</span>
         <input class="input" type="time" bind:value={time} required />
       </label>
     </div>
@@ -140,14 +147,16 @@
   <ul class="rounded-2xl bg-surface-50-950 px-4">
     <ToggleRow
       name="recurring"
-      label="Recurring transaction"
-      description="Repeat every few months"
+      label={m.wizard_details_recurring_label()}
+      description={m.wizard_details_recurring_hint()}
       bind:checked={recurring}
     />
     {#if recurring}
       <li class="border-b border-surface-200-800 py-3">
         <label class="label">
-          <span class="wizard-label label-text">Repeat every (months)</span>
+          <span class="wizard-label label-text"
+            >{m.wizard_details_repeat_every()}</span
+          >
           <input
             class="input"
             type="number"
@@ -163,14 +172,14 @@
     {/if}
     <ToggleRow
       name="isHidden"
-      label="Hidden transaction"
-      description="Hide from standard dashboard metrics"
+      label={m.wizard_details_hidden_label()}
+      description={m.wizard_details_hidden_hint()}
       bind:checked={hidden}
     />
     <ToggleRow
       name="isImportant"
-      label="Important transaction!"
-      description="Pin to the priority feed"
+      label={m.wizard_details_important_label()}
+      description={m.wizard_details_important_hint()}
       bind:checked={important}
     />
   </ul>

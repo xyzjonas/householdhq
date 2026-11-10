@@ -10,6 +10,7 @@
   import X from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
   import { formatDate } from "#lib/format.ts";
+  import { m } from "#paraglide/messages.js";
   import { toaster } from "#lib/toaster.ts";
   import AmountStage from "./AmountStage.svelte";
   import { evaluate } from "./calculator";
@@ -21,7 +22,9 @@
   import ItemizePanel from "./ItemizePanel.svelte";
   import {
     isExpenseLike,
+    stageNext,
     stages,
+    stageTitle,
     type Currency,
     type ItemizeContext,
     type TransactionType,
@@ -189,7 +192,7 @@
       onclick={itemizeAfterSaving}
     >
       <Receipt size={18} aria-hidden="true" />
-      Save &amp; Itemize
+      {m.wizard_save_and_itemize()}
     </button>
   {/if}
 {/snippet}
@@ -201,7 +204,7 @@
     onclick={() => (confirmingDelete = true)}
   >
     <Trash2 size={18} aria-hidden="true" />
-    Delete
+    {m.common_delete()}
   </button>
 {/snippet}
 
@@ -220,8 +223,8 @@
         const nextAt = result.data.nextAt as string | null;
         toaster.success({
           title: nextAt
-            ? `Transaction created and next one scheduled for ${formatDate(nextAt)}`
-            : "Transaction created",
+            ? m.wizard_toast_created_scheduled({ date: formatDate(nextAt) })
+            : m.wizard_toast_created(),
         });
         await goto(resolve("/"));
       } else {
@@ -237,16 +240,16 @@
       <a
         href={resolve("/")}
         class="btn-icon size-10 rounded-full preset-tonal"
-        aria-label="Cancel and go back"
+        aria-label={m.wizard_cancel_and_back()}
       >
         <X size={18} aria-hidden="true" />
       </a>
       <h1 class="flex-1 text-center text-base font-bold text-surface-950-50">
         {editing
-          ? "Edit Transaction"
+          ? m.wizard_heading_edit()
           : itemizing
-            ? "Itemize Receipt"
-            : "Add Transaction"}
+            ? m.wizard_heading_itemize()
+            : m.wizard_heading_add()}
       </h1>
       <span class="size-10" aria-hidden="true"></span>
     </header>
@@ -262,12 +265,14 @@
           tabindex="-1"
           class="text-sm font-semibold text-surface-950-50 outline-none"
         >
-          <span class="sr-only">Step {stage} of {stages.length}:</span>
-          {stages[stage - 1].title}
+          <span class="sr-only"
+            >{m.wizard_step_of({ stage, total: stages.length })}</span
+          >
+          {stageTitle(stage)}
         </h2>
       </div>
       <ol class="grid grid-cols-4 gap-2" aria-hidden="true">
-        {#each stages as s, i (s.title)}
+        {#each stages as s, i (s.key)}
           <li
             class="h-1.5 rounded-full transition-colors {i + 1 < stage
               ? 'bg-[#10b981]'
@@ -293,10 +298,10 @@
         class="track flex items-start"
         style="transform: translateX(-{(stage - 1) * 100}%)"
       >
-        <section class="panel" inert={stage !== 1} aria-label={stages[0].title}>
+        <section class="panel" inert={stage !== 1} aria-label={stageTitle(1)}>
           <TypeStage bind:value={type} onchange={setType} />
         </section>
-        <section class="panel" inert={stage !== 2} aria-label={stages[1].title}>
+        <section class="panel" inert={stage !== 2} aria-label={stageTitle(2)}>
           {#if itemize}
             <div class="mb-4">
               <ItemizePanel {itemize} {categories} {amount} />
@@ -313,14 +318,14 @@
             onadvance={() => canAdvance && goTo(3)}
           />
         </section>
-        <section class="panel" inert={stage !== 3} aria-label={stages[2].title}>
+        <section class="panel" inert={stage !== 3} aria-label={stageTitle(3)}>
           <CategoryStage
             {categories}
             bind:value={categoryId}
             onselect={() => goTo(4)}
           />
         </section>
-        <section class="panel" inert={stage !== 4} aria-label={stages[3].title}>
+        <section class="panel" inert={stage !== 4} aria-label={stageTitle(4)}>
           <DetailsStage
             bind:this={details}
             {type}
@@ -363,7 +368,7 @@
     {/if}
 
     <nav
-      aria-label="Wizard steps"
+      aria-label={m.wizard_steps_nav()}
       class="dock fixed inset-x-0 bottom-0 z-20 flex flex-col gap-3 border-t border-surface-200-800 bg-surface-50-950/95 p-4 backdrop-blur-md lg:static lg:border-0 lg:bg-transparent lg:p-0"
     >
       {#if stage === stages.length && !editing && canItemize}
@@ -378,7 +383,7 @@
           <a
             href={resolve("/")}
             class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
-            aria-label="Cancel"
+            aria-label={m.common_cancel()}
           >
             <ArrowLeft size={20} aria-hidden="true" />
           </a>
@@ -386,7 +391,7 @@
           <button
             type="button"
             class="flex size-12 shrink-0 items-center justify-center rounded-full border border-surface-200-800 bg-surface-50-950 active:bg-surface-200-800"
-            aria-label="Previous step"
+            aria-label={m.wizard_previous_step()}
             onclick={() => goTo(stage - 1)}
           >
             <ArrowLeft size={20} aria-hidden="true" />
@@ -394,7 +399,7 @@
         {/if}
 
         <ol class="flex items-center gap-2" aria-hidden="true">
-          {#each stages as s, i (s.title)}
+          {#each stages as s, i (s.key)}
             <li
               class="dot size-2.5 rounded-full {i + 1 === stage
                 ? 'scale-125 bg-emerald-600'
@@ -410,7 +415,7 @@
             disabled={!canAdvance}
             onclick={() => goTo(stage + 1)}
           >
-            {stages[stage - 1].next}
+            {stageNext(stage)}
             <ArrowRight size={18} aria-hidden="true" />
           </button>
         {:else}
@@ -420,12 +425,12 @@
             disabled={!canAdvance || saving}
           >
             {saving
-              ? "Saving…"
+              ? m.wizard_saving()
               : editing
-                ? "Save changes"
+                ? m.wizard_save_changes()
                 : itemizing
-                  ? "Finish"
-                  : stages[stage - 1].next}
+                  ? m.wizard_finish()
+                  : stageNext(stage)}
             <Check size={18} aria-hidden="true" />
           </button>
         {/if}

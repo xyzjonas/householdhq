@@ -1,6 +1,7 @@
 <script lang="ts">
   import Search from "@lucide/svelte/icons/search";
   import CategoryCard from "#lib/components/CategoryCard.svelte";
+  import { m } from "#paraglide/messages.js";
   import type { WizardCategory } from "./types";
 
   let {
@@ -30,15 +31,15 @@
     <input
       class="input"
       type="search"
-      placeholder="Search categories"
-      aria-label="Search categories"
+      placeholder={m.wizard_category_search()}
+      aria-label={m.wizard_category_search()}
       bind:value={query}
       onkeydown={(e) => e.key === "Enter" && e.preventDefault()}
     />
   </div>
 
   <fieldset>
-    <legend class="sr-only">Category</legend>
+    <legend class="sr-only">{m.wizard_category_legend()}</legend>
     <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
       {#each visible as c (c.id)}
         <CategoryCard
@@ -54,7 +55,7 @@
         />
       {:else}
         <p class="col-span-2 py-6 text-center text-sm text-surface-600-400">
-          No category matches “{query}”.
+          {m.wizard_category_no_match({ query })}
         </p>
       {/each}
     </div>

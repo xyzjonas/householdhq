@@ -1,5 +1,6 @@
 <script lang="ts">
   import { TagsInput } from "@skeletonlabs/skeleton-svelte";
+  import { m } from "#paraglide/messages.js";
   import {
     chipClass,
     chipInteractiveClass,
@@ -39,7 +40,7 @@
     validate={(d) =>
       !value.some((v) => v.toLowerCase() === d.inputValue.toLowerCase())}
   >
-    <TagsInput.Label class="sr-only">Tags</TagsInput.Label>
+    <TagsInput.Label class="sr-only">{m.wizard_tags()}</TagsInput.Label>
     <TagsInput.Context>
       {#snippet children(tagsInput)}
         <TagsInput.Control class="input flex h-auto flex-wrap gap-2 py-2">
@@ -52,7 +53,7 @@
                 <TagsInput.ItemText>{tag}</TagsInput.ItemText>
                 <TagsInput.ItemDeleteTrigger
                   class="grid size-4 place-items-center rounded-full hover:bg-surface-500/20"
-                  aria-label="Remove tag {tag}"
+                  aria-label={m.wizard_tag_remove({ tag })}
                 >
                   <X size={12} aria-hidden="true" />
                 </TagsInput.ItemDeleteTrigger>
@@ -61,7 +62,9 @@
           {/each}
           <TagsInput.Input
             class="min-w-32 flex-1 border-0 bg-transparent p-0 focus:ring-0"
-            placeholder={value.length ? "Add another…" : "Type and press Enter"}
+            placeholder={value.length
+              ? m.wizard_tag_add_another()
+              : m.wizard_tag_type_and_enter()}
             maxlength={50}
           />
         </TagsInput.Control>
@@ -74,7 +77,7 @@
   {/each}
 
   {#if suggestions.length}
-    <ul class="flex flex-wrap gap-1.5" aria-label="Existing tags">
+    <ul class="flex flex-wrap gap-1.5" aria-label={m.wizard_tag_existing()}>
       {#each suggestions as { name, color } (name)}
         <li>
           <button

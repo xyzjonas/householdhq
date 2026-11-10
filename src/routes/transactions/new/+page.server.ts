@@ -1,4 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { m } from "#paraglide/messages.js";
 import type { HouseholdCore } from "#lib/server/core/index.ts";
 import { hq } from "#lib/server/index.ts";
 import {
@@ -47,15 +48,14 @@ async function persist(core: HouseholdCore, request: Request) {
   }
 
   const parent = await loadItemize(core, String(refs.parentId), null);
-  if (!parent)
-    return fail(400, { errors: ["The original transaction is gone"] });
+  if (!parent) return fail(400, { errors: [m.wizard_error_original_gone()] });
   const left = parent.parent.amount;
   if (input.currency !== parent.parent.currency) {
-    return fail(400, { errors: ["Items must use the original's currency"] });
+    return fail(400, { errors: [m.wizard_error_currency_mismatch()] });
   }
   if (input.amount >= left) {
     return fail(400, {
-      errors: ["Items must leave something on the original transaction"],
+      errors: [m.wizard_error_leave_something()],
     });
   }
   const item = await transactions.create({ ...input, recurring: 0 });
