@@ -44,7 +44,7 @@ English (base) and Czech. Translators edit `messages/<locale>.json`; see [docs/l
 just up         # db -> one-shot `migrate` service -> app on http://localhost:8080
 ```
 
-The runtime image is distroless (no shell, non-root; read-only rootfs in compose) and is published as `scotch3840/householdhq-v2` with `just docker`. Migrations ship as a separate image, `scotch3840/householdhq-v2-migrate` (runs `prisma migrate deploy`); use it for the one-shot migrate service in your deployment, not the app image.
+The runtime image is distroless (no shell, non-root; read-only rootfs in compose) and is published as `scotch3840/householdhq-v2` with `just docker`. Migrations ship as a separate, slim image, `scotch3840/householdhq-v2-migrate` (the official `prisma migrate deploy` on the same distroless base, so only a ~80 MB prisma layer is new); use it for the one-shot migrate service in your deployment, not the app image. Its minimal prisma install is built by `docker/install-migrate-deps.sh`, which smoke-tests the CLI at build time, so a prisma upgrade that breaks the pruning fails the image build instead of a deploy.
 
 The container entrypoint is `server.js` (wraps adapter-node so plain-http deployments pass SvelteKit's CSRF check; behind a TLS proxy that sends `x-forwarded-proto` nothing changes, otherwise set `PUBLIC_SCHEME=https`).
 

@@ -25,12 +25,26 @@ RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
  && npm cache clean --force
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
-# --- migrations: one-shot `prisma migrate deploy` ---
-FROM deps AS migrate
+# --- migrations: minimal prisma CLI install (no app / dev dependencies) ---
+FROM base AS migrate-deps
+WORKDIR /migrate
+COPY package-lock.json ./lock.json
+# The schema-engine is downloaded for the glibc target of the distroless runtime
+# image (not this musl build stage); see docker/install-migrate-deps.sh.
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x
+COPY docker/install-migrate-deps.sh ./
+RUN sh install-migrate-deps.sh
+
+# --- migrations: one-shot `prisma migrate deploy` on the app's distroless base,
+# so only the prisma + migrations layers are new to push / pull ---
+FROM gcr.io/distroless/nodejs24-debian13:nonroot AS migrate
 ENV NODE_ENV=production
-COPY prisma.config.ts ./
-COPY prisma ./prisma
-ENTRYPOINT ["npx", "prisma", "migrate", "deploy"]
+WORKDIR /app
+COPY --from=migrate-deps /migrate/node_modules ./node_modules
+COPY prisma.migrate.config.mjs ./prisma.config.mjs
+COPY prisma/schema.prisma ./prisma/schema.prisma
+COPY prisma/migrations ./prisma/migrations
+ENTRYPOINT ["/nodejs/bin/node", "node_modules/prisma/build/index.js", "migrate", "deploy"]
 
 # --- runtime: distroless nodejs, production deps + built output only ---
 FROM gcr.io/distroless/nodejs24-debian13:nonroot AS runtime
