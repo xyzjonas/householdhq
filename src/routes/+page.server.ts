@@ -9,9 +9,8 @@ export const load: PageServerLoad = async ({ locals }) => {
   const settings = await core.settings.get();
   const interval = fiscalIntervalAt(now, settings.fiscalIntervalStartDay);
 
-  const [accounts, balances, recent, upcoming] = await Promise.all([
+  const [accounts, recent, upcoming] = await Promise.all([
     core.accounts.listWithBalances(),
-    core.accounts.balances(),
     // Completed transactions are shown regardless of the interval; pending
     // ones, overdue or not, wait in the upcoming section instead.
     core.transactions.list({
@@ -22,6 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     // Upcoming ones stop at the end of the current interval.
     core.transactions.upcoming(interval.end),
   ]);
+  const balances = await core.accounts.balances(accounts);
   return {
     // "Out" accounts are external (expenses etc.), not part of the household.
     accounts: accounts.filter((a) => !a.isOut),

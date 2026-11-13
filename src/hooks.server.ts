@@ -1,6 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
+import { building } from "$app/env";
 import { sequence } from "@sveltejs/kit/hooks";
-import type { Handle } from "@sveltejs/kit/hooks";
+import type { Handle, ServerInit } from "@sveltejs/kit/hooks";
 import { m } from "#paraglide/messages.js";
 import { paraglideMiddleware } from "#paraglide/server.js";
 import { getCore } from "#lib/server/index.ts";
@@ -34,6 +35,20 @@ const isSuperuserPath = (path: string) =>
 
 // Once an admin exists this never goes back to false.
 let hasUsers = false;
+
+/**
+ * Runs once when the server starts: loads Prisma's query compiler and opens
+ * the first database connections, so the first visitor does not pay for it.
+ */
+export const init: ServerInit = async () => {
+  if (building) return;
+  try {
+    hasUsers = (await getCore().users.count()) > 0;
+  } catch (e) {
+    // The first real request retries and reports the failure properly.
+    console.error("database warm-up failed", e);
+  }
+};
 
 const auth: Handle = async ({ event, resolve }) => {
   const core = getCore();

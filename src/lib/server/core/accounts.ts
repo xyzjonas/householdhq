@@ -32,8 +32,12 @@ export function accountsRepo(db: Db) {
       );
     },
 
-    async balances(): Promise<Balances> {
-      const accounts = await this.listWithBalances();
+    /**
+     * Totals over the accounts. Pass the accounts of an earlier
+     * `listWithBalances()` to reuse their balances rather than recompute them.
+     */
+    async balances(known?: AccountWithBalance[]): Promise<Balances> {
+      const accounts = known ?? (await this.listWithBalances());
       const summary: Balances = { liquid: 0, total: 0, byType: {} };
       for (const a of accounts) {
         if (a.isOut) continue;
