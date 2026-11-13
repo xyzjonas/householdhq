@@ -25,6 +25,12 @@ const include = {
   tags: true,
 } satisfies Prisma.TransactionInclude;
 
+/**
+ * Reads load the relations with one joined query instead of one extra query
+ * per relation, which matters when the database is a network hop away.
+ */
+const read = { include, relationLoadStrategy: "join" } as const;
+
 /** Tags are looked up (and created) by name within the household. */
 function tagLinks(householdId: number, tags: string[]) {
   return tags.map((name) => ({
@@ -159,7 +165,7 @@ export function transactionsRepo(db: Db, householdId: number) {
       const [items, total] = await Promise.all([
         db.transaction.findMany({
           where: scoped,
-          include,
+          ...read,
           orderBy: orderBy[filter.sort],
           take: filter.limit,
           skip: filter.offset,
@@ -181,7 +187,7 @@ export function transactionsRepo(db: Db, householdId: number) {
     const ids = ranked.slice(filter.offset, filter.offset + filter.limit);
     const found = await db.transaction.findMany({
       where: { id: { in: ids } },
-      include,
+      ...read,
     });
     const byId = new Map(found.map((t) => [t.id, t]));
     return {
@@ -206,7 +212,7 @@ export function transactionsRepo(db: Db, householdId: number) {
       const [items, total] = await Promise.all([
         db.transaction.findMany({
           where,
-          include,
+          ...read,
           orderBy: orderBy[filter.sort ?? "date-desc"],
           take: filter.limit,
           skip: filter.offset,
@@ -237,13 +243,13 @@ export function transactionsRepo(db: Db, householdId: number) {
           confirmed: false,
           transactedAt: { lt: before },
         },
-        include,
+        ...read,
         orderBy: [{ transactedAt: "asc" }, { id: "asc" }],
       });
     },
 
     async get(id: number): Promise<TransactionWithRelations> {
-      const tx = await db.transaction.findUnique({ where: { id }, include });
+      const tx = await db.transaction.findUnique({ where: { id }, ...read });
       if (!tx) throw new NotFoundError("Transaction", id);
       return tx;
     },
