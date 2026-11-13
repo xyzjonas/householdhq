@@ -2,12 +2,16 @@
   import "./layout.css";
   import Toaster from "#lib/components/Toaster.svelte";
   import UpdateBanner from "#lib/components/UpdateBanner.svelte";
+  import NavigationProgress from "#lib/components/NavigationProgress.svelte";
+  import { watchSlowNavigation } from "#lib/navigation.svelte.ts";
   import AppShell from "#lib/components/AppShell.svelte";
   import SoloShell from "#lib/components/SoloShell.svelte";
   import { m } from "#paraglide/messages.js";
   import type { LayoutProps } from "./$types";
 
   let { data, children }: LayoutProps = $props();
+
+  watchSlowNavigation();
 </script>
 
 <svelte:head>
@@ -33,5 +37,6 @@
   {@render children()}
 {/if}
 
+<NavigationProgress />
 <UpdateBanner />
 <Toaster />

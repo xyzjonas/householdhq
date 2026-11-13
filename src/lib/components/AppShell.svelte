@@ -8,6 +8,7 @@
   import HouseholdTitle from "./HouseholdTitle.svelte";
   import { m } from "#paraglide/messages.js";
   import NavItems from "./NavItems.svelte";
+  import { isSlowNavigation } from "#lib/navigation.svelte.ts";
 
   let {
     user,
@@ -83,7 +84,11 @@
       </form>
     </header>
 
-    <main class="flex-1 p-4 pb-24 lg:p-8 lg:pb-8">
+    <main
+      class="flex-1 p-4 pb-24 transition-opacity duration-200 lg:p-8 lg:pb-8"
+      class:opacity-60={isSlowNavigation()}
+      aria-busy={isSlowNavigation()}
+    >
       {@render children()}
     </main>
   </div>
