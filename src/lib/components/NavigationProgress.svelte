@@ -10,7 +10,7 @@
   aria-label={m.nav_loading_label()}
   aria-hidden={!isSlowNavigation()}
 >
-  <div class="bar bg-emerald-500"></div>
+  <div class="bar bg-primary-500"></div>
 </div>
 
 <style scoped>
