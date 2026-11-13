@@ -19,11 +19,15 @@ export function settingsRepo(db: Db, householdId: number) {
      *    null only while no external account exists.
      */
     async get(): Promise<AppSettings> {
-      let settings = await db.appSettings.upsert({
-        where: { householdId },
-        create: { householdId },
-        update: {},
-      });
+      // A plain read in the steady state: an upsert is a transaction of
+      // several round trips even when the row exists.
+      let settings =
+        (await db.appSettings.findUnique({ where: { householdId } })) ??
+        (await db.appSettings.upsert({
+          where: { householdId },
+          create: { householdId },
+          update: {},
+        }));
       const fill: { mankoCategoryId?: number; defaultOutAccountId?: number } =
         {};
       if (settings.mankoCategoryId == null) {

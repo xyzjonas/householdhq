@@ -49,15 +49,17 @@ describe("ensureDefaultAccounts", () => {
 });
 
 describe("settings", () => {
-  const fake = () => {
-    const upsert = vi.fn().mockResolvedValue({
-      id: 1,
-      currency: "EUR",
-      mankoCategoryId: 7,
-      defaultOutAccountId: 3,
-    });
-    const db = { appSettings: { upsert } } as unknown as Db;
-    return { repo: settingsRepo(db, HID), upsert };
+  const row = {
+    id: 1,
+    currency: "EUR",
+    mankoCategoryId: 7,
+    defaultOutAccountId: 3,
+  };
+  const fake = (existing: typeof row | null = null) => {
+    const upsert = vi.fn().mockResolvedValue(row);
+    const findUnique = vi.fn().mockResolvedValue(existing);
+    const db = { appSettings: { upsert, findUnique } } as unknown as Db;
+    return { repo: settingsRepo(db, HID), upsert, findUnique };
   };
 
   it("get creates the singleton row with defaults when missing", async () => {
@@ -68,6 +70,13 @@ describe("settings", () => {
       create: { householdId: HID },
       update: {},
     });
+  });
+
+  it("get only reads when the row already exists", async () => {
+    const { repo, upsert, findUnique } = fake(row);
+    expect(await repo.get()).toEqual(row);
+    expect(findUnique).toHaveBeenCalledWith({ where: { householdId: HID } });
+    expect(upsert).not.toHaveBeenCalled();
   });
 
   it("update normalizes the currency and only touches given fields", async () => {

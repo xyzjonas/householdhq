@@ -51,13 +51,12 @@ export function householdsRepo(db: RawDb) {
 
     /** The households a user belongs to, by name. */
     async forUser(userId: number): Promise<Household[]> {
-      const rows = await db.membership.findMany({
-        where: { userId },
-        include: { household: true },
+      // Runs on every request, so a single statement: filtering the
+      // households by membership avoids a second query for the relation.
+      const rows = await db.household.findMany({
+        where: { memberships: { some: { userId } } },
       });
-      return rows
-        .map((m) => m.household)
-        .sort((a, b) => a.name.localeCompare(b.name) || a.id - b.id);
+      return rows.sort((a, b) => a.name.localeCompare(b.name) || a.id - b.id);
     },
 
     get: requireHousehold,
