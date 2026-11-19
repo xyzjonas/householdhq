@@ -13,10 +13,10 @@ export interface ChartPoint {
   value: number;
 }
 
-export type FuelChartMode = "distance" | "price" | "yearly";
+export type FuelChartMode = "consumption" | "price" | "yearly";
 
 export const fuelChartModes = (): { id: FuelChartMode; label: string }[] => [
-  { id: "distance", label: m.vehicles_chart_mode_distance() },
+  { id: "consumption", label: m.vehicles_chart_mode_consumption() },
   { id: "price", label: m.vehicles_chart_mode_price() },
   { id: "yearly", label: m.vehicles_chart_mode_yearly() },
 ];
@@ -28,51 +28,66 @@ export function chronological<T extends FuelPoint>(entries: T[]): T[] {
   return [...entries].sort((a, b) => time(a) - time(b));
 }
 
-const monthStart = (value: Date | string) => {
-  const d = new Date(value);
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-};
-
-/** Odometer reading at `at`, interpolated between the surrounding fill-ups. */
-export function odometerAt(sorted: FuelPoint[], at: number): number {
-  const first = sorted[0];
-  const last = sorted[sorted.length - 1];
-  if (!first || !last) return 0;
-  if (at <= time(first)) return first.odometer;
-  if (at >= time(last)) return last.odometer;
-  for (let i = 1; i < sorted.length; i++) {
-    const before = sorted[i - 1];
-    const after = sorted[i];
-    if (at <= time(after)) {
-      const span = time(after) - time(before);
-      if (span <= 0) return after.odometer;
-      const progress = (at - time(before)) / span;
-      return before.odometer + (after.odometer - before.odometer) * progress;
-    }
-  }
-  return last.odometer;
+export interface ConsumptionFill extends FuelPoint {
+  fuelAmount: number;
+  isFullTank: boolean;
 }
 
-/** Odometer at the start of every month from the first to the last fill-up. */
-export function distanceByMonth(
-  entries: FuelPoint[],
-  label: (month: Date) => string,
-): ChartPoint[] {
-  const sorted = chronological(entries);
-  if (!sorted.length) return [];
-  const end = monthStart(sorted[sorted.length - 1].fueledAt);
-  const points: ChartPoint[] = [];
-  for (
-    const cursor = monthStart(sorted[0].fueledAt);
-    cursor <= end;
-    cursor.setMonth(cursor.getMonth() + 1)
-  ) {
-    points.push({
-      label: label(new Date(cursor)),
-      value: odometerAt(sorted, cursor.getTime()),
-    });
+export interface ConsumptionSegment {
+  /** Full tank that closes the segment. */
+  fueledAt: Date | string;
+  /** Litres per 100 km between the previous full tank and this one. */
+  value: number;
+  litres: number;
+  distance: number;
+}
+
+/**
+ * Full-tank to full-tank segments: the fuel put in after one full tank up to
+ * and including the next full tank was burnt over the distance between them.
+ * Part-tank fill-ups are folded into the segment they fall in.
+ */
+export function consumptionSegments(
+  entries: ConsumptionFill[],
+): ConsumptionSegment[] {
+  const segments: ConsumptionSegment[] = [];
+  let base: ConsumptionFill | undefined;
+  let litres = 0;
+  for (const e of chronological(entries)) {
+    if (base) litres += e.fuelAmount;
+    if (!e.isFullTank) continue;
+    const distance = base ? e.odometer - base.odometer : 0;
+    if (base && distance > 0 && litres > 0) {
+      segments.push({
+        fueledAt: e.fueledAt,
+        value: (litres / distance) * 100,
+        litres,
+        distance,
+      });
+    }
+    base = e;
+    litres = 0;
   }
-  return points;
+  return segments;
+}
+
+/** Consumption (l/100 km) of every full-tank segment, oldest first. */
+export function consumptionSeries(
+  entries: ConsumptionFill[],
+  label: (at: Date) => string,
+): ChartPoint[] {
+  return consumptionSegments(entries).map((s) => ({
+    label: label(new Date(s.fueledAt)),
+    value: s.value,
+  }));
+}
+
+/** Average consumption in l/100 km over all full-tank segments; null if none. */
+export function averageConsumption(entries: ConsumptionFill[]): number | null {
+  const segments = consumptionSegments(entries);
+  const distance = segments.reduce((sum, s) => sum + s.distance, 0);
+  if (distance <= 0) return null;
+  return (segments.reduce((sum, s) => sum + s.litres, 0) / distance) * 100;
 }
 
 /** Unit price of every fill-up, oldest first. */

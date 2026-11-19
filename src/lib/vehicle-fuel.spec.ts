@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   averageUnitPrice,
   chronological,
-  distanceByMonth,
+  averageConsumption,
+  consumptionSegments,
   distanceByYear,
-  odometerAt,
   odometerGrowth,
   priceBounds,
   unitPrices,
@@ -30,45 +30,50 @@ describe("chronological", () => {
   });
 });
 
-describe("odometerAt", () => {
-  const sorted = [
-    fill("2026-01-01T00:00", 1000),
-    fill("2026-01-11T00:00", 1500),
-  ];
-  const at = (iso: string) => new Date(iso).getTime();
+describe("consumptionSegments", () => {
+  const tank = (
+    at: string,
+    odometer: number,
+    fuelAmount: number,
+    isFullTank = true,
+  ) => ({ ...fill(at, odometer), fuelAmount, isFullTank });
 
-  it("interpolates between two fill-ups", () => {
-    expect(odometerAt(sorted, at("2026-01-06T00:00"))).toBe(1250);
+  it("measures from one full tank to the next", () => {
+    const segments = consumptionSegments([
+      tank("2026-03-01T00:00", 1700, 35),
+      tank("2026-01-01T00:00", 1000, 40),
+      tank("2026-02-01T00:00", 1400, 28),
+    ]);
+    expect(segments).toHaveLength(2);
+    expect(segments[0].value).toBeCloseTo(7);
+    expect(segments[1].value).toBeCloseTo(11.667);
   });
 
-  it("clamps outside the recorded range", () => {
-    expect(odometerAt(sorted, at("2025-12-01T00:00"))).toBe(1000);
-    expect(odometerAt(sorted, at("2026-02-01T00:00"))).toBe(1500);
+  it("folds part-tank fill-ups into the segment they fall in", () => {
+    const segments = consumptionSegments([
+      tank("2026-01-01T00:00", 1000, 40),
+      tank("2026-01-10T00:00", 1200, 10, false),
+      tank("2026-02-01T00:00", 1500, 25),
+    ]);
+    expect(segments).toHaveLength(1);
+    expect(segments[0].value).toBeCloseTo(7);
   });
 
-  it("is zero without fill-ups", () => {
-    expect(odometerAt([], 0)).toBe(0);
-  });
-});
-
-describe("distanceByMonth", () => {
-  it("has one point per month, from the first to the last fill-up", () => {
-    const points = distanceByMonth(
-      [
-        fill("2026-03-15T00:00", 3000),
-        fill("2026-01-01T00:00", 1000),
-        fill("2026-01-20T00:00", 1200),
-      ],
-      label,
+  it("needs two full tanks", () => {
+    expect(consumptionSegments([tank("2026-01-01T00:00", 1000, 40)])).toEqual(
+      [],
     );
-    expect(points.map((p) => p.label)).toEqual(["2026-1", "2026-2", "2026-3"]);
-    expect(points[0].value).toBe(1000);
-    expect(points[1].value).toBeGreaterThan(1200);
-    expect(points[1].value).toBeLessThan(3000);
+    expect(averageConsumption([])).toBeNull();
   });
 
-  it("is empty without fill-ups", () => {
-    expect(distanceByMonth([], label)).toEqual([]);
+  it("averages weighted by distance", () => {
+    expect(
+      averageConsumption([
+        tank("2026-01-01T00:00", 0, 40),
+        tank("2026-02-01T00:00", 100, 5),
+        tank("2026-03-01T00:00", 400, 30),
+      ]),
+    ).toBeCloseTo(8.75);
   });
 });
 

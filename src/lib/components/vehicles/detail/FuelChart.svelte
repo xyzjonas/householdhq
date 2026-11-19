@@ -4,38 +4,38 @@
   import { formatNumber } from "#lib/format.ts";
   import { intlLocale } from "#lib/i18n.ts";
   import {
-    distanceByMonth,
+    consumptionSeries,
     distanceByYear,
     fuelChartModes,
     unitPrices,
     type ChartPoint,
     type FuelChartMode,
-    type FuelPoint,
+    type ConsumptionFill,
   } from "#lib/vehicle-fuel.ts";
 
   let {
     entries,
     currency,
   }: {
-    entries: FuelPoint[];
+    entries: ConsumptionFill[];
     currency: string;
   } = $props();
 
-  let mode = $state<FuelChartMode>("distance");
+  let mode = $state<FuelChartMode>("consumption");
 
   const W = 480;
   const H = 180;
-  const monthFmt = $derived(
-    new Intl.DateTimeFormat(intlLocale(), {
-      month: "short",
-      year: "2-digit",
-    }),
-  );
   const dayFmt = $derived(
     new Intl.DateTimeFormat(intlLocale(), {
       day: "numeric",
       month: "short",
       year: "2-digit",
+    }),
+  );
+  const consumptionFmt = $derived(
+    new Intl.NumberFormat(intlLocale(), {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
     }),
   );
   const priceFmt = $derived(
@@ -50,13 +50,17 @@
   const series = $derived.by<ChartPoint[]>(() => {
     if (mode === "price") return unitPrices(entries, (d) => dayFmt.format(d));
     if (mode === "yearly") return distanceByYear(entries);
-    return distanceByMonth(entries, (d) => monthFmt.format(d));
+    return consumptionSeries(entries, (d) => dayFmt.format(d));
   });
 
   const format = $derived((v: number) =>
     mode === "price"
       ? m.vehicles_chart_price_value({ price: priceFmt.format(v), currency })
-      : formatNumber(Math.round(v), "km"),
+      : mode === "consumption"
+        ? m.vehicles_chart_consumption_value({
+            value: consumptionFmt.format(v),
+          })
+        : formatNumber(Math.round(v), "km"),
   );
 
   const points = $derived(
@@ -82,7 +86,7 @@
       ? m.vehicles_chart_subtitle_price()
       : mode === "yearly"
         ? m.vehicles_chart_subtitle_yearly()
-        : m.vehicles_chart_subtitle_distance(),
+        : m.vehicles_chart_subtitle_consumption(),
   );
   const ariaLabel = $derived(
     series.length

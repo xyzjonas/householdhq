@@ -2,7 +2,7 @@
 
 ## Git
 
-- each feature is to be started in a worktree and a  new clean feature branch
+- each feature is to be started in a worktree and a new clean feature branch
 - new feature branches should always be based off of the main branch - always freshly fetched
 - implement each change as a semantic commit, push the brancha and open a PR once it is ready
 

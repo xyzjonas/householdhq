@@ -2,12 +2,26 @@
   import { m } from "#paraglide/messages.js";
   import { intlLocale } from "#lib/i18n.ts";
   import { formatMoney, formatNumber } from "#lib/format.ts";
-  import { yearSummary, type YearFill } from "#lib/vehicle-fuel.ts";
+  import {
+    averageConsumption,
+    yearSummary,
+    type ConsumptionFill,
+    type YearFill,
+  } from "#lib/vehicle-fuel.ts";
 
-  let { entries, currency }: { entries: YearFill[]; currency: string } =
-    $props();
+  let {
+    entries,
+    currency,
+  }: { entries: (YearFill & ConsumptionFill)[]; currency: string } = $props();
 
   const summary = $derived(yearSummary(entries));
+  const consumption = $derived(averageConsumption(entries));
+  const consumptionFmt = $derived(
+    new Intl.NumberFormat(intlLocale(), {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }),
+  );
   const perKm = $derived(
     new Intl.NumberFormat(intlLocale(), {
       minimumFractionDigits: 2,
@@ -38,6 +52,23 @@
   <dl
     class="grid grid-cols-2 gap-3 border-t border-surface-200-800 pt-4 text-sm"
   >
+    <div class="col-span-2 flex flex-col gap-1">
+      <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
+        {m.vehicles_summary_avg_consumption()}
+      </dt>
+      <dd class="text-2xl font-extrabold">
+        {consumption === null
+          ? "—"
+          : m.vehicles_chart_consumption_value({
+              value: consumptionFmt.format(consumption),
+            })}
+        {#if consumption === null}
+          <span class="block text-xs font-medium opacity-60">
+            {m.vehicles_summary_consumption_needs_two()}
+          </span>
+        {/if}
+      </dd>
+    </div>
     <div class="flex flex-col gap-1">
       <dt class="text-xs font-bold tracking-wider uppercase opacity-60">
         {m.vehicles_summary_monthly_average()}
