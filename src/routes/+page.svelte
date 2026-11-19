@@ -2,6 +2,7 @@
   import AccountList from "#lib/components/AccountList.svelte";
   import PillarOverview from "#lib/components/accounts/PillarOverview.svelte";
   import BalanceCard from "#lib/components/BalanceCard.svelte";
+  import BudgetAlertsCard from "#lib/components/categories/BudgetAlertsCard.svelte";
   import NewRecordCta from "#lib/components/NewRecordCta.svelte";
   import TransactionList from "#lib/components/TransactionList.svelte";
   import { resolve } from "$app/paths";
@@ -48,6 +49,8 @@
   </section>
 
   <NewRecordCta />
+
+  <BudgetAlertsCard alerts={data.budgetAlerts} />
 
   <section
     aria-labelledby="accounts-heading"

@@ -20,7 +20,6 @@
 
   let { data, form }: PageProps = $props();
 
-  // Budgeting is not implemented in the backend yet: no category has one.
   const items = $derived(buildItems(data.categories));
   const label = $derived(monthLabel(data.month));
 </script>

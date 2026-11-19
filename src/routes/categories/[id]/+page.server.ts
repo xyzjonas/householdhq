@@ -2,6 +2,7 @@ import { error, fail, redirect } from "@sveltejs/kit";
 import { resolve } from "$app/paths";
 import { m } from "#paraglide/messages.js";
 import { hq } from "#lib/server/index.ts";
+import { readBudgetForm } from "#lib/server/budget-form.ts";
 import { ConflictError, NotFoundError } from "#lib/server/core/index.ts";
 import {
   monthKey,
@@ -143,6 +144,22 @@ export const actions: Actions = {
       throw e;
     }
     redirect(303, resolve("/categories"));
+  },
+
+  /** Sets, changes or (when left empty) removes the monthly budget. */
+  setBudget: async ({ params, request, locals }) => {
+    const id = Number(params.id);
+    if (!Number.isInteger(id))
+      return fail(404, { message: m.categories_action_not_found() });
+    const parsed = readBudgetForm(await request.formData());
+    if ("failure" in parsed) return parsed.failure;
+    try {
+      await hq(locals).categories.update(id, { monthlyBudget: parsed.budget });
+    } catch (e) {
+      if (e instanceof NotFoundError) return fail(404, { message: e.message });
+      throw e;
+    }
+    return { budgetSaved: true };
   },
 
   delete: async ({ request, locals }) => {
