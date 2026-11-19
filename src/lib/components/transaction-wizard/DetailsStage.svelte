@@ -5,8 +5,10 @@
   import ToggleRow from "./ToggleRow.svelte";
   import {
     isExpenseLike,
+    type Currency,
     type TransactionType,
     type WizardAccount,
+    type WizardCategory,
     type WizardTag,
   } from "./types";
 
@@ -16,6 +18,11 @@
     suggestions,
     tagOptions,
     fallbackDescription = "",
+    categories,
+    currency,
+    showBasics = false,
+    tape = $bindable(),
+    categoryId = $bindable(),
     sourceId = $bindable(),
     targetId = $bindable(),
     description = $bindable(),
@@ -34,6 +41,13 @@
     tagOptions: WizardTag[];
     /** Used as the description when left empty (the category name). */
     fallbackDescription?: string;
+    categories: WizardCategory[];
+    currency: Currency;
+    /** Repeats the amount and category fields, so edits needn't revisit them. */
+    showBasics?: boolean;
+    /** The amount tape (a plain number once settled). */
+    tape: string;
+    categoryId: number | null;
     sourceId: number | null;
     targetId: number | null;
     description: string;
@@ -68,6 +82,40 @@
 
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-4 rounded-2xl bg-surface-50-950 p-4">
+    {#if showBasics}
+      <label class="label">
+        <span class="wizard-label label-text">{m.wizard_details_amount()}</span>
+        <span class="input-group grid-cols-[1fr_auto]">
+          <input
+            class="ig-input"
+            inputmode="decimal"
+            autocomplete="off"
+            value={tape}
+            oninput={(e) => {
+              // Keep the tape to what the keypad could have produced.
+              tape = e.currentTarget.value
+                .replace(",", ".")
+                .replace(/[^0-9.+-]/g, "");
+              e.currentTarget.value = tape;
+            }}
+            required
+          />
+          <span class="ig-cell preset-tonal">{currency}</span>
+        </span>
+      </label>
+
+      <label class="label">
+        <span class="wizard-label label-text"
+          >{m.wizard_details_category()}</span
+        >
+        <select class="select" bind:value={categoryId} required>
+          {#each categories as c (c.id)}
+            <option value={c.id}>{c.name}</option>
+          {/each}
+        </select>
+      </label>
+    {/if}
+
     <label class="label">
       <span class="wizard-label label-text">{accountLabel}</span>
       <select class="select" name="accountId" bind:value={sourceId} required>

@@ -1526,6 +1526,8 @@
   "wizard_description": "Description",
   "wizard_details_balance": "Balance {balance}",
   "wizard_details_choose_account": "Choose account",
+  "wizard_details_amount": "Amount",
+  "wizard_details_category": "Category",
   "wizard_details_date": "Date",
   "wizard_details_description_merchant": "Description / merchant",
   "wizard_details_hidden_hint": "Hide from standard dashboard metrics",

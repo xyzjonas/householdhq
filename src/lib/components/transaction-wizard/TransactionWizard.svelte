@@ -147,7 +147,10 @@
       : stage === 3
         ? categoryId !== null
         : stage === 4
-          ? sourceId !== null &&
+          ? amount > 0 &&
+            fitsReceipt &&
+            categoryId !== null &&
+            sourceId !== null &&
             transactedAt !== "" &&
             (type !== "TRANSFER" ||
               (targetId !== null && targetId !== sourceId))
@@ -333,6 +336,11 @@
             {suggestions}
             {tagOptions}
             fallbackDescription={category?.name}
+            {categories}
+            {currency}
+            showBasics={editing}
+            bind:tape
+            bind:categoryId
             bind:sourceId={() => sourceId, (id) => (chosenSourceId = id)}
             bind:targetId
             bind:description
