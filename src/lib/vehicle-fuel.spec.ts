@@ -7,6 +7,7 @@ import {
   distanceByYear,
   odometerGrowth,
   priceBounds,
+  rangeStart,
   unitPrices,
   yearSummary,
   type FuelPoint,
@@ -205,5 +206,16 @@ describe("yearSummary", () => {
     ).toBe(null);
     const empty = yearSummary([], now);
     expect(empty).toMatchObject({ fillUps: 0, spent: 0, costPerKm: null });
+  });
+});
+
+describe("rangeStart", () => {
+  const now = new Date(2026, 10, 19);
+  it("starts at the first day of the month N-1 months back", () => {
+    expect(rangeStart("6", now)).toBe(new Date(2026, 5, 1).getTime());
+    expect(rangeStart("12", now)).toBe(new Date(2025, 11, 1).getTime());
+  });
+  it("is unlimited for all", () => {
+    expect(rangeStart("all", now)).toBe(0);
   });
 });

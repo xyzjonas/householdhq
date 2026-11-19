@@ -1,4 +1,5 @@
 import { m } from "#paraglide/messages.js";
+import type { ChartRange } from "#lib/category-detail.ts";
 
 /** Series behind the fuel chart on a vehicle's page. */
 
@@ -20,6 +21,16 @@ export const fuelChartModes = (): { id: FuelChartMode; label: string }[] => [
   { id: "price", label: m.vehicles_chart_mode_price() },
   { id: "yearly", label: m.vehicles_chart_mode_yearly() },
 ];
+
+/** Start of the chart range ("6" / "12" months back from `now`, else no limit) as a timestamp. */
+export function rangeStart(range: ChartRange, now = new Date()): number {
+  if (range === "all") return 0;
+  return new Date(
+    now.getFullYear(),
+    now.getMonth() - Number(range) + 1,
+    1,
+  ).getTime();
+}
 
 const time = (e: FuelPoint) => new Date(e.fueledAt).getTime();
 
@@ -75,11 +86,14 @@ export function consumptionSegments(
 export function consumptionSeries(
   entries: ConsumptionFill[],
   label: (at: Date) => string,
+  since = 0,
 ): ChartPoint[] {
-  return consumptionSegments(entries).map((s) => ({
-    label: label(new Date(s.fueledAt)),
-    value: s.value,
-  }));
+  return consumptionSegments(entries)
+    .filter((s) => new Date(s.fueledAt).getTime() >= since)
+    .map((s) => ({
+      label: label(new Date(s.fueledAt)),
+      value: s.value,
+    }));
 }
 
 /** Average consumption in l/100 km over all full-tank segments; null if none. */
@@ -94,11 +108,14 @@ export function averageConsumption(entries: ConsumptionFill[]): number | null {
 export function unitPrices(
   entries: FuelPoint[],
   label: (at: Date) => string,
+  since = 0,
 ): ChartPoint[] {
-  return chronological(entries).map((e) => ({
-    label: label(new Date(e.fueledAt)),
-    value: e.unitPrice,
-  }));
+  return chronological(entries)
+    .filter((e) => time(e) >= since)
+    .map((e) => ({
+      label: label(new Date(e.fueledAt)),
+      value: e.unitPrice,
+    }));
 }
 
 /**

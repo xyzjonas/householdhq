@@ -1,12 +1,14 @@
 <script lang="ts">
   import { m } from "#paraglide/messages.js";
   import { areaPath, chartPoints, linePath } from "#lib/account-detail.ts";
+  import { chartRanges, type ChartRange } from "#lib/category-detail.ts";
   import { formatNumber } from "#lib/format.ts";
   import { intlLocale } from "#lib/i18n.ts";
   import {
     consumptionSeries,
     distanceByYear,
     fuelChartModes,
+    rangeStart,
     unitPrices,
     type ChartPoint,
     type FuelChartMode,
@@ -21,6 +23,7 @@
     currency: string;
   } = $props();
 
+  let range = $state<ChartRange>("12");
   let mode = $state<FuelChartMode>("consumption");
 
   const W = 480;
@@ -47,10 +50,12 @@
 
   const modes = $derived(fuelChartModes());
 
+  const since = $derived(rangeStart(range));
   const series = $derived.by<ChartPoint[]>(() => {
-    if (mode === "price") return unitPrices(entries, (d) => dayFmt.format(d));
+    if (mode === "price")
+      return unitPrices(entries, (d) => dayFmt.format(d), since);
     if (mode === "yearly") return distanceByYear(entries);
-    return consumptionSeries(entries, (d) => dayFmt.format(d));
+    return consumptionSeries(entries, (d) => dayFmt.format(d), since);
   });
 
   const format = $derived((v: number) =>
@@ -118,23 +123,45 @@
       </h2>
       <p class="text-sm text-surface-600-400">{subtitle}</p>
     </div>
-    <div
-      class="flex flex-wrap gap-1"
-      role="group"
-      aria-label={m.vehicles_chart_type()}
-    >
-      {#each modes as option (option.id)}
-        <button
-          type="button"
-          aria-pressed={option.id === mode}
-          class="btn rounded-full text-xs btn-sm {option.id === mode
-            ? 'preset-filled-surface-950-50'
-            : 'preset-tonal'}"
-          onclick={() => (mode = option.id)}
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div
+        class="flex flex-wrap gap-1"
+        role="group"
+        aria-label={m.vehicles_chart_type()}
+      >
+        {#each modes as option (option.id)}
+          <button
+            type="button"
+            aria-pressed={option.id === mode}
+            class="btn rounded-full text-xs btn-sm {option.id === mode
+              ? 'preset-filled-surface-950-50'
+              : 'preset-tonal'}"
+            onclick={() => (mode = option.id)}
+          >
+            {option.label}
+          </button>
+        {/each}
+      </div>
+      {#if mode !== "yearly"}
+        <div
+          class="flex gap-1"
+          role="group"
+          aria-label={m.categories_chart_range_label()}
         >
-          {option.label}
-        </button>
-      {/each}
+          {#each chartRanges() as r (r.id)}
+            <button
+              type="button"
+              aria-pressed={r.id === range}
+              class="btn rounded-full text-xs btn-sm {r.id === range
+                ? 'preset-filled-surface-950-50'
+                : 'preset-tonal'}"
+              onclick={() => (range = r.id)}
+            >
+              {r.label}
+            </button>
+          {/each}
+        </div>
+      {/if}
     </div>
   </header>
 
