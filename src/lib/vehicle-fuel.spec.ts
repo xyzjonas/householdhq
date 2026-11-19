@@ -2,13 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   averageUnitPrice,
   chronological,
-  distanceByMonth,
+  averageConsumption,
+  consumptionSegments,
   distanceByYear,
-  odometerAt,
   odometerGrowth,
   priceBounds,
+  rangeStart,
   unitPrices,
-  yearSummary,
+  rangeSummary,
   type FuelPoint,
 } from "./vehicle-fuel";
 
@@ -30,45 +31,50 @@ describe("chronological", () => {
   });
 });
 
-describe("odometerAt", () => {
-  const sorted = [
-    fill("2026-01-01T00:00", 1000),
-    fill("2026-01-11T00:00", 1500),
-  ];
-  const at = (iso: string) => new Date(iso).getTime();
+describe("consumptionSegments", () => {
+  const tank = (
+    at: string,
+    odometer: number,
+    fuelAmount: number,
+    isFullTank = true,
+  ) => ({ ...fill(at, odometer), fuelAmount, isFullTank });
 
-  it("interpolates between two fill-ups", () => {
-    expect(odometerAt(sorted, at("2026-01-06T00:00"))).toBe(1250);
+  it("measures from one full tank to the next", () => {
+    const segments = consumptionSegments([
+      tank("2026-03-01T00:00", 1700, 35),
+      tank("2026-01-01T00:00", 1000, 40),
+      tank("2026-02-01T00:00", 1400, 28),
+    ]);
+    expect(segments).toHaveLength(2);
+    expect(segments[0].value).toBeCloseTo(7);
+    expect(segments[1].value).toBeCloseTo(11.667);
   });
 
-  it("clamps outside the recorded range", () => {
-    expect(odometerAt(sorted, at("2025-12-01T00:00"))).toBe(1000);
-    expect(odometerAt(sorted, at("2026-02-01T00:00"))).toBe(1500);
+  it("folds part-tank fill-ups into the segment they fall in", () => {
+    const segments = consumptionSegments([
+      tank("2026-01-01T00:00", 1000, 40),
+      tank("2026-01-10T00:00", 1200, 10, false),
+      tank("2026-02-01T00:00", 1500, 25),
+    ]);
+    expect(segments).toHaveLength(1);
+    expect(segments[0].value).toBeCloseTo(7);
   });
 
-  it("is zero without fill-ups", () => {
-    expect(odometerAt([], 0)).toBe(0);
-  });
-});
-
-describe("distanceByMonth", () => {
-  it("has one point per month, from the first to the last fill-up", () => {
-    const points = distanceByMonth(
-      [
-        fill("2026-03-15T00:00", 3000),
-        fill("2026-01-01T00:00", 1000),
-        fill("2026-01-20T00:00", 1200),
-      ],
-      label,
+  it("needs two full tanks", () => {
+    expect(consumptionSegments([tank("2026-01-01T00:00", 1000, 40)])).toEqual(
+      [],
     );
-    expect(points.map((p) => p.label)).toEqual(["2026-1", "2026-2", "2026-3"]);
-    expect(points[0].value).toBe(1000);
-    expect(points[1].value).toBeGreaterThan(1200);
-    expect(points[1].value).toBeLessThan(3000);
+    expect(averageConsumption([])).toBeNull();
   });
 
-  it("is empty without fill-ups", () => {
-    expect(distanceByMonth([], label)).toEqual([]);
+  it("averages weighted by distance", () => {
+    expect(
+      averageConsumption([
+        tank("2026-01-01T00:00", 0, 40),
+        tank("2026-02-01T00:00", 100, 5),
+        tank("2026-03-01T00:00", 400, 30),
+      ]),
+    ).toBeCloseTo(8.75);
   });
 });
 
@@ -157,8 +163,9 @@ describe("priceBounds", () => {
   });
 });
 
-describe("yearSummary", () => {
+describe("rangeSummary", () => {
   const now = new Date(2026, 3, 15); // April: four months elapsed
+  const yearStart = new Date(2026, 0, 1).getTime();
   const f = (at: Date, odometer: number, fuelAmount: number) => ({
     fueledAt: at,
     odometer,
@@ -167,13 +174,14 @@ describe("yearSummary", () => {
   });
 
   it("sums this year's fuel and spreads it over the elapsed months", () => {
-    const s = yearSummary(
+    const s = rangeSummary(
       [
         f(new Date(2025, 11, 20), 1000, 50), // last year: the baseline
         f(new Date(2026, 0, 10), 1500, 40),
         f(new Date(2026, 2, 10), 2000, 30),
         f(new Date(2026, 5, 1), 9999, 99), // still to come
       ],
+      yearStart,
       now,
     );
     expect(s.fillUps).toBe(2);
@@ -185,8 +193,9 @@ describe("yearSummary", () => {
   });
 
   it("measures from the first fill-up when none precedes the year", () => {
-    const s = yearSummary(
+    const s = rangeSummary(
       [f(new Date(2026, 0, 10), 1000, 40), f(new Date(2026, 1, 10), 1500, 25)],
+      yearStart,
       now,
     );
     expect(s.distance).toBe(500);
@@ -194,11 +203,33 @@ describe("yearSummary", () => {
     expect(s.costPerKm).toBe(2);
   });
 
+  it("spreads over all months since the first fill-up for the full history", () => {
+    const s = rangeSummary(
+      [f(new Date(2026, 0, 10), 1000, 40), f(new Date(2026, 2, 10), 1500, 25)],
+      0,
+      now,
+    );
+    expect(s.spent).toBe(2600);
+    expect(s.monthlyAverage).toBe(650);
+  });
+
   it("has no cost per km without a distance", () => {
     expect(
-      yearSummary([f(new Date(2026, 1, 1), 1000, 40)], now).costPerKm,
+      rangeSummary([f(new Date(2026, 1, 1), 1000, 40)], yearStart, now)
+        .costPerKm,
     ).toBe(null);
-    const empty = yearSummary([], now);
+    const empty = rangeSummary([], yearStart, now);
     expect(empty).toMatchObject({ fillUps: 0, spent: 0, costPerKm: null });
+  });
+});
+
+describe("rangeStart", () => {
+  const now = new Date(2026, 10, 19);
+  it("starts at the first day of the month N-1 months back", () => {
+    expect(rangeStart("6", now)).toBe(new Date(2026, 5, 1).getTime());
+    expect(rangeStart("12", now)).toBe(new Date(2025, 11, 1).getTime());
+  });
+  it("is unlimited for all", () => {
+    expect(rangeStart("all", now)).toBe(0);
   });
 });

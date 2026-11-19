@@ -464,12 +464,31 @@ export function vehiclesRepo(
   };
 
   return {
-    /** Most recently changed first. */
-    list(): Promise<Vehicle[]> {
-      return db.vehicle.findMany({
-        where: { deletedAt: null },
+    /** Most recently active first: edited itself or got a fuel/service entry. */
+    async list(): Promise<Vehicle[]> {
+      const latest = {
         orderBy: { updatedAt: "desc" },
+        take: 1,
+        select: { updatedAt: true },
+      } as const;
+      const rows = await db.vehicle.findMany({
+        where: { deletedAt: null },
+        include: { fuelEntries: latest, serviceEntries: latest },
       });
+      const activity = (v: (typeof rows)[number]) =>
+        Math.max(
+          v.updatedAt.getTime(),
+          v.fuelEntries[0]?.updatedAt.getTime() ?? 0,
+          v.serviceEntries[0]?.updatedAt.getTime() ?? 0,
+        );
+      return rows
+        .sort((a, b) => activity(b) - activity(a) || b.id - a.id)
+        .map((row) => {
+          const vehicle: Partial<typeof row> = { ...row };
+          delete vehicle.fuelEntries;
+          delete vehicle.serviceEntries;
+          return vehicle as Vehicle;
+        });
     },
 
     async get(id: number): Promise<VehicleDetail> {

@@ -1,41 +1,46 @@
 <script lang="ts">
   import { m } from "#paraglide/messages.js";
+  import { SegmentedControl } from "@skeletonlabs/skeleton-svelte";
   import { areaPath, chartPoints, linePath } from "#lib/account-detail.ts";
+  import { chartRanges, type ChartRange } from "#lib/category-detail.ts";
   import { formatNumber } from "#lib/format.ts";
   import { intlLocale } from "#lib/i18n.ts";
   import {
-    distanceByMonth,
+    consumptionSeries,
     distanceByYear,
     fuelChartModes,
+    rangeStart,
     unitPrices,
     type ChartPoint,
     type FuelChartMode,
-    type FuelPoint,
+    type ConsumptionFill,
   } from "#lib/vehicle-fuel.ts";
 
   let {
     entries,
     currency,
+    range = $bindable(),
   }: {
-    entries: FuelPoint[];
+    entries: ConsumptionFill[];
     currency: string;
+    range: ChartRange;
   } = $props();
 
-  let mode = $state<FuelChartMode>("distance");
+  let mode = $state<FuelChartMode>("consumption");
 
   const W = 480;
   const H = 180;
-  const monthFmt = $derived(
-    new Intl.DateTimeFormat(intlLocale(), {
-      month: "short",
-      year: "2-digit",
-    }),
-  );
   const dayFmt = $derived(
     new Intl.DateTimeFormat(intlLocale(), {
       day: "numeric",
       month: "short",
       year: "2-digit",
+    }),
+  );
+  const consumptionFmt = $derived(
+    new Intl.NumberFormat(intlLocale(), {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
     }),
   );
   const priceFmt = $derived(
@@ -47,16 +52,22 @@
 
   const modes = $derived(fuelChartModes());
 
+  const since = $derived(rangeStart(range));
   const series = $derived.by<ChartPoint[]>(() => {
-    if (mode === "price") return unitPrices(entries, (d) => dayFmt.format(d));
+    if (mode === "price")
+      return unitPrices(entries, (d) => dayFmt.format(d), since);
     if (mode === "yearly") return distanceByYear(entries);
-    return distanceByMonth(entries, (d) => monthFmt.format(d));
+    return consumptionSeries(entries, (d) => dayFmt.format(d), since);
   });
 
   const format = $derived((v: number) =>
     mode === "price"
       ? m.vehicles_chart_price_value({ price: priceFmt.format(v), currency })
-      : formatNumber(Math.round(v), "km"),
+      : mode === "consumption"
+        ? m.vehicles_chart_consumption_value({
+            value: consumptionFmt.format(v),
+          })
+        : formatNumber(Math.round(v), "km"),
   );
 
   const points = $derived(
@@ -71,10 +82,12 @@
   const peak = $derived(Math.max(...values));
   const minPoint = $derived(points[values.indexOf(min)]);
   const peakPoint = $derived(points[values.indexOf(peak)]);
-  const last = $derived(points[points.length - 1]);
   const lastValue = $derived(values[values.length - 1]);
   // Dot and label every point while they fit, thin out a long history.
   const dots = $derived(series.length <= 12);
+  // Keep labels at the chart's edges from being cut off.
+  const anchorAt = (x: number) =>
+    x < 40 ? "start" : x > W - 40 ? "end" : "middle";
   const every = $derived(Math.max(1, Math.ceil(series.length / 8)));
 
   const subtitle = $derived(
@@ -82,7 +95,7 @@
       ? m.vehicles_chart_subtitle_price()
       : mode === "yearly"
         ? m.vehicles_chart_subtitle_yearly()
-        : m.vehicles_chart_subtitle_distance(),
+        : m.vehicles_chart_subtitle_consumption(),
   );
   const ariaLabel = $derived(
     series.length
@@ -107,31 +120,33 @@
   aria-labelledby="fuel-chart-heading"
   class="flex flex-col justify-between gap-4 card border border-surface-200-800 p-6"
 >
-  <header class="flex flex-col gap-3">
+  <header class="flex flex-wrap items-start justify-between gap-3">
     <div>
       <h2 id="fuel-chart-heading" class="text-lg font-bold">
         {m.vehicles_chart_heading()}
       </h2>
       <p class="text-sm text-surface-600-400">{subtitle}</p>
     </div>
-    <div
-      class="flex flex-wrap gap-1"
-      role="group"
-      aria-label={m.vehicles_chart_type()}
-    >
-      {#each modes as option (option.id)}
-        <button
-          type="button"
-          aria-pressed={option.id === mode}
-          class="btn rounded-full text-xs btn-sm {option.id === mode
-            ? 'preset-filled-surface-950-50'
-            : 'preset-tonal'}"
-          onclick={() => (mode = option.id)}
-        >
-          {option.label}
-        </button>
-      {/each}
-    </div>
+    {#if mode !== "yearly"}
+      <div
+        class="flex gap-1"
+        role="group"
+        aria-label={m.categories_chart_range_label()}
+      >
+        {#each chartRanges() as r (r.id)}
+          <button
+            type="button"
+            aria-pressed={r.id === range}
+            class="btn rounded-full text-xs btn-sm {r.id === range
+              ? 'preset-filled-surface-950-50'
+              : 'preset-tonal'}"
+            onclick={() => (range = r.id)}
+          >
+            {r.label}
+          </button>
+        {/each}
+      </div>
+    {/if}
   </header>
 
   {#if series.length}
@@ -178,22 +193,20 @@
           </text>
         {/if}
       {/each}
-      {#if peakPoint && peak !== min}
+      {#if peakPoint && minPoint && peak !== min}
         <text
           x={peakPoint.x}
           y={peakPoint.y - 12}
-          text-anchor="middle"
+          text-anchor={anchorAt(peakPoint.x)}
           class="fill-slate-700 text-[11px] font-bold dark:fill-slate-200"
         >
           {format(peak)}
         </text>
-      {/if}
-      {#if minPoint && last && minPoint !== last && peak !== min}
         <text
           x={minPoint.x}
-          y={minPoint.y + 20}
-          text-anchor="middle"
-          class="fill-slate-500 text-[11px]"
+          y={minPoint.y + 18}
+          text-anchor={anchorAt(minPoint.x)}
+          class="fill-slate-700 text-[11px] font-bold dark:fill-slate-200"
         >
           {format(min)}
         </text>
@@ -223,4 +236,20 @@
   {:else}
     <p class="text-sm opacity-70">{m.vehicles_chart_empty()}</p>
   {/if}
+
+  <SegmentedControl
+    value={mode}
+    onValueChange={(e) => (mode = e.value as FuelChartMode)}
+    class="w-full"
+  >
+    <SegmentedControl.Control class="w-full">
+      <SegmentedControl.Indicator />
+      {#each modes as option (option.id)}
+        <SegmentedControl.Item value={option.id} class="flex-1 justify-center">
+          <SegmentedControl.ItemText>{option.label}</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      {/each}
+    </SegmentedControl.Control>
+  </SegmentedControl>
 </section>

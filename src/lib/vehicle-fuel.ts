@@ -1,4 +1,5 @@
 import { m } from "#paraglide/messages.js";
+import type { ChartRange } from "#lib/category-detail.ts";
 
 /** Series behind the fuel chart on a vehicle's page. */
 
@@ -13,13 +14,23 @@ export interface ChartPoint {
   value: number;
 }
 
-export type FuelChartMode = "distance" | "price" | "yearly";
+export type FuelChartMode = "consumption" | "price" | "yearly";
 
 export const fuelChartModes = (): { id: FuelChartMode; label: string }[] => [
-  { id: "distance", label: m.vehicles_chart_mode_distance() },
+  { id: "consumption", label: m.vehicles_chart_mode_consumption() },
   { id: "price", label: m.vehicles_chart_mode_price() },
   { id: "yearly", label: m.vehicles_chart_mode_yearly() },
 ];
+
+/** Start of the chart range ("6" / "12" months back from `now`, else no limit) as a timestamp. */
+export function rangeStart(range: ChartRange, now = new Date()): number {
+  if (range === "all") return 0;
+  return new Date(
+    now.getFullYear(),
+    now.getMonth() - Number(range) + 1,
+    1,
+  ).getTime();
+}
 
 const time = (e: FuelPoint) => new Date(e.fueledAt).getTime();
 
@@ -28,62 +39,88 @@ export function chronological<T extends FuelPoint>(entries: T[]): T[] {
   return [...entries].sort((a, b) => time(a) - time(b));
 }
 
-const monthStart = (value: Date | string) => {
-  const d = new Date(value);
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-};
-
-/** Odometer reading at `at`, interpolated between the surrounding fill-ups. */
-export function odometerAt(sorted: FuelPoint[], at: number): number {
-  const first = sorted[0];
-  const last = sorted[sorted.length - 1];
-  if (!first || !last) return 0;
-  if (at <= time(first)) return first.odometer;
-  if (at >= time(last)) return last.odometer;
-  for (let i = 1; i < sorted.length; i++) {
-    const before = sorted[i - 1];
-    const after = sorted[i];
-    if (at <= time(after)) {
-      const span = time(after) - time(before);
-      if (span <= 0) return after.odometer;
-      const progress = (at - time(before)) / span;
-      return before.odometer + (after.odometer - before.odometer) * progress;
-    }
-  }
-  return last.odometer;
+export interface ConsumptionFill extends FuelPoint {
+  fuelAmount: number;
+  isFullTank: boolean;
 }
 
-/** Odometer at the start of every month from the first to the last fill-up. */
-export function distanceByMonth(
-  entries: FuelPoint[],
-  label: (month: Date) => string,
-): ChartPoint[] {
-  const sorted = chronological(entries);
-  if (!sorted.length) return [];
-  const end = monthStart(sorted[sorted.length - 1].fueledAt);
-  const points: ChartPoint[] = [];
-  for (
-    const cursor = monthStart(sorted[0].fueledAt);
-    cursor <= end;
-    cursor.setMonth(cursor.getMonth() + 1)
-  ) {
-    points.push({
-      label: label(new Date(cursor)),
-      value: odometerAt(sorted, cursor.getTime()),
-    });
+export interface ConsumptionSegment {
+  /** Full tank that closes the segment. */
+  fueledAt: Date | string;
+  /** Litres per 100 km between the previous full tank and this one. */
+  value: number;
+  litres: number;
+  distance: number;
+}
+
+/**
+ * Full-tank to full-tank segments: the fuel put in after one full tank up to
+ * and including the next full tank was burnt over the distance between them.
+ * Part-tank fill-ups are folded into the segment they fall in.
+ */
+export function consumptionSegments(
+  entries: ConsumptionFill[],
+): ConsumptionSegment[] {
+  const segments: ConsumptionSegment[] = [];
+  let base: ConsumptionFill | undefined;
+  let litres = 0;
+  for (const e of chronological(entries)) {
+    if (base) litres += e.fuelAmount;
+    if (!e.isFullTank) continue;
+    const distance = base ? e.odometer - base.odometer : 0;
+    if (base && distance > 0 && litres > 0) {
+      segments.push({
+        fueledAt: e.fueledAt,
+        value: (litres / distance) * 100,
+        litres,
+        distance,
+      });
+    }
+    base = e;
+    litres = 0;
   }
-  return points;
+  return segments;
+}
+
+/** Consumption (l/100 km) of every full-tank segment, oldest first. */
+export function consumptionSeries(
+  entries: ConsumptionFill[],
+  label: (at: Date) => string,
+  since = 0,
+): ChartPoint[] {
+  return consumptionSegments(entries)
+    .filter((s) => new Date(s.fueledAt).getTime() >= since)
+    .map((s) => ({
+      label: label(new Date(s.fueledAt)),
+      value: s.value,
+    }));
+}
+
+/** Average consumption in l/100 km over all full-tank segments; null if none. */
+export function averageConsumption(
+  entries: ConsumptionFill[],
+  since = 0,
+): number | null {
+  const segments = consumptionSegments(entries).filter(
+    (s) => new Date(s.fueledAt).getTime() >= since,
+  );
+  const distance = segments.reduce((sum, s) => sum + s.distance, 0);
+  if (distance <= 0) return null;
+  return (segments.reduce((sum, s) => sum + s.litres, 0) / distance) * 100;
 }
 
 /** Unit price of every fill-up, oldest first. */
 export function unitPrices(
   entries: FuelPoint[],
   label: (at: Date) => string,
+  since = 0,
 ): ChartPoint[] {
-  return chronological(entries).map((e) => ({
-    label: label(new Date(e.fueledAt)),
-    value: e.unitPrice,
-  }));
+  return chronological(entries)
+    .filter((e) => time(e) >= since)
+    .map((e) => ({
+      label: label(new Date(e.fueledAt)),
+      value: e.unitPrice,
+    }));
 }
 
 /**
@@ -134,50 +171,58 @@ export interface YearFill extends FuelPoint {
   fuelAmount: number;
 }
 
-export interface YearSummary {
-  year: number;
+export interface RangeSummary {
   fillUps: number;
-  /** Fuel bought so far this year. */
+  /** Fuel bought within the range. */
   spent: number;
-  /** `spent` spread over the months elapsed, the current one included. */
+  /** `spent` spread over the months the range covers. */
   monthlyAverage: number;
-  /** Kilometres between the last fill-up before the year (else its first) and the latest. */
+  /** Kilometres between the last fill-up before the range (else its first) and the latest. */
   distance: number;
   /** Fuel cost per kilometre driven; null while no distance is known. */
   costPerKm: number | null;
 }
 
 /**
- * Fuel spending of the calendar year of `now`, up to `now`. A fill-up pays
- * for the distance since the one before it, so the per-km cost leaves out the
- * fill-up the distance is measured from.
+ * Fuel spending from `since` (a timestamp, 0 for everything) up to `now`. A
+ * fill-up pays for the distance since the one before it, so the per-km cost
+ * leaves out the fill-up the distance is measured from.
  */
-export function yearSummary(
+export function rangeSummary(
   entries: YearFill[],
+  since = 0,
   now = new Date(),
-): YearSummary {
-  const year = now.getFullYear();
+): RangeSummary {
   const sorted = chronological(entries);
-  const yearStart = new Date(year, 0, 1).getTime();
-  const inYear = sorted.filter(
-    (e) => time(e) >= yearStart && time(e) <= now.getTime(),
+  const inRange = sorted.filter(
+    (e) => time(e) >= since && time(e) <= now.getTime(),
   );
   const cost = (list: YearFill[]) =>
     list.reduce((sum, e) => sum + e.fuelAmount * e.unitPrice, 0);
 
-  const spent = cost(inYear);
-  const before = sorted.filter((e) => time(e) < yearStart).at(-1);
-  const baseline = before ?? inYear[0];
-  const latest = inYear.at(-1);
+  const spent = cost(inRange);
+  const before = sorted.filter((e) => time(e) < since).at(-1);
+  const baseline = before ?? inRange[0];
+  const latest = inRange.at(-1);
   const distance =
     baseline && latest ? Math.max(latest.odometer - baseline.odometer, 0) : 0;
-  const paying = inYear.filter((e) => e !== baseline);
+  const paying = inRange.filter((e) => e !== baseline);
+
+  // Months covered, the current one included; a young vehicle counts from its first fill-up.
+  const first = sorted[0];
+  const from = new Date(Math.max(since, first ? time(first) : now.getTime()));
+  const months = Math.max(
+    (now.getFullYear() - from.getFullYear()) * 12 +
+      now.getMonth() -
+      from.getMonth() +
+      1,
+    1,
+  );
 
   return {
-    year,
-    fillUps: inYear.length,
+    fillUps: inRange.length,
     spent,
-    monthlyAverage: spent / (now.getMonth() + 1),
+    monthlyAverage: spent / months,
     distance,
     costPerKm: distance > 0 ? cost(paying) / distance : null,
   };

@@ -5,6 +5,7 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import { formatDateTime, formatMoney, formatNumber } from "#lib/format.ts";
   import type { FuelEntry } from "#lib/server/core/types.ts";
+  import type { ChartRange } from "#lib/category-detail.ts";
   import FuelChart from "./FuelChart.svelte";
   import FuelSummary from "./FuelSummary.svelte";
   import Timeline from "./Timeline.svelte";
@@ -22,13 +23,15 @@
     onedit: (entry: FuelEntry) => void;
     onadd: () => void;
   } = $props();
+
+  let range = $state<ChartRange>("12");
 </script>
 
 <div class="flex flex-col gap-6">
   {#if entries.length}
     <div class="grid gap-6 lg:grid-cols-2">
-      <FuelSummary {entries} {currency} />
-      <FuelChart {entries} {currency} />
+      <FuelSummary {entries} {currency} {range} />
+      <FuelChart {entries} {currency} bind:range />
     </div>
   {/if}
 

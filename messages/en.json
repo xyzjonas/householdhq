@@ -1255,19 +1255,20 @@
   "vehicles_breadcrumb_home": "Home",
   "vehicles_breadcrumb_label": "Breadcrumb",
   "vehicles_breadcrumb_total": "Vehicles ({count} total)",
+  "vehicles_chart_consumption_value": "{value} l/100 km",
   "vehicles_chart_aria": "{mode}, {from} to {to}: {points}",
   "vehicles_chart_aria_point": "{label} {value}",
   "vehicles_chart_empty": "Not enough fill-ups to chart yet.",
   "vehicles_chart_heading": "Fuel statistics",
   "vehicles_chart_latest": "Latest",
   "vehicles_chart_min": "Min",
-  "vehicles_chart_mode_distance": "Distance by date",
+  "vehicles_chart_mode_consumption": "Avg fuel consumption",
   "vehicles_chart_mode_price": "Price by date",
   "vehicles_chart_mode_yearly": "Distance by year",
   "vehicles_chart_no_data": "No fuel data",
   "vehicles_chart_peak": "Peak",
   "vehicles_chart_price_value": "{price} {currency}/L",
-  "vehicles_chart_subtitle_distance": "Odometer at the start of each month",
+  "vehicles_chart_subtitle_consumption": "Litres per 100 km, full tank to full tank",
   "vehicles_chart_subtitle_price": "Unit price of every fill-up",
   "vehicles_chart_subtitle_yearly": "Distance driven per year",
   "vehicles_chart_type": "Chart type",
@@ -1443,19 +1444,25 @@
   "vehicles_service_type_fees": "Fees",
   "vehicles_service_type_regular_maintenance": "Regular maintenance",
   "vehicles_service_type_upgrade": "Upgrade",
+  "vehicles_summary_avg_consumption": "Average fuel consumption",
+  "vehicles_summary_consumption_needs_two": "Needs two full-tank fill-ups",
   "vehicles_summary_cost_per_km": "{price} {currency} / km",
   "vehicles_summary_distance": "Over {distance} driven",
-  "vehicles_summary_heading": "Spent on fuel in {year}",
+  "vehicles_summary_heading": "Spent on fuel",
   "vehicles_summary_monthly_average": "Monthly average",
   "vehicles_summary_needs_two": "Needs two fill-ups",
   "vehicles_summary_price_per_km": "Average price per km",
   "vehicles_summary_so_far": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "input range",
+        "local countPlural = count: plural"
+      ],
       "selectors": ["countPlural"],
       "match": {
-        "countPlural=one": "So far this year · {count} fill-up",
-        "countPlural=other": "So far this year · {count} fill-ups"
+        "countPlural=one": "{range} · {count} fill-up",
+        "countPlural=other": "{range} · {count} fill-ups"
       }
     }
   ],
