@@ -85,9 +85,9 @@
     {#if showBasics}
       <label class="label">
         <span class="wizard-label label-text">{m.wizard_details_amount()}</span>
-        <span class="input-group grid-cols-[1fr_auto]">
+        <span class="field-group grid-cols-[1fr_auto]">
           <input
-            class="ig-input"
+            class="input"
             inputmode="decimal"
             autocomplete="off"
             value={tape}
@@ -100,7 +100,7 @@
             }}
             required
           />
-          <span class="ig-cell preset-tonal">{currency}</span>
+          <span class="label preset-tonal">{currency}</span>
         </span>
       </label>
 
