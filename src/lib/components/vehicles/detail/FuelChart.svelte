@@ -82,10 +82,12 @@
   const peak = $derived(Math.max(...values));
   const minPoint = $derived(points[values.indexOf(min)]);
   const peakPoint = $derived(points[values.indexOf(peak)]);
-  const last = $derived(points[points.length - 1]);
   const lastValue = $derived(values[values.length - 1]);
   // Dot and label every point while they fit, thin out a long history.
   const dots = $derived(series.length <= 12);
+  // Keep labels at the chart's edges from being cut off.
+  const anchorAt = (x: number) =>
+    x < 40 ? "start" : x > W - 40 ? "end" : "middle";
   const every = $derived(Math.max(1, Math.ceil(series.length / 8)));
 
   const subtitle = $derived(
@@ -191,22 +193,20 @@
           </text>
         {/if}
       {/each}
-      {#if peakPoint && peak !== min}
+      {#if peakPoint && minPoint && peak !== min}
         <text
           x={peakPoint.x}
           y={peakPoint.y - 12}
-          text-anchor="middle"
+          text-anchor={anchorAt(peakPoint.x)}
           class="fill-slate-700 text-[11px] font-bold dark:fill-slate-200"
         >
           {format(peak)}
         </text>
-      {/if}
-      {#if minPoint && last && minPoint !== last && peak !== min}
         <text
           x={minPoint.x}
-          y={minPoint.y + 20}
-          text-anchor="middle"
-          class="fill-slate-500 text-[11px]"
+          y={minPoint.y + 18}
+          text-anchor={anchorAt(minPoint.x)}
+          class="fill-slate-700 text-[11px] font-bold dark:fill-slate-200"
         >
           {format(min)}
         </text>
