@@ -1580,6 +1580,8 @@
   "wizard_description": "Popis",
   "wizard_details_balance": "Zůstatek {balance}",
   "wizard_details_choose_account": "Vyberte účet",
+  "wizard_details_amount": "Částka",
+  "wizard_details_category": "Kategorie",
   "wizard_details_date": "Datum",
   "wizard_details_description_merchant": "Popis / obchodník",
   "wizard_details_hidden_hint": "Skrýt ze standardních metrik přehledu",

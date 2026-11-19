@@ -29,7 +29,7 @@
 
   <section
     aria-labelledby="balances-heading"
-    class="no-scrollbar -mx-4 flex touch-pan-x snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto overscroll-x-contain px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible sm:px-0"
+    class="no-scrollbar -mx-4 flex touch-pan-x touch-pan-y snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto overscroll-x-contain px-4 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible sm:px-0"
   >
     <h2 id="balances-heading" class="sr-only">{m.dashboard_balances()}</h2>
     <BalanceCard
