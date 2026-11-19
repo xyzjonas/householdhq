@@ -9,7 +9,7 @@ import {
   priceBounds,
   rangeStart,
   unitPrices,
-  yearSummary,
+  rangeSummary,
   type FuelPoint,
 } from "./vehicle-fuel";
 
@@ -163,8 +163,9 @@ describe("priceBounds", () => {
   });
 });
 
-describe("yearSummary", () => {
+describe("rangeSummary", () => {
   const now = new Date(2026, 3, 15); // April: four months elapsed
+  const yearStart = new Date(2026, 0, 1).getTime();
   const f = (at: Date, odometer: number, fuelAmount: number) => ({
     fueledAt: at,
     odometer,
@@ -173,13 +174,14 @@ describe("yearSummary", () => {
   });
 
   it("sums this year's fuel and spreads it over the elapsed months", () => {
-    const s = yearSummary(
+    const s = rangeSummary(
       [
         f(new Date(2025, 11, 20), 1000, 50), // last year: the baseline
         f(new Date(2026, 0, 10), 1500, 40),
         f(new Date(2026, 2, 10), 2000, 30),
         f(new Date(2026, 5, 1), 9999, 99), // still to come
       ],
+      yearStart,
       now,
     );
     expect(s.fillUps).toBe(2);
@@ -191,8 +193,9 @@ describe("yearSummary", () => {
   });
 
   it("measures from the first fill-up when none precedes the year", () => {
-    const s = yearSummary(
+    const s = rangeSummary(
       [f(new Date(2026, 0, 10), 1000, 40), f(new Date(2026, 1, 10), 1500, 25)],
+      yearStart,
       now,
     );
     expect(s.distance).toBe(500);
@@ -200,11 +203,22 @@ describe("yearSummary", () => {
     expect(s.costPerKm).toBe(2);
   });
 
+  it("spreads over all months since the first fill-up for the full history", () => {
+    const s = rangeSummary(
+      [f(new Date(2026, 0, 10), 1000, 40), f(new Date(2026, 2, 10), 1500, 25)],
+      0,
+      now,
+    );
+    expect(s.spent).toBe(2600);
+    expect(s.monthlyAverage).toBe(650);
+  });
+
   it("has no cost per km without a distance", () => {
     expect(
-      yearSummary([f(new Date(2026, 1, 1), 1000, 40)], now).costPerKm,
+      rangeSummary([f(new Date(2026, 1, 1), 1000, 40)], yearStart, now)
+        .costPerKm,
     ).toBe(null);
-    const empty = yearSummary([], now);
+    const empty = rangeSummary([], yearStart, now);
     expect(empty).toMatchObject({ fillUps: 0, spent: 0, costPerKm: null });
   });
 });

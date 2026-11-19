@@ -1,5 +1,6 @@
 <script lang="ts">
   import { m } from "#paraglide/messages.js";
+  import { SegmentedControl } from "@skeletonlabs/skeleton-svelte";
   import { areaPath, chartPoints, linePath } from "#lib/account-detail.ts";
   import { chartRanges, type ChartRange } from "#lib/category-detail.ts";
   import { formatNumber } from "#lib/format.ts";
@@ -18,12 +19,13 @@
   let {
     entries,
     currency,
+    range = $bindable(),
   }: {
     entries: ConsumptionFill[];
     currency: string;
+    range: ChartRange;
   } = $props();
 
-  let range = $state<ChartRange>("12");
   let mode = $state<FuelChartMode>("consumption");
 
   const W = 480;
@@ -116,53 +118,33 @@
   aria-labelledby="fuel-chart-heading"
   class="flex flex-col justify-between gap-4 card border border-surface-200-800 p-6"
 >
-  <header class="flex flex-col gap-3">
+  <header class="flex flex-wrap items-start justify-between gap-3">
     <div>
       <h2 id="fuel-chart-heading" class="text-lg font-bold">
         {m.vehicles_chart_heading()}
       </h2>
       <p class="text-sm text-surface-600-400">{subtitle}</p>
     </div>
-    <div class="flex flex-wrap items-center justify-between gap-3">
+    {#if mode !== "yearly"}
       <div
-        class="flex flex-wrap gap-1"
+        class="flex gap-1"
         role="group"
-        aria-label={m.vehicles_chart_type()}
+        aria-label={m.categories_chart_range_label()}
       >
-        {#each modes as option (option.id)}
+        {#each chartRanges() as r (r.id)}
           <button
             type="button"
-            aria-pressed={option.id === mode}
-            class="btn rounded-full text-xs btn-sm {option.id === mode
+            aria-pressed={r.id === range}
+            class="btn rounded-full text-xs btn-sm {r.id === range
               ? 'preset-filled-surface-950-50'
               : 'preset-tonal'}"
-            onclick={() => (mode = option.id)}
+            onclick={() => (range = r.id)}
           >
-            {option.label}
+            {r.label}
           </button>
         {/each}
       </div>
-      {#if mode !== "yearly"}
-        <div
-          class="flex gap-1"
-          role="group"
-          aria-label={m.categories_chart_range_label()}
-        >
-          {#each chartRanges() as r (r.id)}
-            <button
-              type="button"
-              aria-pressed={r.id === range}
-              class="btn rounded-full text-xs btn-sm {r.id === range
-                ? 'preset-filled-surface-950-50'
-                : 'preset-tonal'}"
-              onclick={() => (range = r.id)}
-            >
-              {r.label}
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </div>
+    {/if}
   </header>
 
   {#if series.length}
@@ -254,4 +236,20 @@
   {:else}
     <p class="text-sm opacity-70">{m.vehicles_chart_empty()}</p>
   {/if}
+
+  <SegmentedControl
+    value={mode}
+    onValueChange={(e) => (mode = e.value as FuelChartMode)}
+    class="w-full"
+  >
+    <SegmentedControl.Control class="w-full">
+      <SegmentedControl.Indicator />
+      {#each modes as option (option.id)}
+        <SegmentedControl.Item value={option.id} class="flex-1 justify-center">
+          <SegmentedControl.ItemText>{option.label}</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      {/each}
+    </SegmentedControl.Control>
+  </SegmentedControl>
 </section>

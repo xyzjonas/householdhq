@@ -97,8 +97,13 @@ export function consumptionSeries(
 }
 
 /** Average consumption in l/100 km over all full-tank segments; null if none. */
-export function averageConsumption(entries: ConsumptionFill[]): number | null {
-  const segments = consumptionSegments(entries);
+export function averageConsumption(
+  entries: ConsumptionFill[],
+  since = 0,
+): number | null {
+  const segments = consumptionSegments(entries).filter(
+    (s) => new Date(s.fueledAt).getTime() >= since,
+  );
   const distance = segments.reduce((sum, s) => sum + s.distance, 0);
   if (distance <= 0) return null;
   return (segments.reduce((sum, s) => sum + s.litres, 0) / distance) * 100;
@@ -166,50 +171,58 @@ export interface YearFill extends FuelPoint {
   fuelAmount: number;
 }
 
-export interface YearSummary {
-  year: number;
+export interface RangeSummary {
   fillUps: number;
-  /** Fuel bought so far this year. */
+  /** Fuel bought within the range. */
   spent: number;
-  /** `spent` spread over the months elapsed, the current one included. */
+  /** `spent` spread over the months the range covers. */
   monthlyAverage: number;
-  /** Kilometres between the last fill-up before the year (else its first) and the latest. */
+  /** Kilometres between the last fill-up before the range (else its first) and the latest. */
   distance: number;
   /** Fuel cost per kilometre driven; null while no distance is known. */
   costPerKm: number | null;
 }
 
 /**
- * Fuel spending of the calendar year of `now`, up to `now`. A fill-up pays
- * for the distance since the one before it, so the per-km cost leaves out the
- * fill-up the distance is measured from.
+ * Fuel spending from `since` (a timestamp, 0 for everything) up to `now`. A
+ * fill-up pays for the distance since the one before it, so the per-km cost
+ * leaves out the fill-up the distance is measured from.
  */
-export function yearSummary(
+export function rangeSummary(
   entries: YearFill[],
+  since = 0,
   now = new Date(),
-): YearSummary {
-  const year = now.getFullYear();
+): RangeSummary {
   const sorted = chronological(entries);
-  const yearStart = new Date(year, 0, 1).getTime();
-  const inYear = sorted.filter(
-    (e) => time(e) >= yearStart && time(e) <= now.getTime(),
+  const inRange = sorted.filter(
+    (e) => time(e) >= since && time(e) <= now.getTime(),
   );
   const cost = (list: YearFill[]) =>
     list.reduce((sum, e) => sum + e.fuelAmount * e.unitPrice, 0);
 
-  const spent = cost(inYear);
-  const before = sorted.filter((e) => time(e) < yearStart).at(-1);
-  const baseline = before ?? inYear[0];
-  const latest = inYear.at(-1);
+  const spent = cost(inRange);
+  const before = sorted.filter((e) => time(e) < since).at(-1);
+  const baseline = before ?? inRange[0];
+  const latest = inRange.at(-1);
   const distance =
     baseline && latest ? Math.max(latest.odometer - baseline.odometer, 0) : 0;
-  const paying = inYear.filter((e) => e !== baseline);
+  const paying = inRange.filter((e) => e !== baseline);
+
+  // Months covered, the current one included; a young vehicle counts from its first fill-up.
+  const first = sorted[0];
+  const from = new Date(Math.max(since, first ? time(first) : now.getTime()));
+  const months = Math.max(
+    (now.getFullYear() - from.getFullYear()) * 12 +
+      now.getMonth() -
+      from.getMonth() +
+      1,
+    1,
+  );
 
   return {
-    year,
-    fillUps: inYear.length,
+    fillUps: inRange.length,
     spent,
-    monthlyAverage: spent / (now.getMonth() + 1),
+    monthlyAverage: spent / months,
     distance,
     costPerKm: distance > 0 ? cost(paying) / distance : null,
   };

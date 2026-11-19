@@ -1448,17 +1448,21 @@
   "vehicles_summary_consumption_needs_two": "Needs two full-tank fill-ups",
   "vehicles_summary_cost_per_km": "{price} {currency} / km",
   "vehicles_summary_distance": "Over {distance} driven",
-  "vehicles_summary_heading": "Spent on fuel in {year}",
+  "vehicles_summary_heading": "Spent on fuel",
   "vehicles_summary_monthly_average": "Monthly average",
   "vehicles_summary_needs_two": "Needs two fill-ups",
   "vehicles_summary_price_per_km": "Average price per km",
   "vehicles_summary_so_far": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "input range",
+        "local countPlural = count: plural"
+      ],
       "selectors": ["countPlural"],
       "match": {
-        "countPlural=one": "So far this year · {count} fill-up",
-        "countPlural=other": "So far this year · {count} fill-ups"
+        "countPlural=one": "{range} · {count} fill-up",
+        "countPlural=other": "{range} · {count} fill-ups"
       }
     }
   ],

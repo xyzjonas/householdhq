@@ -1498,19 +1498,23 @@
   "vehicles_summary_consumption_needs_two": "Vyžaduje dvě tankování do plna",
   "vehicles_summary_cost_per_km": "{price} {currency} / km",
   "vehicles_summary_distance": "Při ujetých {distance}",
-  "vehicles_summary_heading": "Za palivo utraceno v roce {year}",
+  "vehicles_summary_heading": "Za palivo utraceno",
   "vehicles_summary_monthly_average": "Měsíční průměr",
   "vehicles_summary_needs_two": "Vyžaduje dvě tankování",
   "vehicles_summary_price_per_km": "Průměrná cena za km",
   "vehicles_summary_so_far": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "input range",
+        "local countPlural = count: plural"
+      ],
       "selectors": ["countPlural"],
       "match": {
-        "countPlural=one": "Od začátku roku · {count} tankování",
-        "countPlural=few": "Od začátku roku · {count} tankování",
-        "countPlural=many": "Od začátku roku · {count} tankování",
-        "countPlural=other": "Od začátku roku · {count} tankování"
+        "countPlural=one": "{range} · {count} tankování",
+        "countPlural=few": "{range} · {count} tankování",
+        "countPlural=many": "{range} · {count} tankování",
+        "countPlural=other": "{range} · {count} tankování"
       }
     }
   ],
