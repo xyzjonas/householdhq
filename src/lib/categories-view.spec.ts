@@ -11,6 +11,7 @@ import {
   shiftMonth,
   sortItems,
   unbudgeted,
+  budgetAlerts,
 } from "./categories-view";
 
 let id = 0;
@@ -19,6 +20,7 @@ const cat = (
   spent: number,
   received = 0,
   description: string | null = null,
+  monthlyBudget: number | null = null,
 ): CategoryWithActivity => ({
   id: ++id,
   householdId: 1,
@@ -26,6 +28,7 @@ const cat = (
   description,
   icon: null,
   color: null,
+  monthlyBudget,
   spent,
   received,
 });
@@ -51,18 +54,17 @@ describe("buildItems", () => {
   });
 
   it("applies the threshold colours when a budget exists", () => {
-    const budgets = new Map([
-      [categories[0].id, 8_000], // 68%
-      [categories[1].id, 18_500], // 100%
+    const [groceries, mortgage] = buildItems([
+      { ...categories[0], monthlyBudget: 8_000 }, // 68%
+      { ...categories[1], monthlyBudget: 18_500 }, // 100%
     ]);
-    const [groceries, mortgage] = buildItems(categories, budgets);
     expect(groceries).toMatchObject({ consumptionPct: 68, status: "ok" });
     expect(mortgage).toMatchObject({ consumptionPct: 100, status: "over" });
   });
 
   it("flags 80–99% as warning", () => {
-    const c = cat("Bus", 550);
-    expect(buildItems([c], new Map([[c.id, 600]]))[0].status).toBe("warn");
+    const c = cat("Bus", 550, 0, null, 600);
+    expect(buildItems([c])[0].status).toBe("warn");
   });
 });
 
@@ -107,8 +109,10 @@ describe("runRate", () => {
   });
 
   it("compares spend with budget over budgeted categories only", () => {
-    const budgets = new Map([[categories[0].id, 10_000]]);
-    expect(runRate(buildItems(categories, budgets))).toMatchObject({
+    const budgeted = [{ ...categories[0], monthlyBudget: 10_000 }];
+    expect(
+      runRate(buildItems([...budgeted, ...categories.slice(1)])),
+    ).toMatchObject({
       totalBudget: 10_000,
       pct: 54,
       status: "ok",
@@ -138,7 +142,7 @@ describe("burnConcentration", () => {
 });
 
 describe("unbudgeted", () => {
-  it("lists every spending category while budgets are undefined", () => {
+  it("lists every spending category without a budget", () => {
     expect(unbudgeted(buildItems(categories)).map((i) => i.name)).toEqual([
       "Groceries",
       "Mortgage",
@@ -162,5 +166,21 @@ describe("months", () => {
     expect(shiftMonth("2026-01", -1)).toBe("2025-12");
     expect(shiftMonth("2026-12", 1)).toBe("2027-01");
     expect(monthLabel("2026-11")).toBe("November 2026");
+  });
+});
+
+describe("budgetAlerts", () => {
+  it("keeps budgets at 90% or more, the most exhausted first", () => {
+    const alerts = budgetAlerts("category", [
+      cat("Fine", 800, 0, null, 1_000), // 80%
+      cat("Close", 900, 0, null, 1_000), // 90%
+      cat("Over", 1_500, 0, null, 1_000), // 150%
+      cat("No budget", 9_999),
+      cat("Income", 0, 5_000, null, 1_000),
+    ]);
+    expect(alerts.map((a) => [a.name, a.pct, a.status, a.kind])).toEqual([
+      ["Over", 150, "over", "category"],
+      ["Close", 90, "warn", "category"],
+    ]);
   });
 });

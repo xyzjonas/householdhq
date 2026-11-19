@@ -7,7 +7,7 @@ export type TagItem = CategoryItem & {
   entries: number;
 };
 
-/** Tags have no budgets, so only the activity of the month is shown. */
+/** Tags with the activity of the month and, when set, their budget. */
 export function buildTagItems(tags: TagWithActivity[]): TagItem[] {
   const items = buildItems(tags);
   return items.map((item, i) => ({ ...item, entries: tags[i].entries }));

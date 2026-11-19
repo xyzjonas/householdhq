@@ -60,11 +60,15 @@ export const sourceTypes = [
   "DEBT",
 ] as const;
 
+/** A monthly spending limit: a positive amount, or null/undefined for none. */
+const monthlyBudget = z.number().positive().finite().nullish();
+
 export const CategoryInput = z.object({
   name: z.string().trim().min(1),
   description: optionalText,
   icon: optionalText,
   color: optionalText,
+  monthlyBudget,
 });
 export type CategoryInput = z.infer<typeof CategoryInput>;
 export const CategoryPatch = CategoryInput.partial();
@@ -75,6 +79,7 @@ export const TagInput = z.object({
   description: optionalText,
   icon: optionalText,
   color: optionalText,
+  monthlyBudget,
 });
 export type TagInput = z.infer<typeof TagInput>;
 export const TagPatch = TagInput.partial();

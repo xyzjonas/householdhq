@@ -295,6 +295,19 @@ describe.skipIf(!core)("core layer", () => {
       const updated = await c.categories.update(created.id, { color: "#fff" });
       expect(updated.color).toBe("#fff");
 
+      expect(created.monthlyBudget).toBeNull();
+      const budgeted = await c.categories.update(created.id, {
+        monthlyBudget: 5000,
+      });
+      expect(budgeted.monthlyBudget).toBe(5000);
+      await expect(
+        c.categories.update(created.id, { monthlyBudget: 0 }),
+      ).rejects.toThrow();
+      const cleared = await c.categories.update(created.id, {
+        monthlyBudget: null,
+      });
+      expect(cleared.monthlyBudget).toBeNull();
+
       await c.categories.remove(created.id);
       await expect(c.categories.get(created.id)).rejects.toBeInstanceOf(
         NotFoundError,
@@ -447,6 +460,15 @@ describe.skipIf(!core)("core layer", () => {
 
       const updated = await c.tags.update(created.id, { color: "#fff" });
       expect(updated.color).toBe("#fff");
+
+      expect(created.monthlyBudget).toBeNull();
+      expect(
+        (await c.tags.update(created.id, { monthlyBudget: 250 })).monthlyBudget,
+      ).toBe(250);
+      expect(
+        (await c.tags.update(created.id, { monthlyBudget: null }))
+          .monthlyBudget,
+      ).toBeNull();
       expect((await c.tags.list()).map((t) => t.id)).toContain(created.id);
 
       await c.tags.remove(created.id);

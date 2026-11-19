@@ -11,8 +11,8 @@ generator client {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
+  id       Int    @id @default(autoincrement())
+  email    String @unique
   password String
 
   /// The only role for now: may manage users. The first account is one.
@@ -67,12 +67,14 @@ model Session {
 }
 
 model Category {
-  id          Int     @id @default(autoincrement())
-  householdId Int     @default(0)
-  name        String
-  description String?
-  icon        String?
-  color       String?
+  id            Int     @id @default(autoincrement())
+  householdId   Int     @default(0)
+  name          String
+  description   String?
+  icon          String?
+  color         String?
+  /// Optional monthly spending limit; null means no budget.
+  monthlyBudget Float?
 
   transactions Transaction[]
   vehicle      Vehicle?      @relation("VehicleCategory")
@@ -85,12 +87,14 @@ model Category {
 }
 
 model Tag {
-  id          Int     @id @default(autoincrement())
-  householdId Int     @default(0)
-  name        String
-  description String?
-  icon        String?
-  color       String?
+  id            Int     @id @default(autoincrement())
+  householdId   Int     @default(0)
+  name          String
+  description   String?
+  icon          String?
+  color         String?
+  /// Optional monthly spending limit; null means no budget.
+  monthlyBudget Float?
 
   parentId  Int?
   parentTag Tag?  @relation("TagHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
