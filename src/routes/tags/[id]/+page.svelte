@@ -1,6 +1,7 @@
 <script lang="ts">
   import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
+  import BudgetCard from "#lib/components/categories/detail/BudgetCard.svelte";
   import CategoryEntries from "#lib/components/categories/detail/CategoryEntries.svelte";
   import CategoryGlyph from "#lib/components/categories/CategoryGlyph.svelte";
   import CategoryProperties from "#lib/components/categories/detail/CategoryProperties.svelte";
@@ -11,7 +12,13 @@
   import { viewQuery, type DetailView } from "#lib/category-detail.ts";
   import type { PageProps } from "./$types";
 
-  let { data }: PageProps = $props();
+  let { data, form }: PageProps = $props();
+
+  const budgetMessage = $derived(
+    form && "budgetMessage" in form && typeof form.budgetMessage === "string"
+      ? form.budgetMessage
+      : "",
+  );
 
   /** Query string of this page with some view state replaced. */
   const queryFor = (changes: Partial<DetailView> = {}) =>
@@ -58,18 +65,27 @@
   </header>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-    <SpendingHero
-      month={data.month}
-      previousMonth={data.previousMonth}
-      nextMonth={data.nextMonth}
-      route="/tags/[id]"
-      id={data.tag.id}
-      {queryFor}
-      spent={data.spent}
-      delta={data.delta}
-      average={data.average}
-      entryCount={data.monthEntryCount}
-    />
+    <div class="flex flex-col gap-6">
+      <SpendingHero
+        month={data.month}
+        previousMonth={data.previousMonth}
+        nextMonth={data.nextMonth}
+        route="/tags/[id]"
+        id={data.tag.id}
+        {queryFor}
+        spent={data.spent}
+        delta={data.delta}
+        average={data.average}
+        entryCount={data.monthEntryCount}
+      />
+      <BudgetCard
+        name={data.tag.name}
+        month={data.month}
+        budget={data.tag.monthlyBudget ?? undefined}
+        spent={data.spent}
+        message={budgetMessage}
+      />
+    </div>
     <SpendingChart
       series={data.series}
       incomeSeries={data.incomeSeries}

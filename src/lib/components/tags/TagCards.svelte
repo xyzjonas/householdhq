@@ -3,6 +3,8 @@
   import { resolve } from "$app/paths";
   import { formatMoney } from "#lib/format.ts";
   import type { TagItem } from "#lib/tags-view.ts";
+  import BudgetBadge from "../categories/BudgetBadge.svelte";
+  import BudgetMeter from "../categories/BudgetMeter.svelte";
   import CategoryGlyph from "../categories/CategoryGlyph.svelte";
 
   let { items }: { items: TagItem[] } = $props();
@@ -26,22 +28,35 @@
                   {item.name}
                 </a>
               </h3>
-              <p class="text-xs text-slate-500">
+              <p
+                class="flex flex-wrap items-center gap-2 text-xs text-slate-500"
+              >
                 {m.tags_entries_count({ count: item.entries })}
+                <BudgetBadge pct={item.consumptionPct} status={item.status} />
               </p>
             </div>
           </div>
-          <p
-            class="shrink-0 text-right text-base font-bold tabular-nums {item.isInflow
-              ? 'text-emerald-600'
-              : 'text-surface-950-50'}"
-          >
-            {item.isInflow ? "+" : ""}{formatMoney(item.amount)}
+          <p class="shrink-0 text-right">
+            <span
+              class="block text-base font-bold tabular-nums {item.isInflow
+                ? 'text-emerald-600'
+                : 'text-surface-950-50'}"
+            >
+              {item.isInflow ? "+" : ""}{formatMoney(item.amount)}
+            </span>
+            {#if item.budget !== undefined}
+              <span class="block text-xs text-slate-500 tabular-nums">
+                {m.categories_card_of_budget({
+                  amount: formatMoney(item.budget),
+                })}
+              </span>
+            {/if}
           </p>
         </div>
         {#if item.subtitle}
           <p class="text-xs wrap-anywhere text-slate-400">{item.subtitle}</p>
         {/if}
+        <BudgetMeter pct={item.consumptionPct} status={item.status} />
       </article>
     </li>
   {:else}

@@ -9,6 +9,7 @@ const tag = (over: Partial<TagWithActivity>): TagWithActivity => ({
   description: null,
   icon: null,
   color: null,
+  monthlyBudget: null,
   parentId: null,
   spent: 0,
   received: 0,
@@ -32,9 +33,18 @@ describe("buildTagItems", () => {
     expect(unused).toMatchObject({ amount: 0, entries: 0 });
   });
 
-  it("never has a budget", () => {
+  it("has no budget unless one is set", () => {
     const [item] = buildTagItems([tag({ spent: 100 })]);
     expect(item.budget).toBeUndefined();
     expect(item.status).toBe("none");
+  });
+
+  it("tracks spending against the monthly budget", () => {
+    const [item] = buildTagItems([tag({ spent: 450, monthlyBudget: 500 })]);
+    expect(item).toMatchObject({
+      budget: 500,
+      consumptionPct: 90,
+      status: "warn",
+    });
   });
 });

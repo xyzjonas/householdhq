@@ -1,3 +1,4 @@
+import { budgetAlerts, monthKey, monthRange } from "#lib/categories-view.ts";
 import { fiscalIntervalAt } from "#lib/fiscal-interval.ts";
 import { hq } from "#lib/server/index.ts";
 import { availableToSpend } from "#lib/upcoming.ts";
@@ -9,7 +10,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   const settings = await core.settings.get();
   const interval = fiscalIntervalAt(now, settings.fiscalIntervalStartDay);
 
-  const [accounts, recent, upcoming] = await Promise.all([
+  const month = monthRange(monthKey(now));
+
+  const [accounts, recent, upcoming, categories, tags] = await Promise.all([
     core.accounts.listWithBalances(),
     // Completed transactions are shown regardless of the interval; pending
     // ones, overdue or not, wait in the upcoming section instead.
@@ -20,6 +23,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     }),
     // Upcoming ones stop at the end of the current interval.
     core.transactions.upcoming(interval.end),
+    // Budgets are monthly, so they follow the calendar month.
+    core.categories.listWithActivity(month),
+    core.tags.listWithActivity(month),
   ]);
   const balances = await core.accounts.balances(accounts);
   return {
@@ -29,6 +35,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     interval,
     availableToSpend: availableToSpend(balances.liquid, upcoming),
     upcoming,
+    budgetAlerts: [
+      ...budgetAlerts("category", categories),
+      ...budgetAlerts("tag", tags),
+    ].sort((a, b) => b.pct - a.pct),
     transactions: recent.items,
   };
 };

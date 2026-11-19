@@ -1,6 +1,9 @@
 import { m } from "#paraglide/messages.js";
 import { intlLocale } from "#lib/i18n.ts";
-import type { CategoryWithActivity } from "#lib/server/core/types.ts";
+import type {
+  CategoryWithActivity,
+  TagWithActivity,
+} from "#lib/server/core/types.ts";
 
 /** <80% healthy, 80–99% near the cap, >=100% over; none without a budget. */
 export type BudgetStatus = "none" | "ok" | "warn" | "over";
@@ -14,10 +17,7 @@ export interface CategoryItem {
   /** Spent, or received for inflow categories. */
   amount: number;
   isInflow: boolean;
-  /**
-   * Monthly budget. Budgeting is not implemented in the backend yet and even
-   * then not every category will have one, so `undefined` is the default.
-   */
+  /** Monthly budget; `undefined` when none is set (it is optional). */
   budget?: number;
   /** Share of the budget used; `undefined` while there is no budget. */
   consumptionPct?: number;
@@ -61,13 +61,12 @@ export function consumption(
 }
 
 export function buildItems(
-  categories: CategoryWithActivity[],
-  budgets: ReadonlyMap<number, number> = new Map(),
+  categories: (CategoryWithActivity | TagWithActivity)[],
 ): CategoryItem[] {
   return categories.map((c) => {
     const isInflow = c.received > c.spent;
     const amount = isInflow ? c.received : c.spent;
-    const budget = budgets.get(c.id);
+    const budget = c.monthlyBudget ?? undefined;
     const consumptionPct = isInflow ? undefined : consumption(amount, budget);
     return {
       id: c.id,
@@ -226,4 +225,57 @@ export function monthLabel(key: string): string {
     year: "numeric",
     timeZone: "UTC",
   }).format(monthRange(key).from);
+}
+
+/**
+ * Parses a budget typed into a form: a positive amount, `null` when left
+ * empty (no budget) and `undefined` when it is not a usable amount.
+ */
+export function parseBudget(
+  value: FormDataEntryValue | null,
+): number | null | undefined {
+  const text = typeof value === "string" ? value.trim().replace(",", ".") : "";
+  if (text === "") return null;
+  const amount = Number(text);
+  return Number.isFinite(amount) && amount > 0 ? amount : undefined;
+}
+
+/** Share of a budget at which the dashboard starts to flag it. */
+export const BUDGET_ALERT_PCT = 90;
+
+/** A budget that is (nearly) used up, for the dashboard. */
+export interface BudgetAlert {
+  kind: "category" | "tag";
+  id: number;
+  name: string;
+  budget: number;
+  spent: number;
+  pct: number;
+  status: BudgetStatus;
+}
+
+/** Budgeted entries at or beyond `BUDGET_ALERT_PCT`, the most exhausted first. */
+export function budgetAlerts(
+  kind: BudgetAlert["kind"],
+  records: (CategoryWithActivity | TagWithActivity)[],
+): BudgetAlert[] {
+  return buildItems(records)
+    .flatMap((i) =>
+      i.budget !== undefined &&
+      i.consumptionPct !== undefined &&
+      i.consumptionPct >= BUDGET_ALERT_PCT
+        ? [
+            {
+              kind,
+              id: i.id,
+              name: i.name,
+              budget: i.budget,
+              spent: i.amount,
+              pct: i.consumptionPct,
+              status: i.status,
+            },
+          ]
+        : [],
+    )
+    .sort((a, b) => b.pct - a.pct);
 }
