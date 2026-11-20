@@ -183,4 +183,16 @@ describe("budgetAlerts", () => {
       ["Close", 90, "warn", "category"],
     ]);
   });
+
+  it("honours a custom threshold", () => {
+    const records = [
+      cat("Fine", 800, 0, null, 1_000), // 80%
+      cat("Close", 900, 0, null, 1_000), // 90%
+    ];
+    expect(budgetAlerts("category", records, 80).map((a) => a.name)).toEqual([
+      "Close",
+      "Fine",
+    ]);
+    expect(budgetAlerts("category", records, 100)).toEqual([]);
+  });
 });

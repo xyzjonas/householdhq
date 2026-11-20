@@ -343,6 +343,11 @@ export const SettingsInput = z.object({
     .number()
     .int({ error: () => m.core_settings_choose_account() })
     .positive({ error: () => m.core_settings_choose_account() }),
+  budgetAlertPct: z.coerce
+    .number()
+    .int({ error: () => m.core_settings_pct_whole() })
+    .min(1, { error: () => m.core_settings_pct_range() })
+    .max(100, { error: () => m.core_settings_pct_range() }),
   /** Module keys; stored as a normalised comma-separated list. */
   enabledModules: z.array(z.string()).transform(serializeEnabledModules),
 });
