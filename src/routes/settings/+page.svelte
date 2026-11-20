@@ -1,6 +1,7 @@
 <script lang="ts">
   import { m } from "#paraglide/messages.js";
   import { resolve } from "$app/paths";
+  import BudgetAlertForm from "#lib/components/settings/BudgetAlertForm.svelte";
   import CurrencyForm from "#lib/components/settings/CurrencyForm.svelte";
   import FiscalIntervalForm from "#lib/components/settings/FiscalIntervalForm.svelte";
   import DefaultOutAccountForm from "#lib/components/settings/DefaultOutAccountForm.svelte";
@@ -59,6 +60,15 @@
     accounts={data.outAccounts}
     message={form && "defaultOutMessage" in form ? form.defaultOutMessage : ""}
     saved={form !== null && "defaultOutSaved" in form}
+  />
+
+  <BudgetAlertForm
+    pct={data.settings.budgetAlertPct}
+    currency={data.settings.currency}
+    message={form && "budgetAlertMessage" in form
+      ? form.budgetAlertMessage
+      : ""}
+    saved={form !== null && "budgetAlertSaved" in form}
   />
 
   <ModulesForm enabled={data.enabledModules} />

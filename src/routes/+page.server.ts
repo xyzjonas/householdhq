@@ -36,8 +36,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     availableToSpend: availableToSpend(balances.liquid, upcoming),
     upcoming,
     budgetAlerts: [
-      ...budgetAlerts("category", categories),
-      ...budgetAlerts("tag", tags),
+      ...budgetAlerts("category", categories, settings.budgetAlertPct),
+      ...budgetAlerts("tag", tags, settings.budgetAlertPct),
     ].sort((a, b) => b.pct - a.pct),
     transactions: recent.items,
   };

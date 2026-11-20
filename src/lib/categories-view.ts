@@ -240,8 +240,8 @@ export function parseBudget(
   return Number.isFinite(amount) && amount > 0 ? amount : undefined;
 }
 
-/** Share of a budget at which the dashboard starts to flag it. */
-export const BUDGET_ALERT_PCT = 90;
+/** Share of a budget (in percent) at which the dashboard flags it by default. */
+export const DEFAULT_BUDGET_ALERT_PCT = 90;
 
 /** A budget that is (nearly) used up, for the dashboard. */
 export interface BudgetAlert {
@@ -254,16 +254,17 @@ export interface BudgetAlert {
   status: BudgetStatus;
 }
 
-/** Budgeted entries at or beyond `BUDGET_ALERT_PCT`, the most exhausted first. */
+/** Budgeted entries at or beyond `thresholdPct`, the most exhausted first. */
 export function budgetAlerts(
   kind: BudgetAlert["kind"],
   records: (CategoryWithActivity | TagWithActivity)[],
+  thresholdPct: number = DEFAULT_BUDGET_ALERT_PCT,
 ): BudgetAlert[] {
   return buildItems(records)
     .flatMap((i) =>
       i.budget !== undefined &&
       i.consumptionPct !== undefined &&
-      i.consumptionPct >= BUDGET_ALERT_PCT
+      i.consumptionPct >= thresholdPct
         ? [
             {
               kind,

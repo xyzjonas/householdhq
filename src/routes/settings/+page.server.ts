@@ -81,6 +81,20 @@ export const actions: Actions = {
     return { success: true };
   },
 
+  budgetAlert: async ({ request, locals }) => {
+    const parsed = SettingsInput.pick({ budgetAlertPct: true }).safeParse({
+      budgetAlertPct: (await request.formData()).get("budgetAlertPct"),
+    });
+    if (!parsed.success) {
+      return fail(400, {
+        budgetAlertMessage:
+          parsed.error.issues[0]?.message ?? m.settings_budget_alert_invalid(),
+      });
+    }
+    await hq(locals).settings.update(parsed.data);
+    return { budgetAlertSaved: true };
+  },
+
   defaultOut: async ({ request, locals }) => {
     const parsed = SettingsInput.pick({ defaultOutAccountId: true }).safeParse({
       defaultOutAccountId: (await request.formData()).get(
