@@ -1,6 +1,6 @@
 import { m } from "#paraglide/messages.js";
 import { Prisma } from "@prisma/client";
-import { shiftCheckpoints } from "./balance";
+import { shiftCheckpoints, shiftCheckpointsForRemoval } from "./balance";
 import type { Db } from "./prisma";
 import { requireAccounts, requireCategories } from "./refs";
 import {
@@ -436,7 +436,14 @@ export function transactionsRepo(db: Db, householdId: number) {
         throw new ConflictError(m.core_transaction_belongs_to_vehicle_entry());
       }
       try {
-        await db.transaction.delete({ where: { id } });
+        // The deletion and the checkpoint corrections land together or not at all.
+        await db.$transaction(async (tx) => {
+          const removed = await tx.transaction.findUniqueOrThrow({
+            where: { id },
+          });
+          await tx.transaction.delete({ where: { id } });
+          await shiftCheckpointsForRemoval(tx, removed);
+        });
       } catch (e) {
         if (
           e instanceof Prisma.PrismaClientKnownRequestError &&

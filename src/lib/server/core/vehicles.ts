@@ -1,6 +1,10 @@
 import { m } from "#paraglide/messages.js";
 import { Prisma } from "@prisma/client";
-import { roundMoney } from "./balance";
+import {
+  roundMoney,
+  shiftCheckpoints,
+  shiftCheckpointsForRemoval,
+} from "./balance";
 import type { Db } from "./prisma";
 import { requireCategories } from "./refs";
 import {
@@ -23,6 +27,30 @@ import {
   type VehicleComponent,
   type VehicleDetail,
 } from "./types";
+
+/**
+ * Edits the transaction behind a fuel/service entry and keeps balance
+ * checkpoints truthful, exactly as editing it directly would.
+ */
+async function updateEntryTransaction(
+  tx: Prisma.TransactionClient,
+  id: number,
+  data: Prisma.TransactionUpdateInput,
+): Promise<void> {
+  const before = await tx.transaction.findUniqueOrThrow({ where: { id } });
+  const after = await tx.transaction.update({ where: { id }, data });
+  await shiftCheckpoints(tx, before, after);
+}
+
+/** Deletes the transaction behind an entry, correcting checkpoints. */
+async function removeEntryTransaction(
+  tx: Prisma.TransactionClient,
+  id: number,
+): Promise<void> {
+  const removed = await tx.transaction.findUniqueOrThrow({ where: { id } });
+  await tx.transaction.delete({ where: { id } });
+  await shiftCheckpointsForRemoval(tx, removed);
+}
 
 /** What the vehicle pages show of an entry's transaction. */
 const transactionSummary = {
@@ -252,13 +280,10 @@ export function vehiclesRepo(
       );
 
       return db.$transaction(async (tx) => {
-        await tx.transaction.update({
-          where: { id: current.transactionId },
-          data: {
-            transactedAt: fueledAt,
-            amount: roundMoney(fuelAmount * unitPrice),
-            confirmed: fueledAt <= new Date(),
-          },
+        await updateEntryTransaction(tx, current.transactionId, {
+          transactedAt: fueledAt,
+          amount: roundMoney(fuelAmount * unitPrice),
+          confirmed: fueledAt <= new Date(),
         });
         return tx.vehicleFuelEntry.update({
           where: { id: entryId },
@@ -294,7 +319,7 @@ export function vehiclesRepo(
           },
         });
         await tx.vehicleFuelEntry.delete({ where: { id: entryId } });
-        await tx.transaction.delete({ where: { id: current.transactionId } });
+        await removeEntryTransaction(tx, current.transactionId);
       });
     },
   };
@@ -377,14 +402,11 @@ export function vehiclesRepo(
 
       return db.$transaction(async (tx) => {
         const servicedAt = patch.servicedAt ?? current.servicedAt;
-        await tx.transaction.update({
-          where: { id: current.transactionId },
-          data: {
-            transactedAt: servicedAt,
-            confirmed: servicedAt <= new Date(),
-            ...(patch.title ? { description: `Service: ${patch.title}` } : {}),
-            ...(price !== undefined ? { amount: roundMoney(price ?? 0) } : {}),
-          },
+        await updateEntryTransaction(tx, current.transactionId, {
+          transactedAt: servicedAt,
+          confirmed: servicedAt <= new Date(),
+          ...(patch.title ? { description: `Service: ${patch.title}` } : {}),
+          ...(price !== undefined ? { amount: roundMoney(price ?? 0) } : {}),
         });
         return tx.vehicleServiceEntry.update({
           where: { id: entryId },
@@ -412,7 +434,7 @@ export function vehiclesRepo(
           data: { components: { set: [] } },
         });
         await tx.vehicleServiceEntry.delete({ where: { id: entryId } });
-        await tx.transaction.delete({ where: { id: current.transactionId } });
+        await removeEntryTransaction(tx, current.transactionId);
       });
     },
   };

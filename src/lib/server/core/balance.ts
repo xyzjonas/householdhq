@@ -123,3 +123,15 @@ export async function shiftCheckpoints(
     }
   }
 }
+
+/**
+ * `shiftCheckpoints` for a transaction that is about to be deleted: it stops
+ * counting, so the checkpoints at or after it lose its effect. Call it with
+ * the row as it was, in the same database transaction as the deletion.
+ */
+export function shiftCheckpointsForRemoval(
+  db: CheckpointWriter,
+  removed: BalanceEffect,
+): Promise<void> {
+  return shiftCheckpoints(db, removed, { ...removed, cancelled: true });
+}
